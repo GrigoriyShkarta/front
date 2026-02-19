@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--space-bg);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--space-primary);
+  --color-primary-hover: var(--space-primary-hover);
+  --color-primary-bg: var(--space-primary-bg);
+  --color-secondary: var(--space-secondary);
+  --color-secondary-hover: var(--space-secondary-hover);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --space-bg: #ffffff;
+  --space-primary: #2563eb;
+  --space-primary-hover: #1d4ed8;
+  --background: var(--space-bg);
+  --foreground: #171717;
+  
+  /* Auth Gradients */
+  --auth-bg: linear-gradient(135deg, #f0f2f5 0%, #ffffff 100%);
+  --auth-orb-1: rgba(59, 130, 246, 0.1);
+  --auth-orb-2: rgba(168, 85, 247, 0.1);
+  --auth-card-bg: rgba(255, 255, 255, 0.7);
+  --auth-card-border: rgba(255, 255, 255, 0.5);
+}
+
+[data-mantine-color-scheme="dark"] {
+  --foreground: #ededed;
+
+  /* Auth Gradients */
+  --auth-bg: linear-gradient(135deg, #09090b 0%, #18181b 100%);
+  --auth-orb-1: rgba(59, 130, 246, 0.2);
+  --auth-orb-2: rgba(168, 85, 247, 0.2);
+  --auth-card-bg: rgba(24, 24, 27, 0.7);
+  --auth-card-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* Glassmorphism for Mantine components */
+.mantine-Input-input {
+  background-color: var(--space-input-bg) !important;
+  border-color: var(--space-secondary) !important;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.mantine-Input-input:focus {
+  border-color: var(--space-primary) !important;
+  box-shadow: 0 0 0 2px rgba(var(--space-primary-rgb), 0.1);
+}
+
+.mantine-Button-root[data-variant="filled"], 
+.mantine-ActionIcon-root[data-variant="filled"],
+.mantine-Badge-root[data-variant="filled"],
+.bg-primary, 
+.bg-primary-hover {
+  background: var(--space-primary-bg) !important;
+  border: none !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease !important;
+}
+
+.mantine-Button-root[data-variant="filled"]:hover,
+.mantine-ActionIcon-root[data-variant="filled"]:hover,
+.bg-primary:hover,
+.bg-primary-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.1);
+}
+
+.text-gradient-primary {
+  background: var(--space-primary-bg);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.space-bg-dynamic {
+  background: var(--space-bg);
+  background-attachment: fixed;
+}
+
+/* Custom scrollbar for premium look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--space-secondary);
+  border-radius: 10px;
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--space-primary);
+}

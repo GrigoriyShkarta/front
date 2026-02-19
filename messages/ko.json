@@ -1,0 +1,29 @@
+{
+  "Auth": {
+    "login": {
+      "title": "Welcome back!",
+      "no_account": "Do not have an account yet?",
+      "create_account": "Create account",
+      "email_label": "Email",
+      "password_label": "Password",
+      "submit": "Sign in",
+      "error_generic": "An error occurred during login",
+      "error_wrong_credentials": "Incorrect email or password"
+    },
+    "register": {
+      "title": "Create an account",
+      "has_account": "Already have an account?",
+      "login_link": "Login",
+      "name_label": "Name",
+      "email_label": "Email",
+      "password_label": "Password",
+      "submit": "Register",
+      "error_generic": "An error occurred during registration"
+    },
+    "validation": {
+      "required": "Required",
+      "email_invalid": "Invalid email",
+      "password_min": "Password must be at least 6 characters"
+    }
+  }
+}

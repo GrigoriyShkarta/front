@@ -1,0 +1,642 @@
+{
+  "Common": {
+    "upgrade_plan": "Upgrade Plan",
+    "pricing_title": "Pricing Plans",
+    "upgrade_modal": {
+      "title": "Premium Feature",
+      "description": "This look is incredible! Upgrade your plan so your users can see this design too.",
+      "button": "View Pricing",
+      "button_cancel": "Cancel"
+    },
+    "search": "Search",
+    "success": "Success",
+    "error": "Error",
+    "edit": "Edit",
+    "view": "View",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "show": "Show",
+    "per_page": "per page",
+    "delete_selected": "Delete Selected",
+    "user_created_success": "User has been successfully created!",
+    "user_created_error": "Failed to create user.",
+    "user_updated_success": "User has been successfully updated!",
+    "user_updated_error": "Failed to update user.",
+    "user_deleted_success": "User has been successfully deleted!",
+    "user_deleted_error": "Failed to delete user.",
+    "users_deleted_success": "Selected users have been successfully deleted!",
+    "users_deleted_error": "Failed to delete selected users.",
+    "errors": {
+      "required": "This field is required",
+      "invalid_email": "Invalid email address",
+      "password_too_short": "Password must be at least 6 characters",
+      "current_password_invalid": "The current password you entered is incorrect",
+      "email_already_exists": "A user with this email already exists",
+      "invalid_color": "Invalid color format"
+    },
+    "roles": {
+      "super_admin": "Super Admin",
+      "admin": "Admin",
+      "teacher": "Teacher",
+      "student": "Student"
+    },
+    "filters": "Filters",
+    "additional": "Additional",
+    "apply": "Apply",
+    "clear": "Clear",
+    "minutes": "min",
+    "ok": "OK",
+    "items": "items"
+  },
+  "Auth": {
+    "login": {
+      "title": "Welcome back!",
+      "no_account": "Do not have an account yet?",
+      "create_account": "Create account",
+      "email_label": "Email",
+      "password_label": "Password",
+      "submit": "Sign in",
+      "error_generic": "An error occurred during login",
+      "error_wrong_credentials": "Incorrect email or password"
+    },
+    "register": {
+      "title": "Create an account",
+      "has_account": "Already have an account?",
+      "login_link": "Login",
+      "name_label": "Name",
+      "email_label": "Email",
+      "password_label": "Password",
+      "submit": "Register",
+      "error_generic": "An error occurred during registration"
+    },
+    "validation": {
+      "required": "Required",
+      "email_invalid": "Invalid email",
+      "password_min": "Password must be at least 6 characters"
+    }
+  },
+  "Navigation": {
+    "users": "Users Management",
+    "profile": "My Profile",
+    "personalization": "Personalization",
+    "materials": "Materials",
+    "audio": "Audio",
+    "photo": "Photo",
+    "video": "Video",
+    "file": "Files",
+    "lessons": "Lessons",
+    "courses": "Courses",
+    "tests": "Tests",
+    "categories": "Categories",
+    "theme": "Theme",
+    "languages": "Languages",
+    "dashboard": "Dashboard",
+    "select_language": "Select Language",
+    "logout": "Logout",
+    "logout_confirm_title": "Confirm Logout",
+    "logout_confirm_message": "Are you sure you want to log out?",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "Personalization": {
+    "success": "Success",
+    "error": "Error",
+    "title": "Personalization",
+    "description": "Customize the look and feel of your platform.",
+    "space_details_title": "Space Details",
+    "space_details_description": "Change how your platform identifies itself.",
+    "title_space_label": "Space Name",
+    "icon_label": "Logo",
+    "upload_logo": "Upload Logo",
+    "remove_logo": "Remove",
+    "visual_style_title": "Visual Style",
+    "visual_style_description": "Customize colors and theme settings.",
+    "primary_color_label": "Primary Color",
+    "secondary_color_label": "Secondary Color",
+    "bg_color_label": "Background Color",
+    "dark_theme_label": "Enable dark theme",
+    "dark_theme_description": "Allow users to switch to dark mode.",
+    "bg_color_dark_label": "Dark Mode Background",
+    "languages_title": "Languages",
+    "languages_description": "Select supported languages for your platform.",
+    "languages_label": "Supported Languages",
+    "save_button": "Save Changes",
+    "save_success": "Changes saved successfully!",
+    "save_error": "Failed to save changes",
+    "success_title": "Success",
+    "error_title": "Error",
+    "solid_colors": "Solid Colors",
+    "gradients": "Gradients",
+    "sidebar_text_color_label": "Sidebar text color",
+    "sidebar_text_color_description": "Choose text color for sidebar navigation.",
+    "sidebar_color_white": "White",
+    "sidebar_color_black": "Black",
+    "premium": "Premium",
+    "enter_space_name": "Enter space name",
+    "select_languages_placeholder": "Select languages",
+    "custom_color": "Custom Color",
+    "build_gradient": "Build Gradient",
+    "gradient_builder": "Gradient Builder",
+    "colors_count": "Colors",
+    "color_start": "Start",
+    "color_end": "End",
+    "color_stop": "Stop",
+    "add_color_stop": "Add Color Stop",
+    "angle": "Angle",
+    "apply_gradient": "Apply Gradient",
+    "custom_gradient": "Custom Gradient",
+    "enter_hex": "Enter HEX",
+    "font_family_label": "Font",
+    "font_title": "Typography",
+    "font_description": "Choose a font that reflects your brand's personality and ensures great readability.",
+    "is_show_sidebar_icon_label": "Show sidebar icon"
+  },
+  "Users": {
+    "title": "Users Base",
+    "add_button": "Add User",
+    "table": {
+      "user": "User",
+      "email": "Email",
+      "role": "Role",
+      "attached_to": "Attached to",
+      "categories": "Categories",
+      "actions": "Actions"
+    },
+    "cropper": {
+      "title": "Edit Avatar",
+      "zoom": "Zoom"
+    },
+    "filters": {
+      "search_placeholder": "Search users...",
+      "role_placeholder": "Filter by role",
+      "all_roles": "All roles"
+    },
+    "drawer": {
+      "add_title": "Add New User",
+      "edit_title": "Edit User"
+    },
+    "form": {
+      "avatar": "Avatar",
+      "upload": "Upload",
+      "name": "Name",
+      "name_placeholder": "Enter full name",
+      "email": "Email",
+      "email_placeholder": "Enter email address",
+      "password": "Password",
+      "password_placeholder": "Enter password",
+      "role": "Role",
+      "attached_to": "Attached to / Teacher",
+      "select_teacher": "Select a teacher",
+      "categories": "Categories",
+      "create_category": "Create Category",
+      "categories_placeholder": "Select categories"
+    },
+    "delete_modal": {
+      "title": "Confirm Deletion",
+      "description": "Are you sure you want to delete this user? This action cannot be undone.",
+      "bulk_description": "Are you sure you want to delete selected users? This action cannot be undone."
+    }
+  },
+  "Profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your personal information and security settings",
+    "update_success": "Profile updated successfully!",
+    "update_error": "Failed to update profile",
+    "password_success": "Password changed successfully!",
+    "password_error": "Failed to change password",
+    "avatar_hint": "JPG or PNG, max 2MB",
+    "security_title": "Change Password",
+    "tabs": {
+      "general": "General Info",
+      "security": "Security"
+    },
+    "fields": {
+      "avatar": "Avatar",
+      "name": "Full Name",
+      "email": "Email Address",
+      "birthday": "Birthday",
+      "city": "City",
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "current_password": "Current Password",
+      "new_password": "New Password",
+      "confirm_password": "Confirm New Password"
+    },
+    "placeholders": {
+      "name": "Enter your full name",
+      "email": "Enter your email",
+      "birthday": "Select date",
+      "city": "Enter city",
+      "telegram": "@username",
+      "instagram": "@username",
+      "current_password": "Enter current password",
+      "new_password": "Enter new password",
+      "confirm_password": "Confirm new password"
+    },
+    "actions": {
+      "upload_avatar": "Upload New Photo",
+      "change_password": "Update Password"
+    },
+    "errors": {
+      "passwords_do_not_match": "Passwords do not match"
+    }
+  },
+  "Materials": {
+    "audio": {
+      "title": "Audio Materials",
+      "subtitle": "Listen to your course audio materials and recordings.",
+      "empty_title": "No audio files found",
+      "empty_description": "There are no audio materials available for your account yet. Upload some files or contact your teacher to get started.",
+      "empty_description_admin": "There are no audio materials available for your account yet. Upload some files to get started.",
+      "add_audio": "Add Audio",
+      "edit_audio": "Edit Audio",
+      "delete_audio": "Delete Audio",
+      "bulk_delete": "Delete Selected ({count})",
+      "bulk_edit": "Edit Selected",
+      "table": {
+        "name": "Name",
+        "file": "File",
+        "date": "Upload Date",
+        "actions": "Actions"
+      },
+      "form": {
+        "name": "Audio Name",
+        "name_placeholder": "Enter audio name",
+        "file": "Select or drag audio files here",
+        "drop_hint": "Files up to 100MB, maximum 10 files",
+        "uploading": "Uploading..."
+      },
+      "notifications": {
+        "upload_success": "Audio files uploaded successfully",
+        "upload_error": "Failed to upload audio files",
+        "update_success": "Audio updated successfully",
+        "update_error": "Failed to update audio",
+        "delete_success": "Audio deleted successfully",
+        "delete_error": "Failed to delete audio",
+        "bulk_delete_success": "Selected audios deleted successfully",
+        "bulk_delete_error": "Failed to delete selected audios"
+      },
+      "delete_confirm": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this audio file? This action cannot be undone.",
+        "bulk_description": "Are you sure you want to delete {count} selected audio files? This action cannot be undone."
+      }
+    },
+    "photo": {
+      "title": "Photo Materials",
+      "subtitle": "View your course images and photos.",
+      "preview": {
+        "zoom_in": "Zoom In",
+        "zoom_out": "Zoom Out",
+        "rotate": "Rotate (R)",
+        "next": "Next Photo (Alt+→)",
+        "prev": "Previous Photo (Alt+←)",
+        "close": "Close (Esc)",
+        "zoom_level": "Zoom",
+        "rotation": "Rotation"
+      },
+      "empty_title": "No photos found",
+      "empty_description": "There are no photo materials available for your account yet. Upload some files or contact your teacher to get started.",
+      "empty_description_admin": "There are no photo materials available for your account yet. Upload some files to get started.",
+      "add_photo": "Add Photo",
+      "edit_photo": "Edit Photo",
+      "delete_photo": "Delete Photo",
+      "bulk_delete": "Delete Selected ({count})",
+      "view_mode": "View",
+      "gallery": "Gallery",
+      "table_view": "Table",
+      "table": {
+        "name": "Name",
+        "preview": "Preview",
+        "date": "Upload Date",
+        "actions": "Actions"
+      },
+      "form": {
+        "name": "Photo Name",
+        "name_placeholder": "Enter photo name",
+        "file": "Select or drag photos here",
+        "drop_hint": "Files up to 10MB, maximum 10 files",
+        "uploading": "Uploading..."
+      },
+      "notifications": {
+        "upload_success": "Photos uploaded successfully",
+        "upload_error": "Failed to upload photos",
+        "update_success": "Photo updated successfully",
+        "update_error": "Failed to update photo",
+        "delete_success": "Photo deleted successfully",
+        "delete_error": "Failed to delete photo",
+        "bulk_delete_success": "Selected photos deleted successfully",
+        "bulk_delete_error": "Failed to delete selected photos"
+      },
+      "delete_confirm": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this photo? This action cannot be undone.",
+        "bulk_description": "Are you sure you want to delete {count} selected photos? This action cannot be undone."
+      }
+    },
+    "video": {
+      "title": "Video Materials",
+      "subtitle": "Watch educational videos and class recordings.",
+      "empty_title": "No videos found",
+      "empty_description": "There are no video materials available for your account yet. Upload files, add links, or contact your teacher to get started.",
+      "empty_description_admin": "There are no video materials available for your account yet. Upload files or add YouTube links to get started.",
+      "add_video": "Add Video",
+      "edit_video": "Edit Video",
+      "delete_video": "Delete Video",
+      "bulk_delete": "Delete Selected ({count})",
+      "view_mode": "View",
+      "gallery": "Gallery",
+      "table_view": "Table",
+      "tabs": {
+        "file": "Upload File",
+        "url": "YouTube Link"
+      },
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "date": "Date",
+        "actions": "Actions",
+        "file": "File"
+      },
+      "form": {
+        "name": "Video Name",
+        "name_placeholder": "Enter video name",
+        "file": "Select or drag video files here",
+        "drop_hint": "MP4, WebM or OGG up to 500MB",
+        "uploading": "Uploading...",
+        "add_youtube": "Add YouTube Link"
+      },
+      "errors": {
+        "invalid_youtube": "Invalid YouTube link",
+        "file_or_url_required": "File upload or URL is required"
+      },
+      "notifications": {
+        "upload_success": "Video saved successfully",
+        "upload_error": "Failed to save video",
+        "update_success": "Video updated successfully",
+        "update_error": "Failed to update video",
+        "delete_success": "Video deleted successfully",
+        "delete_error": "Failed to delete video",
+        "bulk_delete_success": "Selected videos deleted",
+        "bulk_delete_error": "Failed to delete selected videos"
+      },
+      "delete_confirm": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this video? This action cannot be undone.",
+        "bulk_description": "Are you sure you want to delete {count} selected videos? This action cannot be undone."
+      }
+    },
+    "file": {
+      "title": "File Materials",
+      "subtitle": "Upload and manage documents and other course files.",
+      "empty_title": "No files found",
+      "empty_description": "There are no files available for your account yet. Upload some files or contact your teacher to get started.",
+      "empty_description_admin": "There are no files available for your account yet. Upload some files to get started.",
+      "add_file": "Add File",
+      "edit_file": "Edit File",
+      "delete_file": "Delete File",
+      "bulk_delete": "Delete Selected ({count})",
+      "table": {
+        "name": "Name",
+        "extension": "Extension",
+        "date": "Upload Date",
+        "actions": "Actions"
+      },
+      "form": {
+        "name": "File Name",
+        "name_placeholder": "Enter file name",
+        "file": "Select or drag files here",
+        "drop_hint": "Any file format up to 100MB",
+        "uploading": "Uploading..."
+      },
+      "notifications": {
+        "upload_success": "Files uploaded successfully",
+        "upload_error": "Failed to upload files",
+        "update_success": "File updated successfully",
+        "update_error": "Failed to update file",
+        "delete_success": "File deleted successfully",
+        "delete_error": "Failed to delete file",
+        "bulk_delete_success": "Selected files deleted successfully",
+        "bulk_delete_error": "Failed to delete selected files"
+      },
+      "delete_confirm": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this file? This action cannot be undone.",
+      "bulk_description": "Are you sure you want to delete {count} selected files? This action cannot be undone."
+      }
+    },
+    "lessons": {
+      "title": "Lessons",
+      "subtitle": "Manage your dynamic course content and lessons.",
+      "add_lesson": "Create Lesson",
+      "edit_lesson": "Edit Lesson",
+      "delete_lesson": "Delete Lesson",
+      "bulk_delete": "Delete Selected ({count})",
+      "delete_block": "Delete Block",
+      "empty_title": "No lessons found",
+      "empty_description": "You haven't created any lessons yet. Create your first lesson to get started.",
+      "table": {
+        "name": "Lesson Name",
+        "date": "Created Date",
+        "actions": "Actions"
+      },
+      "notifications": {
+        "delete_success": "Lesson deleted successfully",
+        "delete_error": "Failed to delete lesson",
+        "create_success": "Lesson created successfully",
+        "create_error": "Failed to create lesson",
+        "update_success": "Lesson updated successfully",
+        "update_error": "Failed to update lesson"
+      },
+      "delete_confirm": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this lesson? This action cannot be undone.",
+        "bulk_description": "Are you sure you want to delete {count} selected lessons? This action cannot be undone."
+      },
+      "editor": {
+        "paragraph": "Paragraph",
+        "h1": "Heading 1",
+        "h2": "Heading 2",
+        "h3": "Heading 3",
+        "bulleted_list": "Bulleted List",
+        "numbered_list": "Numbered List",
+        "todo_list": "Todo List",
+        "blockquote": "Blockquote",
+        "callout": "Callout",
+        "image": "Image",
+        "video": "Video",
+        "file": "File",
+        "placeholder": "Start typing or press '/' for commands...",
+        "bank_button": "Materials Bank",
+        "upload": "Upload",
+        "library": "Library",
+        "photo_from_bank": "Photo",
+        "photo_from_bank_subtext": "Insert an image from your library",
+        "video_from_bank": "Video",
+        "video_from_bank_subtext": "Insert a video from your library",
+        "audio_from_bank": "Audio",
+        "audio_from_bank_subtext": "Insert an audio from your library",
+        "file_from_bank": "File",
+        "file_from_bank_subtext": "Insert a file from your library",
+        "add_block": "Add Block",
+        "block": "Block",
+        "youtube": "YouTube",
+        "add_cover": "Add Cover",
+        "change_cover": "Change Cover",
+        "remove_cover": "Remove Cover",
+        "reposition_cover": "Reposition",
+        "save_position": "Save Position",
+        "back": "Back",
+        "save": "Save",
+        "discard_modal": {
+          "title": "Unsaved Changes",
+          "message": "You have unsaved changes. Are you sure you want to leave? Your changes will be lost.",
+          "confirm": "Leave without saving",
+          "cancel": "Stay"
+        }
+      }
+    },
+    "tests": {
+      "title": "Tests",
+      "subtitle": "Create and manage tests to check students' knowledge.",
+      "add_test": "Create Test",
+      "edit_test": "Edit Test",
+      "delete_test": "Delete Test",
+      "empty_title": "No tests found",
+      "empty_description": "You haven't created any tests yet. Create your first test to get started.",
+      "table": {
+        "name": "Test Name",
+        "date": "Date Created",
+        "actions": "Actions"
+      },
+      "notifications": {
+        "delete_success": "Test successfully deleted",
+        "delete_error": "Failed to delete test"
+      },
+      "editor": {
+        "back": "Back",
+        "save": "Save",
+        "preview": "Preview",
+        "add_question": "Add Question",
+        "points": "points",
+        "point": "point",
+        "settings": {
+          "title": "Test Settings",
+          "passing_score": "Passing Score (%)",
+          "time_limit": "Time Limit"
+        },
+        "question_placeholder": "Enter question text...",
+        "option_placeholder": "Option text...",
+        "add_option": "Add Option",
+        "correct_hint": "Mark the correct answer",
+        "fill_blank_hint": "Provide the correct word or phrase",
+        "detailed_hint": "Student will need to write a detailed response",
+        "types": {
+          "single_choice": "Single Choice",
+          "multiple_choice": "Multiple Choice",
+          "fill_in_blank": "Fill in Blank",
+          "detailed_answer": "Detailed Response"
+        },
+        "media": {
+          "align_left": "Left",
+          "align_center": "Center",
+          "align_right": "Right",
+          "size": "Size"
+        },
+        "discard_modal": {
+          "title": "Unsaved Changes",
+          "message": "You have unsaved changes. Are you sure you want to leave? Your changes will be lost.",
+          "confirm": "Leave without saving",
+          "cancel": "Stay"
+        },
+        "time_out_modal": {
+          "title": "Time's Up!",
+          "message": "The time allocated for the test has expired. Your answers have been automatically saved."
+        }
+      }
+    },
+    "courses": {
+      "title": "Courses",
+      "subtitle": "Organize your lessons into structured courses.",
+      "add_course": "Create Course",
+      "edit_course": "Edit Course",
+      "delete_course": "Delete Course",
+      "bulk_delete": "Delete Selected ({count})",
+      "empty_title": "No courses found",
+      "empty_description": "You haven't created any courses yet. Combine your lessons into a course to guide your students.",
+      "table": {
+        "name": "Course Name",
+        "date": "Date Created",
+        "actions": "Actions",
+        "categories": "Categories",
+        "image": "Image"
+      },
+      "form": {
+        "name": "Course Name",
+        "description": "Description",
+        "image": "Course Image",
+        "upload_image": "Upload Image",
+        "library_upload_hint": "Library / Upload",
+        "add_lesson": "Add Lesson",
+        "add_group": "Add Group",
+        "group_title": "Group Title",
+        "no_groups": "No groups or lessons added yet",
+        "placeholder_name": "Enter course name",
+        "placeholder_description": "Enter course description"
+      },
+      "notifications": {
+        "delete_success": "Course deleted successfully",
+        "delete_error": "Failed to delete course",
+        "save_success": "Course saved successfully",
+        "save_error": "Failed to save course"
+      },
+      "delete_confirm": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this course? This action cannot be undone.",
+        "bulk_description": "Are you sure you want to delete {count} selected courses? This action cannot be undone."
+      },
+      "course_structure": "Course Structure",
+      "items": "{count} items",
+      "lessons_count": "{count} lessons"
+    }
+  },
+  "Categories": {
+    "title": "Categories",
+    "add_category": "Add Category",
+    "edit_category": "Edit Category",
+    "delete_category": "Delete Category",
+    "table": {
+      "name": "Name",
+      "color": "Color",
+      "actions": "Actions",
+      "empty": "No Categories"
+    },
+    "select_categories": "Select categories",
+    "subtitle_empty": "You haven't created any categories yet. Add categories to organize your materials.",
+    "notifications": {
+      "create_success": "Category created successfully",
+      "create_error": "Failed to create category",
+      "update_success": "Category updated successfully",
+      "update_error": "Failed to update category",
+      "delete_success": "Category deleted successfully",
+      "delete_error": "Failed to delete category",
+      "bulk_delete_success": "Categories deleted successfully",
+      "bulk_delete_error": "Failed to delete categories"
+    },
+    "modal": {
+      "create_title": "Create Category",
+      "edit_title": "Edit Category",
+      "name_placeholder": "Enter category name",
+      "bulk_delete_confirm": "Are you sure you want to delete selected categories?"
+    },
+    "bulk_delete": "Delete selected ({count})",
+    "add_another": "Add another category",
+    "delete_confirm": {
+      "title": "Confirm deletion",
+      "description": "Are you sure you want to delete this category? This action cannot be undone.",
+      "bulk_description": "Are you sure you want to delete {count} selected categories? This action cannot be undone."
+    }
+  }
+}
