@@ -44,8 +44,9 @@ export function useCourses({ page = 1, limit = 15, search = '', category_ids = [
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: string; data: CreateCourseForm }) => 
             courseActions.update_course(id, data),
-        onSuccess: () => {
+        onSuccess: (_, { id }) => {
             queryClient.invalidateQueries({ queryKey: ['courses'] });
+            queryClient.invalidateQueries({ queryKey: ['course', id] });
             notifications.show({
                 title: t('notifications.save_success'),
                 message: '',

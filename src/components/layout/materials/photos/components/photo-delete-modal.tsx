@@ -1,7 +1,8 @@
 'use client';
 
-import { Modal, Text, Group, Button, Stack } from '@mantine/core';
+import { Modal, Text, Group, Button, Stack, Box } from '@mantine/core';
 import { useTranslations } from 'next-intl';
+import { IoWarningOutline } from 'react-icons/io5';
 
 interface Props {
   opened: boolean;
@@ -37,18 +38,32 @@ export function PhotoDeleteModal({ opened, onClose, onConfirm, is_loading, count
       }}
     >
       <Stack gap="xl">
-        <Text size="sm">
-          {count > 1 
-            ? t('bulk_description', { count }) 
-            : t('description')
-          }
-        </Text>
+        <Group wrap="nowrap" align="flex-start" gap="md">
+           <Box 
+            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: 'var(--mantine-color-red-light)', color: 'var(--mantine-color-red-filled)' }}
+           >
+              <IoWarningOutline size={24} />
+           </Box>
+           <Stack gap={4}>
+             <Text size="sm" fw={500}>
+               {count > 1 ? t('bulk_description', { count }) : t('description')}
+             </Text>
+             <Text size="xs" c="red" fw={500}>
+               {t('warning')}
+             </Text>
+           </Stack>
+        </Group>
 
-        <Group justify="flex-end">
+        <Group justify="flex-end" gap="sm">
           <Button variant="subtle" color="gray" onClick={onClose} disabled={is_loading}>
             {common_t('cancel')}
           </Button>
-          <Button color="red" onClick={onConfirm} loading={is_loading}>
+          <Button 
+            color="red" 
+            onClick={onConfirm} 
+            loading={is_loading}
+          >
             {common_t('delete')}
           </Button>
         </Group>

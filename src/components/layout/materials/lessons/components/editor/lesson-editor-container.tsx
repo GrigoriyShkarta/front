@@ -1,6 +1,6 @@
 'use client';
 
-import { Stack, Button, Group, Text, Paper, ActionIcon, Box, TextInput, Modal, LoadingOverlay, Title, Drawer, MultiSelect, NumberInput } from '@mantine/core';
+import { Stack, Button, Group, Text, Paper, ActionIcon, Box, TextInput, Modal, LoadingOverlay, Title, Drawer, MultiSelect, NumberInput, Switch } from '@mantine/core';
 import { IoAddOutline, IoImageOutline, IoTrashOutline, IoChevronBackOutline, IoPencilOutline, IoOptionsOutline } from 'react-icons/io5';
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
@@ -52,6 +52,7 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
   
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [courseIds, setCourseIds] = useState<string[]>([]);
+  const [isCopyingDisabled, setIsCopyingDisabled] = useState(false);
   const { categories: all_categories, create_category, create_categories, is_pending: is_cat_pending } = useCategories();
   const { courses: all_courses } = useCourses({ limit: 100 });
   const [category_drawer_opened, setCategoryDrawerOpened] = useState(false);
@@ -81,6 +82,7 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
         setCategoryIds(lesson.categories?.map(c => c.id) || []);
         setCourseIds(lesson.course_ids || []);
         setDuration(lesson.duration || null);
+        setIsCopyingDisabled(lesson.is_copying_disabled || false);
         if (lesson.content) {
             try {
                 const parsed = typeof lesson.content === 'string' 
@@ -96,6 +98,16 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
         }
     }
   }, [lesson]);
+
+  useEffect(() => {
+    if (readOnly && isCopyingDisabled && is_student) {
+        const handleCopy = (e: ClipboardEvent) => {
+            e.preventDefault();
+        };
+        document.addEventListener('copy', handleCopy);
+        return () => document.removeEventListener('copy', handleCopy);
+    }
+  }, [readOnly, isCopyingDisabled, is_student]);
 
   const isDirty = title.trim() !== '' || cover !== null || blocks.some(b => b.content !== '' && b.content !== '[]' && b.content !== ' ');
 
@@ -115,6 +127,7 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
         category_ids: categoryIds,
         course_ids: courseIds,
         duration: duration ? Number(duration) : null,
+        is_copying_disabled: isCopyingDisabled,
         content: JSON.stringify(blocks.map((b, i) => ({
             id: b.id,
             content: b.content,
@@ -182,12 +195,12 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
     setBankOpened(true);
   };
 
-  const handleMediaSelect = (item: { url: string; type: 'image' | 'video' | 'audio' | 'file' }) => {
+  const handleMediaSelect = (item: { id: string; url: string; type: 'image' | 'video' | 'audio' | 'file' }) => {
     if (activeBlockId === 'cover') {
         setCover(item.url);
         setCoverPosition(50); // Reset position for new cover
     } else if (activeBlockId && editorRefs.current[activeBlockId]) {
-      editorRefs.current[activeBlockId]?.insert_media(item.url, item.type);
+      editorRefs.current[activeBlockId]?.insert_media(item.id, item.url, item.type);
     }
     setBankOpened(false);
   };
@@ -214,7 +227,19 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
   };
 
   return (
-    <Stack gap="xl" maw={1000} mx="auto" py="xl" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} pos="relative">
+    <Stack 
+        gap="xl" 
+        maw={1000} 
+        mx="auto" 
+        py="xl" 
+        onMouseUp={handleMouseUp} 
+        onMouseLeave={handleMouseUp} 
+        pos="relative"
+        style={{ 
+            userSelect: (readOnly && isCopyingDisabled && is_student) ? 'none' : undefined,
+            WebkitUserSelect: (readOnly && isCopyingDisabled && is_student) ? 'none' : undefined,
+        } as React.CSSProperties}
+    >
       <LoadingOverlay visible={is_loading_lesson || is_saving} overlayProps={{ blur: 2 }} zIndex={100} />
       {/* Header with Back and Save/Edit buttons */}
       <Group justify="space-between" align="center" px="md" mb="md">
@@ -494,6 +519,13 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
                 searchable
                 clearable
                 variant="filled"
+            />
+
+            <Switch
+                label={t('editor.disable_copying')}
+                description={t('editor.disable_copying_description')}
+                checked={isCopyingDisabled}
+                onChange={(e) => setIsCopyingDisabled(e.currentTarget.checked)}
             />
 
             <Button 

@@ -1,5 +1,5 @@
 import { IconType } from 'react-icons';
-import { IoSettingsOutline, IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline } from 'react-icons/io5';
+import { IoSettingsOutline, IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline } from 'react-icons/io5';
 
 export interface NavItem {
   label: string; // Translation key
@@ -73,7 +73,7 @@ export const MAIN_NAVIGATION: NavItem[] = [
       {
         label: 'courses',
         href: '/main/materials/courses',
-        icon: IoLibraryOutline,
+        icon: IoSchoolOutline,
         roles: ['super_admin', 'admin', 'teacher'],
       },
 // {

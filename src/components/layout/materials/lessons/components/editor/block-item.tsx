@@ -79,17 +79,16 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
         }
       }}
     >
-      <Group gap={0} align="stretch" mih={read_only ? 'auto' : 100}>
+      <Group gap={0} align="stretch" mih="auto">
         {!read_only && (
-          <Box 
+          <Box
+            p="4px"
             className="drag-handle cursor-grab" 
-            p="xs"
             onMouseDown={() => setCanDrag(true)}
             onMouseUp={() => setCanDrag(false)}
             onMouseLeave={() => !isDragging && setCanDrag(false)}
           >
             <IoReorderThree size={18} color="var(--mantine-color-gray-6)" />
-            <Text size="xs" c="dimmed" mt="auto">{index + 1}</Text>
           </Box>
         )}
 

@@ -22,7 +22,7 @@ import { FileTable } from '../../files/components/file-table';
 interface Props {
   opened: boolean;
   onClose: () => void;
-  onSelect: (item: { url: string; name: string; type: 'image' | 'video' | 'audio' | 'file' }) => void;
+  onSelect: (item: { id: string; url: string; name: string; type: 'image' | 'video' | 'audio' | 'file' }) => void;
   type?: 'image' | 'video' | 'audio' | 'file' | 'all';
 }
 
@@ -268,7 +268,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
                     on_edit={() => {}} 
                     on_delete={() => {}}
                     on_preview={() => {}}
-                    on_select={(photo) => onSelect({ url: photo.file_url || '', name: photo.name, type: 'image' })}
+                    on_select={(photo) => onSelect({ id: photo.id, url: photo.file_url || '', name: photo.name, type: 'image' })}
                     is_picker={true}
                 />
             ) : render_upload_area(photos.upload_photo, IMAGE_MIME_TYPE, 'image', photos.is_uploading, photos.refetch)}
@@ -283,7 +283,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
                     on_edit={() => {}} 
                     on_delete={() => {}}
                     on_play={() => {}}
-                    on_select={(video) => onSelect({ url: video.youtube_url || video.file_url || '', name: video.name, type: 'video' })}
+                    on_select={(video) => onSelect({ id: video.id, url: video.youtube_url || video.file_url || '', name: video.name, type: 'video' })}
                     is_picker={true}
                 />
             ) : mode === 'upload' ? render_upload_area(videos.create_video, VIDEO_MIME_TYPE, 'video', videos.is_uploading, videos.refetch)
@@ -298,7 +298,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
                     on_selection_change={() => {}} 
                     on_edit={() => {}} 
                     on_delete={() => {}}
-                    on_select={(audio) => onSelect({ url: audio.file_url || '', name: audio.name, type: 'audio' })}
+                    on_select={(audio) => onSelect({ id: audio.id, url: audio.file_url || '', name: audio.name, type: 'audio' })}
                     is_picker={true}
                 />
             ) : render_upload_area(audios.upload_audio, AUDIO_MIME_TYPE, 'audio', audios.is_uploading, audios.refetch)}
@@ -312,7 +312,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
                     on_selection_change={() => {}} 
                     on_edit={() => {}} 
                     on_delete={() => {}}
-                    on_select={(file) => onSelect({ url: file.file_url || '', name: file.name, type: 'file' })}
+                    on_select={(file) => onSelect({ id: file.id, url: file.file_url || '', name: file.name, type: 'file' })}
                     is_picker={true}
                 />
             ) : render_upload_area(files.create_file, undefined, 'file', files.is_uploading, (files as any).refetch)}

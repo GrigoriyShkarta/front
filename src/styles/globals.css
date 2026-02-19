@@ -107,3 +107,13 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--space-primary);
 }
+
+.ProseMirror-selectednode > .bn-block-content > * {
+  outline: none !important;
+}
+
+.is-read-only {
+  .bn-toolbar {
+    display: none !important;
+  }
+}

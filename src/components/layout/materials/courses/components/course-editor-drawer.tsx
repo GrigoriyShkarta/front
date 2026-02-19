@@ -448,7 +448,7 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
                     </Stack>
                 </ScrollArea>
 
-                <Box className="pt-xl bg-var(--mantine-color-body) border-t border-white/10 mt-auto">
+                <Box className="pt-xl border-t border-zinc-300 dark:border-white/10 mt-auto" style={{ backgroundColor: 'transparent' }}>
                     <Button 
                         type="submit" 
                         fullWidth 
@@ -458,6 +458,7 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
                         radius="md"
                         className="h-12"
                         color="primary"
+                        variant="filled"
                     >
                         {common_t('save')}
                     </Button>

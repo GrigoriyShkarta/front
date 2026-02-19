@@ -13,6 +13,11 @@ export const lesson_schema = z.object({
   categories: z.array(category_schema).optional().default([]),
   duration: z.number().nullable().optional(),
   course_ids: z.array(z.string()).optional().default([]),
+  courses: z.array(z.object({
+    id: z.string(),
+    name: z.string()
+  })).optional().default([]),
+  is_copying_disabled: z.boolean().optional().default(false),
   created_at: z.string(),
   updated_at: z.string(),
 });
@@ -30,6 +35,7 @@ export const create_lesson_schema = z.object({
   category_ids: z.array(z.string()).optional(),
   duration: z.number().nullable().optional(),
   course_ids: z.array(z.string()).optional(),
+  is_copying_disabled: z.boolean().optional(),
 });
 
 export type CreateLessonForm = z.infer<typeof create_lesson_schema>;

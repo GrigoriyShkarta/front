@@ -1,7 +1,7 @@
 'use client';
 
 import { Modal, Text, Button, Group, Stack, Box } from '@mantine/core';
-import { IoTrashOutline, IoWarningOutline } from 'react-icons/io5';
+import { IoWarningOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 
 interface Props {
@@ -21,11 +21,10 @@ export function FileDeleteModal({ opened, onClose, onConfirm, is_loading, count 
       opened={opened} 
       onClose={onClose} 
       title={t('title')}
-      centered
-      radius="lg"
-      styles={{
-        header: { backgroundColor: 'var(--mantine-color-body)' },
-        content: { backgroundColor: 'var(--mantine-color-body)' }
+      classNames={{
+        header: 'px-6 py-4',
+        content: 'bg-[var(--mantine-color-body)] transition-colors duration-300',
+        body: 'p-6'
       }}
     >
       <Stack gap="xl">
@@ -34,11 +33,16 @@ export function FileDeleteModal({ opened, onClose, onConfirm, is_loading, count 
             className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
             style={{ backgroundColor: 'var(--mantine-color-red-light)', color: 'var(--mantine-color-red-filled)' }}
            >
-             <IoWarningOutline size={24} />
+              <IoWarningOutline size={24} />
            </Box>
-           <Text size="sm">
-             {count > 1 ? t('bulk_description', { count }) : t('description')}
-           </Text>
+           <Stack gap={4}>
+             <Text size="sm" fw={500}>
+               {count > 1 ? t('bulk_description', { count }) : t('description')}
+             </Text>
+             <Text size="xs" c="red" fw={500}>
+               {t('warning')}
+             </Text>
+           </Stack>
         </Group>
 
         <Group justify="flex-end" gap="sm">
@@ -49,7 +53,6 @@ export function FileDeleteModal({ opened, onClose, onConfirm, is_loading, count 
             color="red" 
             onClick={onConfirm} 
             loading={is_loading}
-            leftSection={<IoTrashOutline size={16} />}
           >
             {common_t('delete')}
           </Button>

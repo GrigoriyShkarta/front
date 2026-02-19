@@ -281,7 +281,8 @@
       "delete_confirm": {
         "title": "Confirm Deletion",
         "description": "Are you sure you want to delete this audio file? This action cannot be undone.",
-        "bulk_description": "Are you sure you want to delete {count} selected audio files? This action cannot be undone."
+        "bulk_description": "Are you sure you want to delete {count} selected audio files? This action cannot be undone.",
+        "warning": "Important: these files will also be automatically removed from all lessons where they are used."
       }
     },
     "photo": {
@@ -333,7 +334,8 @@
       "delete_confirm": {
         "title": "Confirm Deletion",
         "description": "Are you sure you want to delete this photo? This action cannot be undone.",
-        "bulk_description": "Are you sure you want to delete {count} selected photos? This action cannot be undone."
+        "bulk_description": "Are you sure you want to delete {count} selected photos? This action cannot be undone.",
+        "warning": "Important: these photos will also be automatically removed from all lessons where they are used."
       }
     },
     "video": {
@@ -385,7 +387,8 @@
       "delete_confirm": {
         "title": "Confirm Deletion",
         "description": "Are you sure you want to delete this video? This action cannot be undone.",
-        "bulk_description": "Are you sure you want to delete {count} selected videos? This action cannot be undone."
+        "bulk_description": "Are you sure you want to delete {count} selected videos? This action cannot be undone.",
+        "warning": "Important: these videos will also be automatically removed from all lessons where they are used."
       }
     },
     "file": {
@@ -424,7 +427,8 @@
       "delete_confirm": {
         "title": "Confirm Deletion",
         "description": "Are you sure you want to delete this file? This action cannot be undone.",
-      "bulk_description": "Are you sure you want to delete {count} selected files? This action cannot be undone."
+        "bulk_description": "Are you sure you want to delete {count} selected files? This action cannot be undone.",
+        "warning": "Important: these files will also be automatically removed from all lessons where they are used."
       }
     },
     "lessons": {
@@ -440,7 +444,10 @@
       "table": {
         "name": "Lesson Name",
         "date": "Created Date",
-        "actions": "Actions"
+        "actions": "Actions",
+        "courses": "Courses",
+        "view_courses": "View courses",
+        "courses_title": "Lesson Courses"
       },
       "notifications": {
         "delete_success": "Lesson deleted successfully",
@@ -495,7 +502,9 @@
           "message": "You have unsaved changes. Are you sure you want to leave? Your changes will be lost.",
           "confirm": "Leave without saving",
           "cancel": "Stay"
-        }
+        },
+        "disable_copying": "Disable copying",
+        "disable_copying_description": "If enabled, students won't be able to select and copy lesson text."
       }
     },
     "tests": {
@@ -584,7 +593,7 @@
         "group_title": "Group Title",
         "no_groups": "No groups or lessons added yet",
         "placeholder_name": "Enter course name",
-        "placeholder_description": "Enter course description"
+        "placeholder_description": "Unlock your potential with this comprehensive course covering all essential aspects of the subject."
       },
       "notifications": {
         "delete_success": "Course deleted successfully",
@@ -598,8 +607,18 @@
         "bulk_description": "Are you sure you want to delete {count} selected courses? This action cannot be undone."
       },
       "course_structure": "Course Structure",
+      "number_of_lessons": "Number of lessons",
       "items": "{count} items",
-      "lessons_count": "{count} lessons"
+      "lessons_count": "{count} lessons",
+      "min": "min",
+      "h": "h",
+      "m": "m",
+      "stats": {
+        "title": "Quick Stats",
+        "estimated_time": "Estimated Time",
+        "blocks": "{count} blocks",
+        "no_preview": "No preview available"
+      }
     }
   },
   "Categories": {

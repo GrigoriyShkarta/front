@@ -31,7 +31,7 @@ import { PhotoTable } from "./components/photo-table";
 import { PhotoGrid } from "./components/photo-grid";
 import { PhotoDrawer } from "./components/photo-drawer";
 import { PhotoDeleteModal } from "./components/photo-delete-modal";
-import { PhotoPreviewModal } from "./components/photo-preview-modal";
+import { PhotoPreviewModal } from "@/components/common/photo-preview-modal";
 import { PhotoMaterial } from "./schemas/photo-schema";
 import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';

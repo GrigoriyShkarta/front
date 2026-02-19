@@ -4,17 +4,28 @@ import { Modal, ActionIcon, Group, Box, Image, Tooltip, Stack, Text } from '@man
 import { IoCloseOutline, IoAddOutline, IoRemoveOutline, IoRefreshOutline, IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { PhotoMaterial } from '../schemas/photo-schema';
 
-interface Props {
-  opened: boolean;
-  onClose: () => void;
-  photo: PhotoMaterial | null;
-  photos: PhotoMaterial[];
-  onPhotoChange: (photo: PhotoMaterial) => void;
+export interface PhotoMaterialPreview {
+  id: string;
+  name: string;
+  file_url: string;
 }
 
-export function PhotoPreviewModal({ opened, onClose, photo, photos, onPhotoChange }: Props) {
+interface PhotoPreviewModalProps<P extends PhotoMaterialPreview> {
+  opened: boolean;
+  onClose: () => void;
+  photo: P | null;
+  photos: P[];
+  onPhotoChange: (photo: P) => void;
+}
+
+export function PhotoPreviewModal<P extends PhotoMaterialPreview>({ 
+  opened, 
+  onClose, 
+  photo, 
+  photos, 
+  onPhotoChange 
+}: PhotoPreviewModalProps<P>) {
   const t = useTranslations('Materials.photo.preview');
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);

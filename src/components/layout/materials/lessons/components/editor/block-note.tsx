@@ -6,7 +6,10 @@ import {
   useCreateBlockNote, 
   getDefaultReactSlashMenuItems, 
   SuggestionMenuController,
-  createReactBlockSpec
+  createReactBlockSpec,
+  FormattingToolbarController,
+  FormattingToolbar,
+  TextAlignButton
 } from "@blocknote/react";
 import { BlockNoteSchema, defaultBlockSpecs } from "@blocknote/core";
 import "@blocknote/mantine/style.css";
@@ -20,8 +23,8 @@ import {
   IoDownloadOutline,
   IoFileTrayOutline
 } from 'react-icons/io5';
-import { useMemo, forwardRef, useImperativeHandle, useState } from 'react';
-import { ActionIcon, Group, Menu, Box, Paper, Text, Stack, Card, Badge } from '@mantine/core';
+import { useMemo, forwardRef, useImperativeHandle, useState, useEffect } from 'react';
+import { ActionIcon, Group, Menu, Box, Paper, Text, Stack, Card } from '@mantine/core';
 import { useMantineColorScheme } from '@mantine/core';
 import { useTranslations, useLocale } from 'next-intl';
 import { MediaPickerModal } from '../media-picker-modal';
@@ -30,6 +33,8 @@ import { videoActions } from '../../../videos/actions/video-actions';
 import { audioActions } from '../../../audios/actions/audio-actions';
 import { fileActions } from '../../../files/actions/file-actions';
 import { AudioPlayer } from '@/components/ui/audio-player';
+import { cn } from '@/lib/utils';
+import { PhotoPreviewModal, PhotoMaterialPreview } from '@/components/common/photo-preview-modal';
 
 /**
  * Custom YouTube block specification
@@ -38,6 +43,7 @@ const YoutubeBlock = createReactBlockSpec(
   {
     type: "youtube",
     propSchema: {
+      id: { default: "" },
       url: { default: "" },
       videoId: { default: "" },
       alignment: { default: "center", values: ["left", "center", "right"] },
@@ -50,7 +56,7 @@ const YoutubeBlock = createReactBlockSpec(
       const videoId = block.props.videoId || "";
       const url = videoId ? `https://www.youtube.com/embed/${videoId}?rel=0` : block.props.url;
       const { alignment, width } = block.props;
-      
+      const is_read_only = !editor.isEditable;
       const justify = alignment === 'left' ? 'flex-start' : (alignment === 'right' ? 'flex-end' : 'center');
 
       return (
@@ -66,51 +72,53 @@ const YoutubeBlock = createReactBlockSpec(
               allowFullScreen
             />
             
-            {/* Controls Overlay - visible on hover */}
-            <Box className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              <Paper 
-                withBorder 
-                shadow="sm" 
-                radius="md" 
-                p={4} 
-                className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md"
-              >
-                <Group gap={4}>
-                  <Menu shadow="md">
-                    <Menu.Target>
-                      <ActionIcon variant="subtle" size="sm" color="gray">
-                        <IoMenuOutline size={14} />
-                      </ActionIcon>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'left' } })}>Left</Menu.Item>
-                      <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'center' } })}>Center</Menu.Item>
-                      <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'right' } })}>Right</Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
+            {!is_read_only && (
+              <Box className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                <Paper 
+                  withBorder 
+                  shadow="sm" 
+                  radius="md" 
+                  p={4} 
+                  className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md"
+                >
+                  <Group gap={4}>
+                    <Menu shadow="md">
+                      <Menu.Target>
+                        <ActionIcon variant="subtle" size="sm" color="gray">
+                          <IoMenuOutline size={14} />
+                        </ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'left' } })}>Left</Menu.Item>
+                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'center' } })}>Center</Menu.Item>
+                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'right' } })}>Right</Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
 
-                  <Menu shadow="md">
-                    <Menu.Target>
-                      <ActionIcon variant="subtle" size="sm" color="gray">
-                        <IoResizeOutline size={14} />
-                      </ActionIcon>
-                    </Menu.Target>
-                    <Menu.Dropdown>
-                      <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '50%' } })}>50%</Menu.Item>
-                      <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '70%' } })}>70%</Menu.Item>
-                      <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '85%' } })}>85%</Menu.Item>
-                      <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '100%' } })}>Full Width</Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                </Group>
-              </Paper>
-            </Box>
+                    <Menu shadow="md">
+                      <Menu.Target>
+                        <ActionIcon variant="subtle" size="sm" color="gray">
+                          <IoResizeOutline size={14} />
+                        </ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '50%' } })}>50%</Menu.Item>
+                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '70%' } })}>70%</Menu.Item>
+                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '85%' } })}>85%</Menu.Item>
+                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '100%' } })}>Full Width</Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  </Group>
+                </Paper>
+              </Box>
+            )}
           </Box>
         </Box>
       );
     },
   }
 );
+
 
 /**
  * Custom Audio block specification
@@ -119,6 +127,7 @@ const AudioBlock = createReactBlockSpec(
   {
     type: "audio",
     propSchema: {
+      id: { default: "" },
       url: { default: "" },
       name: { default: "Audio File" },
       alignment: { default: "center", values: ["left", "center", "right"] },
@@ -128,28 +137,31 @@ const AudioBlock = createReactBlockSpec(
   {
     render: ({ block, editor }) => {
       const { alignment, url } = block.props;
+      const is_read_only = !editor.isEditable;
       const justify = alignment === 'left' ? 'flex-start' : (alignment === 'right' ? 'flex-end' : 'center');
 
       return (
         <Box className="py-4 relative group w-full" style={{ display: 'flex', justifyContent: justify }}>
           <AudioPlayer src={url} class_name="" />
           
-          <Box className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-            <Paper withBorder shadow="sm" radius="md" p={4} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
-              <Menu shadow="md">
-                <Menu.Target>
-                  <ActionIcon variant="subtle" size="sm" color="gray">
-                    <IoMenuOutline size={14} />
-                  </ActionIcon>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'left' } })}>Left</Menu.Item>
-                  <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'center' } })}>Center</Menu.Item>
-                  <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'right' } })}>Right</Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            </Paper>
-          </Box>
+          {!is_read_only && (
+            <Box className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <Paper withBorder shadow="sm" radius="md" p={4} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
+                <Menu shadow="md">
+                  <Menu.Target>
+                    <ActionIcon variant="subtle" size="sm" color="gray">
+                      <IoMenuOutline size={14} />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'left' } })}>Left</Menu.Item>
+                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'center' } })}>Center</Menu.Item>
+                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'right' } })}>Right</Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              </Paper>
+            </Box>
+          )}
         </Box>
       );
     }
@@ -163,6 +175,7 @@ const FileBlock = createReactBlockSpec(
   {
     type: "file",
     propSchema: {
+      id: { default: "" },
       url: { default: "" },
       name: { default: "Document" },
       extension: { default: "" },
@@ -175,19 +188,29 @@ const FileBlock = createReactBlockSpec(
       const { url, name, alignment } = block.props;
       const extension = block.props.extension || url.split('.').pop()?.toUpperCase() || 'FILE';
       const justify = alignment === 'left' ? 'flex-start' : (alignment === 'right' ? 'flex-end' : 'center');
+      const is_read_only = !editor.isEditable;
 
       return (
-        <Box className="py-4 relative group w-full" style={{ display: 'flex', justifyContent: justify }}>
+        <Box className="py-2 relative group w-full" style={{ display: 'flex', justifyContent: justify }}>
           <Card 
-            withBorder 
+            component="a"
+            href={url}
+            target="_blank"
+            download
+            withBorder={!is_read_only} 
             radius="lg" 
             p="sm" 
-            className="w-full max-w-md bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors border-zinc-200 dark:border-zinc-800"
+            className={cn(
+                "w-full max-w-md transition-all no-underline text-inherit",
+                is_read_only 
+                    ? "bg-transparent hover:bg-zinc-50 dark:hover:bg-white/5" 
+                    : "bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800"
+            )}
           >
             <Group wrap="nowrap" gap="md">
               <Box className="relative">
                 <Box 
-                  className="w-12 h-14 rounded-lg border flex items-center justify-center relative overflow-hidden text-white"
+                  className="w-12 h-14 rounded-lg border flex items-center justify-center relative overflow-hidden text-white border-transparent"
                   bg="brand"
                 >
                   <IoFileTrayOutline size={24} />
@@ -199,41 +222,43 @@ const FileBlock = createReactBlockSpec(
                 <Text size="xs" c="dimmed">{extension} Document</Text>
               </Stack>
 
-              <ActionIcon 
-                component="a" 
-                href={url} 
-                target="_blank" 
-                download
-                variant="subtle" 
-                color="brand"
-                radius="md"
-              >
-                <IoDownloadOutline size={20} />
-              </ActionIcon>
+              {!is_read_only && (
+                <ActionIcon 
+                  variant="subtle" 
+                  color="brand"
+                  radius="md"
+                >
+                  <IoDownloadOutline size={20} />
+                </ActionIcon>
+              )}
             </Group>
           </Card>
 
-          <Box className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-            <Paper withBorder shadow="sm" radius="md" p={4} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
-              <Menu shadow="md">
-                <Menu.Target>
-                  <ActionIcon variant="subtle" size="sm" color="gray">
-                    <IoMenuOutline size={14} />
-                  </ActionIcon>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'left' } })}>Left</Menu.Item>
-                  <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'center' } })}>Center</Menu.Item>
-                  <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'right' } })}>Right</Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            </Paper>
-          </Box>
+          {!is_read_only && (
+            <Box className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <Paper withBorder shadow="sm" radius="md" p={4} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
+                <Menu shadow="md">
+                  <Menu.Target>
+                    <ActionIcon variant="subtle" size="sm" color="gray">
+                      <IoMenuOutline size={14} />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'left' } })}>Left</Menu.Item>
+                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'center' } })}>Center</Menu.Item>
+                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'right' } })}>Right</Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              </Paper>
+            </Box>
+          )}
         </Box>
       )
     }
   }
 );
+
+// Create schema with the custom blocks
 
 // Create schema with the custom blocks
 const schema = BlockNoteSchema.create({
@@ -246,7 +271,7 @@ const schema = BlockNoteSchema.create({
 });
 
 export interface BlockNoteEditorRef {
-  insert_media: (url: string, type: 'image' | 'video' | 'audio' | 'file') => void;
+  insert_media: (id: string, url: string, type: 'image' | 'video' | 'audio' | 'file') => void;
 }
 
 /**
@@ -270,6 +295,10 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
   const [pickerOpened, setPickerOpened] = useState(false);
   const [pickerType, setPickerType] = useState<'image' | 'video' | 'audio' | 'file' | 'all'>('all');
 
+  const [previewOpened, setPreviewOpened] = useState(false);
+  const [previewPhoto, setPreviewPhoto] = useState<PhotoMaterialPreview | null>(null);
+  const [previewPhotosList, setPreviewPhotosList] = useState<PhotoMaterialPreview[]>([]);
+
   const editor = useCreateBlockNote({
     schema,
     initialContent: initial_content ? JSON.parse(initial_content) : undefined,
@@ -290,18 +319,58 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
     }
   });
 
+  // Sync editor editability with read_only prop
+  useEffect(() => {
+    editor.isEditable = !read_only;
+  }, [read_only, editor]);
+
+  // Handle image clicks in read-only mode
+  const handleWrapperClick = (e: React.MouseEvent) => {
+    if (!read_only) return;
+
+    const target = e.target as HTMLElement;
+    const img = target.closest('img');
+    
+    if (img && img.closest('.bn-editor')) {
+      const url = img.src;
+      
+      // Find all images for gallery in THIS editor
+      const allImages: PhotoMaterialPreview[] = [];
+      editor.forEachBlock((block) => {
+        if (block.type === 'image' && block.props.url) {
+          allImages.push({
+            id: block.id,
+            name: (block.props as any).name || 'Image',
+            file_url: block.props.url
+          });
+        }
+        return true;
+      });
+
+      const currentPhoto = allImages.find(p => p.file_url === url) || {
+        id: Math.random().toString(),
+        name: 'Image',
+        file_url: url
+      };
+
+      setPreviewPhoto(currentPhoto);
+      setPreviewPhotosList(allImages);
+      setPreviewOpened(true);
+    }
+  };
+
   const open_picker = (type: 'image' | 'video' | 'audio' | 'file') => {
     setPickerType(type);
     setPickerOpened(true);
   };
 
-  const handle_selection = (item: { url: string; name: string; type: 'image' | 'video' | 'audio' | 'file' }) => {
+  const handle_selection = (item: { id: string; url: string; name: string; type: 'image' | 'video' | 'audio' | 'file' }) => {
     const selection = editor.getTextCursorPosition();
     const current_block = selection?.block;
 
     // Determine block type and props
     let block_type: any = item.type;
-    let props: any = { url: item.url, name: item.name };
+    let props: any = { id: item.id, url: item.url, name: item.name };
 
     if (item.type === 'video') {
       const youtube_regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
@@ -329,8 +398,8 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
   };
 
   useImperativeHandle(ref, () => ({
-    insert_media: (url: string, type: 'image' | 'video' | 'audio' | 'file') => {
-      handle_selection({ url, name: '', type });
+    insert_media: (id: string, url: string, type: 'image' | 'video' | 'audio' | 'file') => {
+      handle_selection({ id, url, name: '', type });
     }
   }));
 
@@ -383,74 +452,64 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
   }, [editor, t]);
 
   return (
-    <div className={`block-note-wrapper ${read_only ? 'is-read-only' : ''}`}>
-      <BlockNoteView 
-        editor={editor} 
+    <div 
+      className={`block-note-wrapper ${read_only ? 'is-read-only' : ''}`}
+      onClick={handleWrapperClick}
+    >
+      <BlockNoteView
+        editor={editor}
         theme={colorScheme === 'dark' ? 'dark' : 'light'}
-        onChange={() => {
-          on_change(JSON.stringify(editor.document));
-        }}
+        onChange={() => on_change(JSON.stringify(editor.document, null, 2))}
         slashMenu={false}
-        editable={!read_only}
+        formattingToolbar={false}
+        data-test="block-note-editor"
       >
+        <FormattingToolbarController
+          formattingToolbar={() => (
+            <FormattingToolbar>
+              <TextAlignButton textAlignment="left" />
+              <TextAlignButton textAlignment="center" />
+              <TextAlignButton textAlignment="right" />
+            </FormattingToolbar>
+          )}
+        />
         <SuggestionMenuController
-          triggerCharacter="/"
-          getItems={async (query) => {
-            return custom_slash_items.filter((item) => 
-               item.title.toLowerCase().includes(query.toLowerCase())
-            );
-          }}
+          triggerCharacter={'/'}
+          getItems={async (query) =>
+            custom_slash_items.filter((item: any) =>
+              item.title.toLowerCase().includes(query.toLowerCase())
+            )
+          }
         />
       </BlockNoteView>
-      <style jsx global>{`
-        .block-note-wrapper {
-          width: 100%;
-        }
-        .block-note-wrapper .bn-editor {
-          padding: 32px 48px !important;
-          min-height: 150px;
-          background-color: transparent !important;
-        }
-        .block-note-wrapper.is-read-only .bn-editor {
-          padding: 0px !important;
-          min-height: auto;
-        }
-        .block-note-wrapper.is-read-only .group-hover\:opacity-100 {
-          display: none !important;
-        }
-        .block-note-wrapper .bn-container {
-           background: transparent !important;
-        }
-        .block-note-wrapper .bn-block-content {
-          margin-bottom: 4px;
-        }
-        /* Custom aesthetics for media blocks */
-        .block-note-wrapper [data-content-type="image"] img,
-        .block-note-wrapper [data-content-type="video"] video,
-        .block-note-wrapper [data-content-type="video"] iframe {
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-          border: 1px solid var(--mantine-color-default-border);
-          width: 100% !important;
-          max-width: 100%;
-          aspect-ratio: 16 / 9;
-          height: auto;
-          display: block;
-        }
 
-        .block-note-wrapper [data-content-type="video"] iframe {
-          border: 0;
-        }
-        [data-mantine-color-scheme='dark'] .block-note-wrapper [data-content-type="image"] img {
-          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-      `}</style>
-      <MediaPickerModal 
-        opened={pickerOpened} 
-        onClose={() => setPickerOpened(false)} 
+      <MediaPickerModal
+        opened={pickerOpened}
+        onClose={() => setPickerOpened(false)}
         onSelect={handle_selection}
         type={pickerType}
       />
+
+      <PhotoPreviewModal
+        opened={previewOpened}
+        onClose={() => setPreviewOpened(false)}
+        photo={previewPhoto}
+        photos={previewPhotosList}
+        onPhotoChange={setPreviewPhoto}
+      />
+
+      <style jsx global>{`
+        /* Keep only alignment handlers */
+        .block-note-wrapper.is-read-only .bn-visual-editor {
+          cursor: default;
+        }
+        .block-note-wrapper.is-read-only .bn-editor img {
+          cursor: pointer;
+        }
+        .bn-file-block-content-wrapper {
+          outline: none !important;
+        }
+      `}</style>
     </div>
   );
 });
