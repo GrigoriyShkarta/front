@@ -1,5 +1,5 @@
 import { IconType } from 'react-icons';
-import { IoSettingsOutline, IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline } from 'react-icons/io5';
+import { IoSettingsOutline, IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline } from 'react-icons/io5';
 
 export interface NavItem {
   label: string; // Translation key
@@ -15,6 +15,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
     href: '/main',
     icon: IoHomeOutline,
     roles: ['super_admin', 'admin', 'teacher', 'student'],
+  },
+  {
+    label: 'profile',
+    href: '/main/profile',
+    icon: IoPersonOutline,
+    roles: ['student'],
   },
   {
     label: 'personalization',
@@ -76,12 +82,20 @@ export const MAIN_NAVIGATION: NavItem[] = [
         icon: IoSchoolOutline,
         roles: ['super_admin', 'admin', 'teacher'],
       },
-// {
-//   label: 'tests',
-//   href: '/main/materials/tests',
-//   icon: IoCheckmarkDoneOutline,
-//   roles: ['super_admin', 'admin', 'teacher'],
-// },
+    ]
+  },
+  {
+    label: 'finance',
+    href: '/main/finance',
+    icon: IoWalletOutline,
+    roles: ['super_admin', 'admin'],
+    items: [
+      {
+        label: 'subscriptions',
+        href: '/main/finance/subscriptions',
+        icon: IoCardOutline,
+        roles: ['super_admin', 'admin'],
+      }
     ]
   }
 ];

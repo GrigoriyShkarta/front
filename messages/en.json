@@ -34,7 +34,10 @@
       "password_too_short": "Password must be at least 6 characters",
       "current_password_invalid": "The current password you entered is incorrect",
       "email_already_exists": "A user with this email already exists",
-      "invalid_color": "Invalid color format"
+      "invalid_color": "Invalid color format",
+      "subscription_name_required": "Subscription name is required",
+      "subscription_price_required": "Subscription price is required",
+      "subscription_lessons_count_required": "Lessons count must be at least 1"
     },
     "roles": {
       "super_admin": "Super Admin",
@@ -47,6 +50,7 @@
     "apply": "Apply",
     "clear": "Clear",
     "minutes": "min",
+    "lessons": "lessons",
     "ok": "OK",
     "items": "items"
   },
@@ -93,6 +97,8 @@
     "theme": "Theme",
     "languages": "Languages",
     "dashboard": "Dashboard",
+    "finance": "Finance",
+    "subscriptions": "Subscriptions",
     "select_language": "Select Language",
     "logout": "Logout",
     "logout_confirm_title": "Confirm Logout",
@@ -197,7 +203,14 @@
       "title": "Confirm Deletion",
       "description": "Are you sure you want to delete this user? This action cannot be undone.",
       "bulk_description": "Are you sure you want to delete selected users? This action cannot be undone."
-    }
+    },
+    "tabs": {
+      "general": "General Details",
+      "subscriptions": "Subscriptions",
+      "activity": "Activity"
+    },
+    "not_found": "User not found",
+    "no_subscriptions_yet": "This user has no active subscriptions yet."
   },
   "Profile": {
     "title": "My Profile",
@@ -504,7 +517,11 @@
           "cancel": "Stay"
         },
         "disable_copying": "Disable copying",
-        "disable_copying_description": "If enabled, students won't be able to select and copy lesson text."
+        "disable_copying_description": "If enabled, students won't be able to select and copy lesson text.",
+        "show_sidebar": "Show course navigation",
+        "hide_sidebar": "Hide course navigation",
+        "course_navigation": "Course Navigation",
+        "your_progress": "Your Progress"
       }
     },
     "tests": {
@@ -618,7 +635,8 @@
         "estimated_time": "Estimated Time",
         "blocks": "{count} blocks",
         "no_preview": "No preview available"
-      }
+      },
+      "current": "Current"
     }
   },
   "Categories": {
@@ -656,6 +674,47 @@
       "title": "Confirm deletion",
       "description": "Are you sure you want to delete this category? This action cannot be undone.",
       "bulk_description": "Are you sure you want to delete {count} selected categories? This action cannot be undone."
+    }
+  },
+  "Finance": {
+    "subscriptions": {
+      "title": "Subscriptions",
+      "subtitle": "Manage subscription plans for your students.",
+      "add_subscription": "Add Subscription",
+      "edit_subscription": "Edit Subscription",
+      "delete_subscription": "Delete Subscription",
+      "bulk_delete": "Delete Selected ({count})",
+      "empty_title": "No subscriptions found",
+      "empty_description": "There are no subscription plans available. Create one to get started.",
+      "table": {
+        "name": "Name",
+        "lessons_count": "Lessons",
+        "price": "Price",
+        "date": "Created Date",
+        "actions": "Actions"
+      },
+      "form": {
+        "name_placeholder": "Enter subscription name",
+        "lessons_count": "Lessons count",
+        "lessons_count_placeholder": "8",
+        "price": "Price",
+        "price_placeholder": "99.99"
+      },
+      "notifications": {
+        "create_success": "Subscription created successfully",
+        "create_error": "Failed to create subscription",
+        "update_success": "Subscription updated successfully",
+        "update_error": "Failed to update subscription",
+        "delete_success": "Subscription deleted successfully",
+        "delete_error": "Failed to delete subscription",
+        "bulk_delete_success": "Selected subscriptions deleted successfully",
+        "bulk_delete_error": "Failed to delete selected subscriptions"
+      },
+      "delete_confirm": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this subscription? This action cannot be undone.",
+        "bulk_description": "Are you sure you want to delete {count} selected subscriptions? This action cannot be undone."
+      }
     }
   }
 }

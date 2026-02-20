@@ -40,4 +40,21 @@ export const queryKeys = {
       detail: (id: string) => [...queryKeys.materials.files.all(), 'detail', id] as const,
     },
   },
+
+  // Finance
+  finance: {
+    all: ['finance'] as const,
+    subscriptions: {
+      all: () => [...queryKeys.finance.all, 'subscriptions'] as const,
+      list: (filters?: any) => [...queryKeys.finance.subscriptions.all(), 'list', filters] as const,
+      detail: (id: string) => [...queryKeys.finance.subscriptions.all(), 'detail', id] as const,
+    },
+  },
+
+  // Users
+  users: {
+    all: ['users'] as const,
+    list: (filters?: any) => [...queryKeys.users.all, 'list', filters] as const,
+    detail: (id: string) => [...queryKeys.users.all, 'detail', id] as const,
+  },
 } as const;

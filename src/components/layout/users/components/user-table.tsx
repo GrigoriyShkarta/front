@@ -4,6 +4,7 @@ import { Table, Checkbox, Avatar, Group, Text, ActionIcon, Menu, Badge, Paginati
 import { IoEllipsisHorizontal, IoPencilOutline, IoTrashOutline } from 'react-icons/io5';
 import { UserListItem } from '@/schemas/users';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 interface Props {
   users: UserListItem[];
@@ -100,10 +101,23 @@ export function UserTable({
       </Table.Td>
       <Table.Td>
         <Group gap="sm">
-          <Avatar src={user.avatar} radius="xl" size="sm">
+          <Avatar 
+            src={user.avatar} 
+            radius="xl" 
+            size="sm"
+            component={Link}
+            href={`/main/users/${user.id}`}
+            className="cursor-pointer hover:opacity-80 transition-opacity"
+          >
             {user.name.charAt(0)}
           </Avatar>
-          <Text size="sm" fw={500}>
+          <Text 
+            size="sm" 
+            fw={500}
+            component={Link}
+            href={`/main/users/${user.id}`}
+            className="cursor-pointer hover:text-blue-500 transition-colors"
+          >
             {user.name}
           </Text>
         </Group>

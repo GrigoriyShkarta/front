@@ -17,12 +17,14 @@ import { CourseContentItemRenderer } from './course-content-item';
 interface Props {
     content: CourseContentItem[];
     all_lessons: LessonMaterial[];
+    course_id: string;
+    active_lesson_id?: string;
 }
 
 /**
  * Section displaying the course curriculum (list of lessons and groups)
  */
-export function CourseCurriculum({ content, all_lessons }: Props) {
+export function CourseCurriculum({ content, all_lessons, course_id, active_lesson_id }: Props) {
     const t = useTranslations('Materials.courses');
 
     return (
@@ -42,6 +44,8 @@ export function CourseCurriculum({ content, all_lessons }: Props) {
                             item={item} 
                             all_lessons={all_lessons}
                             index={index}
+                            course_id={course_id}
+                            active_lesson_id={active_lesson_id}
                         />
                     ))
                 ) : (

@@ -4,6 +4,7 @@ import { userActions } from '../actions/user-actions';
 import { notifications } from '@mantine/notifications';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/hooks/use-auth';
+import { queryKeys } from '@/lib/query-keys';
 
 export const useUsersQuery = (params?: Record<string, any>) => {
   const t = useTranslations('Common');
@@ -11,7 +12,7 @@ export const useUsersQuery = (params?: Record<string, any>) => {
   const { user: current_user } = useAuth();
 
   const users_query = useQuery({
-    queryKey: ['users', params],
+    queryKey: queryKeys.users.list(params),
     queryFn: () => userActions.get_users(params),
   });
 
@@ -56,7 +57,7 @@ export const useUsersQuery = (params?: Record<string, any>) => {
   const create_user_mutation = useMutation({
     mutationFn: userActions.create_user,
     onSuccess: () => {
-      query_client.invalidateQueries({ queryKey: ['users'] });
+      query_client.invalidateQueries({ queryKey: queryKeys.users.all });
       notifications.show({
         title: t('success'),
         message: t('user_created_success'),
@@ -75,7 +76,7 @@ export const useUsersQuery = (params?: Record<string, any>) => {
   const update_user_mutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => userActions.update_user(id, data),
     onSuccess: () => {
-      query_client.invalidateQueries({ queryKey: ['users'] });
+      query_client.invalidateQueries({ queryKey: queryKeys.users.all });
       notifications.show({
         title: t('success'),
         message: t('user_updated_success'),
@@ -94,7 +95,7 @@ export const useUsersQuery = (params?: Record<string, any>) => {
   const delete_user_mutation = useMutation({
     mutationFn: userActions.delete_user,
     onSuccess: () => {
-      query_client.invalidateQueries({ queryKey: ['users'] });
+      query_client.invalidateQueries({ queryKey: queryKeys.users.all });
       notifications.show({
         title: t('success'),
         message: t('user_deleted_success'),
@@ -136,10 +137,10 @@ export const useUsersQuery = (params?: Record<string, any>) => {
     is_error: users_query.isError,
     teachers,
     current_user,
+    is_mutating: create_user_mutation.isPending || update_user_mutation.isPending || delete_user_mutation.isPending || bulk_delete_mutation.isPending,
     create_user: create_user_mutation.mutateAsync,
     update_user: update_user_mutation.mutateAsync,
     delete_user: delete_user_mutation.mutateAsync,
     bulk_delete: bulk_delete_mutation.mutateAsync,
-    is_mutating: create_user_mutation.isPending || update_user_mutation.isPending || delete_user_mutation.isPending || bulk_delete_mutation.isPending,
   };
 };

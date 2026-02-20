@@ -56,6 +56,7 @@ export function UserForm({ initial_data, teachers, current_user, on_submit, is_l
     setValue,
     setError,
     watch,
+    reset,
     formState: { errors, isValid },
   } = useForm<UserFormData>({
     resolver: zodResolver(user_form_schema),
@@ -104,8 +105,6 @@ export function UserForm({ initial_data, teachers, current_user, on_submit, is_l
       
       // 2. If creating a teacher, automatically attach to the super admin
       if (data.role === 'teacher') {
-        // If the current user is a super admin, attach the new teacher to them.
-        // Otherwise (e.g., an admin creating a teacher), attach to the current user's super admin.
         data.teacher_id = is_super_admin ? current_user?.id : current_user?.super_admin_id;
       }
 
@@ -127,9 +126,17 @@ export function UserForm({ initial_data, teachers, current_user, on_submit, is_l
 
   useEffect(() => {
     if (initial_data) {
+      reset({
+        name: initial_data.name,
+        email: initial_data.email,
+        role: initial_data.role,
+        teacher_id: initial_data.teacher_id || current_user?.id,
+        password: '',
+        categories: initial_data.categories?.map(c => c.id) || [],
+      });
       set_avatar_preview(initial_data.avatar || null);
     }
-  }, [initial_data]);
+  }, [initial_data, reset, current_user]);
 
   const available_roles = [
     ...(is_super_admin ? [{ value: 'admin', label: common_t('roles.admin') }] : []),

@@ -20,10 +20,10 @@ const LessonEditorContainer = dynamic(
  * Main entry point for the Lesson Editor component.
  * Wraps the internal editor structure and handles SSR safety.
  */
-export default function LessonEditor({ id, is_read_only = false }: { id?: string, is_read_only?: boolean }) {
+export default function LessonEditor({ id, is_read_only = false, course_id }: { id?: string, is_read_only?: boolean, course_id?: string }) {
   return (
     <div className="lesson-editor-root">
-      <LessonEditorContainer id={id} is_read_only={is_read_only} />
+      <LessonEditorContainer id={id} is_read_only={is_read_only} course_id={course_id} />
       
       <style jsx global>{`
         .lesson-editor-root {

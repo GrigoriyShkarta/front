@@ -1,6 +1,6 @@
 'use client';
 
-import { Stack, Button, Group, Text, Paper, ActionIcon, Box, TextInput, Modal, LoadingOverlay, Title, Drawer, MultiSelect, NumberInput, Switch } from '@mantine/core';
+import { Stack, Button, Group, Text, Paper, ActionIcon, Box, TextInput, Modal, LoadingOverlay, Title, Drawer, MultiSelect, NumberInput, Switch, Tooltip, Grid, Divider } from '@mantine/core';
 import { IoAddOutline, IoImageOutline, IoTrashOutline, IoChevronBackOutline, IoPencilOutline, IoOptionsOutline } from 'react-icons/io5';
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
@@ -14,6 +14,12 @@ import { useCategories } from '@/components/layout/categories/hooks/use-categori
 import { useCourses } from '@/components/layout/materials/courses/hooks/use-courses';
 import { CategoryDrawer as CreateCategoryDrawer } from '@/components/layout/categories/components/category-drawer';
 import { CreateCategoryForm } from '@/components/layout/categories/schemas/category-schema';
+import { useCourse } from '@/components/layout/materials/courses/hooks/use-course';
+import { useLessons } from '@/components/layout/materials/lessons/hooks/use-lessons';
+import { CourseCurriculum } from '@/components/layout/materials/courses/course/course-curriculum';
+import { CourseContentItem } from '@/components/layout/materials/courses/schemas/course-schema';
+import { IoArrowForwardOutline, IoArrowBackOutline, IoListOutline } from 'react-icons/io5';
+import { cn } from '@/lib/utils';
 
 interface LessonBlock {
   id: string;
@@ -24,13 +30,14 @@ interface LessonBlock {
 interface Props {
     id?: string;
     is_read_only?: boolean;
+    course_id?: string;
 }
 
 /**
  * Main Lesson Editor component
  * Manages multiple blocks of content, reordering, and media bank integration.
  */
-export default function LessonEditorContainer({ id, is_read_only = false }: Props) {
+export default function LessonEditorContainer({ id, is_read_only = false, course_id }: Props) {
   const t = useTranslations('Materials.lessons');
   const common_t = useTranslations('Common');
   const tCat = useTranslations('Categories');
@@ -56,6 +63,11 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
   const { categories: all_categories, create_category, create_categories, is_pending: is_cat_pending } = useCategories();
   const { courses: all_courses } = useCourses({ limit: 100 });
   const [category_drawer_opened, setCategoryDrawerOpened] = useState(false);
+
+  const { course: context_course, is_loading: is_loading_context_course } = useCourse(course_id || '');
+  const { lessons: all_lessons_context } = useLessons({ page: 1, limit: 1000, search: '' });
+
+  const [sidebar_opened, setSidebarOpened] = useState(true);
 
   const [blocks, setBlocks] = useState<LessonBlock[]>([
     { id: crypto.randomUUID(), content: '' }
@@ -227,20 +239,54 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
   };
 
   return (
-    <Stack 
-        gap="xl" 
-        maw={1000} 
+    <Box 
+        maw={course_id ? (sidebar_opened ? 1600 : 1200) : 1000} 
         mx="auto" 
         py="xl" 
+        px="md"
         onMouseUp={handleMouseUp} 
         onMouseLeave={handleMouseUp} 
         pos="relative"
-        style={{ 
-            userSelect: (readOnly && isCopyingDisabled && is_student) ? 'none' : undefined,
-            WebkitUserSelect: (readOnly && isCopyingDisabled && is_student) ? 'none' : undefined,
-        } as React.CSSProperties}
+        className="transition-all duration-500 ease-in-out"
     >
-      <LoadingOverlay visible={is_loading_lesson || is_saving} overlayProps={{ blur: 2 }} zIndex={100} />
+      <LoadingOverlay visible={is_loading_lesson || is_saving || (!!course_id && is_loading_context_course)} overlayProps={{ blur: 2 }} zIndex={100} />
+      
+      {course_id && (
+        <Box 
+            className={cn(
+                "hidden lg:block fixed top-1/2 -translate-y-1/2 z-[102] transition-all duration-500 ease-in-out",
+                sidebar_opened ? "right-[378px]" : "right-6"
+            )}
+        >
+            <Tooltip label={sidebar_opened ? t('editor.hide_sidebar') : t('editor.show_sidebar')} position="left">
+                <ActionIcon 
+                    size="xl" 
+                    radius="xl" 
+                    variant="filled" 
+                    color="primary"
+                    onClick={() => setSidebarOpened(!sidebar_opened)}
+                    className="shadow-2xl hover:scale-110 active:scale-95 transition-all"
+                    style={{
+                        backgroundColor: 'var(--mantine-primary-color-filled)',
+                        boxShadow: '0 0 20px rgba(var(--mantine-primary-color-main-filled), 0.4)'
+                    }}
+                >
+                    {sidebar_opened ? <IoArrowForwardOutline size={20} /> : <IoListOutline size={20} />}
+                </ActionIcon>
+            </Tooltip>
+        </Box>
+      )}
+
+      <Grid gutter={40} align="flex-start">
+        <Grid.Col span={{ base: 12, lg: (course_id && sidebar_opened) ? 8 : 12 }} pos="relative">
+            <Stack 
+                gap="xl" 
+                className="transition-all duration-500"
+                style={{ 
+                    userSelect: (readOnly && isCopyingDisabled && is_student) ? 'none' : undefined,
+                    WebkitUserSelect: (readOnly && isCopyingDisabled && is_student) ? 'none' : undefined,
+                } as React.CSSProperties}
+            >
       {/* Header with Back and Save/Edit buttons */}
       <Group justify="space-between" align="center" px="md" mb="md">
         <Button 
@@ -437,6 +483,102 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
             </Button>
         </Group>
       )}
+            </Stack>
+        </Grid.Col>
+        
+        {/* Full-Height Course Navigation Sidebar */}
+        {course_id && context_course && (
+            <Box 
+                className={cn(
+                    "hidden lg:block fixed top-0 bottom-0 z-[101] transition-all duration-500 ease-in-out border-l border-white/10",
+                    sidebar_opened ? "right-0 w-[400px] opacity-100" : "-right-[400px] w-0 opacity-0 pointer-events-none"
+                )}
+            >
+                <Paper 
+                    radius="0" 
+                    className="h-full bg-white/95 dark:bg-zinc-900/95 backdrop-blur-3xl flex flex-col"
+                    style={{
+                        boxShadow: '-10px 0 30px rgba(0, 0, 0, 0.05)'
+                    }}
+                >
+                    <Stack gap="0" className="h-full">
+                        {/* Custom Header Area for Sidebar */}
+                        <Box p="xl" pb="md" className="bg-zinc-50/50 dark:bg-white/5 border-b border-zinc-100 dark:border-white/5">
+                            <Group justify="space-between" align="flex-start" mb="xl" wrap="nowrap">
+                                <Stack gap={4}>
+                                    <Text size="xs" fw={800} c="primary" tt="uppercase" lts={2}>
+                                        {t('editor.course_navigation')}
+                                    </Text>
+                                    <Title order={3} className="line-clamp-2 leading-tight">
+                                        {context_course.name}
+                                    </Title>
+                                </Stack>
+                            </Group>
+                            
+                            <Stack gap={8}>
+                                <Group justify="space-between">
+                                    <Text size="xs" fw={700} c="dimmed">{t('editor.your_progress')}</Text>
+                                    <Text size="xs" fw={700} c="primary">
+                                        {(() => {
+                                            const all_ids = context_course.content.flatMap((item: CourseContentItem) => 
+                                                item.type === 'lesson' ? [item.lesson_id] : item.lesson_ids
+                                            );
+                                            const current_index = all_ids.indexOf(id || '');
+                                            const progress = all_ids.length > 0 ? Math.round(((current_index + 1) / all_ids.length) * 100) : 0;
+                                            return `${progress}%`;
+                                        })()}
+                                    </Text>
+                                </Group>
+                                <Box h={6} className="bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                    <Box 
+                                        h="100%" 
+                                        className="bg-primary rounded-full transition-all duration-1000"
+                                        style={{ 
+                                            width: (() => {
+                                                const all_ids = context_course.content.flatMap((item: CourseContentItem) => 
+                                                    item.type === 'lesson' ? [item.lesson_id] : item.lesson_ids
+                                                );
+                                                const current_index = all_ids.indexOf(id || '');
+                                                return `${all_ids.length > 0 ? ((current_index + 1) / all_ids.length) * 100 : 0}%`;
+                                            })()
+                                        }}
+                                    />
+                                </Box>
+                            </Stack>
+                        </Box>
+
+                        <Box p="xl" className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+                            <CourseCurriculum 
+                                content={context_course.content} 
+                                all_lessons={all_lessons_context} 
+                                course_id={course_id} 
+                                active_lesson_id={id}
+                            />
+                        </Box>
+                    </Stack>
+                </Paper>
+            </Box>
+        )}
+
+        {/* Mobile Sidebar (Standard Flow) */}
+        {course_id && context_course && (
+            <Grid.Col span={12} className="lg:hidden mt-10">
+                <Paper p="xl" radius="24px" withBorder className="bg-zinc-50/50 dark:bg-zinc-900/50 backdrop-blur-xl">
+                    <Stack gap="lg">
+                        <Text size="xs" fw={700} c="primary" tt="uppercase" lts={1}>
+                            {t('editor.course_navigation')}
+                        </Text>
+                        <CourseCurriculum 
+                            content={context_course.content} 
+                            all_lessons={all_lessons_context} 
+                            course_id={course_id} 
+                            active_lesson_id={id}
+                        />
+                    </Stack>
+                </Paper>
+            </Grid.Col>
+        )}
+      </Grid>
 
       <MediaPickerModal 
         opened={bankOpened}
@@ -549,6 +691,6 @@ export default function LessonEditorContainer({ id, is_read_only = false }: Prop
         onSubmit={handle_category_create_submit}
         loading={is_cat_pending}
       />
-    </Stack>
+    </Box>
   );
 }

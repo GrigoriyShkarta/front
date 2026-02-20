@@ -128,6 +128,7 @@ export function CourseView({ id }: Props) {
                         <CourseCurriculum 
                             content={filtered_content}
                             all_lessons={all_lessons}
+                            course_id={id}
                         />
                     </Grid.Col>
 

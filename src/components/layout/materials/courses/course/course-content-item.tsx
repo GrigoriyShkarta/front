@@ -20,12 +20,14 @@ interface Props {
     item: CourseContentItem;
     all_lessons: LessonMaterial[];
     index: number;
+    course_id: string;
+    active_lesson_id?: string;
 }
 
 /**
  * Renders a course content item (either a single lesson or a group of lessons)
  */
-export function CourseContentItemRenderer({ item, all_lessons, index }: Props) {
+export function CourseContentItemRenderer({ item, all_lessons, index, course_id, active_lesson_id }: Props) {
     const t = useTranslations('Materials.courses');
     const [opened, set_opened] = useState(true);
 
@@ -80,6 +82,8 @@ export function CourseContentItemRenderer({ item, all_lessons, index }: Props) {
                                     lesson={lesson} 
                                     index={`${index + 1}.${l_index + 1}`} 
                                     is_standalone
+                                    course_id={course_id}
+                                    active_lesson_id={active_lesson_id}
                                 />
                             );
                         })}
@@ -95,6 +99,8 @@ export function CourseContentItemRenderer({ item, all_lessons, index }: Props) {
             lesson={lesson} 
             index={index + 1} 
             is_standalone
+            course_id={course_id}
+            active_lesson_id={active_lesson_id}
         />
     );
 }
