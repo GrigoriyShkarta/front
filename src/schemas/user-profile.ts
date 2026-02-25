@@ -31,6 +31,7 @@ export const user_schema = z.object({
     name: z.string(),
   }).nullable().optional(),
   teacher_id: z.string().nullable().optional(),
+  learning_goals: z.string().nullable().optional(),
   is_premium: z.boolean().default(false),
   space: z.object({
     personalization: personalization_schema.nullable().optional(),

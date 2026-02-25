@@ -37,7 +37,8 @@
       "invalid_color": "Invalid color format",
       "subscription_name_required": "Subscription name is required",
       "subscription_price_required": "Subscription price is required",
-      "subscription_lessons_count_required": "Lessons count must be at least 1"
+      "subscription_lessons_count_required": "Lessons count must be at least 1",
+      "at_least_one_day": "Select at least one day"
     },
     "roles": {
       "super_admin": "Super Admin",
@@ -52,7 +53,34 @@
     "minutes": "min",
     "lessons": "lessons",
     "ok": "OK",
-    "items": "items"
+    "items": "items",
+    "days_of_week": "Lesson Days",
+    "preview": "Schedule Preview",
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "payment_status": "Payment Status",
+    "payment_statuses": {
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "partially_paid": "Partially Paid"
+    },
+    "paid_amount": "Paid Amount",
+    "payment_date": "Payment date of subscription",
+    "payment_details": "Payment Details",
+    "lesson_status": "Lesson status",
+    "lesson_statuses": {
+      "attended": "Attended",
+      "scheduled": "Scheduled",
+      "burned": "Missed",
+      "rescheduled": "Rescheduled"
+    }
   },
   "Auth": {
     "login": {
@@ -99,6 +127,7 @@
     "dashboard": "Dashboard",
     "finance": "Finance",
     "subscriptions": "Subscriptions",
+    "reports": "Reports",
     "select_language": "Select Language",
     "logout": "Logout",
     "logout_confirm_title": "Confirm Logout",
@@ -168,6 +197,7 @@
       "role": "Role",
       "attached_to": "Attached to",
       "categories": "Categories",
+      "status": "Status",
       "actions": "Actions"
     },
     "cropper": {
@@ -181,7 +211,9 @@
     },
     "drawer": {
       "add_title": "Add New User",
-      "edit_title": "Edit User"
+      "edit_title": "Edit User",
+      "add_student_title": "Add New Student",
+      "edit_student_title": "Edit Student Profile"
     },
     "form": {
       "avatar": "Avatar",
@@ -197,7 +229,21 @@
       "select_teacher": "Select a teacher",
       "categories": "Categories",
       "create_category": "Create Category",
-      "categories_placeholder": "Select categories"
+      "categories_placeholder": "Select categories",
+      "learning_goals": "Learning Goals",
+      "learning_goals_placeholder": "What are your goals for learning?",
+      "selected_days": "Schedule",
+      "start_date": "Start Date",
+      "next_payment_date": "Next payment date",
+      "payment_reminder": "Payment reminder (one week before)",
+      "partial_payment_date": "Date of additional payment",
+      "status": "Status",
+      "status_active": "Active",
+      "status_inactive": "Inactive",
+      "is_avatar_locked": "Lock editing avatar",
+      "is_name_locked": "Lock editing name",
+      "deactivation_date": "Deactivation date",
+      "permissions": "Permissions"
     },
     "delete_modal": {
       "title": "Confirm Deletion",
@@ -209,8 +255,22 @@
       "subscriptions": "Subscriptions",
       "activity": "Activity"
     },
+    "tabs_drawer": {
+      "personal": "Personal Data",
+      "settings": "Settings"
+    },
     "not_found": "User not found",
-    "no_subscriptions_yet": "This user has no active subscriptions yet."
+    "no_subscriptions_yet": "This user has no active subscriptions yet.",
+    "no_goals_yet": "No goals specified yet.",
+    "social": "Social & Contact",
+    "student_details": "Student Details",
+    "add_subscription": "Add Subscription",
+    "subscription": "Subscription",
+    "no_subscriptions": "No subscriptions found",
+    "price": "Price",
+    "selected": "selected",
+    "need_more_lessons": "Need {count} more lessons",
+    "remove_lessons": "Remove {count} extra lessons"
   },
   "Profile": {
     "title": "My Profile",
@@ -715,6 +775,31 @@
         "description": "Are you sure you want to delete this subscription? This action cannot be undone.",
         "bulk_description": "Are you sure you want to delete {count} selected subscriptions? This action cannot be undone."
       }
+    },
+    "reports": {
+      "title": "Financial Reports",
+      "subtitle": "Revenue analytics and statistics for the selected period.",
+      "total_revenue": "Total Revenue",
+      "expected_revenue": "Expected Revenue",
+      "active_students": "Active Students",
+      "sold_subscriptions": "Subscriptions Sold",
+      "real_income_tab": "Real Income",
+      "expected_income_tab": "Expected Income",
+      "student": "Student",
+      "amount": "Amount",
+      "date": "Date",
+      "subscription": "Subscription",
+      "breakdown_title": "Subscription Breakdown",
+      "sold_count": "Sold",
+      "revenue_share": "Revenue Share",
+      "no_data": "No data for this period",
+      "no_breakdown_data": "No subscription data",
+      "payment_types": {
+        "renewal": "Renewal",
+        "balance": "Balance",
+        "paid": "Paid"
+      },
+      "select_period": "Select period"
     }
   }
 }

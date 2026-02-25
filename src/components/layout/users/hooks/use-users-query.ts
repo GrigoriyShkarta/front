@@ -14,6 +14,7 @@ export const useUsersQuery = (params?: Record<string, any>) => {
   const users_query = useQuery({
     queryKey: queryKeys.users.list(params),
     queryFn: () => userActions.get_users(params),
+    enabled: !!current_user && current_user?.role !== 'student',
   });
 
   const users_list = users_query.data?.data || [];
@@ -75,8 +76,14 @@ export const useUsersQuery = (params?: Record<string, any>) => {
 
   const update_user_mutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => userActions.update_user(id, data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       query_client.invalidateQueries({ queryKey: queryKeys.users.all });
+      
+      // If updating self, also invalidate auth user query
+      if (current_user && variables.id === current_user.id) {
+        query_client.invalidateQueries({ queryKey: queryKeys.auth.user() });
+      }
+
       notifications.show({
         title: t('success'),
         message: t('user_updated_success'),

@@ -11,6 +11,15 @@ export const user_form_schema = z.object({
   avatar: z.any().optional(), // File or string URL
   teacher_id: z.string().optional().nullable(),
   categories: z.array(z.string()).optional(),
+  learning_goals: z.string().optional(),
+  birthday: z.string().nullable().optional(),
+  city: z.string().nullable().optional(),
+  telegram: z.string().nullable().optional(),
+  instagram: z.string().nullable().optional(),
+  status: z.enum(['active', 'inactive']),
+  is_avatar_locked: z.boolean(),
+  is_name_locked: z.boolean(),
+  deactivation_date: z.string().nullable().optional(),
 });
 
 export type UserFormData = z.infer<typeof user_form_schema>;
@@ -32,11 +41,16 @@ export const user_response_schema = z.object({
   telegram: z.string().nullable().optional(),
   instagram: z.string().nullable().optional(),
   is_premium: z.boolean().optional(),
+  status: z.enum(['active', 'inactive']).optional(),
+  is_avatar_locked: z.boolean().optional(),
+  is_name_locked: z.boolean().optional(),
+  deactivation_date: z.string().nullable().optional(),
   categories: z.array(z.object({
     id: z.string(),
     name: z.string(),
     color: z.string().optional(),
   })).optional(),
+  learning_goals: z.string().nullable().optional(),
 });
 
 export type UserListItem = z.infer<typeof user_response_schema>;

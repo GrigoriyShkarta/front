@@ -6,7 +6,7 @@ import { queryKeys } from '@/lib/query-keys';
 
 export const useUserQuery = (id: string) => {
   const query = useQuery({
-    queryKey: ['user-detail', id],
+    queryKey: queryKeys.users.detail(id),
     queryFn: () => userActions.get_user(id),
     enabled: !!id,
     staleTime: 0,

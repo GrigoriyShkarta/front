@@ -100,13 +100,11 @@ export function UserTable({
         </Menu>
       </Table.Td>
       <Table.Td>
-        <Group gap="sm">
+        <Box component={Link} href={`/main/users/${user.id}`} className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
           <Avatar 
             src={user.avatar} 
             radius="xl" 
             size="sm"
-            component={Link}
-            href={`/main/users/${user.id}`}
             className="cursor-pointer hover:opacity-80 transition-opacity"
           >
             {user.name.charAt(0)}
@@ -114,13 +112,22 @@ export function UserTable({
           <Text 
             size="sm" 
             fw={500}
-            component={Link}
-            href={`/main/users/${user.id}`}
             className="cursor-pointer hover:text-blue-500 transition-colors"
           >
             {user.name}
           </Text>
-        </Group>
+        </Box>
+      </Table.Td>
+      <Table.Td>
+        {user.role === 'student' && (
+          <Badge 
+            color={user.status === 'active' ? 'green' : 'red'} 
+            variant="light" 
+            size="sm"
+          >
+            {user.status === 'active' ? t('form.status_active') : t('form.status_inactive')}
+          </Badge>
+        )}
       </Table.Td>
       <Table.Td>
         <Text size="sm">{user.email}</Text>
@@ -148,6 +155,7 @@ export function UserTable({
           ))}
         </Group>
       </Table.Td>
+      
       {/* <Table.Td>
         <Text size="sm" c="dimmed">
           {get_attached_name(user)}
@@ -172,6 +180,7 @@ export function UserTable({
               </Table.Th>
               <Table.Th style={{ width: 80 }}>{t('table.actions')}</Table.Th>
               <Table.Th>{t('table.user')}</Table.Th>
+              <Table.Th>{t('table.status')}</Table.Th>
               <Table.Th>{t('table.email')}</Table.Th>
               {/* <Table.Th>{t('table.role')}</Table.Th> */}
               <Table.Th>{t('table.categories')}</Table.Th>

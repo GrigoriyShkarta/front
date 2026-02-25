@@ -4,24 +4,26 @@ import { Tabs, Stack, Title, Paper, Text, Breadcrumbs, Anchor, Box } from '@mant
 import { IoPersonOutline, IoLockClosedOutline } from 'react-icons/io5';
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { ProfileInfoForm } from './components/profile-info-form';
 import { SecurityForm } from './components/security-form';
 import { useProfile } from './hooks/use-profile';
 
 /**
- * Main profile layout with tabs for different sections.
- * Displays user's name and breadcrumbs.
+ * Main profile layout for non-student roles.
+ * Supports nested routing for consistency.
  */
-export function ProfileLayout() {
+export function ProfileLayout({ children }: { children?: React.ReactNode }) {
   const { user } = useAuth();
   const t = useTranslations('Profile');
   const tNav = useTranslations('Navigation');
+  const pathname = usePathname();
+  const router = useRouter();
   const { update_profile, is_updating, change_password, is_changing_password } = useProfile();
 
   if (!user) return null;
 
-  console.log('user', user);
+  const active_tab = pathname.endsWith('/security') ? 'security' : 'general';
 
   const breadcrumb_items = [
     { title: tNav('dashboard'), href: '/main' },
@@ -41,10 +43,18 @@ export function ProfileLayout() {
       </Stack>
 
       <Paper withBorder radius="md" p={0} className="bg-white/5 border-white/10 overflow-hidden">
-        <Tabs defaultValue="general" variant="outline" classNames={{
-           list: 'pl-5 border-b border-white/10',
-           tab: 'h-[50px] border-b-2 border-transparent data-[active=true]:border-blue-500 transition-colors'
-        }}>
+        <Tabs 
+          value={active_tab} 
+          variant="outline" 
+          onChange={(val) => {
+            if (val === 'general') router.push('/main/profile');
+            if (val === 'security') router.push('/main/profile/security');
+          }}
+          classNames={{
+            list: 'pl-5 border-b border-white/10',
+            tab: 'h-[50px] border-b-2 border-transparent data-[active=true]:border-blue-500 transition-colors'
+          }}
+        >
           <Tabs.List>
             <Tabs.Tab value="general" leftSection={<IoPersonOutline size={16} />}>
               {t('tabs.general')}
@@ -54,15 +64,15 @@ export function ProfileLayout() {
             </Tabs.Tab>
           </Tabs.List>
 
-          <Tabs.Panel value="general" p="xl">
-            <Box maw={1000}>
-              <ProfileInfoForm user={user} on_submit={update_profile} is_loading={is_updating} />
-            </Box>
-          </Tabs.Panel>
-
-          <Tabs.Panel value="security" p="xl">
-            <SecurityForm on_submit={change_password} is_loading={is_changing_password} />
-          </Tabs.Panel>
+          <Box p="xl">
+            {children || (
+               active_tab === 'general' ? 
+               <Box maw={1000}>
+                 <ProfileInfoForm user={user} on_submit={update_profile} is_loading={is_updating} />
+               </Box> : 
+               <SecurityForm on_submit={change_password} is_loading={is_changing_password} />
+            )}
+          </Box>
         </Tabs>
       </Paper>
     </Stack>

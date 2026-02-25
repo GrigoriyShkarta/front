@@ -1,18 +1,18 @@
-import { PageContainer } from '@/components/common/page-container';
-import { UserProfileLayout } from '@/components/layout/users/user-profile-layout';
-import { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'User Profile | Lirnexa',
-  description: 'View and manage user profile details.',
-};
+import { useUserQuery } from '@/components/layout/users/hooks/use-user-query';
+import { useParams } from 'next/navigation';
+import { LoadingOverlay, Box } from '@mantine/core';
+import { StudentGeneralInfo } from '@/components/layout/users/studentProfile/components/student-general-info';
 
-export default async function UserProfilePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default function UserProfilePage() {
+  const params = useParams();
+  const id = params?.id as string;
   
-  return (
-    <PageContainer>
-      <UserProfileLayout id={id} />
-    </PageContainer>
-  );
+  const { user, is_loading } = useUserQuery(id);
+
+  if (is_loading) return <Box mih={200} pos="relative"><LoadingOverlay visible /></Box>;
+  if (!user) return null;
+
+  return <StudentGeneralInfo user={user} />;
 }

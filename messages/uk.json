@@ -52,7 +52,34 @@
     "minutes": "хв",
     "lessons": "занять",
     "ok": "ОК",
-    "items": "елем."
+    "items": "елем.",
+    "days_of_week": "Дні занять",
+    "preview": "Попередній перегляд розкладу",
+    "days": {
+      "mon": "Пн",
+      "tue": "Вт",
+      "wed": "Ср",
+      "thu": "Чт",
+      "fri": "Пт",
+      "sat": "Сб",
+      "sun": "Нд"
+    },
+    "payment_status": "Статус оплати",
+    "payment_statuses": {
+      "paid": "Оплачено",
+      "unpaid": "Не оплачено",
+      "partially_paid": "Оплачено частково"
+    },
+    "paid_amount": "Сплачена сума",
+    "payment_date": "Дата оплати абонемента",
+    "payment_details": "Деталі оплати",
+    "lesson_status": "Статус заняття",
+    "lesson_statuses": {
+      "attended": "Відвідано",
+      "scheduled": "Заплановано",
+      "burned": "Згоріло",
+      "rescheduled": "Перенесено"
+    }
   },
   "Auth": {
     "login": {
@@ -99,6 +126,7 @@
     "dashboard": "Головна",
     "finance": "Фінанси",
     "subscriptions": "Абонементи",
+    "reports": "Звіти",
     "select_language": "Вибрати мову",
     "logout": "Вийти",
     "logout_confirm_title": "Підтвердження виходу",
@@ -168,6 +196,7 @@
       "role": "Роль",
       "attached_to": "Прив'язаний до",
       "categories": "Категорії",
+      "status": "Статус",
       "actions": "Дії"
     },
     "cropper": {
@@ -181,7 +210,9 @@
     },
     "drawer": {
       "add_title": "Додати нового користувача",
-      "edit_title": "Редагувати користувача"
+      "edit_title": "Редагувати користувача",
+      "add_student_title": "Додати нового студента",
+      "edit_student_title": "Редагувати профіль студента"
     },
     "form": {
       "avatar": "Аватар",
@@ -197,7 +228,22 @@
       "select_teacher": "Оберіть вчителя",
       "categories": "Категорії",
       "create_category": "Створити категорію",
-      "categories_placeholder": "Оберіть категорії"
+      "categories_placeholder": "Оберіть категорії",
+      "learning_goals": "Цілі навчання",
+      "learning_goals_placeholder": "Які ваші цілі навчання?",
+      "selected_days": "Розклад",
+      "start_date": "Дата початку",
+      "next_payment_date": "Дата наступної оплати",
+      "payment_reminder": "Нагадування про оплату (за тиждень)",
+      "partial_payment_date": "Дата доплати",
+      "status": "Статус",
+      "status_active": "Активний",
+      "status_inactive": "Неактивний",
+      "is_avatar_locked": "Заблокувати редагування аватара",
+      "is_name_locked": "Заблокувати редагування імені",
+      "deactivation_date": "Дата деактивації",
+      "permissions": "Дозволи",
+      "extend_subscription": "Продовжити абонемент"
     },
     "delete_modal": {
       "title": "Підтвердження видалення",
@@ -209,8 +255,22 @@
       "subscriptions": "Абонементи",
       "activity": "Активність"
     },
+    "tabs_drawer": {
+      "personal": "Особисті дані",
+      "settings": "Налаштування"
+    },
     "not_found": "Користувача не знайдено",
-    "no_subscriptions_yet": "У цього користувача ще немає активних абонементів."
+    "no_subscriptions_yet": "У цього користувача ще немає активних абонементів.",
+    "no_goals_yet": "Цілі ще не вказані.",
+    "social": "Соцмережі та контакти",
+    "student_details": "Деталі студента",
+    "add_subscription": "Додати абонемент",
+    "subscription": "Абонемент",
+    "no_subscriptions": "Абонементів не знайдено",
+    "price": "Ціна",
+    "selected": "вибрано",
+    "need_more_lessons": "Потрібно ще {count} занять",
+    "remove_lessons": "Видалити {count} зайвих занять"
   },
   "Profile": {
     "title": "Мій профіль",
@@ -722,6 +782,31 @@
         "description": "Ви впевнені, що хочете видалити цей абонемент? Цю дію неможливо скасувати.",
         "bulk_description": "Ви впевнені, що хочете видалити {count} вибраних абонементів? Цю дію неможливо скасувати."
       }
+    },
+    "reports": {
+      "title": "Фінансові звіти",
+      "subtitle": "Аналітика доходів та статистика за вибраний період.",
+      "total_revenue": "Загальний дохід",
+      "expected_revenue": "Очікуваний дохід",
+      "active_students": "Активні студенти",
+      "sold_subscriptions": "Продано абонементів",
+      "real_income_tab": "Реальний дохід",
+      "expected_income_tab": "Очікуваний дохід",
+      "student": "Студент",
+      "amount": "Сума",
+      "date": "Дата",
+      "subscription": "Абонемент",
+      "breakdown_title": "Розподіл за абонементами",
+      "sold_count": "Продано",
+      "revenue_share": "Частка доходу",
+      "no_data": "Немає даних за цей період",
+      "no_breakdown_data": "Немає даних про продаж абонементів",
+      "payment_types": {
+        "renewal": "Продовження",
+        "balance": "Доплата",
+        "paid": "Сплачено"
+      },
+      "select_period": "Оберіть період"
     }
   }
 }

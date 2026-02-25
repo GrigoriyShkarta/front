@@ -95,6 +95,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
         href: '/main/finance/subscriptions',
         icon: IoCardOutline,
         roles: ['super_admin', 'admin'],
+      },
+      {
+        label: 'reports',
+        href: '/main/finance/reports',
+        icon: IoDocumentOutline,
+        roles: ['super_admin', 'admin'],
       }
     ]
   }
