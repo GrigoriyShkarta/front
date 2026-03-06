@@ -27,10 +27,14 @@ import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer
 import { CourseMaterial, CreateCourseForm } from './schemas/course-schema';
 import { cn } from "@/lib/utils";
 
+import { useAuth } from "@/hooks/use-auth";
+
 export default function CoursesLayout() {
     const t = useTranslations('Materials.courses');
     const tNav = useTranslations('Navigation');
     const common_t = useTranslations('Common');
+    const { user } = useAuth();
+    const is_student = user?.role === 'student';
 
     const breadcrumb_items = [
         { title: tNav('dashboard'), href: '/main' },
@@ -126,15 +130,10 @@ export default function CoursesLayout() {
                 </Breadcrumbs>
 
                 <Group justify="space-between" align="flex-end">
-                    <Stack gap={0}>
-                        <Title order={2}>{t('title')}</Title>
-                        <Text color="dimmed" size="sm">
-                            {t('subtitle')}
-                        </Text>
-                    </Stack>
+                    <Title order={2}>{t('title')}</Title>
                     
                     <Group>
-                         {selected_ids.length > 0 && (
+                         {!is_student && selected_ids.length > 0 && (
                               <Button 
                                  color="red" 
                                  variant="light" 
@@ -163,13 +162,15 @@ export default function CoursesLayout() {
                             )}
                         </Button>
 
-                        <Button 
-                            leftSection={<IoAddOutline size={18} />} 
-                            onClick={handle_create}
-                            className="bg-blue-600 hover:bg-blue-700"
-                        >
-                            {t('add_course')}
-                        </Button>
+                        {!is_student && (
+                            <Button 
+                                leftSection={<IoAddOutline size={18} />} 
+                                onClick={handle_create}
+                                className="bg-blue-600 hover:bg-blue-700"
+                            >
+                                {t('add_course')}
+                            </Button>
+                        )}
                     </Group>
                 </Group>
 
@@ -250,11 +251,13 @@ export default function CoursesLayout() {
                                 <Text c="dimmed" size="sm" ta="center" maw={400}>
                                     {t('empty_description')}
                                 </Text>
-                                <Group mt="sm">
-                                    <Button variant="light" onClick={handle_create}>
-                                        {t('add_course')}
-                                    </Button>
-                                </Group>
+                                {!is_student && (
+                                    <Group mt="sm">
+                                        <Button variant="light" onClick={handle_create}>
+                                            {t('add_course')}
+                                        </Button>
+                                    </Group>
+                                )}
                             </Stack>
                         )
                     )}

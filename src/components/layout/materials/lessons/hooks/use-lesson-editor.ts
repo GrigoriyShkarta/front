@@ -7,17 +7,18 @@ import { CreateLessonForm } from '../schemas/lesson-schema';
 
 interface EditorProps {
     id?: string;
+    student_id?: string;
 }
 
-export function useLessonEditor({ id }: EditorProps = {}) {
+export function useLessonEditor({ id, student_id }: EditorProps = {}) {
     const queryClient = useQueryClient();
     const router = useRouter();
     const t = useTranslations('Materials.lessons');
     const common_t = useTranslations('Common');
 
     const { data: lesson, isLoading: is_loading_lesson } = useQuery({
-        queryKey: ['lesson', id],
-        queryFn: () => lessonActions.get_lesson(id!),
+        queryKey: ['lesson', id, student_id],
+        queryFn: () => lessonActions.get_lesson(id!, student_id),
         enabled: !!id,
     });
 

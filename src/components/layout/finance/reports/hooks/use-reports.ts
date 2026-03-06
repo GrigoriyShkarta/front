@@ -5,12 +5,28 @@ import { userActions } from '@/components/layout/users/actions/user-actions';
 import { useMemo } from 'react';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import { financeReportActions } from '../actions/finance-report-actions';
 
 dayjs.extend(isBetween);
 
 export const useReports = (dateRange: [Date | null, Date | null]) => {
   const [startDate, endDate] = dateRange;
 
+  const start_date_str = startDate ? dayjs(startDate).format('YYYY-MM-DD') : undefined;
+  const end_date_str = endDate ? dayjs(endDate).format('YYYY-MM-DD') : undefined;
+
+  // New transactions query for real income
+  const transactionsQuery = useQuery({
+    queryKey: ['finance-transactions', { start_date: start_date_str, end_date: end_date_str }],
+    queryFn: () => financeReportActions.get_transactions({ 
+      start_date: start_date_str, 
+      end_date: end_date_str 
+    }),
+  });
+
+  // Keep users query for expected income and active students count
+  // We can optimize this by only fetching active students if needed, 
+  // but for now we keep it similar to original but focused on expected.
   const usersQuery = useQuery({
     queryKey: ['users-reports', { role: 'student', include_subscriptions: true }],
     queryFn: () => userActions.get_users({ 
@@ -21,15 +37,66 @@ export const useReports = (dateRange: [Date | null, Date | null]) => {
   });
 
   const stats = useMemo(() => {
-    if (!usersQuery.data) return null;
-
-    const allStudents = usersQuery.data.data as any[];
+    const transactions = transactionsQuery.data || [];
+    const allStudents = usersQuery.data?.data as any[] || [];
+    
     const start = startDate ? dayjs(startDate).startOf('day') : null;
     const end = endDate ? dayjs(endDate).endOf('day') : null;
 
+    // --- REAL INCOME (FROM NEW API) ---
+    // The API already filtered by date, so we just group/map it for the UI
+    const totalRevenue = transactions.reduce((acc: number, t: any) => acc + (t.amount || 0), 0);
+    
+    const groupRealByStudent = (data: any[]) => {
+        const groups: Record<string, any> = {};
+        data.forEach((item: any) => {
+            const sid = item.student_id;
+            if (!groups[sid]) {
+                groups[sid] = {
+                    id: sid,
+                    student: item.student,
+                    price: 0,
+                    subscriptionNames: new Set<string>(),
+                    date: item.payment_date,
+                    payment_status: item.payment_status
+                };
+            }
+            groups[sid].price += (item.amount || 0);
+            const subName = item.name || item.subscription?.name;
+            if (subName) groups[sid].subscriptionNames.add(subName);
+            if (item.payment_status === 'partially_paid') groups[sid].payment_status = 'partially_paid';
+            if (dayjs(item.payment_date).isAfter(dayjs(groups[sid].date))) groups[sid].date = item.payment_date;
+        });
+
+        return Object.values(groups).map(g => ({
+            ...g,
+            payment_date: g.date,
+            subscription: { name: Array.from(g.subscriptionNames).join(', ') }
+        }));
+    };
+
+    const realIncomeList = groupRealByStudent(transactions);
+
+    const breakdownMap: Record<string, { count: number; revenue: number; name: string }> = {};
+    transactions.forEach((t: any) => {
+      const templateId = t.subscription_id;
+      const subName = t.name || t.subscription?.name || 'Unknown';
+      const key = templateId || `individual-${subName}`;
+      
+      if (!breakdownMap[key]) {
+        breakdownMap[key] = { count: 0, revenue: 0, name: subName };
+      }
+      breakdownMap[key].count++;
+      breakdownMap[key].revenue += (t.amount || 0);
+    });
+
+    const breakdown = Object.values(breakdownMap).sort((a, b) => b.revenue - a.revenue);
+
+    // --- EXPECTED INCOME (STILL CLIENT-SIDE CALCULATION) ---
+    const expectedEntries: any[] = [];
+    
     // Identify the latest subscription for each student
     const studentLatestSubMap: Record<string, string> = {};
-    
     allStudents.forEach(student => {
         const subs = (student.purchased_subscriptions || []);
         if (subs.length > 0) {
@@ -38,43 +105,6 @@ export const useReports = (dateRange: [Date | null, Date | null]) => {
         }
     });
 
-    // Flatten all subscriptions for Real Income (historical data includes all subs)
-    const allSubscriptions: any[] = allStudents.reduce((acc, student) => {
-        const subs = (student.purchased_subscriptions || []).map((sub: any) => ({
-            ...sub,
-            student: {
-                id: student.id,
-                name: student.name,
-                email: student.email,
-                avatar: student.avatar,
-                status: student.status
-            }
-        }));
-        return [...acc, ...subs];
-    }, []);
-
-    // --- REAL INCOME (ALREADY PAID) ---
-    const realIncomeRaw = allSubscriptions.filter(sub => {
-      const isPaid = sub.payment_status === 'paid';
-      const isPartial = sub.payment_status === 'partially_paid';
-      
-      if (!isPaid && !isPartial) return false;
-      if (!sub.payment_date) return false;
-      
-      if (!start || !end) return true;
-      const payDate = dayjs(sub.payment_date);
-      return payDate.isBetween(start, end, null, '[]');
-    }).map(sub => ({
-        ...sub,
-        reportAmount: sub.payment_status === 'paid' ? (sub.price || 0) : (sub.paid_amount || 0),
-        reportDate: sub.payment_date,
-        reportStatus: sub.payment_status
-    }));
-
-    // --- EXPECTED INCOME (FUTURE PAYMENTS) ---
-    const expectedEntries: any[] = [];
-
-    // ONLY process the latest subscription for each student for expected income
     allStudents.forEach(student => {
         if (student.status !== 'active') return;
         
@@ -107,7 +137,7 @@ export const useReports = (dateRange: [Date | null, Date | null]) => {
                     reportDate: subWithStudent.next_payment_date,
                     reportStatus: 'renewal',
                     isRenewal: true,
-                    isLatestSub: true // Always true here now
+                    isLatestSub: true
                 });
             }
         }
@@ -125,43 +155,13 @@ export const useReports = (dateRange: [Date | null, Date | null]) => {
                     reportDate: subWithStudent.partial_payment_date,
                     reportStatus: 'balance',
                     isBalance: true,
-                    isLatestSub: true // Always true here now
+                    isLatestSub: true
                 });
             }
         }
     });
 
-    const totalRevenue = realIncomeRaw.reduce((acc, sub) => acc + sub.reportAmount, 0);
-    const expectedRevenue = expectedEntries.reduce((acc, sub) => acc + sub.reportAmount, 0);
-    const activeStudentsCount = allStudents.filter(s => s.status === 'active').length;
-
-    const groupRealByStudent = (data: any[]) => {
-        const groups: Record<string, any> = {};
-        data.forEach(item => {
-            const sid = item.student_id;
-            if (!groups[sid]) {
-                groups[sid] = {
-                    id: sid,
-                    student: item.student,
-                    price: 0,
-                    subscriptionNames: new Set<string>(),
-                    date: item.reportDate,
-                    payment_status: item.reportStatus
-                };
-            }
-            groups[sid].price += item.reportAmount;
-            if (item.subscription?.name) groups[sid].subscriptionNames.add(item.subscription.name);
-            if (item.reportStatus === 'partially_paid') groups[sid].payment_status = 'partially_paid';
-            if (dayjs(item.reportDate).isAfter(dayjs(groups[sid].date))) groups[sid].date = item.reportDate;
-        });
-
-        return Object.values(groups).map(g => ({
-            ...g,
-            payment_date: g.date,
-            subscription: { name: Array.from(g.subscriptionNames).join(', ') }
-        }));
-    };
-
+    const expectedRevenue = expectedEntries.reduce((acc, entry) => acc + entry.reportAmount, 0);
     const expectedIncomeList = expectedEntries.map(entry => ({
         ...entry,
         price: entry.reportAmount,
@@ -169,37 +169,25 @@ export const useReports = (dateRange: [Date | null, Date | null]) => {
         payment_status: entry.reportStatus,
     })).sort((a, b) => dayjs(a.reportDate).valueOf() - dayjs(b.reportDate).valueOf());
 
-    const realIncomeList = groupRealByStudent(realIncomeRaw);
-
-    const breakdownMap: Record<string, { count: number; revenue: number; name: string }> = {};
-    realIncomeRaw.forEach(sub => {
-      const templateId = sub.subscription_id;
-      const templateName = sub.subscription?.name || 'Unknown';
-      if (!breakdownMap[templateId]) {
-        breakdownMap[templateId] = { count: 0, revenue: 0, name: templateName };
-      }
-      breakdownMap[templateId].count++;
-      breakdownMap[templateId].revenue += sub.reportAmount;
-    });
-
-    const breakdown = Object.values(breakdownMap).sort((a, b) => b.revenue - a.revenue);
+    const activeStudentsCount = allStudents.filter(s => s.status === 'active').length;
 
     return {
       totalRevenue,
       expectedRevenue,
       activeStudentsCount,
-      soldSubscriptionsCount: realIncomeRaw.length,
+      soldSubscriptionsCount: transactions.length,
       realIncomeList,
       expectedIncomeList,
       breakdown
     };
-  }, [usersQuery.data, startDate, endDate]);
+  }, [transactionsQuery.data, usersQuery.data, startDate, endDate]);
 
   return {
     stats,
-    is_loading: usersQuery.isLoading,
-    is_error: usersQuery.isError,
+    is_loading: transactionsQuery.isLoading || usersQuery.isLoading,
+    is_error: transactionsQuery.isError || usersQuery.isError,
     refresh: () => {
+      transactionsQuery.refetch();
       usersQuery.refetch();
     }
   };

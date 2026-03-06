@@ -17,6 +17,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
     roles: ['super_admin', 'admin', 'teacher', 'student'],
   },
   {
+    label: 'tracker',
+    href: '/main/tracker',
+    icon: IoCheckmarkDoneOutline,
+    roles: ['super_admin', 'admin', 'teacher', 'student'],
+  },
+  {
     label: 'profile',
     href: '/main/profile',
     icon: IoPersonOutline,
@@ -44,37 +50,37 @@ export const MAIN_NAVIGATION: NavItem[] = [
     label: 'materials',
     href: '/main/materials',
     icon: IoLibraryOutline,
-    roles: ['super_admin', 'admin', 'teacher'],
+    roles: ['super_admin', 'admin', 'teacher', 'student'],
     items: [
       {
         label: 'audio',
         href: '/main/materials/audio',
         icon: IoMusicalNotesOutline,
-        roles: ['super_admin', 'admin', 'teacher'],
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
       },
       {
         label: 'photo',
         href: '/main/materials/photo',
         icon: IoImageOutline,
-        roles: ['super_admin', 'admin', 'teacher'],
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
       },
       {
         label: 'video',
         href: '/main/materials/video',
         icon: IoVideocamOutline,
-        roles: ['super_admin', 'admin', 'teacher'],
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
       },
       {
         label: 'file',
         href: '/main/materials/file',
         icon: IoDocumentOutline,
-        roles: ['super_admin', 'admin', 'teacher'],
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
       },
       {
         label: 'lessons',
         href: '/main/materials/lessons',
         icon: IoBookOutline,
-        roles: ['super_admin', 'admin', 'teacher'],
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
       },
       {
         label: 'courses',

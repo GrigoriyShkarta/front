@@ -13,7 +13,7 @@ export const audioActions = {
    * Get paginated list of audio materials
    */
   get_audios: async (params: GetAudiosParams): Promise<AudioListResponse> => {
-    const response = await api.get('/materials/audio', { 
+    const response = await api.get('/materials/audios', { 
       params,
       paramsSerializer: (params) => {
         const searchParams = new URLSearchParams();
@@ -44,7 +44,7 @@ export const audioActions = {
       });
     }
 
-    const response = await api.post('/materials/audio', form_data, {
+    const response = await api.post('/materials/audios', form_data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -69,7 +69,7 @@ export const audioActions = {
       });
     }
 
-    const response = await api.patch(`/materials/audio/${id}`, form_data, {
+    const response = await api.patch(`/materials/audios/${id}`, form_data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -82,13 +82,13 @@ export const audioActions = {
    * Delete single audio material
    */
   delete_audio: async (id: string): Promise<void> => {
-    await api.delete(`/materials/audio/${id}`);
+    await api.delete(`/materials/audios/${id}`);
   },
 
   /**
    * Delete multiple audio materials
    */
   bulk_delete_audios: async (ids: string[]): Promise<void> => {
-    await api.delete('/materials/audio', { data: { ids } });
+    await api.delete('/materials/audios', { data: { ids } });
   }
 };

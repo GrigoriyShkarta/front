@@ -2,6 +2,8 @@
 
 import { Paper, Title, Stack, Group, Text, Progress, ScrollArea, Box } from '@mantine/core';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/hooks/use-auth';
+import { getCurrencySymbol } from '@/lib/constants';
 
 interface BreakdownItem {
   name: string;
@@ -16,6 +18,8 @@ interface SubscriptionBreakdownProps {
 
 export function SubscriptionBreakdown({ data, totalRevenue }: SubscriptionBreakdownProps) {
   const t = useTranslations('Finance.reports');
+  const { user } = useAuth();
+  const currencySymbol = getCurrencySymbol(user?.space?.personalization?.currency);
   const totalCount = data.reduce((acc, item) => acc + item.count, 0);
 
   return (
@@ -33,7 +37,7 @@ export function SubscriptionBreakdown({ data, totalRevenue }: SubscriptionBreakd
                   <Text size="sm" fw={500}>{item.name}</Text>
                   <Text size="xs" c="dimmed">{item.count} {t('sold_count')}</Text>
                 </Stack>
-                <Text size="sm" fw={700}>{item.revenue.toFixed(2)}</Text>
+                <Text size="sm" fw={700}>{item.revenue.toFixed(2)} {currencySymbol}</Text>
               </Group>
               
               <Group gap="xs" align="center">
@@ -42,7 +46,7 @@ export function SubscriptionBreakdown({ data, totalRevenue }: SubscriptionBreakd
                       size="sm" 
                       radius="xl" 
                       className="flex-1"
-                      color="blue"
+                      color={user?.space?.personalization?.primary_color || 'blue'}
                   />
                   <Text size="xs" w={35} ta="right" fw={500}>
                       {percentage.toFixed(0)}%

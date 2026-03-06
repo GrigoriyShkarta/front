@@ -11,6 +11,7 @@ export const student_subscription_lesson_schema = z.object({
 
 export const student_subscription_schema = z.object({
   id: z.string(),
+  name: z.string().optional(),
   price: z.number(),
   paid_amount: z.number(),
   payment_status: z.string(),
@@ -20,21 +21,25 @@ export const student_subscription_schema = z.object({
   payment_reminder: z.boolean().optional(),
   selected_days: z.array(z.string()),
   student_id: z.string(),
-  subscription_id: z.string(),
+  subscription_id: z.string().optional().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
+  comment: z.string().optional().nullable(),
   lessons: z.array(student_subscription_lesson_schema).optional(),
   subscription: z.object({
     id: z.string(),
     name: z.string(),
     lessons_count: z.number(),
-  }).optional(),
+  }).optional().nullable(),
 });
 
 export type StudentSubscription = z.infer<typeof student_subscription_schema>;
 
 export const create_student_subscription_schema = z.object({
-  subscription_id: z.string().min(1, 'errors.required'),
+  subscription_id: z.string().optional(),
+  name: z.string().optional(),
+  lessons_count: z.number().optional(),
+  price: z.number().optional(),
   student_id: z.string().min(1, 'errors.required'),
   paid_amount: z.number().min(0, 'errors.required'),
   payment_status: z.enum(['paid', 'unpaid', 'partially_paid']),
@@ -44,6 +49,7 @@ export const create_student_subscription_schema = z.object({
   payment_reminder: z.boolean().optional(),
   lesson_dates: z.array(z.string()).min(1),
   selected_days: z.array(z.string()).min(1),
+  comment: z.string().optional(),
 });
 
 export type CreateStudentSubscriptionData = z.infer<typeof create_student_subscription_schema>;

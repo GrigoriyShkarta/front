@@ -1,9 +1,10 @@
 'use client';
 
 import { Table, Checkbox, Avatar, Group, Text, ActionIcon, Menu, Badge, Pagination, Select, Box } from '@mantine/core';
-import { IoEllipsisHorizontal, IoPencilOutline, IoTrashOutline } from 'react-icons/io5';
+import { IoEllipsisHorizontal, IoPencilOutline, IoTrashOutline, IoArrowUpOutline, IoArrowDownOutline, IoSwapVerticalOutline } from 'react-icons/io5';
 import { UserListItem } from '@/schemas/users';
 import { useTranslations } from 'next-intl';
+import dayjs from 'dayjs';
 import { Link } from '@/i18n/routing';
 
 interface Props {
@@ -17,12 +18,17 @@ interface Props {
   limit: number;
   current_user: any;
   selected_users: string[];
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
   on_page_change: (page: number) => void;
   on_limit_change: (limit: number) => void;
   on_select: (id: string) => void;
   on_select_all: () => void;
   on_edit: (user: UserListItem) => void;
   on_delete: (id: string) => void;
+  on_sort: (field: string) => void;
+  user_link_prefix?: string;
+  show_actions?: boolean;
 }
 
 export function UserTable({ 
@@ -35,9 +41,14 @@ export function UserTable({
   on_page_change,
   on_limit_change,
   on_select, 
-  on_select_all, 
+  on_select_all,
   on_edit, 
-  on_delete 
+  on_delete,
+  sort_by,
+  sort_order,
+  on_sort,
+  user_link_prefix = '/main/users',
+  show_actions = true
 }: Props) {
   const t = useTranslations('Users');
   const common_t = useTranslations('Common');
@@ -67,103 +78,136 @@ export function UserTable({
     return common_t('roles.super_admin');
   };
 
-  const rows = users.map((user) => (
-    <Table.Tr key={user.id} className={selected_users.includes(user.id) ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}>
-      <Table.Td>
-        <Checkbox
-          checked={selected_users.includes(user.id)}
-          onChange={() => on_select(user.id)}
-        />
-      </Table.Td>
-      <Table.Td>
-        <Menu shadow="md" width={160} position="bottom-end">
-          <Menu.Target>
-            <ActionIcon variant="subtle" color="gray">
-              <IoEllipsisHorizontal size={16} />
-            </ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Item 
-              leftSection={<IoPencilOutline size={14} />} 
-              onClick={() => on_edit(user)}
-            >
-              {common_t('edit')}
-            </Menu.Item>
-            <Menu.Item 
-              leftSection={<IoTrashOutline size={14} />} 
-              color="red"
-              onClick={() => on_delete(user.id)}
-            >
-              {common_t('delete')}
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
-      </Table.Td>
-      <Table.Td>
-        <Box component={Link} href={`/main/users/${user.id}`} className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-          <Avatar 
-            src={user.avatar} 
-            radius="xl" 
-            size="sm"
-            className="cursor-pointer hover:opacity-80 transition-opacity"
-          >
-            {user.name.charAt(0)}
-          </Avatar>
-          <Text 
-            size="sm" 
-            fw={500}
-            className="cursor-pointer hover:text-blue-500 transition-colors"
-          >
-            {user.name}
-          </Text>
-        </Box>
-      </Table.Td>
-      <Table.Td>
-        {user.role === 'student' && (
-          <Badge 
-            color={user.status === 'active' ? 'green' : 'red'} 
-            variant="light" 
-            size="sm"
-          >
-            {user.status === 'active' ? t('form.status_active') : t('form.status_inactive')}
-          </Badge>
+  const rows = users.map((user) => {
+    const last_sub = (user as any).purchased_subscriptions?.[0];
+    const is_partially_paid = last_sub?.payment_status === 'partially_paid';
+    
+    // If partially paid, we prioritize partial_payment_date for this column
+    const displayed_date = is_partially_paid 
+      ? last_sub?.partial_payment_date 
+      : last_sub?.next_payment_date;
+
+    const is_overdue = displayed_date && dayjs(displayed_date).isBefore(dayjs(), 'day');
+
+    return (
+      <Table.Tr key={user.id} className={selected_users.includes(user.id) ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}>
+        {show_actions && (
+          <Table.Td>
+            <Checkbox
+              checked={selected_users.includes(user.id)}
+              onChange={() => on_select(user.id)}
+            />
+          </Table.Td>
         )}
-      </Table.Td>
-      <Table.Td>
-        <Text size="sm">{user.email}</Text>
-      </Table.Td>
-      {/* <Table.Td>
-        <Badge variant="light" size="sm" color={getRoleColor(user.role)}>
-          {common_t(`roles.${user.role}`)}
-        </Badge>
-      </Table.Td> */}
-      <Table.Td>
-        <Group gap="xs">
-          {user.categories?.map((category, index) => (
-            <Badge 
-              key={index}
-              variant="outline"
-              color="gray"
-              style={{ 
-                backgroundColor: category.color || 'transparent',
-                color: category.color ? 'var(--mantine-color-white)' : undefined,
-                border: category.color ? 'none' : '1px solid var(--mantine-color-gray-4)',
-              }}
+        {show_actions && (
+          <Table.Td>
+            <Menu shadow="md" width={160} position="bottom-end">
+            <Menu.Target>
+              <ActionIcon variant="subtle" color="gray">
+                <IoEllipsisHorizontal size={16} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item 
+                leftSection={<IoPencilOutline size={14} />} 
+                onClick={() => on_edit(user)}
+              >
+                {common_t('edit')}
+              </Menu.Item>
+              <Menu.Item 
+                leftSection={<IoTrashOutline size={14} />} 
+                color="red"
+                onClick={() => on_delete(user.id)}
+              >
+                {common_t('delete')}
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </Table.Td>
+        )}
+        <Table.Td>
+          <Box component={Link} href={`${user_link_prefix}/${user.id}`} className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+            <Avatar 
+              src={user.avatar} 
+              radius="xl" 
+              size="sm"
+              className="cursor-pointer hover:opacity-80 transition-opacity"
             >
-              {category.name}
+              {user.name.charAt(0)}
+            </Avatar>
+            <Text 
+              size="sm" 
+              fw={500}
+              className="cursor-pointer hover:text-blue-500 transition-colors"
+            >
+              {user.name}
+            </Text>
+          </Box>
+        </Table.Td>
+        <Table.Td>
+          {user.role === 'student' && (
+            <Badge 
+              color={user.status === 'active' ? 'green' : 'red'} 
+              variant="light" 
+              size="sm"
+            >
+              {user.status === 'active' ? t('form.status_active') : t('form.status_inactive')}
             </Badge>
-          ))}
-        </Group>
-      </Table.Td>
-      
-      {/* <Table.Td>
-        <Text size="sm" c="dimmed">
-          {get_attached_name(user)}
-        </Text>
-      </Table.Td> */}
-      
-    </Table.Tr>
-  ));
+          )}
+        </Table.Td>
+        <Table.Td>
+          {(user.role === 'student' || last_sub) && (
+            <Badge 
+              color={
+                last_sub?.payment_status === 'paid' ? 'green' : 
+                last_sub?.payment_status === 'partially_paid' ? 'orange' : 
+                last_sub?.payment_status === 'unpaid' ? 'red' :
+                'gray'
+              } 
+              variant="light" 
+              size="sm"
+            >
+              {last_sub?.payment_status 
+                ? common_t(`payment_statuses.${last_sub.payment_status}`) 
+                : '-'}
+            </Badge>
+          )}
+        </Table.Td>
+        <Table.Td>
+          {displayed_date ? (
+            <Text 
+              size="sm" 
+              c={is_overdue ? 'red' : undefined}
+              fw={is_overdue ? 700 : undefined}
+            >
+              {dayjs(displayed_date).format('DD.MM.YYYY')}
+            </Text>
+          ) : (
+            <Text size="sm" c="dimmed">-</Text>
+          )}
+        </Table.Td>
+        <Table.Td>
+          <Group gap="xs">
+            {user.categories?.map((category, index) => (
+              <Badge 
+                key={index}
+                variant="outline"
+                color="gray"
+                style={{ 
+                  backgroundColor: category.color || 'transparent',
+                  color: category.color ? 'var(--mantine-color-white)' : undefined,
+                  border: category.color ? 'none' : '1px solid var(--mantine-color-gray-4)',
+                }}
+              >
+                {category.name}
+              </Badge>
+            ))}
+          </Group>
+        </Table.Td>
+        
+      </Table.Tr>
+    );
+  });
 
   return (
     <Box>
@@ -171,20 +215,33 @@ export function UserTable({
         <Table verticalSpacing="sm" highlightOnHover>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th style={{ width: 40 }}>
-                <Checkbox
-                  checked={all_selected}
-                  indeterminate={some_selected}
-                  onChange={on_select_all}
-                />
-              </Table.Th>
-              <Table.Th style={{ width: 80 }}>{t('table.actions')}</Table.Th>
+              {show_actions && (
+                <Table.Th style={{ width: 40 }}>
+                  <Checkbox
+                    checked={all_selected}
+                    indeterminate={some_selected}
+                    onChange={on_select_all}
+                  />
+                </Table.Th>
+              )}
+              {show_actions && <Table.Th style={{ width: 80 }}>{t('table.actions')}</Table.Th>}
               <Table.Th>{t('table.user')}</Table.Th>
               <Table.Th>{t('table.status')}</Table.Th>
-              <Table.Th>{t('table.email')}</Table.Th>
-              {/* <Table.Th>{t('table.role')}</Table.Th> */}
+              <Table.Th>{t('table.payment_status')}</Table.Th>
+              <Table.Th 
+                className="cursor-pointer hover:bg-white/5 transition-colors"
+                onClick={() => on_sort('next_payment_date')}
+              >
+                <Group gap={4}>
+                  <Text size="sm" fw={700}>{t('table.next_payment_date')}</Text>
+                  {sort_by === 'next_payment_date' ? (
+                    sort_order === 'asc' ? <IoArrowUpOutline size={14} style={{ color: 'var(--space-primary)' }} /> : <IoArrowDownOutline size={14} style={{ color: 'var(--space-primary)' }} />
+                  ) : (
+                    <IoSwapVerticalOutline size={14} color="gray" />
+                  )}
+                </Group>
+              </Table.Th>
               <Table.Th>{t('table.categories')}</Table.Th>
-              {/* <Table.Th>{t('table.attached_to')}</Table.Th> */}
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>

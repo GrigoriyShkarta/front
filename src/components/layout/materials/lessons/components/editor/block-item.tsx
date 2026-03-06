@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef, useState } from 'react';
-import { Paper, Group, ActionIcon, Box, Tooltip, Text } from '@mantine/core';
+import { Paper, Group, ActionIcon, Box, Tooltip, Text, Checkbox } from '@mantine/core';
 import { IoReorderThree, IoTrashOutline} from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import BlockNoteEditor, { BlockNoteEditorRef } from './block-note';
@@ -16,10 +16,24 @@ interface Props {
   on_move: (from: number, to: number) => void;
   show_remove?: boolean;
   read_only?: boolean;
+  is_access_mode?: boolean;
+  is_checked?: boolean;
+  on_checked_change?: (checked: boolean) => void;
 }
 
 const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({ 
-  id, index, content, on_change, on_remove, on_open_bank, on_move, show_remove = true, read_only = false 
+  id, 
+  index, 
+  content, 
+  on_change, 
+  on_remove, 
+  on_open_bank, 
+  on_move, 
+  show_remove = true, 
+  read_only = false,
+  is_access_mode = false,
+  is_checked = false,
+  on_checked_change
 }, ref) => {
   const t = useTranslations('Materials.lessons');
   const [isDragging, setIsDragging] = useState(false);
@@ -80,7 +94,17 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
       }}
     >
       <Group gap={0} align="stretch" mih="auto">
-        {!read_only && (
+        {is_access_mode && (
+          <Box p="md">
+            <Checkbox 
+              checked={is_checked} 
+              onChange={(e) => on_checked_change?.(e.currentTarget.checked)}
+              size="md"
+            />
+          </Box>
+        )}
+
+        {!read_only && !is_access_mode && (
           <Box
             p="4px"
             className="drag-handle cursor-grab" 

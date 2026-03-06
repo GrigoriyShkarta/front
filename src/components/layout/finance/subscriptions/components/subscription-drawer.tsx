@@ -13,6 +13,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { SubscriptionMaterial, subscription_form_schema, SubscriptionFormData } from '../schemas/subscription-schema';
+import { useAuth } from '@/hooks/use-auth';
+import { getCurrencySymbol } from '@/lib/constants';
 
 interface Props {
   opened: boolean;
@@ -25,6 +27,8 @@ interface Props {
 export function SubscriptionDrawer({ opened, onClose, subscription, on_submit, is_loading }: Props) {
   const t = useTranslations('Finance.subscriptions');
   const common_t = useTranslations('Common');
+  const { user } = useAuth();
+  const currencySymbol = getCurrencySymbol(user?.space?.personalization?.currency);
   
   const {
     register,
@@ -136,6 +140,7 @@ export function SubscriptionDrawer({ opened, onClose, subscription, on_submit, i
                 onChange={field.onChange}
                 error={errors.price?.message ? common_t(`errors.${errors.price.message as any}`) : null}
                 variant="filled"
+                rightSection={currencySymbol}
               />
             )}
           />

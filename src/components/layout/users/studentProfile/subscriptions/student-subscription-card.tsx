@@ -4,19 +4,33 @@ import {
 import { useTranslations, useLocale } from 'next-intl';
 import { IoPencilOutline, IoTrashOutline, IoRepeatOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
-import { StudentSubscription } from '../schemas/student-subscription-schema';
 import { SubscriptionPaymentSection } from './subscription-payment-section';
 import { SubscriptionLessonItem } from './subscription-lesson-item';
+import { useAuth } from '@/hooks/use-auth';
+import { getCurrencySymbol } from '@/lib/constants';
 
 import { SubscriptionLesson, StudentSubscriptionCardProps } from './types';
 
 export function StudentSubscriptionCard({ 
-  sub, isTeacher, onEdit, onDelete, onUpdateSubscription, onUpdateLesson,
-  isExpanded = true, onToggle, canToggle = true, showExtend = false, onExtend
+  sub, 
+  isTeacher, 
+  isExpanded = true, 
+  canToggle = true, 
+  showExtend = false, 
+  onEdit, 
+  onDelete, 
+  onUpdateSubscription, 
+  onUpdateLesson,
+  onToggle, 
+  onExtend
 }: StudentSubscriptionCardProps) {
   const t = useTranslations('Users');
   const common_t = useTranslations('Common');
   const locale = useLocale();
+  const { user } = useAuth();
+  const currencySymbol = getCurrencySymbol(user?.space?.personalization?.currency);
+
+
 
   const handleExtendClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -47,7 +61,7 @@ export function StudentSubscriptionCard({
       >
         <Group gap="xs" wrap="nowrap" flex={1}>
           <Text fw={700} size="sm" className="text-white truncate">
-            {sub.subscription?.name || t('subscription')} ({sub.price} ₴)
+            {sub?.name ?? sub.subscription?.name ?? t('subscription')} ({sub.price} {currencySymbol})
           </Text>
           <Text size="xs" c="dimmed" fw={500} className="whitespace-nowrap">
             {periodString}
@@ -68,13 +82,18 @@ export function StudentSubscriptionCard({
             className={canToggle ? 'cursor-pointer' : ''} 
             flex={1}
           >
-            <Text fw={700} size="lg" className="text-white">{sub.subscription?.name || t('subscription')}</Text>
+            <Text fw={700} size="lg" className="text-white">{sub?.name ?? sub.subscription?.name ?? t('subscription')}</Text>
             <Text fw={700} size="xl" color="var(--space-primary)">
-              {sub.price} ₴
+              {sub.price} {currencySymbol}
             </Text>
             {periodString && (
               <Text size="xs" c="dimmed" fw={500}>
                 {periodString}
+              </Text>
+            )}
+            {sub.comment && (
+              <Text size="xs" mt={8} c="dimmed" fw={400} fs="italic">
+                {sub.comment}
               </Text>
             )}
           </Stack>

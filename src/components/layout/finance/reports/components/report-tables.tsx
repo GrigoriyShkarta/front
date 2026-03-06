@@ -4,6 +4,8 @@ import { Tabs, Table, Text, Avatar, Group, Box } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { Link } from '@/i18n/routing';
+import { useAuth } from '@/hooks/use-auth';
+import { getCurrencySymbol } from '@/lib/constants';
 
 interface ReportTablesProps {
   realIncome: any[];
@@ -12,6 +14,8 @@ interface ReportTablesProps {
 
 export function ReportTables({ realIncome, expectedIncome }: ReportTablesProps) {
   const t = useTranslations('Finance.reports');
+  const { user } = useAuth();
+  const currencySymbol = getCurrencySymbol(user?.space?.personalization?.currency);
 
   const getStatusStyle = (status: string, isExpected: boolean) => {
     switch (status) {
@@ -72,13 +76,13 @@ export function ReportTables({ realIncome, expectedIncome }: ReportTablesProps) 
                   className="cursor-pointer hover:text-blue-400 transition-colors no-underline"
                   c="dimmed"
                 >
-                  {item.subscription?.name || '-'}
+                  {item.name || item.subscription?.name || '-'}
                 </Text>
               </Table.Td>
               <Table.Td>
                 <Group gap={6}>
                   <Text size="sm" fw={700} c={color}>
-                      {item.price.toLocaleString()}
+                      {item.price.toLocaleString()} {currencySymbol}
                   </Text>
                   {label && (
                       <Text size="xs" c="dimmed" fw={500}>

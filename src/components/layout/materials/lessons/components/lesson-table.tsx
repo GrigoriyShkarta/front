@@ -1,27 +1,32 @@
 'use client';
 
 import { Table, Checkbox, ActionIcon, Group, Text, Menu, rem, useMantineTheme, Badge, Modal, Stack, Tooltip, Paper, Box } from '@mantine/core';
-import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoBookOutline, IoLayersOutline } from 'react-icons/io5';
+import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoBookOutline, IoLayersOutline, IoPeopleOutline } from 'react-icons/io5';
 import { LessonMaterial } from '../schemas/lesson-schema';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/routing';
 import { useState } from 'react';
+import { useAuth } from '@/hooks/use-auth';
 
 interface Props {
   data: LessonMaterial[];
   selected_ids: string[];
   on_selection_change: (ids: string[]) => void;
   on_delete: (id: string) => void;
+  on_grant_access: (id: string) => void;
   is_loading?: boolean;
 }
 
-export function LessonTable({ data, selected_ids, on_selection_change, on_delete, is_loading }: Props) {
+export function LessonTable({ data, selected_ids, on_selection_change, on_delete, on_grant_access, is_loading }: Props) {
   const t = useTranslations('Materials.lessons.table');
+  const tAccess = useTranslations('Materials.access');
   const common_t = useTranslations('Common');
   const tCat = useTranslations('Categories');
   const theme = useMantineTheme();
+  const { user } = useAuth();
+  const is_student = user?.role === 'student';
   
   const [selectedCourses, setSelectedCourses] = useState<{ id: string, name: string }[]>([]);
   const [modalOpened, setModalOpened] = useState(false);
@@ -45,16 +50,18 @@ export function LessonTable({ data, selected_ids, on_selection_change, on_delete
       <Table verticalSpacing="sm" highlightOnHover>
         <Table.Thead className="bg-white/5 border-b border-white/10">
           <Table.Tr>
-            <Table.Th w={40}>
-              <Checkbox
-                checked={data.length > 0 && selected_ids.length === data.length}
-                indeterminate={selected_ids.length > 0 && selected_ids.length < data.length}
-                onChange={toggle_all}
-              />
-            </Table.Th>
-            <Table.Th w={40}>{t('actions')}</Table.Th>
+            {!is_student && (
+              <Table.Th w={40}>
+                <Checkbox
+                  checked={data.length > 0 && selected_ids.length === data.length}
+                  indeterminate={selected_ids.length > 0 && selected_ids.length < data.length}
+                  onChange={toggle_all}
+                />
+              </Table.Th>
+            )}
+            {!is_student && <Table.Th w={40}>{t('actions')}</Table.Th>}
             <Table.Th>{t('name')}</Table.Th>
-            <Table.Th>{t('courses')}</Table.Th>
+            {!is_student && <Table.Th>{t('courses')}</Table.Th>}
             <Table.Th>{tCat('title')}</Table.Th>
             <Table.Th>{t('date')}</Table.Th>
           </Table.Tr>
@@ -71,37 +78,47 @@ export function LessonTable({ data, selected_ids, on_selection_change, on_delete
                   is_selected ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-white/5'
                 )}
               >
-                <Table.Td>
-                  <Checkbox
-                    checked={is_selected}
-                    onChange={() => toggle_one(item.id)}
-                  />
-                </Table.Td>
-                <Table.Td>
-                  <Menu shadow="md" width={160} position="left-start" withArrow>
-                    <Menu.Target>
-                      <ActionIcon variant="subtle" color="gray">
-                        <IoEllipsisVertical size={16} />
-                      </ActionIcon>
-                    </Menu.Target>
-                    <Menu.Dropdown className="bg-[var(--space-card-bg)] border-white/10 backdrop-blur-md">
-                      <Menu.Item 
-                        leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
-                        component={Link}
-                        href={`/main/materials/lessons/${item.id}/edit`}
-                      >
-                        {common_t('edit')}
-                      </Menu.Item>
-                      <Menu.Item 
-                        color="red"
-                        leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
-                        onClick={() => on_delete(item.id)}
-                      >
-                        {common_t('delete')}
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                </Table.Td>
+                {!is_student && (
+                  <Table.Td>
+                    <Checkbox
+                      checked={is_selected}
+                      onChange={() => toggle_one(item.id)}
+                    />
+                  </Table.Td>
+                )}
+                {!is_student && (
+                  <Table.Td>
+                    <Menu shadow="md" width={160} position="left-start" withArrow>
+                      <Menu.Target>
+                        <ActionIcon variant="subtle" color="gray">
+                          <IoEllipsisVertical size={16} />
+                        </ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown className="bg-[var(--space-card-bg)] border-white/10 backdrop-blur-md">
+                        <Menu.Item 
+                          leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
+                          component={Link}
+                          href={`/main/materials/lessons/${item.id}/edit`}
+                        >
+                          {common_t('edit')}
+                        </Menu.Item>
+                        <Menu.Item 
+                          leftSection={<IoPeopleOutline style={{ width: rem(14), height: rem(14) }} />}
+                          onClick={() => on_grant_access(item.id)}
+                        >
+                          {tAccess('grant_access')}
+                        </Menu.Item>
+                        <Menu.Item 
+                          color="red"
+                          leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
+                          onClick={() => on_delete(item.id)}
+                        >
+                          {common_t('delete')}
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
+                  </Table.Td>
+                )}
                 <Table.Td>
                   <Group gap="sm" wrap="nowrap">
                     <IoBookOutline 
@@ -116,7 +133,8 @@ export function LessonTable({ data, selected_ids, on_selection_change, on_delete
                     </Link>
                   </Group>
                 </Table.Td>
-                <Table.Td>
+                {!is_student && (
+                  <Table.Td>
                     {item.courses && item.courses.length > 0 && (
                         <Tooltip label={t('view_courses')}>
                             <ActionIcon 
@@ -132,7 +150,8 @@ export function LessonTable({ data, selected_ids, on_selection_change, on_delete
                             </ActionIcon>
                         </Tooltip>
                     )}
-                </Table.Td>
+                  </Table.Td>
+                )}
                 <Table.Td>
                     <Group gap={4}>
                         {item.categories?.map((cat) => (

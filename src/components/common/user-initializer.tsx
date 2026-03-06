@@ -11,9 +11,8 @@ export function UserInitializer() {
   const { refresh_user, is_authenticated } = useAuthContext();
 
   useEffect(() => {
-    // We only refresh if we entered the authorized zone (which usually implies we should be authenticated)
-    refresh_user();
-  }, [refresh_user]);
+    // React Query handles refetching on mount automatically via useQuery config
+  }, []);
 
   return null;
 }

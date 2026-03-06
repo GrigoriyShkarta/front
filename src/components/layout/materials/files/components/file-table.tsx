@@ -1,10 +1,11 @@
 'use client';
 
 import { Table, Checkbox, ActionIcon, Group, Text, Menu, rem, Badge, useMantineTheme, Anchor } from '@mantine/core';
-import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoDocumentOutline, IoDownloadOutline } from 'react-icons/io5';
-import { FileMaterial } from '../schemas/file-schema';
+import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoDocumentOutline, IoDownloadOutline, IoPeopleOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
+import { useAuth } from '@/hooks/use-auth';
+import { FileMaterial } from '../schemas/file-schema';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
   on_selection_change: (ids: string[]) => void;
   on_edit: (file: FileMaterial) => void;
   on_delete: (id: string) => void;
+  on_grant_access: (id: string) => void;
   on_select?: (file: FileMaterial) => void;
   is_loading?: boolean;
   is_picker?: boolean;
@@ -24,14 +26,18 @@ export function FileTable({
     on_selection_change, 
     on_edit, 
     on_delete, 
+    on_grant_access,
     on_select, 
     is_loading,
     is_picker = false
 }: Props) {
   const t = useTranslations('Materials.file.table');
+  const tAccess = useTranslations('Materials.access');
   const common_t = useTranslations('Common');
   const tCat = useTranslations('Categories');
   const theme = useMantineTheme();
+  const { user } = useAuth();
+  const is_student = user?.role === 'student';
 
   const toggle_all = () => {
     on_selection_change(
@@ -47,6 +53,9 @@ export function FileTable({
     );
   };
 
+  const show_selection = is_picker || !is_student;
+  const show_actions = !is_picker && !is_student;
+
   const get_extension = (url: string) => {
     const filename = url.split('/').pop() || '';
     const parts = filename.split('.');
@@ -57,16 +66,18 @@ export function FileTable({
     <Table verticalSpacing="sm" highlightOnHover>
       <Table.Thead className="bg-white/5 border-b border-white/10">
         <Table.Tr>
-          <Table.Th w={40}>
-            {!is_picker && (
-              <Checkbox
-                checked={data.length > 0 && selected_ids.length === data.length}
-                indeterminate={selected_ids.length > 0 && selected_ids.length < data.length}
-                onChange={toggle_all}
-              />
-            )}
-          </Table.Th>
-          {!is_picker && <Table.Th w={40}>{t('actions')}</Table.Th>}
+          {show_selection && (
+            <Table.Th w={40}>
+              {!is_picker && (
+                <Checkbox
+                  checked={data.length > 0 && selected_ids.length === data.length}
+                  indeterminate={selected_ids.length > 0 && selected_ids.length < data.length}
+                  onChange={toggle_all}
+                />
+              )}
+            </Table.Th>
+          )}
+          {show_actions && <Table.Th w={40}>{t('actions')}</Table.Th>}
           <Table.Th>{t('name')}</Table.Th>
           <Table.Th>{tCat('title')}</Table.Th>
           <Table.Th>{t('extension')}</Table.Th>
@@ -86,61 +97,69 @@ export function FileTable({
                 is_selected ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-white/5'
               )}
             >
-              <Table.Td>
-              <Checkbox
-                checked={is_selected}
-                onChange={() => {
-                  if (is_picker && on_select) {
-                    on_select(item);
-                  } else {
-                    toggle_one(item.id);
-                  }
-                }}
-              />
-            </Table.Td>
-            {!is_picker && (
-              <Table.Td>
-                <Menu shadow="md" width={160} position="left-start" withArrow>
-                  <Menu.Target>
-                    <ActionIcon variant="subtle" color="gray">
-                      <IoEllipsisVertical size={16} />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown className="bg-[var(--space-card-bg)] border-white/10 backdrop-blur-md">
-                    {on_select && (
+              {show_selection && (
+                <Table.Td>
+                  <Checkbox
+                    checked={is_selected}
+                    onChange={() => {
+                      if (is_picker && on_select) {
+                        on_select(item);
+                      } else {
+                        toggle_one(item.id);
+                      }
+                    }}
+                  />
+                </Table.Td>
+              )}
+              {show_actions && (
+                <Table.Td>
+                  <Menu shadow="md" width={160} position="left-start" withArrow>
+                    <Menu.Target>
+                      <ActionIcon variant="subtle" color="gray">
+                        <IoEllipsisVertical size={16} />
+                      </ActionIcon>
+                    </Menu.Target>
+                    <Menu.Dropdown className="bg-[var(--space-card-bg)] border-white/10 backdrop-blur-md">
+                      {on_select && (
+                        <Menu.Item 
+                          leftSection={<IoDocumentOutline style={{ width: rem(14), height: rem(14) }} />}
+                          onClick={() => on_select(item)}
+                          color="blue"
+                        >
+                          {common_t('confirm')}
+                        </Menu.Item>
+                      )}
                       <Menu.Item 
-                        leftSection={<IoDocumentOutline style={{ width: rem(14), height: rem(14) }} />}
-                        onClick={() => on_select(item)}
-                        color="blue"
+                        leftSection={<IoDownloadOutline style={{ width: rem(14), height: rem(14) }} />}
+                        component="a"
+                        href={item.file_url}
+                        download
                       >
-                        {common_t('confirm')}
+                        {common_t('show')}
                       </Menu.Item>
-                    )}
-                    <Menu.Item 
-                      leftSection={<IoDownloadOutline style={{ width: rem(14), height: rem(14) }} />}
-                      component="a"
-                      href={item.file_url}
-                      download
-                    >
-                      {common_t('show')}
-                    </Menu.Item>
-                    <Menu.Item 
-                      leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
-                      onClick={() => on_edit(item)}
-                    >
-                      {common_t('edit')}
-                    </Menu.Item>
-                    <Menu.Item 
-                      color="red"
-                      leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
-                      onClick={() => on_delete(item.id)}
-                    >
-                      {common_t('delete')}
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              </Table.Td>
-            )}
+                      <Menu.Item 
+                        leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
+                        onClick={() => on_edit(item)}
+                      >
+                        {common_t('edit')}
+                      </Menu.Item>
+                      <Menu.Item 
+                        leftSection={<IoPeopleOutline style={{ width: rem(14), height: rem(14) }} />}
+                        onClick={() => on_grant_access(item.id)}
+                      >
+                        {tAccess('grant_access')}
+                      </Menu.Item>
+                      <Menu.Item 
+                        color="red"
+                        leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
+                        onClick={() => on_delete(item.id)}
+                      >
+                        {common_t('delete')}
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                </Table.Td>
+              )}
               <Table.Td>
                 <Group gap="sm" wrap="nowrap">
                    <IoDocumentOutline 

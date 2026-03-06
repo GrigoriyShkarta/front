@@ -1,5 +1,8 @@
 'use client';
 
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Link, useRouter } from '@/i18n/routing';
 import { 
     Stack, 
     Text, 
@@ -10,13 +13,10 @@ import {
     Grid,
     Anchor
 } from '@mantine/core';
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { Link, useRouter } from '@/i18n/routing';
 import { useCourse } from '../hooks/use-course';
 import { useCourses } from '../hooks/use-courses';
 import { useLessons } from '@/components/layout/materials/lessons/hooks/use-lessons';
-import { CourseContentItem, CreateCourseForm } from '../schemas/course-schema';
+import { CreateCourseForm } from '../schemas/course-schema';
 import { LessonMaterial } from '@/components/layout/materials/lessons/schemas/lesson-schema';
 import { CourseHero } from './course-hero';
 import { CourseStats } from './course-stats';
@@ -39,8 +39,6 @@ export function CourseView({ id }: Props) {
     const { course, is_loading } = useCourse(id);
     const { lessons: all_lessons } = useLessons({ page: 1, limit: 1000, search: '' });
     const { update_course, is_saving } = useCourses();
-
-
     const [editor_opened, set_editor_opened] = useState(false);
 
     if (is_loading) {
@@ -68,30 +66,17 @@ export function CourseView({ id }: Props) {
         </Anchor>
     ));
 
-    const filtered_content = course.content.map((item: CourseContentItem) => {
-        if (item.type === 'group') {
-            return {
-                ...item,
-                lesson_ids: item.lesson_ids.filter((lid: string) => all_lessons.some((l: LessonMaterial) => l.id === lid))
-            };
-        }
-        return item;
-    }).filter((item: CourseContentItem) => {
-        if (item.type === 'lesson') {
-            return all_lessons.some((l: LessonMaterial) => l.id === item.lesson_id);
-        }
-        if (item.type === 'group') {
-            return item.lesson_ids.length > 0;
-        }
-        return false;
-    });
+    const filtered_content = course.content;
 
-    const total_duration = filtered_content.reduce((acc: number, item: CourseContentItem) => {
+    const total_duration = filtered_content.reduce((acc: number, item: any) => {
         if (item.type === 'lesson') {
             const lesson = all_lessons.find((l: LessonMaterial) => l.id === item.lesson_id);
-            return acc + (lesson?.duration || 0);
+            return acc + (item.duration || lesson?.duration || 0);
         } else if (item.type === 'group') {
-            const group_duration = item.lesson_ids.reduce((g_acc: number, lid: string) => {
+            const group_duration = (item.lessons || []).reduce((g_acc: number, l: any) => {
+                const lesson = all_lessons.find((all_l: LessonMaterial) => all_l.id === l.lesson_id);
+                return g_acc + (l.duration || lesson?.duration || 0);
+            }, 0) || (item.lesson_ids || []).reduce((g_acc: number, lid: string) => {
                 const lesson = all_lessons.find((l: LessonMaterial) => l.id === lid);
                 return g_acc + (lesson?.duration || 0);
             }, 0);
@@ -100,17 +85,15 @@ export function CourseView({ id }: Props) {
         return acc;
     }, 0);
 
-    const lessons_count = filtered_content.reduce((acc: number, item: CourseContentItem) => {
+    const lessons_count = filtered_content.reduce((acc: number, item: any) => {
         if (item.type === 'lesson') return acc + 1;
-        if (item.type === 'group') return acc + item.lesson_ids.length;
+        if (item.type === 'group') return acc + (item.lessons?.length || item.lesson_ids?.length || 0);
         return acc;
     }, 0);
 
     const handle_save = async (data: CreateCourseForm) => {
         return await update_course(id, data);
     };
-
-    
 
     return (
         <div className="min-h-screen -mt-4">

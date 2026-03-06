@@ -33,8 +33,10 @@ export const lessonActions = {
   /**
    * Get single lesson by ID
    */
-  get_lesson: async (id: string): Promise<LessonMaterial> => {
-    const response = await api.get(`/materials/lessons/${id}`);
+  get_lesson: async (id: string, student_id?: string): Promise<LessonMaterial> => {
+    const response = await api.get(`/materials/lessons/${id}`, {
+      params: { student_id }
+    });
     return response.data;
   },
 

@@ -17,7 +17,7 @@ import {
   Breadcrumbs,
   Anchor
 } from "@mantine/core";
-import { IoMusicalNotesOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoFilterOutline } from "react-icons/io5";
+import { IoMusicalNotesOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoFilterOutline, IoPeopleOutline } from "react-icons/io5";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
@@ -29,12 +29,14 @@ import { AudioDeleteModal } from "./components/audio-delete-modal";
 import { AudioMaterial } from "./schemas/audio-schema";
 import { Dropzone } from "@mantine/dropzone";
 import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
+import { GrantAccessModal } from '@/components/common/materials/grant-access-modal';
 import { cn } from "@/lib/utils";
 
 const AUDIO_MIME_TYPES = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/flac'];
 
 export default function AudiosLayout() {
     const t = useTranslations('Materials.audio');
+    const tAccess = useTranslations('Materials.access');
     const tNav = useTranslations('Navigation');
     const common_t = useTranslations('Common');
     const { user } = useAuth();
@@ -62,6 +64,8 @@ export default function AudiosLayout() {
     const [editing_audio, setEditingAudio] = useState<AudioMaterial | null>(null);
     const [delete_modal_opened, setDeleteModalOpened] = useState(false);
     const [id_to_delete, setIdToDelete] = useState<string | null>(null);
+    const [access_modal_opened, setAccessModalOpened] = useState(false);
+    const [ids_to_grant, setIdsToGrant] = useState<string[]>([]);
     const [dropped_files, setDroppedFiles] = useState<any[]>([]);
 
     // Data fetching
@@ -176,54 +180,57 @@ export default function AudiosLayout() {
     };
 
     const has_data = audios.length > 0;
+    const is_student = user?.role === 'student';
 
     return (
     <>
         {/* Portal components moved to the top level of the fragment */}
-        <Dropzone.FullScreen 
-            active={!drawer_opened && !filter_drawer_opened}
-            onDrop={(files) => {
-                const new_files = files.map(f => ({
-                    file: f,
-                    id: Math.random().toString(36).substring(7),
-                    name: f.name.replace(/\.[^/.]+$/, ""),
-                    progress: 0,
-                    status: 'idle' as const,
-                    categories: []
-                }));
-                setEditingAudio(null);
-                setDroppedFiles(new_files);
-                setDrawerOpened(true);
-            }} 
-            accept={AUDIO_MIME_TYPES}
-            styles={{
-                fullScreen: { 
-                    backgroundColor: 'rgba(0, 0, 0, 0.4)', 
-                    backdropFilter: 'blur(10px)',
-                    zIndex: 10000
-                }
-            }}
-        >
-            <Center mih="100vh">
-                <Box 
-                    p={60} 
-                    className="border-2 border-dashed border-blue-500/50 rounded-[40px] bg-blue-500/5 backdrop-blur-md flex flex-col items-center gap-8 transition-all scale-100 hover:scale-[1.02]"
-                    style={{ pointerEvents: 'none' }}
-                >
-                    <Box className="w-28 h-28 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
-                         <IoMusicalNotesOutline size={60} />
+        {!is_student && (
+            <Dropzone.FullScreen 
+                active={!drawer_opened && !filter_drawer_opened}
+                onDrop={(files) => {
+                    const new_files = files.map(f => ({
+                        file: f,
+                        id: Math.random().toString(36).substring(7),
+                        name: f.name.replace(/\.[^/.]+$/, ""),
+                        progress: 0,
+                        status: 'idle' as const,
+                        categories: []
+                    }));
+                    setEditingAudio(null);
+                    setDroppedFiles(new_files);
+                    setDrawerOpened(true);
+                }} 
+                accept={AUDIO_MIME_TYPES}
+                styles={{
+                    fullScreen: { 
+                        backgroundColor: 'rgba(0, 0, 0, 0.4)', 
+                        backdropFilter: 'blur(10px)',
+                        zIndex: 10000
+                    }
+                }}
+            >
+                <Center mih="100vh">
+                    <Box 
+                        p={60} 
+                        className="border-2 border-dashed border-blue-500/50 rounded-[40px] bg-blue-500/5 backdrop-blur-md flex flex-col items-center gap-8 transition-all scale-100 hover:scale-[1.02]"
+                        style={{ pointerEvents: 'none' }}
+                    >
+                        <Box className="w-28 h-28 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                             <IoMusicalNotesOutline size={60} />
+                        </Box>
+                        <Stack align="center" gap={10}>
+                            <Text size="32px" fw={800} c="white" ta="center" style={{ letterSpacing: '-0.5px' }}>
+                                {t('form.file')}
+                            </Text>
+                            <Text size="lg" c="dimmed" ta="center" fw={500}>
+                                 {t('form.drop_hint')}
+                            </Text>
+                        </Stack>
                     </Box>
-                    <Stack align="center" gap={10}>
-                        <Text size="32px" fw={800} c="white" ta="center" style={{ letterSpacing: '-0.5px' }}>
-                            {t('form.file')}
-                        </Text>
-                        <Text size="lg" c="dimmed" ta="center" fw={500}>
-                             {t('form.drop_hint')}
-                        </Text>
-                    </Stack>
-                </Box>
-            </Center>
-        </Dropzone.FullScreen>
+                </Center>
+            </Dropzone.FullScreen>
+        )}
 
         <AudioDrawer 
             opened={drawer_opened}
@@ -252,29 +259,47 @@ export default function AudiosLayout() {
             count={id_to_delete ? 1 : selected_ids.length}
         />
 
+        <GrantAccessModal 
+            opened={access_modal_opened}
+            onClose={() => setAccessModalOpened(false)}
+            materialIds={ids_to_grant}
+            materialType="audio"
+            initialSelectedIds={audios
+                .filter(a => ids_to_grant.includes(a.id))
+                .flatMap(a => (a as any).accessible_student_ids || [])
+            }
+        />
+
         <Stack gap="lg">
                 <Breadcrumbs mb="xs" separator="→">
                     {breadcrumb_items}
                 </Breadcrumbs>
 
                 <Group justify="space-between" align="flex-end">
-                    <Stack gap={0}>
-                        <Title order={2}>{t('title')}</Title>
-                        <Text color="dimmed" size="sm">
-                            {t('subtitle')}
-                        </Text>
-                    </Stack>
+                    <Title order={2}>{t('title')}</Title>
                     
                     <Group>
-                        {selected_ids.length > 0 && (
-                             <Button 
-                                color="red" 
-                                variant="light" 
-                                leftSection={<IoTrashOutline size={16} />}
-                                onClick={handle_bulk_delete_click}
-                             >
-                                {t('bulk_delete', { count: selected_ids.length })}
-                             </Button>
+                        {!is_student && selected_ids.length > 0 && (
+                             <Group gap="xs">
+                                <Button 
+                                   variant="light" 
+                                   leftSection={<IoPeopleOutline size={16} />}
+                                   onClick={() => {
+                                       setIdsToGrant(selected_ids);
+                                       setAccessModalOpened(true);
+                                   }}
+                                >
+                                   {tAccess('grant_access')}
+                                </Button>
+                                <Button 
+                                   color="red" 
+                                   variant="light" 
+                                   leftSection={<IoTrashOutline size={16} />}
+                                   onClick={handle_bulk_delete_click}
+                                >
+                                   {t('bulk_delete', { count: selected_ids.length })}
+                                </Button>
+                             </Group>
                         )}
 
                         <Button 
@@ -295,13 +320,15 @@ export default function AudiosLayout() {
                             )}
                         </Button>
 
-                        <Button 
-                            leftSection={<IoAddOutline size={18} />} 
-                            onClick={handle_add}
-                            className="bg-blue-600 hover:bg-blue-700"
-                        >
-                            {t('add_audio')}
-                        </Button>
+                        {!is_student && (
+                            <Button 
+                                leftSection={<IoAddOutline size={18} />} 
+                                onClick={handle_add}
+                                className="bg-blue-600 hover:bg-blue-700"
+                            >
+                                {t('add_audio')}
+                            </Button>
+                        )}
                     </Group>
                 </Group>
 
@@ -334,6 +361,10 @@ export default function AudiosLayout() {
                                     on_selection_change={setSelectedIds}
                                     on_edit={handle_edit}
                                     on_delete={handle_delete_click}
+                                    on_grant_access={(id) => {
+                                        setIdsToGrant([id]);
+                                        setAccessModalOpened(true);
+                                    }}
                                 />
                                 
                                 {/* Pagination */}
@@ -380,9 +411,11 @@ export default function AudiosLayout() {
                                 <Text c="dimmed" size="sm" ta="center" maw={400}>
                                     {is_super_admin ? t('empty_description_admin') : t('empty_description')}
                                 </Text>
-                                <Button variant="light" mt="sm" onClick={handle_add}>
-                                    {t('add_audio')}
-                                </Button>
+                                {!is_student && (
+                                    <Button variant="light" mt="sm" onClick={handle_add}>
+                                        {t('add_audio')}
+                                    </Button>
+                                )}
                             </Stack>
                         )
                     )}

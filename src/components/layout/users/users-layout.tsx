@@ -7,7 +7,7 @@ import { UserTable } from './components/user-table';
 import { UserDrawer } from './components/user-drawer';
 import { UserDeleteModal } from './components/user-delete-modal';
 import { UserFilters } from './components/user-filters';
-import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
+import { UserFilterDrawer } from './components/user-filter-drawer';
 import { useUsersQuery } from './hooks/use-users-query';
 import { UserListItem, UserFormData } from '@/schemas/users';
 import { useTranslations } from 'next-intl';
@@ -25,6 +25,9 @@ export function UsersLayout() {
   const [category_filters, set_category_filters] = useState<string[]>([]);
   const [page, set_page] = useState(1);
   const [limit, set_limit] = useState(15);
+  const [sort_by, set_sort_by] = useState<string | undefined>();
+  const [sort_order, set_sort_order] = useState<'asc' | 'desc'>('desc');
+  const [payment_statuses_filter, set_payment_statuses_filter] = useState<string[]>([]);
 
   const { 
     users, 
@@ -42,6 +45,10 @@ export function UsersLayout() {
     category_ids: category_filters,
     page,
     limit,
+    sortBy: sort_by,
+    sortOrder: sort_order,
+    payment_statuses: payment_statuses_filter.length > 0 ? payment_statuses_filter : undefined,
+    include_subscriptions: true
   });
 
   const [selected_users, set_selected_users] = useState<string[]>([]);
@@ -56,7 +63,7 @@ export function UsersLayout() {
   // Reset page when filters change
   useEffect(() => {
     set_page(1);
-  }, [debounced_search, category_filters]);
+  }, [debounced_search, category_filters, payment_statuses_filter]);
 
   const breadcrumb_items = [
     { title: tNav('dashboard'), href: '/main' },
@@ -95,6 +102,21 @@ export function UsersLayout() {
   const handle_delete_click = (id: string) => {
     set_delete_id(id);
     open_delete();
+  };
+  
+  const handle_sort = (field: string) => {
+    if (sort_by === field) {
+      if (sort_order === 'desc') {
+        set_sort_order('asc');
+      } else {
+        set_sort_by(undefined);
+        set_sort_order('desc');
+      }
+    } else {
+      set_sort_by(field);
+      set_sort_order('desc');
+    }
+    set_page(1);
   };
 
   const on_form_submit = async (data: UserFormData) => {
@@ -148,19 +170,19 @@ export function UsersLayout() {
           )}
 
           <Button 
-            variant={category_filters.length > 0 ? "light" : "default"}
-            color={category_filters.length > 0 ? "primary" : "gray"}
+            variant={(category_filters.length > 0 || payment_statuses_filter.length > 0) ? "light" : "default"}
+            color={(category_filters.length > 0 || payment_statuses_filter.length > 0) ? "primary" : "gray"}
             leftSection={<IoFilterOutline size={18} />} 
             onClick={open_filter_drawer}
           >
              <Box className="hidden sm:inline">{common_t('filters')}</Box>
-             {category_filters.length > 0 && (
+             {(category_filters.length > 0 || payment_statuses_filter.length > 0) && (
                 <Box 
                     ml={8} 
                     className="w-5 h-5 rounded-full text-white flex items-center justify-center text-[10px] font-bold shadow-sm"
                     style={{ backgroundColor: 'var(--mantine-primary-color-filled)' }}
                 >
-                    {category_filters.length}
+                    {(category_filters.length > 0 ? 1 : 0) + (payment_statuses_filter.length > 0 ? 1 : 0)}
                 </Box>
             )}
           </Button>
@@ -193,6 +215,9 @@ export function UsersLayout() {
             on_select_all={handle_select_all}
             on_edit={handle_edit_user}
             on_delete={handle_delete_click}
+            sort_by={sort_by}
+            sort_order={sort_order}
+            on_sort={handle_sort}
           />
         )}
       </Paper>
@@ -207,11 +232,13 @@ export function UsersLayout() {
         on_close={close_drawer}
       />
 
-      <CategoryFilterDrawer
+      <UserFilterDrawer
         opened={filter_drawer_opened}
         categoryIds={category_filters}
-        onClose={close_filter_drawer}
         onCategoryIdsChange={set_category_filters}
+        paymentStatuses={payment_statuses_filter}
+        onPaymentStatusesChange={set_payment_statuses_filter}
+        onClose={close_filter_drawer}
       />
 
       <UserDeleteModal 

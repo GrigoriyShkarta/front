@@ -13,7 +13,7 @@ export const photoActions = {
    * Get paginated list of photo materials
    */
   get_photos: async (params: GetPhotosParams): Promise<PhotoListResponse> => {
-    const response = await api.get('/materials/photo', { 
+    const response = await api.get('/materials/photos', { 
       params,
       paramsSerializer: (params) => {
         const searchParams = new URLSearchParams();
@@ -44,7 +44,7 @@ export const photoActions = {
       });
     }
 
-    const response = await api.post('/materials/photo', form_data, {
+    const response = await api.post('/materials/photos', form_data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -67,7 +67,7 @@ export const photoActions = {
       });
     }
 
-    const response = await api.patch(`/materials/photo/${id}`, form_data, {
+    const response = await api.patch(`/materials/photos/${id}`, form_data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -80,13 +80,13 @@ export const photoActions = {
    * Delete single photo material
    */
   delete_photo: async (id: string): Promise<void> => {
-    await api.delete(`/materials/photo/${id}`);
+    await api.delete(`/materials/photos/${id}`);
   },
 
   /**
    * Delete multiple photo materials
    */
   bulk_delete_photos: async (ids: string[]): Promise<void> => {
-    await api.delete('/materials/photo', { data: { ids } });
+    await api.delete('/materials/photos', { data: { ids } });
   }
 };

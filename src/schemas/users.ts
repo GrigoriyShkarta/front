@@ -51,6 +51,24 @@ export const user_response_schema = z.object({
     color: z.string().optional(),
   })).optional(),
   learning_goals: z.string().nullable().optional(),
+  purchased_subscriptions: z.array(z.any()).optional(),
+  can_student_create_tracker: z.boolean().default(false).optional(),
+  can_student_edit_tracker: z.boolean().default(false).optional(),
+  user_categories: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    color: z.string().optional(),
+    super_admin_id: z.string().optional(),
+    created_at: z.string().optional(),
+    updated_at: z.string().optional()
+  })).optional(),
+  notifications: z.array(z.object({
+    id: z.string(),
+    message_id: z.string().optional(),
+    message: z.string(),
+    is_read: z.boolean(),
+    created_at: z.string().optional()
+  })).optional()
 });
 
 export type UserListItem = z.infer<typeof user_response_schema>;

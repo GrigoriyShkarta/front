@@ -155,3 +155,21 @@ export const SPACE_FONTS: FontOption[] = [
 export const DEFAULT_FONT = 'inter';
 
 export const BASIC_FONTS: FontOption[] = SPACE_FONTS.filter(f => !f.is_premium);
+
+// ============================================
+// CURRENCIES
+// ============================================
+export const CURRENCIES = [
+  { value: 'UAH', label: 'UAH (₴)', symbol: '₴' },
+  { value: 'USD', label: 'USD ($)', symbol: '$' },
+  { value: 'EUR', label: 'EUR (€)', symbol: '€' },
+  { value: 'PLN', label: 'PLN (zł)', symbol: 'zł' },
+  { value: 'GBP', label: 'GBP (£)', symbol: '£' },
+] as const;
+
+export type CurrencyCode = typeof CURRENCIES[number]['value'];
+export const DEFAULT_CURRENCY: CurrencyCode = 'UAH';
+
+export const getCurrencySymbol = (code?: string | null) => {
+  return CURRENCIES.find(c => c.value === code)?.symbol || '₴';
+};

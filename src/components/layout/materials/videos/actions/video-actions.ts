@@ -13,7 +13,7 @@ export const videoActions = {
    * Get paginated list of video materials
    */
   get_videos: async (params: GetVideosParams): Promise<VideoListResponse> => {
-    const response = await api.get('/materials/video', { 
+    const response = await api.get('/materials/videos', { 
       params,
       paramsSerializer: (params) => {
         const searchParams = new URLSearchParams();
@@ -45,7 +45,7 @@ export const videoActions = {
       });
     }
 
-    const response = await api.post('/materials/video', form_data, {
+    const response = await api.post('/materials/videos', form_data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -69,7 +69,7 @@ export const videoActions = {
       });
     }
 
-    const response = await api.patch(`/materials/video/${id}`, form_data, {
+    const response = await api.patch(`/materials/videos/${id}`, form_data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -82,13 +82,13 @@ export const videoActions = {
    * Delete single video material
    */
   delete_video: async (id: string): Promise<void> => {
-    await api.delete(`/materials/video/${id}`);
+    await api.delete(`/materials/videos/${id}`);
   },
 
   /**
    * Delete multiple video materials
    */
   bulk_delete_videos: async (ids: string[]): Promise<void> => {
-    await api.delete('/materials/video', { data: { ids } });
+    await api.delete('/materials/videos', { data: { ids } });
   }
 };

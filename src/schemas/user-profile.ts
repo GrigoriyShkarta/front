@@ -13,13 +13,14 @@ export const personalization_schema = z.object({
   is_white_sidebar_color: z.boolean(),
   is_show_sidebar_icon: z.boolean().optional(),
   font_family: z.string().default('inter'),
+  currency: z.string().default('UAH'),
 });
 
 export const user_schema = z.object({
   id: z.string(),
   email: z.string().email(),
   name: z.string(),
-  role: z.string(), // Could be enum, but role can vary
+  role: z.string(),
   birthday: z.string().nullable().optional(),
   city: z.string().nullable().optional(),
   telegram: z.string().nullable().optional(),
@@ -33,9 +34,29 @@ export const user_schema = z.object({
   teacher_id: z.string().nullable().optional(),
   learning_goals: z.string().nullable().optional(),
   is_premium: z.boolean().default(false),
+  payment_reminder_date: z.string().nullable().optional(),
+  deactivation_date: z.string().nullable().optional(),
   space: z.object({
     personalization: personalization_schema.nullable().optional(),
-  })
+  }).nullable().optional(),
+  can_student_create_tracker: z.boolean().default(false).optional(),
+  can_student_edit_tracker: z.boolean().default(false).optional(),
+  user_categories: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    color: z.string().optional(),
+    super_admin_id: z.string().optional(),
+    created_at: z.string().optional(),
+    updated_at: z.string().optional()
+  })).optional(),
+  notifications: z.array(z.object({
+    id: z.string(),
+    message_id: z.string().optional(),
+    message: z.string(),
+    message_title: z.string(),
+    is_read: z.boolean(),
+    created_at: z.string().optional()
+  })).optional()
 });
 
 export type UserProfile = z.infer<typeof user_schema>;

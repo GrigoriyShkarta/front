@@ -6,6 +6,8 @@ import { SubscriptionMaterial } from '../schemas/subscription-schema';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
+import { getCurrencySymbol } from '@/lib/constants';
 
 interface Props {
   data: SubscriptionMaterial[];
@@ -24,6 +26,8 @@ export function SubscriptionTable({
 }: Props) {
   const t = useTranslations('Finance.subscriptions.table');
   const common_t = useTranslations('Common');
+  const { user } = useAuth();
+  const currencySymbol = getCurrencySymbol(user?.space?.personalization?.currency);
 
   const toggle_all = () => {
     on_selection_change(
@@ -125,7 +129,7 @@ export function SubscriptionTable({
                 </Table.Td>
                 <Table.Td>
                   <Text size="sm" fw={700}>
-                    {item.price}
+                    {item.price} {currencySymbol}
                   </Text>
                 </Table.Td>
                 <Table.Td>

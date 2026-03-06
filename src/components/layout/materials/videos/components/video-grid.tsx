@@ -1,10 +1,11 @@
 'use client';
 
-import { SimpleGrid, Card, Image, Text, Group, Checkbox, ActionIcon, Menu, rem, Box, Badge, useMantineTheme } from '@mantine/core';
-import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoPlayOutline, IoLogoYoutube, IoVideocamOutline } from 'react-icons/io5';
+import { SimpleGrid, Card, Image, Text, Group, Checkbox, ActionIcon, Menu, rem, Box, Tooltip, Badge, useMantineTheme } from '@mantine/core';
+import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoPlayOutline, IoLogoYoutube, IoVideocamOutline, IoPeopleOutline } from 'react-icons/io5';
 import { VideoMaterial } from '../schemas/video-schema';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
+import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -14,27 +15,23 @@ interface Props {
   on_edit: (video: VideoMaterial) => void;
   on_delete: (id: string) => void;
   on_play: (video: VideoMaterial) => void;
+  on_grant_access: (id: string) => void;
   is_loading?: boolean;
 }
 
-export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on_delete, on_play, is_loading }: Props) {
+export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on_delete, on_play, on_grant_access, is_loading }: Props) {
   const common_t = useTranslations('Common');
+  const tAccess = useTranslations('Materials.access');
+  const tAuth = useTranslations('Auth.validation');
+  const tVideo = useTranslations('Materials.video.table');
+  const theme = useMantineTheme();
+  const { user } = useAuth();
+  const is_student = user?.role === 'student';
 
   const get_youtube_id = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
-  };
-
-  const get_thumbnail = (item: VideoMaterial) => {
-    // If it's a YouTube video (has youtube_url OR has file_url but no file_key)
-    const url = item.youtube_url || (!item.file_key ? item.file_url : null);
-    
-    if (url) {
-      const id = get_youtube_id(url);
-      return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
-    }
-    return item.thumbnail_url || null;
   };
 
   const toggle_one = (id: string) => {
@@ -45,14 +42,13 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
     );
   };
 
-  const theme = useMantineTheme();
-
   return (
     <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 4, lg: 5 }} spacing="lg">
       {data.map((item) => {
         const is_selected = selected_ids.includes(item.id);
         const is_youtube = !!item.youtube_url || (!item.file_key && !!item.file_url);
-        const thumbnail = get_thumbnail(item);
+        const youtube_target_url = item.youtube_url || (!item.file_key ? item.file_url : null);
+        const youtube_id = youtube_target_url ? get_youtube_id(youtube_target_url) : null;
 
         return (
           <Card
@@ -61,109 +57,111 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
             radius="md"
             withBorder
             className={cn(
-              'group transition-all duration-300 hover:shadow-md h-full cursor-pointer',
-              is_selected ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-50/5 dark:bg-blue-900/10' : 'bg-white/5 border-white/10'
+              'group transition-all duration-300 hover:shadow-md h-full cursor-pointer overflow-hidden',
+              is_selected ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-50/5 dark:bg-blue-900/10' : 'bg-white/5 border-white/10 shadow-sm'
             )}
             onClick={() => on_play(item)}
           >
-            <Card.Section className="relative overflow-hidden aspect-video flex items-center justify-center bg-black">
-              {is_youtube ? (
-                thumbnail ? (
-                  <Image
-                    src={thumbnail}
-                    alt={item.name}
-                    className="transition-transform duration-500 group-hover:scale-105"
-                    fit="cover"
-                    h="100%"
-                  />
-                ) : (
-                  <Box className="w-full h-full flex items-center justify-center bg-white/5">
-                    <IoLogoYoutube size={40} className="text-white/20" />
-                  </Box>
-                )
+            <Card.Section className="relative aspect-video flex items-center justify-center bg-black overflow-hidden border-b border-white/5">
+              {is_youtube && youtube_id ? (
+                <Image 
+                  src={`https://img.youtube.com/vi/${youtube_id}/mqdefault.jpg`} 
+                  alt={item.name} 
+                  fit="cover"
+                  className="transition-transform duration-500 group-hover:scale-105"
+                />
               ) : (
                 item.thumbnail_url ? (
-                  <Image
-                    src={item.thumbnail_url}
-                    alt={item.name}
+                   <Image 
+                    src={item.thumbnail_url} 
+                    alt={item.name} 
+                    fit="cover" 
                     className="transition-transform duration-500 group-hover:scale-105"
-                    fit="cover"
-                    h="100%"
-                  />
-                ) : item.file_url ? (
-                  <video
-                    key={item.file_url}
-                    src={`${item.file_url}#t=0.5`}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    preload="metadata"
-                    muted
-                    playsInline
                   />
                 ) : (
-                  <Box className="w-full h-full flex items-center justify-center bg-white/5">
-                    <IoVideocamOutline size={40} className="text-white/20" />
+                  <Box 
+                    className="w-full h-full flex items-center justify-center"
+                    style={{ backgroundColor: is_selected ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.02)' }}
+                  >
+                    <IoVideocamOutline size={40} className="text-white/10" />
                   </Box>
                 )
               )}
-              
-              {/* Overlay / Play Button Decoration */}
-              <Box className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                 <Box className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white scale-0 group-hover:scale-100 transition-transform duration-300">
-                    <IoPlayOutline size={24} />
-                 </Box>
+
+              {/* Badges for video type */}
+              <Box className="absolute bottom-2 left-2 z-10 flex gap-1">
+                 {is_youtube ? (
+                    <Badge color="red" size="xs" variant="filled" leftSection={<IoLogoYoutube size={10} />}>
+                       YouTube
+                    </Badge>
+                 ) : (
+                    <Badge color="blue" size="xs" variant="filled" leftSection={<IoVideocamOutline size={10} />}>
+                       FILE
+                    </Badge>
+                 )}
               </Box>
 
-              <Badge 
-                variant="filled" 
-                color={is_youtube ? 'red' : theme.primaryColor} 
-                size="xs" 
-                className="absolute bottom-2 right-2 backdrop-blur-md opacity-90 shadow-sm"
-                leftSection={is_youtube ? <IoLogoYoutube size={10} /> : <IoVideocamOutline size={10} />}
-              >
-                {is_youtube ? 'YouTube' : 'FILE'}
-              </Badge>
+              <Box className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <Box className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 transform scale-90 group-hover:scale-100 transition-transform">
+                   <IoPlayOutline size={24} color="white" />
+                </Box>
+              </Box>
               
-              <div 
-                className={cn(
-                  "absolute top-2 left-2 transition-opacity duration-200",
-                  is_selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                )}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Checkbox
-                  checked={is_selected}
-                  onChange={() => toggle_one(item.id)}
-                />
-              </div>
+              {!is_student && (
+                <div 
+                  className={cn(
+                    "absolute top-2 left-2 transition-opacity duration-200 z-10",
+                    is_selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  )}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Checkbox
+                    checked={is_selected}
+                    onChange={() => toggle_one(item.id)}
+                    radius="sm"
+                    styles={{
+                      input: { cursor: 'pointer', shadow: '0 2px 4px rgba(0,0,0,0.2)' }
+                    }}
+                  />
+                </div>
+              )}
 
-              <div 
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Menu shadow="md" width={160} position="bottom-end" withArrow>
-                  <Menu.Target>
-                    <ActionIcon variant="filled" color="dark" size="md" className="backdrop-blur-md bg-black/40 hover:bg-black/60 border border-white/10">
-                      <IoEllipsisVertical size={16} />
-                    </ActionIcon>
-                  </Menu.Target>
+              {!is_student && (
+                <div 
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Menu shadow="md" width={160} position="bottom-end" withArrow>
+                    <Menu.Target>
+                      <ActionIcon variant="filled" color="dark" size="md" className="backdrop-blur-md bg-black/40 hover:bg-black/60 border border-white/10">
+                        <IoEllipsisVertical size={16} />
+                      </ActionIcon>
+                    </Menu.Target>
 
-                  <Menu.Dropdown className="bg-[var(--space-card-bg)] border-white/10 backdrop-blur-md">
-                    <Menu.Item 
-                      leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
-                      onClick={() => on_edit(item)}
-                    >
-                      {common_t('edit')}
-                    </Menu.Item>
-                    <Menu.Item 
-                      color="red"
-                      leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
-                      onClick={() => on_delete(item.id)}
-                    >
-                      {common_t('delete')}
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              </div>
+                    <Menu.Dropdown className="bg-[var(--space-card-bg)] border-white/10 backdrop-blur-md">
+                      <Menu.Item 
+                        leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
+                        onClick={() => on_edit(item)}
+                      >
+                        {common_t('edit')}
+                      </Menu.Item>
+                      <Menu.Item 
+                        leftSection={<IoPeopleOutline style={{ width: rem(14), height: rem(14) }} />}
+                        onClick={() => on_grant_access(item.id)}
+                      >
+                        {tAccess('grant_access')}
+                      </Menu.Item>
+                      <Menu.Item 
+                        color="red"
+                        leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
+                        onClick={() => on_delete(item.id)}
+                      >
+                        {common_t('delete')}
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                </div>
+              )}
             </Card.Section>
 
             <Box pt="xs" px="xs">

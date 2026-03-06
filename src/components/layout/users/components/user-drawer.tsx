@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Drawer, Title, ScrollArea, Box, Text, UnstyledButton } from '@mantine/core';
+import { Drawer, Title, ScrollArea, Box, Text, UnstyledButton, Group } from '@mantine/core';
 import { IoPersonOutline, IoSettingsOutline } from 'react-icons/io5';
 import { UserForm } from './user-form';
 import { UserListItem, UserFormData } from '@/schemas/users';
@@ -9,22 +9,22 @@ import { useTranslations } from 'next-intl';
 
 interface Props {
   opened: boolean;
-  on_close: () => void;
   initial_data: UserListItem | null;
   teachers: { id: string; name: string; role: string }[];
   current_user: any;
-  on_submit: (data: UserFormData) => void;
   is_loading: boolean;
+  on_submit: (data: UserFormData) => void;
+  on_close: () => void;
 }
 
 export function UserDrawer({ 
   opened, 
-  on_close, 
   initial_data, 
   teachers, 
   current_user,
+  is_loading, 
   on_submit, 
-  is_loading 
+  on_close, 
 }: Props) {
   const t = useTranslations('Users');
   const [activeTab, setActiveTab] = useState<'personal' | 'settings'>('personal');
@@ -50,19 +50,19 @@ export function UserDrawer({
       onClose={on_close}
       position="right"
       title={
-        <Title order={3} p={32} component="span">
+        <Title order={3} px={{ base: 'xl', sm: 32 }} component="p" className='text-[20px]! leading-tight'>
           {initial_data 
             ? (initial_data.role === 'student' ? t('drawer.edit_student_title') : t('drawer.edit_title'))
             : (current_user?.role === 'teacher' ? t('drawer.add_student_title') : t('drawer.add_title'))
           }
         </Title>
       }
-      padding={0} // We will use padding inside the scroll area
+      padding={0}
       size="md"
       withCloseButton
       styles={{
         root: {
-          overflow: 'hidden',
+          overflowX: 'hidden',
         },
         content: { 
           overflow: 'visible',
@@ -78,9 +78,49 @@ export function UserDrawer({
         }
       }}
     >
-      {/* Bookmark Tabs sticking out to the left */}
+      {/* Mobile Tabs - Only visible on small screens */}
       {current_user?.role !== 'student' && (
         <Box 
+          hiddenFrom="sm" 
+          px="xl" 
+          pb="xs"
+          className="bg-[var(--mantine-color-body)]"
+        >
+          <Group grow gap="sm" pt="xs">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <UnstyledButton
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    height: '44px',
+                    borderRadius: '10px',
+                    background: isActive ? tab.color : 'rgba(255, 255, 255, 0.05)',
+                    color: isActive ? 'white' : 'var(--mantine-color-dimmed)',
+                    transition: 'all 0.2s ease',
+                    boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.1)' : 'none'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {tab.icon}
+                  </div>
+                  <Text size="sm" fw={600}>{tab.label}</Text>
+                </UnstyledButton>
+              );
+            })}
+          </Group>
+        </Box>
+      )}
+
+      {/* Bookmark Tabs sticking out to the left - Only visible on desktop */}
+      {current_user?.role !== 'student' && (
+        <Box 
+          visibleFrom="sm"
           style={{ 
             position: 'absolute', 
             left: '-52px', // Minimum width (collapsed state)

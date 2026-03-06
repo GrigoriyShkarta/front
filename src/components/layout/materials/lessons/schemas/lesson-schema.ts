@@ -18,6 +18,10 @@ export const lesson_schema = z.object({
     name: z.string()
   })).optional().default([]),
   is_copying_disabled: z.boolean().optional().default(false),
+  add_files_to_materials: z.boolean().optional().default(true),
+  accessible_blocks: z.array(z.string()).optional().default([]),
+  full_access: z.boolean().optional().default(true),
+  accessible_student_ids: z.array(z.string()).optional().default([]),
   created_at: z.string(),
   updated_at: z.string(),
 });
@@ -36,6 +40,7 @@ export const create_lesson_schema = z.object({
   duration: z.number().nullable().optional(),
   course_ids: z.array(z.string()).optional(),
   is_copying_disabled: z.boolean().optional(),
+  add_files_to_materials: z.boolean().optional(),
 });
 
 export type CreateLessonForm = z.infer<typeof create_lesson_schema>;

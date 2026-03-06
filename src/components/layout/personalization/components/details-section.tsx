@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, memo } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { 
   TextInput, 
@@ -14,11 +14,14 @@ import {
   FileButton,
   Avatar,
   Switch,
+  Select,
   rem
 } from '@mantine/core';
 import { IoCloudUploadOutline, IoTrashOutline, IoDiamondOutline } from 'react-icons/io5';
 import { Controller, UseFormReturn } from 'react-hook-form';
 import { PersonalizationFormData } from '@/schemas/personalization';
+import { CURRENCIES } from '@/lib/constants';
+import { ImageCropper } from '@/components/ui/image-cropper';
 
 interface Props {
   form: UseFormReturn<PersonalizationFormData>;
@@ -29,7 +32,10 @@ interface Props {
 export function PersonalizationDetailsSection({ form, initial_icon, is_premium }: Props) {
   const t = useTranslations('Personalization');
   const common_t = useTranslations('Common');
+  
   const [icon_preview, set_icon_preview] = useState<string | null>(initial_icon || null);
+  const [crop_image, set_crop_image] = useState<string | null>(null);
+  const [cropper_opened, set_cropper_opened] = useState(false);
 
   const {
     register,
@@ -38,6 +44,23 @@ export function PersonalizationDetailsSection({ form, initial_icon, is_premium }
     control,
     formState: { errors },
   } = form;
+
+  const handle_file_change = (file: File | null) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        set_crop_image(reader.result as string);
+        set_cropper_opened(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handle_crop_complete = useCallback((file: File) => {
+    set_icon_preview(URL.createObjectURL(file));
+    setValue('icon', file, { shouldDirty: true });
+    set_cropper_opened(false);
+  }, [setValue]);
 
   return (
     <Paper 
@@ -80,12 +103,7 @@ export function PersonalizationDetailsSection({ form, initial_icon, is_premium }
               {watch('title_space')?.[0]?.toUpperCase() || 'L'}
             </Avatar>
             <Stack gap={5}>
-              <FileButton onChange={(file) => {
-                if (file) {
-                  set_icon_preview(URL.createObjectURL(file));
-                  setValue('icon', file);
-                }
-              }} accept="image/png,image/jpeg">
+              <FileButton onChange={handle_file_change} accept="image/png,image/jpeg">
                 {(props) => (
                   <Button 
                     {...props} 
@@ -105,7 +123,7 @@ export function PersonalizationDetailsSection({ form, initial_icon, is_premium }
                   size="xs" 
                   onClick={() => {
                     set_icon_preview(null);
-                    setValue('icon', null);
+                    setValue('icon', null, { shouldDirty: true });
                   }}
                   leftSection={<IoTrashOutline size={14} />}
                 >
@@ -138,7 +156,34 @@ export function PersonalizationDetailsSection({ form, initial_icon, is_premium }
             />
           )}
         />
+
+        <Controller
+          name="currency"
+          control={control}
+          render={({ field }) => (
+            <Select
+              label={t('currency_label')}
+              placeholder={t('currency_placeholder')}
+              data={[...CURRENCIES]}
+              value={field.value}
+              onChange={(val) => field.onChange(val || 'UAH')}
+              variant="filled"
+              allowDeselect={false}
+            />
+          )}
+        />
       </Stack>
+
+      {crop_image && (
+        <ImageCropper
+          image={crop_image}
+          opened={cropper_opened}
+          onClose={() => set_cropper_opened(false)}
+          onCropComplete={handle_crop_complete}
+          title={t('icon_label')}
+          aspect={1}
+        />
+      )}
     </Paper>
   );
 }

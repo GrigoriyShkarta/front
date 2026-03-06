@@ -3,8 +3,11 @@
 import { Stack, Button, Group, Text, Paper, ActionIcon, Box, TextInput, Modal, LoadingOverlay, Title, Drawer, MultiSelect, NumberInput, Switch, Tooltip, Grid, Divider } from '@mantine/core';
 import { IoAddOutline, IoImageOutline, IoTrashOutline, IoChevronBackOutline, IoPencilOutline, IoOptionsOutline } from 'react-icons/io5';
 import { useState, useRef, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { notifications } from '@mantine/notifications';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/use-auth';
 import { MediaPickerModal } from '../media-picker-modal';
 import { useLessonEditor } from '../../hooks/use-lesson-editor';
@@ -31,13 +34,15 @@ interface Props {
     id?: string;
     is_read_only?: boolean;
     course_id?: string;
+    student_id?: string; // For partial access configuration
+    is_access_mode?: boolean; // Toggles the selection UI
 }
 
 /**
  * Main Lesson Editor component
  * Manages multiple blocks of content, reordering, and media bank integration.
  */
-export default function LessonEditorContainer({ id, is_read_only = false, course_id }: Props) {
+export default function LessonEditorContainer({ id, is_read_only = false, course_id, student_id, is_access_mode = false }: Props) {
   const t = useTranslations('Materials.lessons');
   const common_t = useTranslations('Common');
   const tCat = useTranslations('Categories');
@@ -45,10 +50,13 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
   const { user } = useAuth();
   const is_student = user?.role === 'student';
 
-  const { lesson, is_loading_lesson, is_saving, create_lesson, update_lesson } = useLessonEditor({ id });
+  const { lesson, is_loading_lesson, is_saving, create_lesson, update_lesson } = useLessonEditor({ id, student_id });
+  const queryClient = useQueryClient();
   
-  const [readOnly, setReadOnly] = useState(is_read_only);
+  const [readOnly, setReadOnly] = useState(is_read_only || is_access_mode);
   const [title, setTitle] = useState('');
+  const [accessible_block_ids, set_accessible_block_ids] = useState<string[]>([]);
+  const [full_access, set_full_access] = useState(true);
   const [cover, setCover] = useState<string | null>(null);
   const [coverPosition, setCoverPosition] = useState(50);
   const [isRepositioning, setIsRepositioning] = useState(false);
@@ -60,6 +68,7 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [courseIds, setCourseIds] = useState<string[]>([]);
   const [isCopyingDisabled, setIsCopyingDisabled] = useState(false);
+  const [addFilesToMaterials, setAddFilesToMaterials] = useState(true);
   const { categories: all_categories, create_category, create_categories, is_pending: is_cat_pending } = useCategories();
   const { courses: all_courses } = useCourses({ limit: 100 });
   const [category_drawer_opened, setCategoryDrawerOpened] = useState(false);
@@ -95,6 +104,7 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
         setCourseIds(lesson.course_ids || []);
         setDuration(lesson.duration || null);
         setIsCopyingDisabled(lesson.is_copying_disabled || false);
+        setAddFilesToMaterials(lesson.add_files_to_materials ?? true);
         if (lesson.content) {
             try {
                 const parsed = typeof lesson.content === 'string' 
@@ -108,8 +118,21 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
                 console.error('Failed to parse lesson content', e);
             }
         }
+        if (lesson.accessible_blocks) {
+            set_accessible_block_ids(lesson.accessible_blocks);
+        }
+        if (lesson.full_access !== undefined) {
+            set_full_access(lesson.full_access);
+        }
     }
   }, [lesson]);
+
+  // Sync accessible IDs with full access state
+  useEffect(() => {
+    if (full_access && blocks.length > 0) {
+        set_accessible_block_ids(blocks.map(b => b.id));
+    }
+  }, [full_access, blocks.length]);
 
   useEffect(() => {
     if (readOnly && isCopyingDisabled && is_student) {
@@ -140,6 +163,7 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
         course_ids: courseIds,
         duration: duration ? Number(duration) : null,
         is_copying_disabled: isCopyingDisabled,
+        add_files_to_materials: addFilesToMaterials,
         content: JSON.stringify(blocks.map((b, i) => ({
             id: b.id,
             content: b.content,
@@ -157,6 +181,36 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
         }
     } catch (error) {
         console.error('Failed to save lesson:', error);
+    }
+  };
+
+  const [is_saving_access, set_is_saving_access] = useState(false);
+  const handleSaveAccess = async () => {
+    if (!student_id || !id) return;
+    
+    set_is_saving_access(true);
+    try {
+        await api.post('/materials/access/grant', {
+            student_ids: [student_id],
+            material_ids: [id],
+            material_type: 'lesson',
+            full_access: full_access,
+            accessible_blocks: accessible_block_ids
+        });
+        notifications.show({
+            title: common_t('success'),
+            message: t('notifications.update_success'),
+            color: 'green'
+        });
+        queryClient.invalidateQueries({ queryKey: ['lesson', id, student_id] });
+    } catch (error: any) {
+        notifications.show({
+            title: common_t('error'),
+            message: error?.response?.data?.message || error?.message,
+            color: 'red'
+        });
+    } finally {
+        set_is_saving_access(false);
     }
   };
 
@@ -199,6 +253,24 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
 
   const updateBlockContent = (id: string, content: string) => {
     setBlocks(prev => prev.map(b => b.id === id ? { ...b, content } : b));
+  };
+
+  const handleToggleBlockAccess = (blockId: string, checked: boolean) => {
+    set_accessible_block_ids(prev => {
+        if (checked) {
+            return [...new Set([...prev, blockId])];
+        } else {
+            set_full_access(false);
+            return prev.filter(id => id !== blockId);
+        }
+    });
+  };
+
+  const handleToggleFullAccess = (checked: boolean) => {
+    set_full_access(checked);
+    if (checked) {
+        set_accessible_block_ids(blocks.map(b => b.id));
+    }
   };
 
   const openBank = (blockId: string, type: 'image' | 'video' | 'audio' | 'file') => {
@@ -298,7 +370,21 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
             {t('editor.back')}
         </Button>
         
-        {readOnly ? (
+        {is_access_mode ? (
+            <Group gap="sm">
+                <Switch 
+                    label={t('access.full_access') || 'Full access'}
+                    checked={full_access}
+                    onChange={(e) => handleToggleFullAccess(e.currentTarget.checked)}
+                />
+                <Button 
+                    onClick={handleSaveAccess}
+                    loading={is_saving_access}
+                >
+                    {t('editor.save')}
+                </Button>
+            </Group>
+        ) : readOnly ? (
             !is_student && (
                 <Button 
                     variant="filled" 
@@ -455,7 +541,10 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
             on_open_bank={(type) => openBank(block.id, type)}
             on_move={moveBlock}
             show_remove={blocks.length > 1}
-            read_only={readOnly}
+            read_only={readOnly || is_access_mode}
+            is_access_mode={is_access_mode}
+            is_checked={accessible_block_ids.includes(block.id)}
+            on_checked_change={(checked) => handleToggleBlockAccess(block.id, checked)}
             ref={(el) => { editorRefs.current[block.id] = el; }}
           />
         ))}
@@ -520,11 +609,11 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
                                     <Text size="xs" fw={700} c="dimmed">{t('editor.your_progress')}</Text>
                                     <Text size="xs" fw={700} c="primary">
                                         {(() => {
-                                            const all_ids = context_course.content.flatMap((item: CourseContentItem) => 
-                                                item.type === 'lesson' ? [item.lesson_id] : item.lesson_ids
+                                            const all_lessons = context_course.content.flatMap((item: any) => 
+                                                item.type === 'lesson' ? [item] : (item.lessons || [])
                                             );
-                                            const current_index = all_ids.indexOf(id || '');
-                                            const progress = all_ids.length > 0 ? Math.round(((current_index + 1) / all_ids.length) * 100) : 0;
+                                            const accessible_count = all_lessons.filter((l: any) => l.has_access).length;
+                                            const progress = all_lessons.length > 0 ? Math.round((accessible_count / all_lessons.length) * 100) : 0;
                                             return `${progress}%`;
                                         })()}
                                     </Text>
@@ -535,11 +624,11 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
                                         className="bg-primary rounded-full transition-all duration-1000"
                                         style={{ 
                                             width: (() => {
-                                                const all_ids = context_course.content.flatMap((item: CourseContentItem) => 
-                                                    item.type === 'lesson' ? [item.lesson_id] : item.lesson_ids
+                                                const all_lessons = context_course.content.flatMap((item: any) => 
+                                                    item.type === 'lesson' ? [item] : (item.lessons || [])
                                                 );
-                                                const current_index = all_ids.indexOf(id || '');
-                                                return `${all_ids.length > 0 ? ((current_index + 1) / all_ids.length) * 100 : 0}%`;
+                                                const accessible_count = all_lessons.filter((l: any) => l.has_access).length;
+                                                return `${all_lessons.length > 0 ? (accessible_count / all_lessons.length) * 100 : 0}%`;
                                             })()
                                         }}
                                     />
@@ -668,6 +757,13 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
                 description={t('editor.disable_copying_description')}
                 checked={isCopyingDisabled}
                 onChange={(e) => setIsCopyingDisabled(e.currentTarget.checked)}
+            />
+
+            <Switch
+                label={t('editor.add_files_to_materials')}
+                description={t('editor.add_files_to_materials_description')}
+                checked={addFilesToMaterials}
+                onChange={(e) => setAddFilesToMaterials(e.currentTarget.checked)}
             />
 
             <Button 

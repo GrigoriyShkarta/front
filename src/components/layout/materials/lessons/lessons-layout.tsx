@@ -16,19 +16,25 @@ import {
   Breadcrumbs,
   Anchor
 } from "@mantine/core";
-import { IoBookOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoFilterOutline } from "react-icons/io5";
+import { IoBookOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoFilterOutline, IoPeopleOutline } from "react-icons/io5";
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useLessons } from "./hooks/use-lessons";
 import { LessonTable } from "./components/lesson-table";
 import { LessonDeleteModal } from "./components/lesson-delete-modal";
 import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
+import { GrantAccessModal } from '@/components/common/materials/grant-access-modal';
 import { cn } from "@/lib/utils";
+
+import { useAuth } from "@/hooks/use-auth";
 
 export default function LessonsLayout() {
     const t = useTranslations('Materials.lessons');
+    const tAccess = useTranslations('Materials.access');
     const tNav = useTranslations('Navigation');
     const common_t = useTranslations('Common');
+    const { user } = useAuth();
+    const is_student = user?.role === 'student';
 
     const breadcrumb_items = [
         { title: tNav('dashboard'), href: '/main' },
@@ -48,6 +54,8 @@ export default function LessonsLayout() {
     const [filter_drawer_opened, setFilterDrawerOpened] = useState(false);
     const [delete_modal_opened, setDeleteModalOpened] = useState(false);
     const [id_to_delete, setIdToDelete] = useState<string | null>(null);
+    const [access_modal_opened, setAccessModalOpened] = useState(false);
+    const [ids_to_grant, setIdsToGrant] = useState<string[]>([]);
     
     // Data fetching
     const { 
@@ -99,23 +107,30 @@ export default function LessonsLayout() {
                 </Breadcrumbs>
 
                 <Group justify="space-between" align="flex-end">
-                    <Stack gap={0}>
-                        <Title order={2}>{t('title')}</Title>
-                        <Text color="dimmed" size="sm">
-                            {t('subtitle')}
-                        </Text>
-                    </Stack>
+                    <Title order={2}>{t('title')}</Title>
                     
                     <Group>
-                         {selected_ids.length > 0 && (
-                              <Button 
-                                 color="red" 
-                                 variant="light" 
-                                 leftSection={<IoTrashOutline size={16} />}
-                                 onClick={handle_bulk_delete_click}
-                              >
-                                 {t('bulk_delete', { count: selected_ids.length })}
-                              </Button>
+                         {!is_student && selected_ids.length > 0 && (
+                             <Group gap="xs">
+                                <Button 
+                                   variant="light" 
+                                   leftSection={<IoPeopleOutline size={16} />}
+                                   onClick={() => {
+                                       setIdsToGrant(selected_ids);
+                                       setAccessModalOpened(true);
+                                   }}
+                                >
+                                   {tAccess('grant_access')}
+                                </Button>
+                                <Button 
+                                   color="red" 
+                                   variant="light" 
+                                   leftSection={<IoTrashOutline size={16} />}
+                                   onClick={handle_bulk_delete_click}
+                                >
+                                   {t('bulk_delete', { count: selected_ids.length })}
+                                </Button>
+                             </Group>
                          )}
 
                         <Button 
@@ -136,14 +151,16 @@ export default function LessonsLayout() {
                             )}
                         </Button>
 
-                        <Button 
-                            leftSection={<IoAddOutline size={18} />} 
-                            component={Link}
-                            href="/main/materials/lessons/create"
-                            className="bg-blue-600 hover:bg-blue-700"
-                        >
-                            {t('add_lesson')}
-                        </Button>
+                        {!is_student && (
+                            <Button 
+                                leftSection={<IoAddOutline size={18} />} 
+                                component={Link}
+                                href="/main/materials/lessons/create"
+                                className="bg-blue-600 hover:bg-blue-700"
+                            >
+                                {t('add_lesson')}
+                            </Button>
+                        )}
                     </Group>
                 </Group>
 
@@ -176,6 +193,10 @@ export default function LessonsLayout() {
                                     selected_ids={selected_ids}
                                     on_selection_change={setSelectedIds}
                                     on_delete={handle_delete_click}
+                                    on_grant_access={(id) => {
+                                        setIdsToGrant([id]);
+                                        setAccessModalOpened(true);
+                                    }}
                                     is_loading={is_loading}
                                 />
                                 
@@ -223,11 +244,13 @@ export default function LessonsLayout() {
                                 <Text c="dimmed" size="sm" ta="center" maw={400}>
                                     {t('empty_description')}
                                 </Text>
-                                <Group mt="sm">
-                                    <Button variant="light" component={Link} href="/main/materials/lessons/create">
-                                        {t('add_lesson')}
-                                    </Button>
-                                </Group>
+                                {!is_student && (
+                                    <Group mt="sm">
+                                        <Button variant="light" component={Link} href="/main/materials/lessons/create">
+                                            {t('add_lesson')}
+                                        </Button>
+                                    </Group>
+                                )}
                             </Stack>
                         )
                     )}
@@ -246,6 +269,17 @@ export default function LessonsLayout() {
                     onConfirm={confirm_delete}
                     is_loading={is_deleting || is_bulk_deleting}
                     count={id_to_delete ? 1 : selected_ids.length}
+                />
+
+                <GrantAccessModal 
+                    opened={access_modal_opened}
+                    onClose={() => setAccessModalOpened(false)}
+                    materialIds={ids_to_grant}
+                    materialType="lesson"
+                    initialSelectedIds={lessons
+                        .filter(l => ids_to_grant.includes(l.id))
+                        .flatMap(l => (l as any).accessible_student_ids || [])
+                    }
                 />
         </Stack>
     );

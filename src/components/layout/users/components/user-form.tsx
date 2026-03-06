@@ -189,7 +189,7 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
   };
 
   return (
-    <form onSubmit={handleSubmit(handle_form_submit)}>
+    <form onSubmit={handleSubmit(handle_form_submit)} className='overflow-x-hidden'>
       <Stack gap="md">
         <AvatarCropper
           image={raw_image || ''}

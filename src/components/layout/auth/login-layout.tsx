@@ -47,8 +47,8 @@ export default function LoginLayout() {
       // 1. Set cookies
       setAuthCookies(response.access_token, response.refresh_token);
       
-      // 2. Update context state
-      login();
+      // 2. Fetch user and update context state
+      await login();
       
       // 3. Redirect to /main
       router.push('/main');

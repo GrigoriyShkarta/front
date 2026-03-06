@@ -10,6 +10,7 @@ export const audio_schema = z.object({
   file_url: z.string(),
   file_key: z.string().optional(),
   categories: z.array(category_schema).optional(),
+  accessible_student_ids: z.array(z.string()).optional().default([]),
   created_at: z.string(),
   updated_at: z.string(),
 });

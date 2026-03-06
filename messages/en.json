@@ -1,5 +1,36 @@
 {
+  "Dashboard": {
+    "welcome_title": "Hello, {name}! 👋",
+    "welcome_description": "We are glad to see you again. Here is what is happening in your space today.",
+    "recent_students": {
+      "title": "Recent Students"
+    },
+    "customize_button": "Customize look",
+    "edit_modal_title": "Dashboard Personalization",
+    "save_success": "Dashboard Updated",
+    "save_success_desc": "Settings have been successfully applied to your space",
+    "actions": {
+      "title": "Quick Actions",
+      "add_student": {
+        "title": "Add Student",
+        "desc": "Register a new student"
+      },
+      "create_course": {
+        "title": "Create Course",
+        "desc": "Add a new syllabus"
+      },
+      "schedule": {
+        "title": "Lesson Schedule",
+        "desc": "Manage your calendar"
+      },
+      "analytics": {
+        "title": "Finance Reports",
+        "desc": "Analyze income and payments"
+      }
+    }
+  },
   "Common": {
+    "no_data": "No data found",
     "upgrade_plan": "Upgrade Plan",
     "pricing_title": "Pricing Plans",
     "upgrade_modal": {
@@ -16,6 +47,7 @@
     "delete": "Delete",
     "save": "Save",
     "cancel": "Cancel",
+    "add": "Add",
     "back": "Back",
     "show": "Show",
     "per_page": "per page",
@@ -80,6 +112,15 @@
       "scheduled": "Scheduled",
       "burned": "Missed",
       "rescheduled": "Rescheduled"
+    },
+    "payment_reminder": {
+      "title": "Payment Reminder",
+      "description": "Your subscription will expire on {date}. Please make a payment in time to continue your studies.",
+      "button": "Pay Now"
+    },
+    "deactivation_reminder": {
+      "title": "Access is expiring",
+      "description": "Your access to the platform will be limited on {date}. Extend your studies to maintain access to materials."
     }
   },
   "Auth": {
@@ -120,6 +161,11 @@
     "file": "Files",
     "lessons": "Lessons",
     "courses": "Courses",
+    "additional_materials": "Lessons",
+    "audio_materials": "Audio",
+    "photo_materials": "Photo",
+    "video_materials": "Video",
+    "file_materials": "Files",
     "tests": "Tests",
     "categories": "Categories",
     "theme": "Theme",
@@ -133,7 +179,50 @@
     "logout_confirm_title": "Confirm Logout",
     "logout_confirm_message": "Are you sure you want to log out?",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "tracker": "Tracker",
+    "add": "Add",
+    "save": "Save"
+  },
+  "Tracker": {
+    "title": "Tracker",
+    "users_title": "Choose Student for Tracker",
+    "board_title": "Tracker: {name}",
+    "columns": {
+      "planned": "Planned",
+      "in_progress": "In Progress",
+      "completed": "Completed"
+    },
+    "card": {
+      "title": "Title",
+      "title_placeholder": "Enter task title...",
+      "description": "Description",
+      "description_placeholder": "Add detailed description here...",
+      "subtasks": "Subtasks",
+      "column": "Column",
+      "add_card": "Add Card",
+      "edit_card": "Edit Card",
+      "add_subtask": "Add",
+      "subtask_placeholder": "Subtask title"
+    },
+    "validation": {
+      "required": "Required"
+    },
+    "add_column": "Add Column",
+    "edit_column": "Edit Column",
+    "column_name": "Column Name",
+    "column_placeholder": "e.g. Backlog",
+    "column_color": "Header Color",
+    "board_empty_student": "It's empty here for now.",
+    "board_empty_admin": "Your tracker board is empty. Start by adding columns to organize work.",
+    "read_more": "Read more",
+    "read_less": "Read less",
+    "settings": {
+      "button": "Settings",
+      "drawer_title": "Tracker Settings",
+      "can_student_create": "Allow student to create new tasks",
+      "can_student_edit": "Allow student to edit tasks"
+    }
   },
   "Personalization": {
     "success": "Success",
@@ -146,6 +235,8 @@
     "icon_label": "Logo",
     "upload_logo": "Upload Logo",
     "remove_logo": "Remove",
+    "currency_label": "Currency",
+    "currency_placeholder": "Select currency",
     "visual_style_title": "Visual Style",
     "visual_style_description": "Customize colors and theme settings.",
     "primary_color_label": "Primary Color",
@@ -186,18 +277,33 @@
     "font_family_label": "Font",
     "font_title": "Typography",
     "font_description": "Choose a font that reflects your brand's personality and ensures great readability.",
-    "is_show_sidebar_icon_label": "Show sidebar icon"
+    "is_show_sidebar_icon_label": "Show sidebar icon",
+    "dashboard_section": {
+      "title": "Dashboard",
+      "title_description": "Customize the dashboard look for your users.",
+      "hero_title": "Title",
+      "hero_description": "Description text",
+      "hero_image": "Hero Background",
+      "upload_image": "Upload Image",
+      "no_image": "No image set",
+      "image_hint": "Recommended size 16:9. Format: JPG, PNG.",
+      "tabs": {
+        "admin": "For Admins",
+        "student": "For Students"
+      }
+    }
   },
   "Users": {
-    "title": "Users Base",
-    "add_button": "Add User",
+    "title": "Student Base",
+    "add_button": "Add Student",
     "table": {
-      "user": "User",
-      "email": "Email",
+      "user": "Student",
       "role": "Role",
       "attached_to": "Attached to",
       "categories": "Categories",
       "status": "Status",
+      "payment_status": "Payment Status",
+      "next_payment_date": "Next Payment",
       "actions": "Actions"
     },
     "cropper": {
@@ -205,15 +311,16 @@
       "zoom": "Zoom"
     },
     "filters": {
-      "search_placeholder": "Search users...",
+      "search_placeholder": "Search students...",
       "role_placeholder": "Filter by role",
       "all_roles": "All roles"
     },
     "drawer": {
-      "add_title": "Add New User",
-      "edit_title": "Edit User",
+      "add_title": "Add New Student",
+      "edit_title": "Edit Student",
       "add_student_title": "Add New Student",
-      "edit_student_title": "Edit Student Profile"
+      "edit_student_title": "Edit Student Profile",
+      "edit_subscription_title": "Edit Subscription"
     },
     "form": {
       "avatar": "Avatar",
@@ -236,14 +343,25 @@
       "start_date": "Start Date",
       "next_payment_date": "Next payment date",
       "payment_reminder": "Payment reminder (one week before)",
+      "remind_1w": "1w reminder",
       "partial_payment_date": "Date of additional payment",
       "status": "Status",
       "status_active": "Active",
       "status_inactive": "Inactive",
+      "status_placeholder": "Select status",
       "is_avatar_locked": "Lock editing avatar",
       "is_name_locked": "Lock editing name",
       "deactivation_date": "Deactivation date",
-      "permissions": "Permissions"
+      "permissions": "Permissions",
+      "extend_subscription": "Extend subscription",
+      "subscription_name": "Subscription Name",
+      "subscription_name_placeholder": "Enter name",
+      "subscription_price": "Price",
+      "subscription_price_placeholder": "1000",
+      "lessons_count": "Lessons Count",
+      "lessons_count_placeholder": "8",
+      "comment": "Comment",
+      "comment_placeholder": "Your comment..."
     },
     "delete_modal": {
       "title": "Confirm Deletion",
@@ -253,6 +371,7 @@
     "tabs": {
       "general": "General Details",
       "subscriptions": "Subscriptions",
+      "lesson_history": "Lesson History",
       "activity": "Activity"
     },
     "tabs_drawer": {
@@ -270,7 +389,9 @@
     "price": "Price",
     "selected": "selected",
     "need_more_lessons": "Need {count} more lessons",
-    "remove_lessons": "Remove {count} extra lessons"
+    "remove_lessons": "Remove {count} extra lessons",
+    "individual_subscription": "Individual Subscription",
+    "template_subscription": "From existing"
   },
   "Profile": {
     "title": "My Profile",
@@ -319,14 +440,16 @@
   "Materials": {
     "audio": {
       "title": "Audio Materials",
-      "subtitle": "Listen to your course audio materials and recordings.",
+      "subtitle": "An exclusive library of audio materials for your learning and development.",
       "empty_title": "No audio files found",
-      "empty_description": "There are no audio materials available for your account yet. Upload some files or contact your teacher to get started.",
-      "empty_description_admin": "There are no audio materials available for your account yet. Upload some files to get started.",
+      "empty_description": "There are currently no audio materials available for your account. Please contact your coordinator for access.",
+      "empty_description_admin": "Your library is currently empty. Upload your first audio file to get started.",
       "add_audio": "Add Audio",
       "edit_audio": "Edit Audio",
       "delete_audio": "Delete Audio",
       "bulk_delete": "Delete Selected ({count})",
+      "gallery": "Gallery",
+      "table_view": "Table",
       "bulk_edit": "Edit Selected",
       "table": {
         "name": "Name",
@@ -356,7 +479,8 @@
         "description": "Are you sure you want to delete this audio file? This action cannot be undone.",
         "bulk_description": "Are you sure you want to delete {count} selected audio files? This action cannot be undone.",
         "warning": "Important: these files will also be automatically removed from all lessons where they are used."
-      }
+      },
+      "search_placeholder": "Search by audio name..."
     },
     "photo": {
       "title": "Photo Materials",
@@ -372,7 +496,7 @@
         "rotation": "Rotation"
       },
       "empty_title": "No photos found",
-      "empty_description": "There are no photo materials available for your account yet. Upload some files or contact your teacher to get started.",
+      "empty_description": "There are no photo materials available for your account yet. Please contact your administrator for access.",
       "empty_description_admin": "There are no photo materials available for your account yet. Upload some files to get started.",
       "add_photo": "Add Photo",
       "edit_photo": "Edit Photo",
@@ -409,14 +533,15 @@
         "description": "Are you sure you want to delete this photo? This action cannot be undone.",
         "bulk_description": "Are you sure you want to delete {count} selected photos? This action cannot be undone.",
         "warning": "Important: these photos will also be automatically removed from all lessons where they are used."
-      }
+      },
+      "search_placeholder": "Search by photo name..."
     },
     "video": {
       "title": "Video Materials",
-      "subtitle": "Watch educational videos and class recordings.",
+      "subtitle": "A dynamic library of video materials for engaging and effective learning.",
       "empty_title": "No videos found",
-      "empty_description": "There are no video materials available for your account yet. Upload files, add links, or contact your teacher to get started.",
-      "empty_description_admin": "There are no video materials available for your account yet. Upload files or add YouTube links to get started.",
+      "empty_description": "There are currently no video materials available for your account. Please contact your administrator for access.",
+      "empty_description_admin": "Your library is currently empty. Upload a file or add a YouTube link to get started.",
       "add_video": "Add Video",
       "edit_video": "Edit Video",
       "delete_video": "Delete Video",
@@ -462,18 +587,21 @@
         "description": "Are you sure you want to delete this video? This action cannot be undone.",
         "bulk_description": "Are you sure you want to delete {count} selected videos? This action cannot be undone.",
         "warning": "Important: these videos will also be automatically removed from all lessons where they are used."
-      }
+      },
+      "search_placeholder": "Search by video name..."
     },
     "file": {
       "title": "File Materials",
-      "subtitle": "Upload and manage documents and other course files.",
+      "subtitle": "A comprehensive repository of documents and files to support your learning journey.",
       "empty_title": "No files found",
-      "empty_description": "There are no files available for your account yet. Upload some files or contact your teacher to get started.",
-      "empty_description_admin": "There are no files available for your account yet. Upload some files to get started.",
+      "empty_description": "There are currently no files available for your account. Please contact your administrator for access.",
+      "empty_description_admin": "Your library is currently empty. Upload your first document to get started.",
       "add_file": "Add File",
       "edit_file": "Edit File",
       "delete_file": "Delete File",
       "bulk_delete": "Delete Selected ({count})",
+      "gallery": "Gallery",
+      "table_view": "Table",
       "table": {
         "name": "Name",
         "extension": "Extension",
@@ -502,18 +630,19 @@
         "description": "Are you sure you want to delete this file? This action cannot be undone.",
         "bulk_description": "Are you sure you want to delete {count} selected files? This action cannot be undone.",
         "warning": "Important: these files will also be automatically removed from all lessons where they are used."
-      }
+      },
+      "search_placeholder": "Search by file name..."
     },
     "lessons": {
       "title": "Lessons",
-      "subtitle": "Manage your dynamic course content and lessons.",
+      "subtitle": "A comprehensive catalog of learning sessions with interactive content, designed for effective knowledge acquisition.",
       "add_lesson": "Create Lesson",
       "edit_lesson": "Edit Lesson",
       "delete_lesson": "Delete Lesson",
       "bulk_delete": "Delete Selected ({count})",
       "delete_block": "Delete Block",
       "empty_title": "No lessons found",
-      "empty_description": "You haven't created any lessons yet. Create your first lesson to get started.",
+      "empty_description": "There are currently no lessons available for your account. Please contact your administrator for access.",
       "table": {
         "name": "Lesson Name",
         "date": "Created Date",
@@ -570,6 +699,10 @@
         "save_position": "Save Position",
         "back": "Back",
         "save": "Save",
+        "duration": "Duration (min)",
+        "duration_placeholder": "e.g. 15",
+        "add_to_course": "Add to course",
+        "add_to_course_placeholder": "Select courses",
         "discard_modal": {
           "title": "Unsaved Changes",
           "message": "You have unsaved changes. Are you sure you want to leave? Your changes will be lost.",
@@ -578,6 +711,8 @@
         },
         "disable_copying": "Disable copying",
         "disable_copying_description": "If enabled, students won't be able to select and copy lesson text.",
+        "add_files_to_materials": "Add files to Materials section",
+        "add_files_to_materials_description": "If enabled, media from libraries (photos, videos, audios, files) used within the lesson will be automatically added to the student's personal materials section.",
         "show_sidebar": "Show course navigation",
         "hide_sidebar": "Hide course navigation",
         "course_navigation": "Course Navigation",
@@ -586,12 +721,12 @@
     },
     "tests": {
       "title": "Tests",
-      "subtitle": "Create and manage tests to check students' knowledge.",
+      "subtitle": "A specialized testing system designed to track and evaluate your progress.",
       "add_test": "Create Test",
       "edit_test": "Edit Test",
       "delete_test": "Delete Test",
       "empty_title": "No tests found",
-      "empty_description": "You haven't created any tests yet. Create your first test to get started.",
+      "empty_description": "There are currently no tests available for your account. Please contact your administrator for access.",
       "table": {
         "name": "Test Name",
         "date": "Date Created",
@@ -645,7 +780,10 @@
     },
     "courses": {
       "title": "Courses",
-      "subtitle": "Organize your lessons into structured courses.",
+      "search_lessons": "Search by lesson name...",
+      "no_extra_filters": "Additional filters can be added here.",
+      "subtitle": "Structured learning programs designed for systematic knowledge mastery.",
+      "placeholder_description": "Unlock your potential with this comprehensive course covering all essential aspects of the subject.",
       "add_course": "Create Course",
       "edit_course": "Edit Course",
       "delete_course": "Delete Course",
@@ -657,7 +795,8 @@
         "date": "Date Created",
         "actions": "Actions",
         "categories": "Categories",
-        "image": "Image"
+        "image": "Image",
+        "progress": "Progress"
       },
       "form": {
         "name": "Course Name",
@@ -696,8 +835,52 @@
         "blocks": "{count} blocks",
         "no_preview": "No preview available"
       },
-      "current": "Current"
-    }
+      "current": "Current",
+      "no_access": "No access"
+    },
+    "access": {
+      "grant_access": "Grant access",
+      "full_access": "Full access",
+      "grant_title": "Grant Access",
+      "select_students": "Select students",
+      "search_students": "Search by name...",
+      "grant_button": "Grant Access",
+      "manage_access": "Manage lessons access",
+      "all_lessons": "All lessons",
+      "full": "Full",
+      "partial": "Partial",
+      "none": "None",
+      "partial_config": "Manage partial access",
+      "unsaved_changes": {
+        "title": "Unsaved changes",
+        "message": "You have unsaved changes. Would you like to save them before leaving?",
+        "save_and_go": "Save and leave",
+        "go_without_saving": "Don't save",
+        "back": "Back"
+      },
+      "notifications": {
+        "access_granted": "Access updated successfully",
+        "access_error": "Error updating access"
+      }
+    },
+    "additional": {
+      "access": "Access",
+      "name": "Lesson Name",
+      "categories": "Categories",
+      "no_lessons": "No lessons found",
+      "search_placeholder": "Search by lesson name..."
+    },
+    "courses_tab": "Courses",
+    "additional_tab": "Lessons",
+    "audio_tab": "Audio",
+    "photo_tab": "Photo",
+    "video_tab": "Video",
+    "files_tab": "Files",
+    "additional_materials_empty": "No lessons found",
+    "audio_materials_empty": "No audio materials found",
+    "photo_materials_empty": "No photo materials found",
+    "video_materials_empty": "No video materials found",
+    "file_materials_empty": "No file materials found"
   },
   "Categories": {
     "title": "Categories",

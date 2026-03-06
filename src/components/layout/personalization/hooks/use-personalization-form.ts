@@ -45,6 +45,7 @@ export function usePersonalizationForm() {
       font_family: space?.font_family || 'inter',
       icon: space?.icon || null,
       is_show_sidebar_icon: space?.is_show_sidebar_icon ?? true,
+      currency: space?.currency || 'UAH',
     }
   });
 
@@ -63,14 +64,13 @@ export function usePersonalizationForm() {
       font_family: space?.font_family || 'inter',
       icon: space?.icon || null,
       is_show_sidebar_icon: space?.is_show_sidebar_icon ?? true,
+      currency: space?.currency || 'UAH',
     });
   }, [space, form]);
 
   const { watch } = form;
   const watched_values = watch();
   const watched_string = JSON.stringify(watched_values);
-
-  console.log('watched_values', watched_values);
 
   // Check if any premium option is selected
   const has_premium_selected = useMemo(() => {

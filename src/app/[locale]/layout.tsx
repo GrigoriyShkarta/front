@@ -11,6 +11,8 @@ import '@mantine/notifications/styles.css';
 import '@mantine/dropzone/styles.css';
 import '@mantine/dates/styles.css';
 import { ReactQueryProvider } from '@/context/query-provider';
+import { SpaceMetadataInitializer } from '@/components/common/space-metadata-initializer';
+import { PaymentReminder } from '@/components/common/payment-reminder';
 
 export default async function LocaleLayout({
   children,
@@ -28,7 +30,9 @@ export default async function LocaleLayout({
         <MantineProvider theme={theme} defaultColorScheme="auto">
           <Notifications position="top-center" />
           <AuthProvider>
+            <SpaceMetadataInitializer />
             {children}
+            <PaymentReminder />
           </AuthProvider>
         </MantineProvider>
       </ReactQueryProvider>

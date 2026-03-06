@@ -1,12 +1,12 @@
 'use client';
 
-import { Drawer, Stack, Button, Select, Group, Checkbox, Text, Divider, Box, TextInput, NumberInput, ActionIcon, Switch } from '@mantine/core';
+import { Drawer, Stack, Button, Select, Group, Checkbox, Text, Divider, Box, TextInput, NumberInput, ActionIcon, Switch, SegmentedControl, Textarea } from '@mantine/core';
 import { DatePickerInput, DatePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSubscriptions } from '@/components/layout/finance/subscriptions/hooks/use-subscriptions';
 import { useStudentSubscriptions } from '../hooks/use-student-subscriptions';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/uk';
 import 'dayjs/locale/en';
@@ -50,29 +50,40 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
 
   const form = useForm({
     initialValues: {
+      subscription_type: 'template' as 'template' | 'custom',
       subscription_id: '',
+      name: '',
+      price: 0,
+      lessons_count: 0,
+      comment: '',
       selected_days: [] as string[],
       start_date: new Date(),
       lesson_times: {
         mon: '10:00', tue: '10:00', wed: '10:00', thu: '10:00', fri: '10:00', sat: '10:00', sun: '10:00'
       } as Record<string, string>,
-      payment_status: 'unpaid' as 'paid' | 'unpaid' | 'partially_paid',
+      payment_status: 'paid' as 'paid' | 'unpaid' | 'partially_paid',
       paid_amount: 0,
-      payment_date: new Date(),
+      payment_date: new Date() as Date | null,
       partial_payment_date: null as Date | null,
       next_payment_date: null as Date | null,
       payment_reminder: false,
     },
     validate: {
-      subscription_id: (value) => (!value ? common_t('errors.required') : null),
+      subscription_id: (value, values) => (values.subscription_type === 'template' && !value ? common_t('errors.required') : null),
+      name: (value, values) => (values.subscription_type === 'custom' && !value ? common_t('errors.required') : null),
+      price: (value, values) => (values.subscription_type === 'custom' && value <= 0 ? common_t('errors.required') : null),
+      lessons_count: (value, values) => (values.subscription_type === 'custom' && value <= 0 ? common_t('errors.required') : null),
       selected_days: (value) => (value.length === 0 ? common_t('errors.at_least_one_day') : null),
       paid_amount: (value, values) => (values.payment_status === 'partially_paid' && value <= 0 ? common_t('errors.required') : null),
     }
   });
 
+  const [is_manual_next_payment_date, set_is_manual_next_payment_date] = useState(false);
+
   // Populate form for editing
   useEffect(() => {
     if (subscription && opened) {
+      set_is_manual_next_payment_date(false);
       const firstLesson = subscription.lessons?.[0];
       
       // Extract times for each day of the week from lessons
@@ -86,8 +97,15 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
         times[dayKey] = d.format('HH:mm');
       });
 
+      const type = subscription.subscription_id ? 'template' as const : 'custom' as const;
+
       form.setValues({
-        subscription_id: subscription.subscription_id,
+        subscription_type: type,
+        subscription_id: subscription.subscription_id || '',
+        name: subscription?.name ?? subscription.subscription?.name ?? '',
+        price: subscription.price || 0,
+        lessons_count: subscription.lessons?.length || 0,
+        comment: subscription.comment || '',
         selected_days: subscription.selected_days,
         start_date: firstLesson ? new Date(firstLesson.date) : new Date(),
         lesson_times: times,
@@ -114,24 +132,55 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
       form.reset();
       setLessons([]);
       setLastGenerated('');
+      set_is_manual_next_payment_date(false);
     }
   }, [subscription, opened]);
 
+  // Reset manual flag when subscription plan changes significantly
+  useEffect(() => {
+    set_is_manual_next_payment_date(false);
+  }, [form.values.subscription_id, form.values.subscription_type]);
+
   const selectedTemplate = templates.find(temp => temp.id === form.values.subscription_id);
+
+  const currentData = useMemo(() => {
+    if (form.values.subscription_type === 'template') {
+      return {
+        price: selectedTemplate?.price || 0,
+        lessons_count: selectedTemplate?.lessons_count || 0,
+        name: selectedTemplate?.name || '',
+      };
+    }
+    return {
+      price: form.values.price,
+      lessons_count: form.values.lessons_count,
+      name: form.values.name,
+    };
+  }, [form.values.subscription_type, selectedTemplate, form.values.price, form.values.lessons_count, form.values.name]);
 
   // Set paid_amount automatically when status is 'paid'
   useEffect(() => {
-    if (form.values.payment_status === 'paid' && selectedTemplate) {
-      form.setFieldValue('paid_amount', selectedTemplate.price);
+    if (form.values.payment_status === 'paid') {
+      form.setFieldValue('paid_amount', currentData.price);
+      if (!form.values.payment_date) {
+        form.setFieldValue('payment_date', new Date());
+      }
     } else if (form.values.payment_status === 'unpaid') {
       form.setFieldValue('paid_amount', 0);
+      form.setFieldValue('payment_date', null);
     }
-  }, [form.values.payment_status, selectedTemplate]);
+  }, [form.values.payment_status, currentData.price]);
 
-  // Auto-generate lessons when template, days or start_date changes
+  // Auto-generate lessons
   useEffect(() => {
-    if (selectedTemplate && form.values.selected_days.length > 0 && form.values.start_date) {
-      const stateKey = `${selectedTemplate.id}-${form.values.selected_days.join(',')}-${dayjs(form.values.start_date).toISOString()}`;
+    const hasConfig = form.values.subscription_type === 'template' 
+      ? !!selectedTemplate 
+      : (form.values.lessons_count > 0 && !!form.values.name);
+
+    if (hasConfig && form.values.selected_days.length > 0 && form.values.start_date) {
+      const configId = form.values.subscription_type === 'template' ? selectedTemplate?.id : 'custom';
+      const stateKey = `${configId}-${form.values.lessons_count}-${form.values.selected_days.join(',')}-${dayjs(form.values.start_date).toISOString()}`;
+      
       if (stateKey !== lastGenerated) {
         const generated: LessonItem[] = [];
         let current = dayjs(form.values.start_date);
@@ -140,7 +189,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
         };
         const targetDays = form.values.selected_days.map(d => dayMap[d]);
 
-        while (generated.length < selectedTemplate.lessons_count && generated.length < 50) {
+        while (generated.length < currentData.lessons_count && generated.length < 100) {
           if (targetDays.includes(current.day())) {
             const dayKey = current.format('ddd').toLowerCase();
             generated.push({
@@ -156,7 +205,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
     } else if (form.values.selected_days.length === 0) {
       setLessons([]);
     }
-  }, [selectedTemplate, form.values.selected_days, form.values.start_date, lastGenerated, form.values.lesson_times]);
+  }, [form.values.subscription_type, selectedTemplate, form.values.lessons_count, form.values.name, form.values.selected_days, form.values.start_date, lastGenerated, form.values.lesson_times, currentData.lessons_count]);
 
   // Sync lesson times when global times change
   useEffect(() => {
@@ -169,16 +218,16 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
     }));
   }, [form.values.lesson_times]);
 
-  // Update next_payment_date when lessons change
+  // Update next_payment_date when lessons change (only if not manually set)
   useEffect(() => {
-    if (lessons.length > 0) {
+    if (lessons.length > 0 && !subscription && !is_manual_next_payment_date) {
       const lastLesson = lessons[lessons.length - 1];
       form.setFieldValue('next_payment_date', lastLesson.date);
     }
-  }, [lessons]);
+  }, [lessons, subscription, is_manual_next_payment_date]);
 
   const handleSubmit = async (values: typeof form.values) => {
-    if (lessons.length !== selectedTemplate?.lessons_count) return;
+    if (lessons.length !== currentData.lessons_count) return;
 
     // Combine date and time for each lesson to build lesson_dates
     const lesson_dates = lessons.map(lesson => {
@@ -197,26 +246,41 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
         data: {
           paid_amount: values.paid_amount,
           payment_status: values.payment_status,
-          payment_date: values.payment_date ? dayjs(values.payment_date).toISOString() : undefined,
-          partial_payment_date: values.partial_payment_date ? dayjs(values.partial_payment_date).toISOString() : undefined,
-          next_payment_date: values.next_payment_date ? dayjs(values.next_payment_date).toISOString() : undefined,
+          payment_date: values.payment_date ? dayjs(values.payment_date).toISOString() : null,
+          partial_payment_date: values.partial_payment_date ? dayjs(values.partial_payment_date).toISOString() : null,
+          next_payment_date: values.next_payment_date ? dayjs(values.next_payment_date).toISOString() : null,
           payment_reminder: values.payment_reminder,
           selected_days: values.selected_days,
+          comment: values.comment,
         }
       });
     } else {
-      await create_subscription({
-        subscription_id: values.subscription_id,
+      const common_data = {
         student_id: studentId,
         paid_amount: values.paid_amount,
         payment_status: values.payment_status,
-        payment_date: values.payment_date ? dayjs(values.payment_date).toISOString() : undefined,
-        partial_payment_date: values.partial_payment_date ? dayjs(values.partial_payment_date).toISOString() : undefined,
-        next_payment_date: values.next_payment_date ? dayjs(values.next_payment_date).toISOString() : undefined,
+        payment_date: values.payment_date ? dayjs(values.payment_date).toISOString() : null,
+        partial_payment_date: values.partial_payment_date ? dayjs(values.partial_payment_date).toISOString() : null,
+        next_payment_date: values.next_payment_date ? dayjs(values.next_payment_date).toISOString() : null,
         payment_reminder: values.payment_reminder,
         lesson_dates,
         selected_days: values.selected_days,
-      });
+        comment: values.comment,
+      };
+
+      if (values.subscription_type === 'template') {
+        await create_subscription({
+          ...common_data,
+          subscription_id: values.subscription_id,
+        });
+      } else {
+        await create_subscription({
+          ...common_data,
+          name: values.name,
+          price: values.price,
+          lessons_count: values.lessons_count,
+        });
+      }
     }
     
     onClose();
@@ -226,7 +290,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
 
   const handleCalendarChange = (dates: any) => {
     const datesArray: Date[] = Array.isArray(dates) ? dates : dates ? [dates] : [];
-    if (selectedTemplate && datesArray.length > selectedTemplate.lessons_count) return;
+    if (datesArray.length > currentData.lessons_count) return;
 
     const newLessons = datesArray.map(date => {
       const existing = lessons.find(l => dayjs(l.date).isSame(date, 'day'));
@@ -255,34 +319,84 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
   };
 
   const is_form_valid = 
-    form.values.subscription_id && 
+    (form.values.subscription_type === 'template' ? !!form.values.subscription_id : (!!form.values.name && form.values.price > 0 && form.values.lessons_count > 0)) && 
     form.values.selected_days.length > 0 && 
-    selectedTemplate &&
-    lessons.length === selectedTemplate?.lessons_count;
+    lessons.length === currentData.lessons_count;
 
   return (
     <Drawer
       opened={opened}
       onClose={onClose}
-      title={<Text fw={600} size="lg">{t('add_subscription')}</Text>}
+      title={<Text fw={600} size="lg">{subscription ? t('drawer.edit_subscription_title') || common_t('edit') : t('add_subscription')}</Text>}
       position="right"
       size="md"
       className="student-subscription-drawer"
     >
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
-          <Select
-            label={t('subscription')}
-            placeholder={t('no_subscriptions')}
-            data={templates.map(temp => ({ 
-              value: temp.id, 
-              label: `${temp.name} (${temp.lessons_count} ${common_t('lessons')}) - ${temp.price} ₴` 
-            }))}
-            {...form.getInputProps('subscription_id')}
-          />
+          {!subscription && (
+            <SegmentedControl
+              fullWidth
+              value={form.values.subscription_type}
+              onChange={(val) => form.setFieldValue('subscription_type', val as 'template' | 'custom')}
+              data={[
+                { label: t('template_subscription'), value: 'template' },
+                { label: t('individual_subscription'), value: 'custom' },
+              ]}
+            />
+          )}
 
-          {form.values.subscription_id && (
+          {form.values.subscription_type === 'template' ? (
+            <Select
+              label={t('subscription')}
+              placeholder={t('no_subscriptions')}
+              data={templates.map(temp => ({ 
+                value: temp.id, 
+                label: `${temp.name} (${temp.lessons_count} ${common_t('lessons')}) - ${temp.price} ₴` 
+              }))}
+              {...form.getInputProps('subscription_id')}
+              disabled={!!subscription}
+            />
+          ) : (
+            <Stack gap="sm">
+              <TextInput
+                label={t('form.subscription_name') || 'Subscription name'}
+                placeholder={t('form.subscription_name_placeholder')}
+                required
+                withAsterisk
+                {...form.getInputProps('name')}
+              />
+              <Group grow>
+                <NumberInput
+                  label={t('form.subscription_price') || 'Price'}
+                  placeholder={t('form.subscription_price_placeholder')}
+                  min={0}
+                  required
+                  withAsterisk
+                  {...form.getInputProps('price')}
+                />
+                <NumberInput
+                  label={t('form.lessons_count') || 'Lessons count'}
+                  placeholder={t('form.lessons_count_placeholder')}
+                  min={1}
+                  required
+                  withAsterisk
+                  {...form.getInputProps('lessons_count')}
+                />
+              </Group>
+            </Stack>
+          )}
+
+          {(form.values.subscription_type === 'custom' || form.values.subscription_id) && (
             <>
+              <Textarea
+                label={t('form.comment')}
+                placeholder={t('form.comment_placeholder')}
+                minRows={2}
+                autosize
+                {...form.getInputProps('comment')}
+              />
+
               <Divider label={common_t('payment_details')} labelPosition="left" />
 
               <Group grow align="flex-start">
@@ -300,7 +414,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                   <NumberInput
                     label={common_t('paid_amount')}
                     min={0}
-                    max={selectedTemplate?.price}
+                    max={currentData.price}
                     allowDecimal={false}
                     allowNegative={false}
                     allowLeadingZeros={false}
@@ -322,7 +436,15 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
               <DatePickerInput
                 label={common_t('payment_date')}
                 locale={locale}
+                clearable
                 {...form.getInputProps('payment_date')}
+              />
+
+              <Divider label={t('form.start_date')} labelPosition="left" />
+              
+              <DatePickerInput
+                locale={locale}
+                {...form.getInputProps('start_date')}
               />
 
               <Divider label={common_t('days_of_week')} labelPosition="left" mb="md" />
@@ -357,26 +479,28 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                 </Stack>
               </Checkbox.Group>
 
-              <Group grow align="flex-start">
+              <Group grow align="center">
                 <DatePickerInput
                   label={t('form.next_payment_date') || 'Next payment date'}
                   locale={locale}
+                  clearable
                   {...form.getInputProps('next_payment_date')}
+                  onChange={(val) => {
+                    form.setFieldValue('next_payment_date', val as any);
+                    set_is_manual_next_payment_date(true);
+                  }}
                 />
-                <Box pt={32}>
+                <Box pt={22}>
                   <Switch
                     label={t('form.payment_reminder') || 'Payment reminder'}
                     {...form.getInputProps('payment_reminder', { type: 'checkbox' })}
+                    styles={{
+                      root: { display: 'flex', alignItems: 'center' },
+                      body: { alignItems: 'center' }
+                    }}
                   />
                 </Box>
               </Group>
-
-              <Divider label={t('form.start_date')} labelPosition="left" />
-              
-              <DatePickerInput
-                locale={locale}
-                {...form.getInputProps('start_date')}
-              />
 
               <Divider label={common_t('preview')} labelPosition="left" />
               
@@ -434,15 +558,15 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                   </Stack>
                 )}
 
-                <Text size="sm" fw={500} mt="md" ta="center" c={lessons.length === selectedTemplate?.lessons_count ? 'green' : 'orange'}>
+                <Text size="sm" fw={500} mt="md" ta="center" c={lessons.length === currentData.lessons_count ? 'green' : 'orange'}>
                   {lessons.length} {common_t('lessons')} {t('selected')} 
-                  {selectedTemplate && ` / ${selectedTemplate.lessons_count}`}
+                  {currentData.lessons_count > 0 && ` / ${currentData.lessons_count}`}
                 </Text>
-                {selectedTemplate && lessons.length !== selectedTemplate.lessons_count && (
+                {currentData.lessons_count > 0 && lessons.length !== currentData.lessons_count && (
                   <Text size="xs" ta="center" c="dimmed">
-                    {lessons.length < selectedTemplate.lessons_count 
-                      ? t('need_more_lessons', { count: selectedTemplate.lessons_count - lessons.length }) 
-                      : t('remove_lessons', { count: lessons.length - selectedTemplate.lessons_count })}
+                    {lessons.length < currentData.lessons_count 
+                      ? t('need_more_lessons', { count: currentData.lessons_count - lessons.length }) 
+                      : t('remove_lessons', { count: lessons.length - currentData.lessons_count })}
                   </Text>
                 )}
               </Box>
@@ -450,7 +574,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
               <Group justify="flex-end" mt="xl">
                 <Button 
                   type="submit" 
-                  loading={is_creating} 
+                  loading={is_creating || is_updating} 
                   disabled={!is_form_valid}
                   fullWidth
                 >

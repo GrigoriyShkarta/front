@@ -7,6 +7,8 @@ import { IoCalendarOutline, IoNotificationsOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { StudentSubscription } from '../schemas/student-subscription-schema';
+import { useAuth } from '@/hooks/use-auth';
+import { getCurrencySymbol } from '@/lib/constants';
 
 import { UpdateSubscriptionData } from './types';
 
@@ -20,6 +22,8 @@ export function SubscriptionPaymentSection({ sub, isTeacher, onUpdate }: Props) 
   const t = useTranslations('Users');
   const common_t = useTranslations('Common');
   const locale = useLocale();
+  const { user } = useAuth();
+  const currencySymbol = getCurrencySymbol(user?.space?.personalization?.currency);
 
   const [editData, setEditData] = useState<{
     status: string;
@@ -83,14 +87,6 @@ export function SubscriptionPaymentSection({ sub, isTeacher, onUpdate }: Props) 
                 )}
               </Stack>
 
-              {isTeacher && sub.payment_reminder && (
-                <Tooltip label={t('form.payment_reminder')}>
-                  <Group gap={4} className="text-yellow-400">
-                    <IoNotificationsOutline size={16} />
-                    <Text size="xs" fw={600}>1w reminder</Text>
-                  </Group>
-                </Tooltip>
-              )}
             </Group>
 
             <Divider variant="dashed" color="white/5" />
@@ -130,7 +126,7 @@ export function SubscriptionPaymentSection({ sub, isTeacher, onUpdate }: Props) 
                       <Group gap="xl">
                         <Stack gap={2}>
                           <Text size="xs" fw={700} c="dimmed" tt="uppercase">{common_t('paid_amount')}</Text>
-                          <Text size="sm" fw={600} color="orange.4">{sub.paid_amount} / {sub.price} ₴</Text>
+                          <Text size="sm" fw={600} color="orange.4">{sub.paid_amount} / {sub.price} {currencySymbol}</Text>
                         </Stack>
                         <Stack gap={2}>
                           <Text size="xs" fw={700} c="dimmed" tt="uppercase">{t('form.partial_payment_date')}</Text>
@@ -153,6 +149,15 @@ export function SubscriptionPaymentSection({ sub, isTeacher, onUpdate }: Props) 
                     <Text size="xs" fw={600}>{t('form.next_payment_date')}:</Text>
                     <Text size="xs" fw={700} color="var(--space-primary)">
                       {dayjs(sub.next_payment_date).locale(locale).format('DD MMM YYYY')}
+                    </Text>
+                  </Group>
+                )}
+
+                {isTeacher && sub.payment_reminder && (
+                  <Group gap={4} className="text-yellow-500">
+                    <IoNotificationsOutline size={14} />
+                    <Text size="xs" fw={500} fs="italic">
+                      {t('form.remind_1w')}
                     </Text>
                   </Group>
                 )}

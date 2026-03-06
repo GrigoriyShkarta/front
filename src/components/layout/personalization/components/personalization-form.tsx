@@ -18,6 +18,7 @@ import { PersonalizationFontSection } from './font-section';
 import { PersonalizationFormData } from '@/schemas/personalization';
 import { useDisclosure } from '@mantine/hooks';
 import { UpgradeModal } from '@/components/common/upgrade-modal';
+import { useAuthContext } from '@/context/auth-context';
 
 /**
  * PersonalizationForm - A form to customize space settings.
@@ -28,6 +29,7 @@ export function PersonalizationForm() {
   const t = useTranslations('Personalization');
   const { form, space, is_premium, has_premium_selected } = usePersonalizationForm();
   const [upgrade_opened, { open: open_upgrade, close: close_upgrade }] = useDisclosure(false);
+  const { refresh_user } = useAuthContext();
 
   const {
     handleSubmit,
@@ -35,7 +37,6 @@ export function PersonalizationForm() {
   } = form;
 
   const onSubmit = async (data: PersonalizationFormData) => {
-    console.log('data', data);
     // If user is not premium but selected premium features, show modal
     if (!is_premium && has_premium_selected) {
       open_upgrade();
@@ -45,6 +46,7 @@ export function PersonalizationForm() {
     try {
       // Process icon file if changed (already handled by FormData in actions)
       await updatePersonalization(data);
+      await refresh_user();
       
       notifications.show({
         title: t('success'),

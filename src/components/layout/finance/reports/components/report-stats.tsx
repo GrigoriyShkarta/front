@@ -3,6 +3,8 @@
 import { SimpleGrid, Paper, Group, Text, ThemeIcon, Stack } from '@mantine/core';
 import { IoCashOutline, IoCalendarOutline, IoPeopleOutline, IoTicketOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/hooks/use-auth';
+import { getCurrencySymbol } from '@/lib/constants';
 
 interface ReportStatsProps {
   stats: {
@@ -15,17 +17,19 @@ interface ReportStatsProps {
 
 export function ReportStats({ stats }: ReportStatsProps) {
   const t = useTranslations('Finance.reports');
+  const { user } = useAuth();
+  const currencySymbol = getCurrencySymbol(user?.space?.personalization?.currency);
 
   const data = [
     {
       title: t('total_revenue'),
-      value: stats ? `${stats.totalRevenue.toFixed(2)}` : '0.00',
+      value: stats ? `${stats.totalRevenue.toFixed(2)} ${currencySymbol}` : `0.00 ${currencySymbol}`,
       icon: IoCashOutline,
       color: 'green',
     },
     {
       title: t('expected_revenue'),
-      value: stats ? `${stats.expectedRevenue.toFixed(2)}` : '0.00',
+      value: stats ? `${stats.expectedRevenue.toFixed(2)} ${currencySymbol}` : `0.00 ${currencySymbol}`,
       icon: IoCalendarOutline,
       color: 'blue',
     },

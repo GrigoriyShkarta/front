@@ -12,6 +12,7 @@ export const photo_schema = z.object({
   type: z.string().optional(),
   size: z.number().optional(),
   categories: z.array(category_schema).optional(),
+  accessible_student_ids: z.array(z.string()).optional().default([]),
   created_at: z.string(),
   updated_at: z.string(),
 });

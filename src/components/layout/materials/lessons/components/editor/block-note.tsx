@@ -9,7 +9,13 @@ import {
   createReactBlockSpec,
   FormattingToolbarController,
   FormattingToolbar,
-  TextAlignButton
+  TextAlignButton,
+  BasicTextStyleButton,
+  ColorStyleButton,
+  BlockTypeSelect,
+  CreateLinkButton,
+  NestBlockButton,
+  UnnestBlockButton
 } from "@blocknote/react";
 import { BlockNoteSchema, defaultBlockSpecs } from "@blocknote/core";
 import "@blocknote/mantine/style.css";
@@ -389,12 +395,97 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
         props.extension = ext.toUpperCase();
     }
 
-    editor.insertBlocks(
-      [{ type: block_type, props: props }],
-      current_block || editor.document[editor.document.length - 1],
-      "after"
-    );
+    // If current block is an empty paragraph, replace it
+    if (current_block && current_block.type === 'paragraph' && (!current_block.content || (Array.isArray(current_block.content) && current_block.content.length === 0))) {
+      editor.replaceBlocks([current_block], [{ type: block_type, props: props }]);
+    } else {
+      editor.insertBlocks(
+        [{ type: block_type, props: props }],
+        current_block || editor.document[editor.document.length - 1],
+        "after"
+      );
+    }
+    
     setPickerOpened(false);
+  };
+
+  const handle_editor_change = () => {
+    on_change(JSON.stringify(editor.document, null, 2));
+
+    if (read_only) return;
+
+    // Automatic conversion of links to media blocks
+    editor.document.forEach(block => {
+      if (block.type === 'paragraph' && block.content && Array.isArray(block.content) && block.content.length === 1) {
+        let text = '';
+        const node = block.content[0];
+        if (node.type === 'text') {
+          text = node.text.trim();
+        } else if (node.type === 'link') {
+          text = node.href.trim();
+        }
+
+        const is_url = /^https?:\/\/\S+$/.test(text);
+
+        if (is_url) {
+          const clean_url = text.split('?')[0].split('#')[0];
+          const is_image = /\.(jpeg|jpg|gif|png|webp|avif|svg)$/i.test(clean_url);
+          const is_video = /\.(mp4|webm|ogg|mov)$/i.test(clean_url);
+          const is_audio = /\.(mp3|wav|ogg|aac|m4a)$/i.test(clean_url);
+          
+          const youtube_match = text.match(
+            /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
+          );
+
+          let new_block: any = null;
+
+          if (youtube_match) {
+            new_block = {
+              type: 'youtube',
+              props: { url: text, videoId: youtube_match[1], id: Math.random().toString() },
+            };
+          } else if (is_image) {
+            new_block = {
+              type: 'image',
+              props: { url: text },
+            };
+          } else if (is_video) {
+            new_block = {
+              type: 'video',
+              props: { url: text },
+            };
+          } else if (is_audio) {
+            new_block = {
+              type: 'audio',
+              props: { url: text, id: Math.random().toString(), name: text.split('/').pop() || 'Audio' },
+            };
+          } else {
+            // Check for other common file types
+            const is_file = /\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|7z|txt|json|csv)$/i.test(clean_url);
+            if (is_file) {
+              new_block = {
+                type: 'file',
+                props: { 
+                  url: text, 
+                  id: Math.random().toString(), 
+                  name: text.split('/').pop() || 'Document',
+                  extension: clean_url.split('.').pop()?.toUpperCase() || 'FILE'
+                },
+              };
+            }
+          }
+
+          if (new_block) {
+            setTimeout(() => {
+              const current_block = editor.getBlock(block.id);
+              if (current_block && current_block.type === 'paragraph') {
+                editor.replaceBlocks([block.id], [new_block]);
+              }
+            }, 0);
+          }
+        }
+      }
+    });
   };
 
   useImperativeHandle(ref, () => ({
@@ -453,24 +544,39 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
 
   return (
     <div 
-      className={`block-note-wrapper ${read_only ? 'is-read-only' : ''}`}
+      className={`block-note-wrapper max-w-[940px] ${read_only ? 'is-read-only' : ''}`}
       onClick={handleWrapperClick}
     >
       <BlockNoteView
         editor={editor}
         theme={colorScheme === 'dark' ? 'dark' : 'light'}
-        onChange={() => on_change(JSON.stringify(editor.document, null, 2))}
+        onChange={handle_editor_change}
         slashMenu={false}
         formattingToolbar={false}
         data-test="block-note-editor"
       >
         <FormattingToolbarController
           formattingToolbar={() => (
-            <FormattingToolbar>
-              <TextAlignButton textAlignment="left" />
-              <TextAlignButton textAlignment="center" />
-              <TextAlignButton textAlignment="right" />
-            </FormattingToolbar>
+        <FormattingToolbar>
+          <BlockTypeSelect />
+          
+          <BasicTextStyleButton basicTextStyle="bold" />
+          <BasicTextStyleButton basicTextStyle="italic" />
+          <BasicTextStyleButton basicTextStyle="underline" />
+          <BasicTextStyleButton basicTextStyle="strike" />
+          <BasicTextStyleButton basicTextStyle="code" />
+
+          <TextAlignButton textAlignment="left" />
+          <TextAlignButton textAlignment="center" />
+          <TextAlignButton textAlignment="right" />
+
+          <ColorStyleButton />
+
+          <NestBlockButton />
+          <UnnestBlockButton />
+
+          <CreateLinkButton />
+        </FormattingToolbar>
           )}
         />
         <SuggestionMenuController

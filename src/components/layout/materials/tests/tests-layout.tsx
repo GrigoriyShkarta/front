@@ -25,6 +25,7 @@ import {
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import { useAuth } from '@/hooks/use-auth';
 import { useTests } from '@/components/layout/materials/tests/hooks/use-tests';
 import { TestTable } from '@/components/layout/materials/tests/components/test-table';
 import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
@@ -33,6 +34,8 @@ import { cn } from '@/lib/utils';
 export default function TestsLayout() {
     const t = useTranslations('Materials.tests');
     const common_t = useTranslations('Common');
+    const { user } = useAuth();
+    const is_student = user?.role === 'student';
     
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -77,16 +80,18 @@ export default function TestsLayout() {
                     </Group>
                 </Stack>
 
-                <Button 
-                    component={Link}
-                    href="/main/materials/tests/create"
-                    size="md" 
-                    radius="md"
-                    leftSection={<IoAddOutline size={20} />}
-                    className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5"
-                >
-                    {t('add_test')}
-                </Button>
+                {!is_student && (
+                    <Button 
+                        component={Link}
+                        href="/main/materials/tests/create"
+                        size="md" 
+                        radius="md"
+                        leftSection={<IoAddOutline size={20} />}
+                        className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5"
+                    >
+                        {t('add_test')}
+                    </Button>
+                )}
             </Group>
 
             <Paper withBorder radius="md" className="bg-white/5 border-white/10 overflow-hidden relative">
@@ -132,24 +137,26 @@ export default function TestsLayout() {
                             </Button>
                         </Group>
 
-                        <Transition mounted={selectedIds.length > 0} transition="fade" duration={200}>
-                            {(styles) => (
-                                <Group style={styles}>
-                                    <Text size="sm" fw={500} c="blue">
-                                        {selectedIds.length} вибрано
-                                    </Text>
-                                    <Button 
-                                        variant="light" 
-                                        color="red" 
-                                        size="sm"
-                                        leftSection={<IoTrashOutline size={16} />}
-                                        onClick={handle_bulk_delete}
-                                    >
-                                        {common_t('delete')}
-                                    </Button>
-                                </Group>
-                            )}
-                        </Transition>
+                        {!is_student && (
+                            <Transition mounted={selectedIds.length > 0} transition="fade" duration={200}>
+                                {(styles) => (
+                                    <Group style={styles}>
+                                        <Text size="sm" fw={500} c="blue">
+                                            {selectedIds.length} вибрано
+                                        </Text>
+                                        <Button 
+                                            variant="light" 
+                                            color="red" 
+                                            size="sm"
+                                            leftSection={<IoTrashOutline size={16} />}
+                                            onClick={handle_bulk_delete}
+                                        >
+                                            {common_t('delete')}
+                                        </Button>
+                                    </Group>
+                                )}
+                            </Transition>
+                        )}
                     </Group>
                 </Box>
 

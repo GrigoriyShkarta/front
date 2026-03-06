@@ -1,10 +1,11 @@
 'use client';
 
 import { SimpleGrid, Card, Image, Text, Group, Checkbox, ActionIcon, Menu, rem, Box, Transition, Badge } from '@mantine/core';
-import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline } from 'react-icons/io5';
-import { PhotoMaterial } from '../schemas/photo-schema';
+import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoPeopleOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
+import { useAuth } from '@/hooks/use-auth';
+import { PhotoMaterial } from '../schemas/photo-schema';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -13,13 +14,17 @@ interface Props {
   on_selection_change: (ids: string[]) => void;
   on_edit: (photo: PhotoMaterial) => void;
   on_delete: (id: string) => void;
+  on_grant_access: (id: string) => void;
   on_preview: (photo: PhotoMaterial) => void;
   is_loading?: boolean;
 }
 
-export function PhotoGrid({ data, selected_ids, on_selection_change, on_edit, on_delete, on_preview, is_loading }: Props) {
+export function PhotoGrid({ data, selected_ids, on_selection_change, on_edit, on_delete, on_grant_access, on_preview, is_loading }: Props) {
   const tAuth = useTranslations('Auth.validation');
+  const tAccess = useTranslations('Materials.access');
   const common_t = useTranslations('Common');
+  const { user } = useAuth();
+  const is_student = user?.role === 'student';
 
   const toggle_one = (id: string) => {
     on_selection_change(
@@ -56,52 +61,63 @@ export function PhotoGrid({ data, selected_ids, on_selection_change, on_edit, on
               />
               
               {/* Overlay for actions and selection */}
-              <Box className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+              {!is_student && <Box className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />}
               
-              <div 
-                className={cn(
-                  "absolute top-2 left-2 transition-opacity duration-200",
-                  is_selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                )}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Checkbox
-                  checked={is_selected}
-                  onChange={() => toggle_one(item.id)}
-                  styles={{
-                    input: { cursor: 'pointer', shadow: '0 2px 4px rgba(0,0,0,0.2)' }
-                  }}
-                />
-              </div>
+              {!is_student && (
+                <div 
+                  className={cn(
+                    "absolute top-2 left-2 transition-opacity duration-200",
+                    is_selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  )}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Checkbox
+                    checked={is_selected}
+                    onChange={() => toggle_one(item.id)}
+                    radius="sm"
+                    styles={{
+                      input: { cursor: 'pointer', shadow: '0 2px 4px rgba(0,0,0,0.2)' }
+                    }}
+                  />
+                </div>
+              )}
 
-              <div 
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Menu shadow="md" width={160} position="bottom-end" withArrow>
-                  <Menu.Target>
-                    <ActionIcon variant="filled" color="dark" size="md" className="backdrop-blur-md bg-black/40 hover:bg-black/60 border border-white/10">
-                      <IoEllipsisVertical size={16} />
-                    </ActionIcon>
-                  </Menu.Target>
+              {!is_student && (
+                <div 
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Menu shadow="md" width={160} position="bottom-end" withArrow>
+                    <Menu.Target>
+                      <ActionIcon variant="filled" color="dark" size="md" className="backdrop-blur-md bg-black/40 hover:bg-black/60 border border-white/10">
+                        <IoEllipsisVertical size={16} />
+                      </ActionIcon>
+                    </Menu.Target>
 
-                  <Menu.Dropdown className="bg-[var(--space-card-bg)] border-white/10 backdrop-blur-md">
-                    <Menu.Item 
-                      leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
-                      onClick={() => on_edit(item)}
-                    >
-                      {common_t('edit')}
-                    </Menu.Item>
-                    <Menu.Item 
-                      color="red"
-                      leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
-                      onClick={() => on_delete(item.id)}
-                    >
-                      {common_t('delete')}
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              </div>
+                    <Menu.Dropdown className="bg-[var(--space-card-bg)] border-white/10 backdrop-blur-md">
+                      <Menu.Item 
+                        leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
+                        onClick={() => on_edit(item)}
+                      >
+                        {common_t('edit')}
+                      </Menu.Item>
+                      <Menu.Item 
+                        leftSection={<IoPeopleOutline style={{ width: rem(14), height: rem(14) }} />}
+                        onClick={() => on_grant_access(item.id)}
+                      >
+                        {tAccess('grant_access')}
+                      </Menu.Item>
+                      <Menu.Item 
+                        color="red"
+                        leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
+                        onClick={() => on_delete(item.id)}
+                      >
+                        {common_t('delete')}
+                      </Menu.Item>
+                    </Menu.Dropdown>
+                  </Menu>
+                </div>
+              )}
             </Card.Section>
 
             <Box pt="xs" px="xs">

@@ -12,6 +12,7 @@ export const personalization_schema = z.object({
   is_show_sidebar_icon: z.boolean(),
   languages: z.array(z.string()).min(1, 'errors.required'),
   font_family: z.string(),
+  currency: z.string(),
 });
 
 export type PersonalizationFormData = z.infer<typeof personalization_schema>;

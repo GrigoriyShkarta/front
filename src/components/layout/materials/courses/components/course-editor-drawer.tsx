@@ -36,6 +36,8 @@ import { useCategories } from '@/components/layout/categories/hooks/use-categori
 import { useLessons } from '@/components/layout/materials/lessons/hooks/use-lessons';
 import { CategoryDrawer } from '@/components/layout/categories/components/category-drawer';
 import { MediaPickerModal } from '@/components/layout/materials/lessons/components/media-picker-modal';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
 
 interface Props {
     opened: boolean;
@@ -46,6 +48,7 @@ interface Props {
 }
 
 export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving }: Props) {
+    const { user } = useAuth();
     const t = useTranslations('Materials.courses');
     const common_t = useTranslations('Common');
     const tCat = useTranslations('Categories');
@@ -201,13 +204,27 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
                                     className="w-full h-44 rounded-xl bg-black/5 border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer overflow-hidden relative hover:border-[var(--mantine-primary-color-filled)]"
                                     onClick={() => setMediaPickerOpened(true)}
                                 >
-                                    {watch('image_url') ? (
+                                    {watch('image_url') || user?.space?.personalization?.icon ? (
                                         <>
-                                            <img src={watch('image_url')!} className="w-full h-full object-cover" />
-                                            <Box className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
+                                            <img 
+                                                src={(watch('image_url') || user?.space?.personalization?.icon) || undefined} 
+                                                className={cn(
+                                                    "w-full h-full object-cover",
+                                                    !watch('image_url') && "opacity-40 grayscale blur-[2px]"
+                                                )} 
+                                            />
+                                            <Box className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
                                                 <IoImageOutline size={20} color="white" />
                                                 <Text c="white" size="xs" fw={500}>{t('form.upload_image')}</Text>
                                             </Box>
+                                            {!watch('image_url') && (
+                                                <Box className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                                    <IoImageOutline size={32} color="white" className="drop-shadow-md" />
+                                                    <Text size="xs" c="white" fw={600} className="drop-shadow-sm">
+                                                        {t('form.upload_image')}
+                                                    </Text>
+                                                </Box>
+                                            )}
                                         </>
                                     ) : (
                                         <>

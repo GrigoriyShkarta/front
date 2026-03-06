@@ -12,13 +12,16 @@ import { useParams } from 'next/navigation';
 
 interface Props {
   collapsed: boolean;
+  hide_email?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 /**
- * User dropdown component for the sidebar footer.
+ * User dropdown component.
  * Provides access to profile and logout.
  */
-export function UserDropdown({ collapsed }: Props) {
+export function UserDropdown({ collapsed, hide_email, className, style }: Props) {
   const { user, logout } = useAuth();
   const t = useTranslations('Navigation');
   const [opened, setOpened] = useState(false);
@@ -26,9 +29,9 @@ export function UserDropdown({ collapsed }: Props) {
   const [is_logging_out, set_is_logging_out] = useState(false);
   const router = useRouter();
   const params = useParams();
-  const current_locale = params.locale as string;
 
   if (!user) return null;
+  const current_locale = params.locale as string;
 
   const handle_logout = async () => {
     set_is_logging_out(true);
@@ -44,19 +47,21 @@ export function UserDropdown({ collapsed }: Props) {
   return (
     <Menu 
       width={220} 
-      position="right-end" 
+      position="bottom-end" 
       offset={10} 
       onOpen={() => setOpened(true)} 
       onClose={() => setOpened(false)}
-      transitionProps={{ transition: 'pop-bottom-right' }}
+      transitionProps={{ transition: 'pop-top-right' }}
       withinPortal
     >
       <Menu.Target>
         <UnstyledButton 
           className={cn(
-            "w-full rounded-lg transition-all hover:bg-white/10 active:scale-[0.98]",
-            collapsed ? "p-2 aspect-square flex items-center justify-center" : "p-3"
+            "rounded-lg transition-all hover:bg-black/5 dark:hover:bg-white/5 active:scale-[0.98]",
+            collapsed ? "p-2 aspect-square flex items-center justify-center" : "p-2 py-1.5",
+            className
           )}
+          style={style}
         >
           <Group gap="sm" wrap="nowrap" justify={collapsed ? "center" : "flex-start"}>
             <Avatar src={user.avatar} radius="md" size="sm" fw={700}>
@@ -65,12 +70,14 @@ export function UserDropdown({ collapsed }: Props) {
             
             {!collapsed && (
               <Box className="flex-1 overflow-hidden">
-                <Text size="sm" fw={600} truncate inherit style={{ color: 'var(--space-sidebar-text)' }}>
+                <Text size="sm" fw={600} truncate inherit style={{ color: 'inherit' }}>
                   {user.name}
                 </Text>
-                <Text size="xs" opacity={0.6} truncate inherit style={{ color: 'var(--space-sidebar-text)' }}>
-                  {user.email}
-                </Text>
+                {!hide_email && (
+                  <Text size="xs" opacity={0.6} truncate inherit style={{ color: 'inherit' }}>
+                    {user.email}
+                  </Text>
+                )}
               </Box>
             )}
 

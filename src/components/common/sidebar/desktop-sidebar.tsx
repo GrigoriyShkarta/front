@@ -40,22 +40,22 @@ export function DesktopSidebar() {
       {/* Header */}
       <Box className={cn(
         'border-b border-white/10 flex relative w-full overflow-hidden transition-all duration-300',
-        collapsed ? 'flex-col items-center py-4 gap-4' : 'h-16 items-center px-4 justify-between gap-2'
+        collapsed ? 'flex-col items-center py-6 gap-6' : 'h-20 items-center px-4 justify-between gap-2'
       )}>
         {/* Full Logo Container */}
         {!collapsed && (
-          <Group gap="xs" className="flex-1 overflow-hidden" wrap="nowrap">
+          <Group gap="sm" className="flex-1 overflow-hidden" wrap="nowrap">
             {show_icon && (
               <Avatar 
                 src={space?.personalization?.icon} 
-                size={32} 
-                radius="md"
-                className="shadow-sm shrink-0"
+                size={36} 
+                radius="lg"
+                className="shadow-md shrink-0"
               >
                 {(space?.personalization?.title_space?.[0] || 'L').toUpperCase()}
               </Avatar>
             )}
-            <Title order={6} className="truncate flex-1" style={{ color: 'var(--space-sidebar-text)' }}>
+            <Title order={3} fw={700} className="truncate flex-1 text-[16px]!" style={{ color: 'var(--space-sidebar-text)' }}>
               {space?.personalization?.title_space || 'Lirnexa'}
             </Title>
           </Group>
@@ -65,9 +65,9 @@ export function DesktopSidebar() {
         {collapsed && show_icon && (
           <Avatar 
             src={space?.personalization?.icon} 
-            size={28} 
-            radius="sm"
-            className="shrink-0"
+            size={36} 
+            radius="md"
+            className="shrink-0 shadow-sm"
           >
             {(space?.personalization?.title_space?.[0] || 'L').toUpperCase()}
           </Avatar>
@@ -119,9 +119,6 @@ export function DesktopSidebar() {
         (space?.personalization?.select_mode || (space?.personalization?.languages?.length || 0) > 1) && 'border-t border-white/10'
       )}>
         <SidebarControls collapsed={collapsed} />
-        <Box className="p-2">
-          <UserDropdown collapsed={collapsed} />
-        </Box>
       </Box>
     </Box>
   );

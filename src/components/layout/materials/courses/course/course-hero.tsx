@@ -82,37 +82,34 @@ export function CourseHero({
                     </Group>
 
                     <Grid gutter={40} align="center">
-                        <Grid.Col span={{ base: 12, md: 7 }}>
+                        <Grid.Col span={{ base: 12, md: image_url ? 7 : 12 }}>
                             <Stack gap="lg">
                                 <Title order={1} size={rem(48)} className="leading-tight font-bold tracking-tight">
                                     {course_name}
                                 </Title>
                                 
-                                <Text size="lg" c="dimmed" lh={1.6} className="max-w-2xl">
-                                    {course_description || t('placeholder_description')}
-                                </Text>
+                                {course_description && (
+                                    <Text size="lg" c="dimmed" lh={1.6} className="max-w-2xl">
+                                        {course_description}
+                                    </Text>
+                                )}
                             </Stack>
                         </Grid.Col>
                         
-                        <Grid.Col span={{ base: 12, md: 5 }}>
-                            <Paper 
-                                radius="2xl" 
-                                className="aspect-video relative overflow-hidden bg-white/5 border border-white/10 shadow-2xl"
-                            >
-                                {image_url ? (
+                        {image_url && (
+                            <Grid.Col span={{ base: 12, md: 5 }}>
+                                <Paper 
+                                    radius="2xl" 
+                                    className="aspect-video relative overflow-hidden bg-white/5 border border-white/10 shadow-2xl"
+                                >
                                     <Image 
                                         src={image_url} 
                                         className="w-full h-full object-cover" 
                                         alt={course_name}
                                     />
-                                ) : (
-                                    <Box className="w-full h-full flex flex-col items-center justify-center gap-4 text-white/20">
-                                        <IoImageOutline size={64} />
-                                        <Text fw={500}>{t('stats.no_preview')}</Text>
-                                    </Box>
-                                )}
-                            </Paper>
-                        </Grid.Col>
+                                </Paper>
+                            </Grid.Col>
+                        )}
                     </Grid>
                 </Stack>
             </Container>

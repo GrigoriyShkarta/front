@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, Stack, Title, Paper, Text, Breadcrumbs, Anchor, Box, LoadingOverlay, Group, Avatar, Badge, Button } from '@mantine/core';
-import { IoPersonOutline, IoCardOutline, IoPencilOutline } from 'react-icons/io5';
+import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoSchoolOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { useUserQuery } from '../hooks/use-user-query';
@@ -36,7 +36,11 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
   const { update_user, teachers, current_user, is_mutating } = useUsersQuery();
 
   // Determine active tab based on pathname
-  const active_tab = pathname.endsWith('/subscriptions') ? 'subscriptions' : 'general';
+  const active_tab = pathname.endsWith('/subscriptions') 
+    ? 'subscriptions' 
+    : pathname.endsWith('/materials') 
+      ? 'materials' 
+      : 'general';
 
   const breadcrumb_items = useMemo(() => {
     const items = [
@@ -100,18 +104,15 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
     <Stack gap="lg">
       <Stack gap="xs">
         <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
-        <Group justify="space-between" align="center">
-          <Group gap="md">
-            <Avatar src={user.avatar} size="xl" radius="md">
+        <Group justify="space-between" align="center" wrap="nowrap" className="flex-col sm:flex-row items-start sm:items-center">
+          <Group gap="md" wrap="nowrap">
+            <Avatar src={user.avatar} size="xl" radius="md" className="hidden xs:block">
               {user.name.charAt(0)}
             </Avatar>
             <Stack gap={0}>
-              <Title order={2}>{user.name}</Title>
+              <Title order={2} size="h3" className="sm:text-3xl">{user.name}</Title>
               <Group gap="xs">
-                <Text c="dimmed" size="sm">{user.email}</Text>
-                <Badge variant="light" size="sm">
-                  {common_t(`roles.${user.role}`)}
-                </Badge>
+                <Text c="dimmed" size="sm" className="hidden sm:block">{user.email}</Text>
                 {user.role === 'student' && current_user?.role !== 'student' && (
                   <Badge 
                     color={user.status === 'active' ? 'green' : 'red'} 
@@ -134,10 +135,32 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
           onChange={(val) => {
             if (val === 'general') router.push(basePath);
             if (val === 'subscriptions') router.push(`${basePath}/subscriptions`);
+            if (val === 'materials') router.push(`${basePath}/materials`);
           }}
           classNames={{
-            list: 'pl-5 border-b border-white/10',
-            tab: 'h-[50px] border-b-2 border-transparent data-[active=true]:border-blue-500 transition-colors'
+            list: 'flex flex-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide px-4 border-b border-white/10 scroll-smooth overscroll-x-contain',
+            tab: 'h-[50px] border-b-2 border-transparent data-[active=true]:border-blue-500 transition-colors whitespace-nowrap px-4 flex-shrink-0'
+          }}
+          styles={{
+            list: {
+              flexWrap: 'nowrap',
+              display: 'flex',
+              scrollbarWidth: 'thin',
+              msOverflowStyle: 'none',
+              '&::-webkit-scrollbar': {
+                height: '4px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'transparent',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '10px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: 'rgba(255, 255, 255, 0.3)',
+              }
+            }
           }}
         >
           <Tabs.List>
@@ -145,19 +168,27 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
               {t('tabs.general') || 'General'}
             </Tabs.Tab>
             {user.role === 'student' && (
-              <Tabs.Tab value="subscriptions" leftSection={<IoCardOutline size={16} />}>
-                {tNav('subscriptions')}
-              </Tabs.Tab>
+              <>
+                <Tabs.Tab value="subscriptions" leftSection={<IoCardOutline size={16} />}>
+                  {t('tabs.lesson_history')}
+                </Tabs.Tab>
+                {current_user?.role !== 'student' && (
+                  <Tabs.Tab value="materials" leftSection={<IoBookOutline size={16} />}>
+                    {tNav('materials') || 'Materials'}
+                  </Tabs.Tab>
+                )}
+              </>
             )}
           </Tabs.List>
 
-          <Box p="xl">
+          <Box p={{ base: 'md', sm: 'xl' }}>
             {active_tab === 'general' && (
               <Group justify="flex-end" mb="lg">
                 <Button 
-                  variant="light" 
                   leftSection={<IoPencilOutline size={16} />}
                   onClick={() => setDrawerOpened(true)}
+                  size="sm"
+                  variant="light"
                 >
                   {common_t('edit')}
                 </Button>
