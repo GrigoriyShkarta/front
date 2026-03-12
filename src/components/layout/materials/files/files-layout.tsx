@@ -207,10 +207,10 @@ export default function FilesLayout() {
                 <Center mih="100vh">
                     <Box 
                         p={60} 
-                        className="border-2 border-dashed border-blue-500/50 rounded-[40px] bg-blue-500/5 backdrop-blur-md flex flex-col items-center gap-8 transition-all scale-100 hover:scale-[1.02]"
+                        className="border-2 border-dashed border-primary/50 rounded-[40px] bg-primary/5 backdrop-blur-md flex flex-col items-center gap-8 transition-all scale-100 hover:scale-[1.02]"
                         style={{ pointerEvents: 'none' }}
                     >
-                        <Box className="w-28 h-28 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
+                        <Box className="w-28 h-28 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-lg shadow-primary/20">
                              <IoDocumentOutline size={60} />
                         </Box>
                         <Stack align="center" gap={10}>
@@ -316,7 +316,7 @@ export default function FilesLayout() {
                             <Button 
                                 leftSection={<IoAddOutline size={18} />} 
                                 onClick={handle_add}
-                                className="bg-blue-600 hover:bg-blue-700"
+                                className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
                             >
                                 {t('add_file')}
                             </Button>
@@ -407,7 +407,7 @@ export default function FilesLayout() {
                                 </Text>
                                 {!is_student && (
                                     <Group mt="sm">
-                                        <Button variant="light" onClick={handle_add}>
+                                        <Button variant="light" onClick={handle_add} className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors">
                                             {t('add_file')}
                                         </Button>
                                     </Group>

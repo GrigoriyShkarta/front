@@ -34,13 +34,13 @@ export function UserDrawer({
       id: 'personal' as const, 
       label: t('tabs_drawer.personal'), 
       icon: <IoPersonOutline size={20} />,
-      color: '#228be6' // mantine blue
+      color: 'var(--space-primary)'
     },
     { 
       id: 'settings' as const, 
       label: t('tabs_drawer.settings'), 
       icon: <IoSettingsOutline size={20} />,
-      color: '#4c6ef5' // mantine indigo
+      color: 'var(--space-primary)'
     }
   ];
 

@@ -30,7 +30,16 @@ export function MaterialsLayout({ student_id, initial_tab = 'courses' }: Props) 
 
   return (
     <Stack gap="md">
-      <Tabs value={active_tab} onChange={set_active_tab} variant="pills">
+      <Tabs 
+        value={active_tab} 
+        onChange={set_active_tab} 
+        variant="default" 
+        color="primary"
+        classNames={{
+          list: 'border-b border-white/5 mb-4 gap-2',
+          tab: 'px-4 py-3 transition-all font-semibold data-[active]:!text-primary border-b-2 border-transparent data-[active]:!border-primary hover:bg-white/5 text-zinc-500'
+        }}
+      >
         <Tabs.List>
           <Tabs.Tab value="courses">{t('courses_tab') || 'Courses'}</Tabs.Tab>
           <Tabs.Tab value="additional">{t('additional_tab') || 'Lessons'}</Tabs.Tab>

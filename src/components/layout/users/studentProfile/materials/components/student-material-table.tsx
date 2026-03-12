@@ -48,7 +48,7 @@ export function StudentMaterialTable({ items, type, on_toggle_access, is_mutatin
                       key={cat.id} 
                       variant="light" 
                       size="xs" 
-                      color={cat.color || 'gray'}
+                      color={cat.color || 'primary'}
                     >
                       {cat.name}
                     </Badge>

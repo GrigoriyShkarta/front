@@ -88,7 +88,7 @@ export function PhotoTable({
                 key={item.id} 
                 className={cn(
                   'transition-colors border-b border-white/5 last:border-0',
-                  is_selected ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-white/5'
+                  is_selected ? 'bg-primary/10' : 'hover:bg-white/5'
                 )}
               >
                 {show_selection && (
@@ -118,7 +118,7 @@ export function PhotoTable({
                           <Menu.Item 
                             leftSection={<IoImageOutline style={{ width: rem(14), height: rem(14) }} />}
                             onClick={() => on_select(item)}
-                            color="blue"
+                            color="primary"
                           >
                             {common_t('confirm')}
                           </Menu.Item>
@@ -178,7 +178,7 @@ export function PhotoTable({
                 <Table.Td>
                     <Group gap={4}>
                         {item.categories?.map((cat) => (
-                            <Badge key={cat.id} color={cat.color || 'blue'} variant="light" size="xs">
+                            <Badge key={cat.id} color={cat.color || 'gray'} variant="light" size="xs" className={!cat.color ? '!text-primary !bg-primary/10' : ''}>
                                 {cat.name}
                             </Badge>
                         ))}

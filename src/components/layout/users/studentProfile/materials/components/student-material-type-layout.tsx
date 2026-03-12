@@ -110,6 +110,7 @@ export function StudentMaterialTypeLayout({ student_id, type }: Props) {
               size="sm"
               value={view_mode}
               onChange={handle_view_change}
+              color="primary"
               data={[
                 { label: <Group gap={6} wrap="nowrap"><IoGridOutline size={14} /><Box ml={4}>{t(`${type}.gallery`) || 'Gallery'}</Box></Group>, value: 'grid' },
                 { label: <Group gap={6} wrap="nowrap"><IoListOutline size={14} /><Box ml={4}>{t(`${type}.table_view`) || 'Table'}</Box></Group>, value: 'table' },
@@ -172,6 +173,7 @@ export function StudentMaterialTypeLayout({ student_id, type }: Props) {
           value={page} 
           onChange={setPage} 
           radius="md"
+          color="primary"
         />
       </Group>
 
@@ -204,7 +206,11 @@ export function StudentMaterialTypeLayout({ student_id, type }: Props) {
               >
                 {common_t('clear')}
               </Button>
-              <Button onClick={() => set_filter_drawer_opened(false)}>
+              <Button 
+                onClick={() => set_filter_drawer_opened(false)}
+                color="primary"
+                className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
+              >
                 {common_t('apply')}
               </Button>
             </Group>

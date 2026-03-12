@@ -65,9 +65,12 @@ export const user_response_schema = z.object({
   notifications: z.array(z.object({
     id: z.string(),
     message_id: z.string().optional(),
+    message_title: z.string().optional(),
+    message_type: z.string().optional(),
     message: z.string(),
     is_read: z.boolean(),
-    created_at: z.string().optional()
+    created_at: z.string().optional(),
+    payload: z.record(z.string(), z.any()).optional().nullable(),
   })).optional()
 });
 

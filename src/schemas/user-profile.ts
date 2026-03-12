@@ -2,19 +2,32 @@ import { z } from 'zod';
 
 export const personalization_schema = z.object({
   id: z.string(),
-  title_space: z.string(),
+  title_space: z.string().optional().nullable().default('Lirnexa'),
   icon: z.string().nullable().optional(),
-  languages: z.array(z.string()),
-  select_mode: z.boolean(),
-  bg_color: z.string(),
-  primary_color: z.string(),
-  secondary_color: z.string(),
-  bg_color_dark: z.string(),
-  is_white_sidebar_color: z.boolean(),
-  is_show_sidebar_icon: z.boolean().optional(),
-  font_family: z.string().default('inter'),
-  currency: z.string().default('UAH'),
+  languages: z.array(z.string()).optional().default(['uk', 'en']),
+  select_mode: z.boolean().optional().default(true),
+  bg_color: z.string().optional().nullable().default('#ffffff'),
+  primary_color: z.string().optional().nullable().default('#2563eb'),
+  secondary_color: z.string().optional().nullable().default('#64748b'),
+  bg_color_dark: z.string().optional().nullable().default('#0f0f0f'),
+  is_white_sidebar_color: z.boolean().optional().default(false),
+  is_show_sidebar_icon: z.boolean().optional().default(true),
+  font_family: z.string().optional().default('inter'),
+  currency: z.string().optional().default('UAH'),
 });
+
+export const dashboard_personalization_schema = z.object({
+  student_dashboard_title: z.string().nullable().optional(),
+  student_dashboard_description: z.string().nullable().optional(),
+  student_dashboard_hero_image: z.string().nullable().optional(),
+  student_announcement: z.string().nullable().optional(),
+  is_show_student_progress: z.boolean().optional(),
+  student_social_instagram: z.string().nullable().optional(),
+  student_support_telegram: z.string().nullable().optional(),
+  dashboard_title: z.string().nullable().optional(),
+  dashboard_description: z.string().nullable().optional(),
+  dashboard_hero_image: z.string().nullable().optional(),
+}).optional();
 
 export const user_schema = z.object({
   id: z.string(),
@@ -33,30 +46,27 @@ export const user_schema = z.object({
   }).nullable().optional(),
   teacher_id: z.string().nullable().optional(),
   learning_goals: z.string().nullable().optional(),
-  is_premium: z.boolean().default(false),
+  is_premium: z.boolean().optional().default(false),
   payment_reminder_date: z.string().nullable().optional(),
   deactivation_date: z.string().nullable().optional(),
   space: z.object({
     personalization: personalization_schema.nullable().optional(),
+    dashboard_personalization: dashboard_personalization_schema.nullable().optional(),
   }).nullable().optional(),
-  can_student_create_tracker: z.boolean().default(false).optional(),
-  can_student_edit_tracker: z.boolean().default(false).optional(),
-  user_categories: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    color: z.string().optional(),
-    super_admin_id: z.string().optional(),
-    created_at: z.string().optional(),
-    updated_at: z.string().optional()
-  })).optional(),
+  can_student_create_tracker: z.boolean().optional().default(false),
+  can_student_edit_tracker: z.boolean().optional().default(false),
+  user_categories: z.array(z.any()).optional(),
+  categories: z.array(z.any()).optional(),
   notifications: z.array(z.object({
     id: z.string(),
-    message_id: z.string().optional(),
-    message: z.string(),
-    message_title: z.string(),
-    is_read: z.boolean(),
-    created_at: z.string().optional()
-  })).optional()
+    message_id: z.string().optional().nullable(),
+    message_type: z.string().optional().nullable(),
+    message: z.string().optional().nullable(),
+    message_title: z.string().optional().nullable(),
+    is_read: z.boolean().optional().default(false),
+    created_at: z.string().optional().nullable(),
+    payload: z.record(z.string(), z.any()).optional().nullable(),
+  })).optional().nullable()
 });
 
 export type UserProfile = z.infer<typeof user_schema>;

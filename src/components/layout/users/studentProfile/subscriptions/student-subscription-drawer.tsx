@@ -21,6 +21,7 @@ interface Props {
   onClose: () => void;
   studentId: string;
   subscription?: StudentSubscription; // Optional for edit mode
+  initialDate?: Date; // Pre-select start date when opening from calendar
 }
 
 const DAYS = [
@@ -38,11 +39,12 @@ interface LessonItem {
   time: string;
 }
 
-export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscription }: Props) {
+export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscription, initialDate }: Props) {
   const t = useTranslations('Users');
   const common_t = useTranslations('Common');
   const locale = useLocale();
   const { subscriptions: templates } = useSubscriptions();
+  const finance_t = useTranslations('Finance.subscriptions.validation');
   const { create_subscription, update_subscription, is_creating, is_updating } = useStudentSubscriptions(studentId);
 
   const [lessons, setLessons] = useState<LessonItem[]>([]);
@@ -54,7 +56,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
       subscription_id: '',
       name: '',
       price: 0,
-      lessons_count: 0,
+      lessons_count: 1,
       comment: '',
       selected_days: [] as string[],
       start_date: new Date(),
@@ -70,11 +72,11 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
     },
     validate: {
       subscription_id: (value, values) => (values.subscription_type === 'template' && !value ? common_t('errors.required') : null),
-      name: (value, values) => (values.subscription_type === 'custom' && !value ? common_t('errors.required') : null),
-      price: (value, values) => (values.subscription_type === 'custom' && value <= 0 ? common_t('errors.required') : null),
-      lessons_count: (value, values) => (values.subscription_type === 'custom' && value <= 0 ? common_t('errors.required') : null),
-      selected_days: (value) => (value.length === 0 ? common_t('errors.at_least_one_day') : null),
-      paid_amount: (value, values) => (values.payment_status === 'partially_paid' && value <= 0 ? common_t('errors.required') : null),
+      name: (value, values) => (values.subscription_type === 'custom' && !value ? finance_t('name_required') : null),
+      price: (value, values) => (values.subscription_type === 'custom' && (value === undefined || value < 0) ? finance_t('price_non_negative') : null),
+      lessons_count: (value, values) => (values.subscription_type === 'custom' && (!value || value <= 0) ? finance_t('lessons_count_required') : null),
+      selected_days: (value) => (value.length === 0 ? finance_t('at_least_one_day') : null),
+      paid_amount: (value, values) => (values.payment_status === 'partially_paid' && (value === undefined || value < 0) ? finance_t('paid_amount_required') : null),
     }
   });
 
@@ -93,7 +95,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
       
       subscription.lessons?.forEach(l => {
         const d = dayjs(l.date);
-        const dayKey = d.format('ddd').toLowerCase();
+        const dayKey = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][d.day()];
         times[dayKey] = d.format('HH:mm');
       });
 
@@ -104,7 +106,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
         subscription_id: subscription.subscription_id || '',
         name: subscription?.name ?? subscription.subscription?.name ?? '',
         price: subscription.price || 0,
-        lessons_count: subscription.lessons?.length || 0,
+        lessons_count: subscription.lessons?.length || 1,
         comment: subscription.comment || '',
         selected_days: subscription.selected_days,
         start_date: firstLesson ? new Date(firstLesson.date) : new Date(),
@@ -133,8 +135,28 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
       setLessons([]);
       setLastGenerated('');
       set_is_manual_next_payment_date(false);
+    } else if (opened && !subscription) {
+      // Opening in creation mode, possibly with an initial date from Calendar
+      const startDate = initialDate || new Date();
+      const times: Record<string, string> = {
+        mon: '10:00', tue: '10:00', wed: '10:00', thu: '10:00', fri: '10:00', sat: '10:00', sun: '10:00'
+      };
+      const selectedDays: string[] = [];
+
+      if (initialDate) {
+        const dayKey = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][dayjs(initialDate).day()];
+        times[dayKey] = dayjs(initialDate).format('HH:mm');
+        selectedDays.push(dayKey);
+      }
+
+      form.setValues({
+        ...form.values,
+        start_date: startDate,
+        lesson_times: times,
+        selected_days: selectedDays,
+      });
     }
-  }, [subscription, opened]);
+  }, [subscription, opened, initialDate]);
 
   // Reset manual flag when subscription plan changes significantly
   useEffect(() => {
@@ -147,7 +169,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
     if (form.values.subscription_type === 'template') {
       return {
         price: selectedTemplate?.price || 0,
-        lessons_count: selectedTemplate?.lessons_count || 0,
+        lessons_count: selectedTemplate?.lessons_count || 1,
         name: selectedTemplate?.name || '',
       };
     }
@@ -189,9 +211,11 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
         };
         const targetDays = form.values.selected_days.map(d => dayMap[d]);
 
-        while (generated.length < currentData.lessons_count && generated.length < 100) {
+        let limitSafe = 0;
+        while (generated.length < currentData.lessons_count && limitSafe < 100) {
+          limitSafe++;
           if (targetDays.includes(current.day())) {
-            const dayKey = current.format('ddd').toLowerCase();
+            const dayKey = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][current.day()];
             generated.push({
               date: current.toDate(),
               time: form.values.lesson_times[dayKey] || '10:00'
@@ -210,7 +234,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
   // Sync lesson times when global times change
   useEffect(() => {
     setLessons(prev => prev.map(lesson => {
-      const dayKey = dayjs(lesson.date).format('ddd').toLowerCase();
+      const dayKey = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][dayjs(lesson.date).day()];
       return {
         ...lesson,
         time: form.values.lesson_times[dayKey] || lesson.time
@@ -296,7 +320,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
       const existing = lessons.find(l => dayjs(l.date).isSame(date, 'day'));
       if (existing) return existing;
       
-      const dayKey = dayjs(date).format('ddd').toLowerCase();
+      const dayKey = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][dayjs(date).day()];
       return {
         date: new Date(date), // Ensure it's a Date object
         time: form.values.lesson_times[dayKey] || '10:00'
@@ -516,7 +540,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                       const isSelected = lessons.some(l => dayjs(l.date).isSame(dateObj, 'day'));
                       return (
                         <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Text size="sm" c={isSelected ? 'blue' : 'inherit'}>{dateObj.getDate()}</Text>
+                          <Text size="sm" c={isSelected ? 'primary' : 'inherit'}>{dateObj.getDate()}</Text>
                           {isSelected && (
                             <div style={{
                               position: 'absolute',
@@ -526,7 +550,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                               width: 4,
                               height: 4,
                               borderRadius: '50%',
-                              backgroundColor: 'var(--mantine-color-blue-filled)'
+                              backgroundColor: 'var(--mantine-primary-color-filled)'
                             }} />
                           )}
                         </div>
@@ -577,6 +601,8 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                   loading={is_creating || is_updating} 
                   disabled={!is_form_valid}
                   fullWidth
+                  color="primary"
+                  className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
                 >
                   {common_t('save')}
                 </Button>

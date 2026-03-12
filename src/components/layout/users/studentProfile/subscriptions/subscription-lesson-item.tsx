@@ -91,7 +91,7 @@ export function SubscriptionLessonItem({ lesson, isTeacher, statusColors, onUpda
                 <ActionIcon 
                   variant="light" 
                   size="xs" 
-                  color="blue" 
+                  color="primary" 
                   onClick={() => handleStatusChange('rescheduled')}
                 >
                   <IoPencilOutline size={12} />
@@ -102,7 +102,7 @@ export function SubscriptionLessonItem({ lesson, isTeacher, statusColors, onUpda
         ) : (
           <Badge size="xs" variant="dot" color={
             lesson.status === 'attended' ? 'green' : 
-            lesson.status === 'scheduled' ? 'blue' : 
+            lesson.status === 'scheduled' ? 'primary' : 
             lesson.status === 'burned' ? 'red' : 'yellow'
           }>
             {common_t(`lesson_statuses.${lesson.status}`)}
@@ -121,7 +121,7 @@ export function SubscriptionLessonItem({ lesson, isTeacher, statusColors, onUpda
             <Button 
               size="compact-xs" 
               variant="filled" 
-              color="blue"
+              color="primary"
               onClick={handleSaveReschedule}
             >
               {common_t('save')}

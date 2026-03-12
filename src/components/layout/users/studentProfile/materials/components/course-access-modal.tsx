@@ -285,6 +285,8 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
           <Button 
             onClick={() => on_submit(selected_ids)} 
             loading={is_loading}
+            color="primary"
+            className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
           >
             {common_t('save') || 'Save'}
           </Button>
@@ -322,6 +324,8 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
             <Button 
               onClick={handle_confirm_save}
               loading={is_loading}
+              color="primary"
+              className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
             >
               {t('unsaved_changes.save_and_go') || 'Save and leave'}
             </Button>

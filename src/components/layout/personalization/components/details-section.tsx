@@ -107,10 +107,11 @@ export function PersonalizationDetailsSection({ form, initial_icon, is_premium }
                 {(props) => (
                   <Button 
                     {...props} 
-                    variant="light" 
+                    variant="filled" 
                     leftSection={<IoCloudUploadOutline size={16} />} 
-                    rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-primary)' }} />}
+                    rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'white' }} />}
                     size="sm"
+                    className="bg-primary shadow-sm hover:shadow-md transition-all h-10 px-6 rounded-lg"
                   >
                     {t('upload_logo')}
                   </Button>

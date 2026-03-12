@@ -223,7 +223,7 @@ export function VideoDrawer({ opened, onClose, video, initial_files, on_submit, 
                   maxSize={500 * 1024 ** 2} // 500MB for video
                   accept={['video/mp4', 'video/webm', 'video/ogg']}
                   maxFiles={10 - items.length}
-                  className="border-2 border-dashed border-white/10 hover:border-blue-500/50 bg-white/5 transition-colors rounded-xl"
+                   className="border-2 border-dashed border-white/10 hover:border-primary/50 bg-white/5 transition-colors rounded-xl"
                 >
                   <Group justify="center" gap="xl" mih={120} style={{ pointerEvents: 'none' }}>
                     <IoVideocamOutline size={50} color="var(--mantine-primary-color-filled)" />
@@ -356,7 +356,7 @@ export function VideoDrawer({ opened, onClose, video, initial_files, on_submit, 
                       <Text size="xs" c="dimmed">{t('form.uploading')}</Text>
                       <Text size="xs" fw={500}>{item.progress}%</Text>
                     </Group>
-                    <Progress value={item.progress} size="xs" animated color="blue" />
+                    <Progress value={item.progress} size="xs" animated className="[&>div]:bg-primary" />
                   </Stack>
                 )}
 
@@ -373,11 +373,11 @@ export function VideoDrawer({ opened, onClose, video, initial_files, on_submit, 
           <Button variant="subtle" color="gray" onClick={onClose} disabled={is_loading}>
             {common_t('cancel')}
           </Button>
-          <Button
+           <Button
             onClick={handle_submit}
             loading={is_loading}
             disabled={is_submit_disabled}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
           >
             {common_t('save')}
           </Button>

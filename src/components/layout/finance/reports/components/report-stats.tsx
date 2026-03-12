@@ -31,7 +31,7 @@ export function ReportStats({ stats }: ReportStatsProps) {
       title: t('expected_revenue'),
       value: stats ? `${stats.expectedRevenue.toFixed(2)} ${currencySymbol}` : `0.00 ${currencySymbol}`,
       icon: IoCalendarOutline,
-      color: 'blue',
+      color: 'primary',
     },
     {
       title: t('active_students'),

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Stack, Box, ActionIcon, Title, Text, ScrollArea, Avatar, Group } from '@mantine/core';
-import { IoChevronBack, IoChevronForward } from 'react-icons/io5';
+import { IoMenuOutline, IoArrowBackOutline } from 'react-icons/io5';
 import { SidebarItem } from './sidebar-item';
 import { SidebarControls } from './sidebar-controls';
 import { UserDropdown } from './user-dropdown';
@@ -76,18 +76,18 @@ export function DesktopSidebar() {
         {/* Toggle Button */}
         <ActionIcon
           onClick={() => setCollapsed(!collapsed)}
-          variant="light"
+          variant="subtle"
           className={cn(
              'transition-all duration-300 rounded-lg shadow-sm',
              collapsed ? 'w-8 h-8' : 'w-7 h-7',
-             'bg-white/5 hover:bg-white/15'
+             'bg-white/10 hover:bg-white/20'
           )}
           style={{ 
-            color: 'var(--space-sidebar-text)',
+            color: 'inherit',
             borderColor: 'rgba(255,255,255,0.1)'
           }}
         >
-          {collapsed ? <IoChevronForward size={20} /> : <IoChevronBack size={20} />}
+          {collapsed ? <IoMenuOutline size={20} /> : <IoArrowBackOutline size={20} />}
         </ActionIcon>
       </Box>
 

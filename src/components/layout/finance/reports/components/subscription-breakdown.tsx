@@ -46,7 +46,7 @@ export function SubscriptionBreakdown({ data, totalRevenue }: SubscriptionBreakd
                       size="sm" 
                       radius="xl" 
                       className="flex-1"
-                      color={user?.space?.personalization?.primary_color || 'blue'}
+                      color={user?.space?.personalization?.primary_color || 'primary'}
                   />
                   <Text size="xs" w={35} ta="right" fw={500}>
                       {percentage.toFixed(0)}%

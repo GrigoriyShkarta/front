@@ -112,6 +112,7 @@ export function AdditionalMaterials({ student_id }: Props) {
           value={page} 
           onChange={setPage} 
           radius="md"
+          color="primary"
         />
       </Group>
 
@@ -144,7 +145,11 @@ export function AdditionalMaterials({ student_id }: Props) {
               >
                 {common_t('clear')}
               </Button>
-              <Button onClick={() => set_filter_drawer_opened(false)}>
+              <Button 
+                onClick={() => set_filter_drawer_opened(false)}
+                color="primary"
+                className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
+              >
                 {common_t('apply')}
               </Button>
             </Group>

@@ -67,8 +67,8 @@
       "current_password_invalid": "The current password you entered is incorrect",
       "email_already_exists": "A user with this email already exists",
       "invalid_color": "Invalid color format",
-      "subscription_name_required": "Subscription name is required",
-      "subscription_price_required": "Subscription price is required",
+      "subscription_name_required": "Servant name is required",
+      "subscription_price_required": "Servant price is required",
       "subscription_lessons_count_required": "Lessons count must be at least 1",
       "at_least_one_day": "Select at least one day"
     },
@@ -104,7 +104,7 @@
       "partially_paid": "Partially Paid"
     },
     "paid_amount": "Paid Amount",
-    "payment_date": "Payment date of subscription",
+    "payment_date": "Payment date of servant",
     "payment_details": "Payment Details",
     "lesson_status": "Lesson status",
     "lesson_statuses": {
@@ -115,7 +115,7 @@
     },
     "payment_reminder": {
       "title": "Payment Reminder",
-      "description": "Your subscription will expire on {date}. Please make a payment in time to continue your studies.",
+      "description": "Your servant will expire on {date}. Please make a payment in time to continue your studies.",
       "button": "Pay Now"
     },
     "deactivation_reminder": {
@@ -172,7 +172,7 @@
     "languages": "Languages",
     "dashboard": "Dashboard",
     "finance": "Finance",
-    "subscriptions": "Subscriptions",
+    "subscriptions": "Servants",
     "reports": "Reports",
     "select_language": "Select Language",
     "logout": "Logout",
@@ -181,8 +181,68 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "tracker": "Tracker",
+    "calendar": "Calendar",
     "add": "Add",
     "save": "Save"
+  },
+  "Calendar": {
+    "title": "Calendar",
+    "today": "Today",
+    "views": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "create_event": "Create Event",
+    "event_modal": {
+      "title": "Create Event",
+      "edit_title": "Edit Event",
+      "name": "Event Name",
+      "date": "Start Date",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "time": "Time",
+      "description": "Description",
+      "save": "Save",
+      "delete": "Delete",
+      "tabs_servant_title": "Servant",
+      "tabs_personal_title": "Personal",
+      "select_student_desc": "Select a student to add a new servant or lesson",
+      "student_label": "Student",
+      "student_placeholder": "Select student",
+      "next_button": "Next",
+      "add_student": "Add Student",
+      "attendees": "Attendees",
+      "invalid_date_range": "End date must be after start date"
+    },
+    "upcoming": "Upcoming",
+    "no_events": "No events found",
+    "google_calendar_connected": "Google Calendar ✓",
+    "google_calendar_disconnect": "Disconnect",
+    "google_calendar_connect": "Connect Google Calendar",
+    "google_disconnected_title": "Google Calendar Disconnected",
+    "google_disconnected_message": "Synchronization with Google Calendar has been successfully stopped",
+    "google_connected_title": "Successfully Connected",
+    "google_connected_message": "Your Google Calendar is now synchronized with Lirnexa",
+    "success_title": "Success",
+    "event_created_success": "Event created successfully",
+    "event_updated_success": "Event updated successfully",
+    "event_deleted_success": "Event deleted successfully",
+    "lesson_drawer": {
+      "title": "Lesson",
+      "student": "Student",
+      "subscription": "Subscription",
+      "status": "Status",
+      "date": "Date and Time",
+      "save": "Save",
+      "transfer_week": "Move to Next Week",
+      "to_subscription": "To Subscription",
+      "statuses": {
+        "scheduled": "Scheduled",
+        "transfered": "Rescheduled",
+        "burned": "Missed"
+      }
+    }
   },
   "Tracker": {
     "title": "Tracker",
@@ -320,7 +380,7 @@
       "edit_title": "Edit Student",
       "add_student_title": "Add New Student",
       "edit_student_title": "Edit Student Profile",
-      "edit_subscription_title": "Edit Subscription"
+      "edit_subscription_title": "Edit Servant"
     },
     "form": {
       "avatar": "Avatar",
@@ -353,8 +413,8 @@
       "is_name_locked": "Lock editing name",
       "deactivation_date": "Deactivation date",
       "permissions": "Permissions",
-      "extend_subscription": "Extend subscription",
-      "subscription_name": "Subscription Name",
+      "extend_subscription": "Extend servant",
+      "subscription_name": "Servant Name",
       "subscription_name_placeholder": "Enter name",
       "subscription_price": "Price",
       "subscription_price_placeholder": "1000",
@@ -370,7 +430,7 @@
     },
     "tabs": {
       "general": "General Details",
-      "subscriptions": "Subscriptions",
+      "subscriptions": "Servants",
       "lesson_history": "Lesson History",
       "activity": "Activity"
     },
@@ -379,18 +439,18 @@
       "settings": "Settings"
     },
     "not_found": "User not found",
-    "no_subscriptions_yet": "This user has no active subscriptions yet.",
+    "no_subscriptions_yet": "This user has no active servants yet.",
     "no_goals_yet": "No goals specified yet.",
     "social": "Social & Contact",
     "student_details": "Student Details",
-    "add_subscription": "Add Subscription",
-    "subscription": "Subscription",
-    "no_subscriptions": "No subscriptions found",
+    "add_subscription": "Add Servant",
+    "subscription": "Servant",
+    "no_subscriptions": "No servants found",
     "price": "Price",
     "selected": "selected",
     "need_more_lessons": "Need {count} more lessons",
     "remove_lessons": "Remove {count} extra lessons",
-    "individual_subscription": "Individual Subscription",
+    "individual_subscription": "Individual Servant",
     "template_subscription": "From existing"
   },
   "Profile": {
@@ -921,14 +981,14 @@
   },
   "Finance": {
     "subscriptions": {
-      "title": "Subscriptions",
-      "subtitle": "Manage subscription plans for your students.",
-      "add_subscription": "Add Subscription",
-      "edit_subscription": "Edit Subscription",
-      "delete_subscription": "Delete Subscription",
+      "title": "Servants",
+      "subtitle": "Manage servants for your students.",
+      "add_subscription": "Add Servant",
+      "edit_subscription": "Edit Servant",
+      "delete_subscription": "Delete Servant",
       "bulk_delete": "Delete Selected ({count})",
-      "empty_title": "No subscriptions found",
-      "empty_description": "There are no subscription plans available. Create one to get started.",
+      "empty_title": "No servants found",
+      "empty_description": "There are no servants available. Create one to get started.",
       "table": {
         "name": "Name",
         "lessons_count": "Lessons",
@@ -937,26 +997,34 @@
         "actions": "Actions"
       },
       "form": {
-        "name_placeholder": "Enter subscription name",
+        "name_placeholder": "Enter servant name",
         "lessons_count": "Lessons count",
         "lessons_count_placeholder": "8",
         "price": "Price",
         "price_placeholder": "99.99"
       },
       "notifications": {
-        "create_success": "Subscription created successfully",
-        "create_error": "Failed to create subscription",
-        "update_success": "Subscription updated successfully",
-        "update_error": "Failed to update subscription",
-        "delete_success": "Subscription deleted successfully",
-        "delete_error": "Failed to delete subscription",
-        "bulk_delete_success": "Selected subscriptions deleted successfully",
-        "bulk_delete_error": "Failed to delete selected subscriptions"
+        "create_success": "Servant created successfully",
+        "create_error": "Failed to create servant",
+        "update_success": "Servant updated successfully",
+        "update_error": "Failed to update servant",
+        "delete_success": "Servant deleted successfully",
+        "delete_error": "Failed to delete servant",
+        "bulk_delete_success": "Selected servants deleted successfully",
+        "bulk_delete_error": "Failed to delete selected servants"
+      },
+      "validation": {
+        "name_required": "Servant name is required",
+        "lessons_count_required": "Lessons count must be at least 1",
+        "price_required": "Servant price is required",
+        "price_non_negative": "Price cannot be negative",
+        "at_least_one_day": "Select at least one day",
+        "paid_amount_required": "Paid amount is required"
       },
       "delete_confirm": {
         "title": "Confirm Deletion",
-        "description": "Are you sure you want to delete this subscription? This action cannot be undone.",
-        "bulk_description": "Are you sure you want to delete {count} selected subscriptions? This action cannot be undone."
+        "description": "Are you sure you want to delete this servant? This action cannot be undone.",
+        "bulk_description": "Are you sure you want to delete {count} selected servants? This action cannot be undone."
       }
     },
     "reports": {
@@ -965,24 +1033,35 @@
       "total_revenue": "Total Revenue",
       "expected_revenue": "Expected Revenue",
       "active_students": "Active Students",
-      "sold_subscriptions": "Subscriptions Sold",
+      "sold_subscriptions": "Servants Sold",
       "real_income_tab": "Real Income",
       "expected_income_tab": "Expected Income",
       "student": "Student",
       "amount": "Amount",
       "date": "Date",
-      "subscription": "Subscription",
-      "breakdown_title": "Subscription Breakdown",
+      "subscription": "Servant",
+      "breakdown_title": "Servant Breakdown",
       "sold_count": "Sold",
       "revenue_share": "Revenue Share",
       "no_data": "No data for this period",
-      "no_breakdown_data": "No subscription data",
+      "no_breakdown_data": "No servants data",
       "payment_types": {
         "renewal": "Renewal",
         "balance": "Balance",
         "paid": "Paid"
       },
       "select_period": "Select period"
+    }
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "no_notifications": "You have no notifications yet",
+    "mark_all_read": "Mark all as read",
+    "clear_all": "Clear all",
+    "view_all": "View all",
+    "messages": {
+      "new_task_created": "New task created",
+      "task_column_changed": "Task status changed"
     }
   }
 }

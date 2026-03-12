@@ -70,7 +70,7 @@ export function SubscriptionTable({
                 key={item.id} 
                 className={cn(
                   'transition-colors border-b border-white/5 last:border-0',
-                  is_selected ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-white/5'
+                  is_selected ? 'bg-primary/10' : 'hover:bg-white/5'
                 )}
               >
                 <Table.Td>

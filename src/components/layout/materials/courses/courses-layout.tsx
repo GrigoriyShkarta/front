@@ -166,7 +166,7 @@ export default function CoursesLayout() {
                             <Button 
                                 leftSection={<IoAddOutline size={18} />} 
                                 onClick={handle_create}
-                                className="bg-blue-600 hover:bg-blue-700"
+                                className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
                             >
                                 {t('add_course')}
                             </Button>
@@ -253,7 +253,7 @@ export default function CoursesLayout() {
                                 </Text>
                                 {!is_student && (
                                     <Group mt="sm">
-                                        <Button variant="light" onClick={handle_create}>
+                                        <Button variant="light" onClick={handle_create} className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors">
                                             {t('add_course')}
                                         </Button>
                                     </Group>

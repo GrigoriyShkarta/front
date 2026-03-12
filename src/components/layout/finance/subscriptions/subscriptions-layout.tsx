@@ -144,7 +144,8 @@ export default function SubscriptionsLayout() {
                 <Button 
                     leftSection={<IoAddOutline size={18} />} 
                     onClick={handle_add}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    color="primary"
+                    className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
                 >
                     {t('add_subscription')}
                 </Button>
@@ -226,7 +227,7 @@ export default function SubscriptionsLayout() {
                         <Text c="dimmed" size="sm" ta="center" maw={400}>
                             {t('empty_description')}
                         </Text>
-                        <Button variant="light" mt="sm" onClick={handle_add}>
+                        <Button variant="light" mt="sm" onClick={handle_add} color="primary" className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors">
                             {t('add_subscription')}
                         </Button>
                     </Stack>

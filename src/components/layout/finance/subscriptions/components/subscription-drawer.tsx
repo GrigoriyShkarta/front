@@ -102,7 +102,7 @@ export function SubscriptionDrawer({ opened, onClose, subscription, on_submit, i
             label={t('table.name')}
             placeholder={t('form.name_placeholder')}
             required
-            error={errors.name?.message ? common_t(`errors.${errors.name.message as any}`) : null}
+            error={errors.name?.message ? t(`validation.${errors.name.message as any}`) : null}
             {...register('name')}
             variant="filled"
           />
@@ -119,7 +119,7 @@ export function SubscriptionDrawer({ opened, onClose, subscription, on_submit, i
                 allowLeadingZeros={false}
                 value={field.value}
                 onChange={field.onChange}
-                error={errors.lessons_count?.message ? common_t(`errors.${errors.lessons_count.message as any}`) : null}
+                error={errors.lessons_count?.message ? t(`validation.${errors.lessons_count.message as any}`) : null}
                 variant="filled"
               />
             )}
@@ -138,7 +138,7 @@ export function SubscriptionDrawer({ opened, onClose, subscription, on_submit, i
                 allowLeadingZeros={false}
                 value={field.value}
                 onChange={field.onChange}
-                error={errors.price?.message ? common_t(`errors.${errors.price.message as any}`) : null}
+                error={errors.price?.message ? t(`validation.${errors.price.message as any}`) : null}
                 variant="filled"
                 rightSection={currencySymbol}
               />
@@ -153,7 +153,8 @@ export function SubscriptionDrawer({ opened, onClose, subscription, on_submit, i
               type="submit"
               loading={is_loading}
               disabled={!isValid || is_loading}
-              className="bg-blue-600 hover:bg-blue-700"
+              color="primary"
+              className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
             >
               {common_t('save')}
             </Button>

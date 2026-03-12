@@ -65,7 +65,7 @@ export default function TestsLayout() {
                 <Stack gap={4}>
                     <Group gap="md">
                         <Box 
-                            className="p-3 rounded-2xl bg-blue-600/10 text-blue-600 dark:bg-blue-600/20"
+                            className="p-3 rounded-2xl bg-primary/10 text-primary dark:bg-primary/20"
                         >
                             <IoCheckmarkDoneOutline size={28} />
                         </Box>
@@ -87,7 +87,7 @@ export default function TestsLayout() {
                         size="md" 
                         radius="md"
                         leftSection={<IoAddOutline size={20} />}
-                        className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5"
+                        className="bg-primary hover:opacity-90 shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5"
                     >
                         {t('add_test')}
                     </Button>
@@ -141,7 +141,7 @@ export default function TestsLayout() {
                             <Transition mounted={selectedIds.length > 0} transition="fade" duration={200}>
                                 {(styles) => (
                                     <Group style={styles}>
-                                        <Text size="sm" fw={500} c="blue">
+                                        <Text size="sm" fw={500} className="text-primary">
                                             {selectedIds.length} вибрано
                                         </Text>
                                         <Button 

@@ -190,7 +190,8 @@ export function UsersLayout() {
           <Button 
             leftSection={<IoAddOutline size={20} />} 
             onClick={handle_add_user}
-            className="shadow-sm"
+            color="primary"
+            className="bg-primary shadow-md hover:shadow-lg transition-all"
           >
             {t('add_button')}
           </Button>

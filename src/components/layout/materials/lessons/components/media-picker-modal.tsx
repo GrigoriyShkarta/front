@@ -135,7 +135,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
         >
             <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: 'none' }}>
                 <Dropzone.Accept>
-                    <IoCloudUploadOutline size={52} color="var(--mantine-color-blue-6)" />
+                    <IoCloudUploadOutline size={52} className="text-primary" />
                 </Dropzone.Accept>
                 <Dropzone.Reject>
                     <IoCloudUploadOutline size={52} color="var(--mantine-color-red-6)" />
@@ -170,7 +170,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
                 <Button variant="light" color="gray" onClick={() => { setPendingFile(null); setFileName(''); }}>
                     {common_t('cancel')}
                 </Button>
-                <Button onClick={() => handle_upload(upload_fn, media_type, refetch_fn)} disabled={!fileName}>
+                <Button onClick={() => handle_upload(upload_fn, media_type, refetch_fn)} disabled={!fileName} className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20">
                     {tEditor('upload')}
                 </Button>
             </Group>
@@ -202,6 +202,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
                 loading={videos.is_uploading}
                 disabled={!youtubeUrl || !youtubeName}
                 fullWidth
+                className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
             >
                 {common_t('save')}
             </Button>
@@ -268,6 +269,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
                     on_edit={() => {}} 
                     on_delete={() => {}}
                     on_preview={() => {}}
+                    on_grant_access={() => {}}
                     on_select={(photo) => onSelect({ id: photo.id, url: photo.file_url || '', name: photo.name, type: 'image' })}
                     is_picker={true}
                 />
@@ -283,6 +285,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
                     on_edit={() => {}} 
                     on_delete={() => {}}
                     on_play={() => {}}
+                    on_grant_access={() => {}}
                     on_select={(video) => onSelect({ id: video.id, url: video.youtube_url || video.file_url || '', name: video.name, type: 'video' })}
                     is_picker={true}
                 />
@@ -298,6 +301,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
                     on_selection_change={() => {}} 
                     on_edit={() => {}} 
                     on_delete={() => {}}
+                    on_grant_access={() => {}}
                     on_select={(audio) => onSelect({ id: audio.id, url: audio.file_url || '', name: audio.name, type: 'audio' })}
                     is_picker={true}
                 />
@@ -312,6 +316,7 @@ export function MediaPickerModal({ opened, onClose, onSelect, type = 'all' }: Pr
                     on_selection_change={() => {}} 
                     on_edit={() => {}} 
                     on_delete={() => {}}
+                    on_grant_access={() => {}}
                     on_select={(file) => onSelect({ id: file.id, url: file.file_url || '', name: file.name, type: 'file' })}
                     is_picker={true}
                 />

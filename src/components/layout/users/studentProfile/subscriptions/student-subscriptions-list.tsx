@@ -115,6 +115,8 @@ export function StudentSubscriptionsList() {
               set_editing_subscription(undefined);
               set_drawer_opened(true);
             }}
+            color="primary"
+            className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
           >
             {t('add_subscription') || 'Add Subscription'}
           </Button>

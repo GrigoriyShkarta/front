@@ -74,7 +74,7 @@ export function VideoPlayerModal({ opened, onClose, video }: Props) {
         <LoadingOverlay 
             visible={is_loading} 
             overlayProps={{ blur: 1, backgroundOpacity: 0.2 }} 
-            loaderProps={{ color: 'blue' }}
+            loaderProps={{ color: 'primary' }}
         />
         <AspectRatio ratio={16 / 9}>
           {youtube_id ? (

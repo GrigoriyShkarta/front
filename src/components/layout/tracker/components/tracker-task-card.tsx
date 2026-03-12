@@ -1,7 +1,5 @@
 'use client';
-
 import { useState } from 'react';
-
 import { 
   Group, 
   Stack, 
@@ -26,7 +24,6 @@ import { Draggable } from '@hello-pangea/dnd';
 import { useTrackerTranslator } from '../hooks/use-tracker-translator';
 import { TrackerTask, TrackerColumn } from '../schemas/tracker-schema';
 import { cn } from '@/lib/utils';
-
 interface Props {
   task: TrackerTask;
   index: number;
@@ -37,7 +34,6 @@ interface Props {
   onMoveTask: (taskId: string, newColumnId: string) => void;
   onDeleteTask: (taskId: string) => void;
 }
-
 /**
  * Task card component for the tracker board
  */
@@ -45,10 +41,8 @@ export function TrackerTaskCard({ task, index, columns, can_edit, onToggleSubtas
   const theme = useMantineTheme();
   const { t, getColumnLabel } = useTrackerTranslator();
   const [expanded, setExpanded] = useState(false);
-  
   const is_long_description = task.description && task.description.length > 100;
   const description_text = task.description || '';
-
   return (
     <Draggable key={task.id} draggableId={task.id} index={index}>
       {(provided, snapshot) => {
@@ -108,7 +102,6 @@ export function TrackerTaskCard({ task, index, columns, can_edit, onToggleSubtas
                     </Group>
                   )}
                 </Group>
-                
                 {task.description && (
                   <Stack gap={4}>
                     <Collapse in={expanded || !is_long_description}>
@@ -136,7 +129,6 @@ export function TrackerTaskCard({ task, index, columns, can_edit, onToggleSubtas
                     )}
                   </Stack>
                 )}
-                
                 {task.subtasks && task.subtasks.length > 0 && (
                   <Stack gap={6} mt={4}>
                     <Stack gap={4} className="bg-zinc-500/5 p-2 rounded-lg">
@@ -156,30 +148,29 @@ export function TrackerTaskCard({ task, index, columns, can_edit, onToggleSubtas
                             readOnly
                             size="xs"
                             radius="xl"
+                            color="var(--space-primary)"
                             styles={{ input: { cursor: 'pointer' } }}
                           />
                           <Text 
                               size="xs" 
                               className={cn(
                                   "transition-all",
-                              subtask.completed ? "line-through opacity-50" : ""
+                              subtask.completed ? "line-through opacity-50" : "text-[var(--space-primary)]"
                           )}
-                          style={{ color: !subtask.completed ? `var(--mantine-color-${theme.primaryColor}-filled)` : undefined }}
                           >
                               {subtask.title}
                           </Text>
                         </Group>
                       ))}
                     </Stack>
-
                     <Group justify="space-between" gap={4} mt={4}>
                       <Group gap={4}>
-                          <IoListOutline size={14} color={`var(--mantine-color-${theme.primaryColor}-filled)`} />
+                          <IoListOutline size={14} style={{ color: 'var(--space-primary)' }} />
                           <Text size="xs" fw={700} c="dimmed">
                               {task.subtasks.filter(s => s.completed).length} / {task.subtasks.length}
                           </Text>
                       </Group>
-                      <Text size="10px" fw={800} color={theme.primaryColor}>
+                      <Text size="10px" fw={800} className="text-primary">
                           {Math.round((task.subtasks.filter(s => s.completed).length / task.subtasks.length) * 100)}%
                       </Text>
                     </Group>
@@ -187,13 +178,12 @@ export function TrackerTaskCard({ task, index, columns, can_edit, onToggleSubtas
                       value={(task.subtasks.filter(s => s.completed).length / task.subtasks.length) * 100} 
                       size="xs" 
                       radius="xl"
-                      color={theme.primaryColor}
+                      color="var(--space-primary)"
                       striped
                       animated={snapshot.isDragging}
                    />
                   </Stack>
                 )}
-
                 <Box onClick={(e) => e.stopPropagation()} mt={4}>
                   <Select 
                      size="xs"
@@ -221,11 +211,9 @@ export function TrackerTaskCard({ task, index, columns, can_edit, onToggleSubtas
             </Paper>
           </div>
         );
-
         if (snapshot.isDragging) {
           return <Portal>{cardContent}</Portal>;
         }
-
         return cardContent;
       }}
     </Draggable>

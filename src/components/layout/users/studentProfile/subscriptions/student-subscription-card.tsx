@@ -42,7 +42,7 @@ export function StudentSubscriptionCard({
 
   const STATUS_COLORS: Record<string, string> = {
     attended: 'rgba(64, 192, 87, 0.3)',
-    scheduled: 'rgba(34, 139, 230, 0.3)',
+    scheduled: 'var(--mantine-primary-color-light)',
     burned: 'rgba(250, 82, 82, 0.3)',
     rescheduled: 'rgba(250, 176, 5, 0.3)',
   };

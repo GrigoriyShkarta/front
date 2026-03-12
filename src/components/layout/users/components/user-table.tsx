@@ -90,7 +90,7 @@ export function UserTable({
     const is_overdue = displayed_date && dayjs(displayed_date).isBefore(dayjs(), 'day');
 
     return (
-      <Table.Tr key={user.id} className={selected_users.includes(user.id) ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}>
+      <Table.Tr key={user.id} className={selected_users.includes(user.id) ? 'bg-primary/5 dark:bg-primary/10' : ''}>
         {show_actions && (
           <Table.Td>
             <Checkbox
@@ -138,7 +138,7 @@ export function UserTable({
             <Text 
               size="sm" 
               fw={500}
-              className="cursor-pointer hover:text-blue-500 transition-colors"
+              className="cursor-pointer hover:text-primary transition-colors"
             >
               {user.name}
             </Text>
@@ -274,6 +274,7 @@ export function UserTable({
             withEdges
             boundaries={1}
             siblings={1}
+            color="primary"
           />
         </Group>
       )}

@@ -269,7 +269,7 @@ export function QuestionBlock({
                             <Group gap={4}>
                                 <ActionIcon 
                                     variant={media_alignment === 'left' ? 'filled' : 'light'} 
-                                    color={media_alignment === 'left' ? 'blue' : 'gray'} 
+                                    color={media_alignment === 'left' ? 'primary' : 'gray'} 
                                     onClick={() => on_change({ ...data, media: { ...data.media!, alignment: 'left' } })}
                                     size="sm"
                                 >
@@ -277,7 +277,7 @@ export function QuestionBlock({
                                 </ActionIcon>
                                 <ActionIcon 
                                     variant={media_alignment === 'center' ? 'filled' : 'light'} 
-                                    color={media_alignment === 'center' ? 'blue' : 'gray'} 
+                                    color={media_alignment === 'center' ? 'primary' : 'gray'} 
                                     onClick={() => on_change({ ...data, media: { ...data.media!, alignment: 'center' } })}
                                     size="sm"
                                 >
@@ -285,7 +285,7 @@ export function QuestionBlock({
                                 </ActionIcon>
                                 <ActionIcon 
                                     variant={media_alignment === 'right' ? 'filled' : 'light'} 
-                                    color={media_alignment === 'right' ? 'blue' : 'gray'} 
+                                    color={media_alignment === 'right' ? 'primary' : 'gray'} 
                                     onClick={() => on_change({ ...data, media: { ...data.media!, alignment: 'right' } })}
                                     size="sm"
                                 >

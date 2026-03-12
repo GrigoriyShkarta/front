@@ -149,7 +149,7 @@ export function FileDrawer({ opened, onClose, file, initial_files, on_submit, is
             onDrop={handle_drop}
             maxSize={100 * 1024 ** 2}
             maxFiles={10 - files.length}
-            className="border-2 border-dashed border-white/10 hover:border-blue-500/50 bg-white/5 transition-colors rounded-xl"
+            className="border-2 border-dashed border-white/10 hover:border-primary/50 bg-white/5 transition-colors rounded-xl"
           >
             <Group justify="center" gap="xl" mih={120} style={{ pointerEvents: 'none' }}>
               <Dropzone.Accept>
@@ -235,7 +235,7 @@ export function FileDrawer({ opened, onClose, file, initial_files, on_submit, is
                       <Text size="xs" c="dimmed">{t('form.uploading')}</Text>
                       <Text size="xs" fw={500}>{fileObj.progress}%</Text>
                     </Group>
-                    <Progress value={fileObj.progress} size="xs" animated color="blue" />
+                    <Progress value={fileObj.progress} size="xs" animated className="[&>div]:bg-primary" />
                   </Stack>
                 )}
 
@@ -255,7 +255,7 @@ export function FileDrawer({ opened, onClose, file, initial_files, on_submit, is
             onClick={handle_submit}
             loading={is_loading}
             disabled={is_submit_disabled || files.length === 0}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
           >
             {common_t('save')}
           </Button>

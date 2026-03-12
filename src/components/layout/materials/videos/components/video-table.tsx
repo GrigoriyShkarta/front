@@ -99,7 +99,7 @@ export function VideoTable({
                 key={item.id} 
                 className={cn(
                   'transition-colors border-b border-white/5 last:border-0',
-                  is_selected ? 'bg-blue-50/50 dark:bg-blue-900/10' : 'hover:bg-white/5'
+                  is_selected ? 'bg-primary/10' : 'hover:bg-white/5'
                 )}
               >
                 {show_selection && (
@@ -129,7 +129,7 @@ export function VideoTable({
                           <Menu.Item 
                             leftSection={<IoVideocamOutline style={{ width: rem(14), height: rem(14) }} />}
                             onClick={() => on_select(item)}
-                            color="blue"
+                            color="primary"
                           >
                             {common_t('confirm')}
                           </Menu.Item>
@@ -183,10 +183,9 @@ export function VideoTable({
                           />
                         ) : (
                           <Box 
-                            className="w-full h-full flex items-center justify-center shadow-inner"
-                            style={{ backgroundColor: `var(--mantine-color-${theme.primaryColor}-light)` }}
+                            className="w-full h-full flex items-center justify-center shadow-inner bg-primary/10"
                           >
-                            <IoVideocamOutline size={14} style={{ color: `var(--mantine-color-${theme.primaryColor}-filled)` }} />
+                            <IoVideocamOutline size={14} className="text-primary" />
                           </Box>
                         )
                       )}
@@ -198,7 +197,7 @@ export function VideoTable({
                       <Text 
                         size="sm" 
                         fw={500} 
-                        className="truncate max-w-[500px] cursor-pointer hover:text-blue-500 transition-colors"
+                        className="truncate max-w-[500px] cursor-pointer hover:text-primary transition-colors"
                         onClick={() => on_play(item)}
                       >
                         {item.name}
@@ -209,7 +208,7 @@ export function VideoTable({
                 <Table.Td>
                   <Group gap={4}>
                     {item.categories?.map((cat) => (
-                      <Badge key={cat.id} color={cat.color || 'blue'} variant="light" size="xs">
+                      <Badge key={cat.id} color={cat.color || 'gray'} variant="light" size="xs" className={!cat.color ? '!text-primary !bg-primary/10' : ''}>
                         {cat.name}
                       </Badge>
                     ))}
@@ -228,7 +227,7 @@ export function VideoTable({
                   ) : (
                     <Badge 
                       variant="filled" 
-                      color={theme.primaryColor} 
+                      color="primary" 
                       size="sm"
                       leftSection={<IoVideocamOutline size={10} />}
                     >

@@ -119,6 +119,8 @@ export default function CategoriesLayout() {
             leftSection={<IoAddOutline size={18} />} 
             onClick={handle_add}
             radius="md"
+            color="primary"
+            className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
           >
             {t('add_category')}
           </Button>
@@ -184,7 +186,14 @@ export default function CategoriesLayout() {
                 <Text c="dimmed" size="sm" ta="center" maw={400}>
                   {t('subtitle_empty', { defaultValue: 'You haven\'t created any categories yet. Add categories to organize your materials.' })}
                 </Text>
-                <Button variant="light" mt="sm" onClick={handle_add} leftSection={<IoAddOutline size={18} />}>
+                <Button 
+                  variant="light" 
+                  mt="sm" 
+                  onClick={handle_add} 
+                  leftSection={<IoAddOutline size={18} />}
+                  color="primary"
+                  className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors"
+                >
                   {t('add_category')}
                 </Button>
               </Stack>

@@ -1,5 +1,5 @@
 import { IconType } from 'react-icons';
-import { IoSettingsOutline, IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline } from 'react-icons/io5';
+import { IoSettingsOutline, IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline } from 'react-icons/io5';
 
 export interface NavItem {
   label: string; // Translation key
@@ -20,6 +20,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
     label: 'tracker',
     href: '/main/tracker',
     icon: IoCheckmarkDoneOutline,
+    roles: ['super_admin', 'admin', 'teacher', 'student'],
+  },
+  {
+    label: 'calendar',
+    href: '/main/calendar',
+    icon: IoCalendarOutline,
     roles: ['super_admin', 'admin', 'teacher', 'student'],
   },
   {

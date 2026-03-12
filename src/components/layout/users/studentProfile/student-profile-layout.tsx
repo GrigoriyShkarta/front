@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, Stack, Title, Paper, Text, Breadcrumbs, Anchor, Box, LoadingOverlay, Group, Avatar, Badge, Button } from '@mantine/core';
-import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoSchoolOutline } from 'react-icons/io5';
+import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoSchoolOutline, IoListOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { useUserQuery } from '../hooks/use-user-query';
@@ -40,7 +40,9 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
     ? 'subscriptions' 
     : pathname.endsWith('/materials') 
       ? 'materials' 
-      : 'general';
+      : pathname.endsWith('/tracker')
+        ? 'tracker'
+        : 'general';
 
   const breadcrumb_items = useMemo(() => {
     const items = [
@@ -128,18 +130,20 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
         </Group>
       </Stack>
 
-      <Paper withBorder radius="md" p={0} className="bg-white/5 border-white/10 overflow-hidden">
+      <Paper withBorder radius="md" p={0} className="bg-secondary/5 border-secondary/20 overflow-hidden">
         <Tabs 
           value={active_tab} 
           variant="outline" 
+          color="primary"
           onChange={(val) => {
             if (val === 'general') router.push(basePath);
             if (val === 'subscriptions') router.push(`${basePath}/subscriptions`);
             if (val === 'materials') router.push(`${basePath}/materials`);
+            if (val === 'tracker') router.push(`${basePath}/tracker`);
           }}
           classNames={{
-            list: 'flex flex-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide px-4 border-b border-white/10 scroll-smooth overscroll-x-contain',
-            tab: 'h-[50px] border-b-2 border-transparent data-[active=true]:border-blue-500 transition-colors whitespace-nowrap px-4 flex-shrink-0'
+            list: 'flex flex-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide px-4 border-b border-secondary/20 scroll-smooth overscroll-x-contain gap-1',
+            tab: 'h-[50px] transition-all whitespace-nowrap px-6 flex-shrink-0 font-medium data-[active=true]:!bg-primary/10 data-[active=true]:!border-primary/50 hover:bg-secondary/10'
           }}
           styles={{
             list: {
@@ -154,11 +158,11 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
                 background: 'transparent',
               },
               '&::-webkit-scrollbar-thumb': {
-                background: 'rgba(255, 255, 255, 0.2)',
+                background: 'rgba(var(--space-secondary-rgb), 0.2)',
                 borderRadius: '10px',
               },
               '&::-webkit-scrollbar-thumb:hover': {
-                background: 'rgba(255, 255, 255, 0.3)',
+                background: 'rgba(var(--space-primary-rgb), 0.5)',
               }
             }
           }}
@@ -177,6 +181,9 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
                     {tNav('materials') || 'Materials'}
                   </Tabs.Tab>
                 )}
+                <Tabs.Tab value="tracker" leftSection={<IoListOutline size={16} />}>
+                  {tNav('tracker') || 'Tracker'}
+                </Tabs.Tab>
               </>
             )}
           </Tabs.List>
@@ -188,7 +195,9 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
                   leftSection={<IoPencilOutline size={16} />}
                   onClick={() => setDrawerOpened(true)}
                   size="sm"
-                  variant="light"
+                  variant="filled"
+                  color="primary"
+                  className="bg-primary shadow-sm hover:shadow-md transition-all"
                 >
                   {common_t('edit')}
                 </Button>

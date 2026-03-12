@@ -285,6 +285,7 @@ export function GrantAccessModal({ opened, onClose, materialIds, materialType, i
             onClick={handleSubmit} 
             loading={isSubmitting}
             disabled={selectedStudentIds.length === 0}
+            className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
           >
             {t('grant_button')}
           </Button>

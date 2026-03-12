@@ -21,6 +21,8 @@ export const useStudentSubscriptions = (studentId: string) => {
     mutationFn: (data: any) => studentSubscriptionActions.create_student_subscription(studentId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['student-subscriptions', studentId] });
+      queryClient.invalidateQueries({ queryKey: ['finance'] });
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
       notifications.show({
         title: common_t('success'),
         message: finance_t('create_success'),
@@ -40,6 +42,8 @@ export const useStudentSubscriptions = (studentId: string) => {
     mutationFn: ({ id, data }: { id: string; data: any }) => studentSubscriptionActions.update_student_subscription(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['student-subscriptions', studentId] });
+      queryClient.invalidateQueries({ queryKey: ['finance'] });
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
       notifications.show({
         title: common_t('success'),
         message: finance_t('update_success'),
@@ -59,6 +63,8 @@ export const useStudentSubscriptions = (studentId: string) => {
     mutationFn: ({ lessonId, data }: { lessonId: string; data: any }) => studentSubscriptionActions.update_lesson(lessonId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['student-subscriptions', studentId] });
+      queryClient.invalidateQueries({ queryKey: ['finance'] });
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
       notifications.show({
         title: common_t('success'),
         message: finance_t('update_success'), // Reuse for now
@@ -78,6 +84,8 @@ export const useStudentSubscriptions = (studentId: string) => {
     mutationFn: (id: string) => studentSubscriptionActions.delete_student_subscription(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['student-subscriptions', studentId] });
+      queryClient.invalidateQueries({ queryKey: ['finance'] });
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
       notifications.show({
         title: common_t('success'),
         message: finance_t('delete_success'),

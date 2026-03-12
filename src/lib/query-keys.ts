@@ -47,6 +47,7 @@ export const queryKeys = {
     subscriptions: {
       all: () => [...queryKeys.finance.all, 'subscriptions'] as const,
       list: (filters?: any) => [...queryKeys.finance.subscriptions.all(), 'list', filters] as const,
+      calendar: (filters?: any) => [...queryKeys.finance.subscriptions.all(), 'calendar', filters] as const,
       detail: (id: string) => [...queryKeys.finance.subscriptions.all(), 'detail', id] as const,
     },
   },

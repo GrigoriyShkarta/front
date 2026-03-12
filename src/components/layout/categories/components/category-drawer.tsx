@@ -121,6 +121,8 @@ export function CategoryDrawer({ opened, onClose, onSubmit, editing_category, lo
               variant="light" 
               leftSection={<IoAddOutline />} 
               onClick={() => append({ name: '', color: '' })}
+              color="primary"
+              className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors"
             >
               {t('add_another')}
             </Button>
@@ -130,7 +132,14 @@ export function CategoryDrawer({ opened, onClose, onSubmit, editing_category, lo
             <Button variant="subtle" color="gray" onClick={onClose}>
               {common_t('cancel')}
             </Button>
-            <Button type="submit" loading={loading} radius="md" disabled={!isValid}>
+            <Button 
+              type="submit" 
+              loading={loading} 
+              radius="md" 
+              disabled={!isValid}
+              color="primary"
+              className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
+            >
               {editing_category ? common_t('save') : common_t('save')}
             </Button>
           </Group>

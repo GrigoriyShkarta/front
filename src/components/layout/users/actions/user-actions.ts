@@ -96,5 +96,18 @@ export const userActions = {
   get_user: async (id: string) => {
     const response = await api.get(`/users/${id}`);
     return response.data as UserListItem;
-  }
+  },
+
+  mark_notifications_as_read: async (ids?: string[]) => {
+    const response = await api.post('/users/notifications/read', { ids });
+    return response.data;
+  },
+
+  mark_all_read_notifications: async () => {
+    await api.patch('/notifications/read-all');
+  },
+
+  delete_notifications: async (ids: string[]) => {
+    await api.delete('/notifications/bulk', { data: { ids } });
+  },
 };

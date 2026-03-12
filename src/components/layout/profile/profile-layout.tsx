@@ -52,7 +52,7 @@ export function ProfileLayout({ children }: { children?: React.ReactNode }) {
           }}
           classNames={{
             list: 'pl-5 border-b border-white/10',
-            tab: 'h-[50px] border-b-2 border-transparent data-[active=true]:border-blue-500 transition-colors'
+            tab: 'h-[50px] border-b-2 border-transparent data-[active=true]:border-primary transition-colors'
           }}
         >
           <Tabs.List>

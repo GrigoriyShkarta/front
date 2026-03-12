@@ -20,7 +20,7 @@ export function ReportTables({ realIncome, expectedIncome }: ReportTablesProps) 
   const getStatusStyle = (status: string, isExpected: boolean) => {
     switch (status) {
       case 'renewal':
-        return { color: 'blue.4', label: t('payment_types.renewal') };
+        return { color: 'primary', label: t('payment_types.renewal') };
       case 'balance':
         return { color: 'orange.4', label: t('payment_types.balance') };
       case 'partially_paid':
@@ -28,7 +28,7 @@ export function ReportTables({ realIncome, expectedIncome }: ReportTablesProps) 
       case 'paid':
         return { color: 'green.4', label: t('payment_types.paid') };
       default:
-        return { color: isExpected ? 'blue.4' : 'green.4', label: '' };
+        return { color: isExpected ? 'primary' : 'green.4', label: '' };
     }
   };
 
@@ -73,7 +73,7 @@ export function ReportTables({ realIncome, expectedIncome }: ReportTablesProps) 
                   size="sm" 
                   component={Link} 
                   href={profilePath}
-                  className="cursor-pointer hover:text-blue-400 transition-colors no-underline"
+                  className="cursor-pointer hover:text-primary transition-colors no-underline"
                   c="dimmed"
                 >
                   {item.name || item.subscription?.name || '-'}
@@ -116,7 +116,7 @@ export function ReportTables({ realIncome, expectedIncome }: ReportTablesProps) 
   );
 
   return (
-    <Tabs defaultValue="real" variant="pills" className="bg-white/2 rounded-md border border-white/5">
+    <Tabs defaultValue="real" variant="pills" color="primary" className="bg-white/2 rounded-md border border-white/5">
       <Tabs.List p="xs" className="border-b border-white/5">
         <Tabs.Tab value="real">{t('real_income_tab')}</Tabs.Tab>
         <Tabs.Tab value="expected">{t('expected_income_tab')}</Tabs.Tab>

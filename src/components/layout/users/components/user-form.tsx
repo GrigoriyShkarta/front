@@ -215,7 +215,12 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
                     accept="image/png,image/jpeg"
                   >
                     {(props) => (
-                      <Button {...props} variant="light" leftSection={<IoCloudUploadOutline size={16} />}>
+                      <Button 
+                        {...props} 
+                        variant="filled" 
+                        leftSection={<IoCloudUploadOutline size={16} />}
+                        className="bg-primary shadow-sm hover:shadow-md transition-all"
+                      >
                         {t('form.upload')}
                       </Button>
                     )}
@@ -283,7 +288,7 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
                 {...register('password')}
                 error={errors.password?.message && common_t(errors.password.message)}
                 leftSection={
-                  <ActionIcon onClick={on_generate_password} variant="subtle" color="blue" type="button">
+                  <ActionIcon onClick={on_generate_password} variant="subtle" color="primary" type="button">
                     <IoRefreshOutline size={16} />
                   </ActionIcon>
                 }
@@ -365,6 +370,8 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
           loading={is_loading} 
           disabled={!isValid || is_loading}
           mt="md"
+          color="primary"
+          className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
         >
           {common_t('save')}
         </Button>

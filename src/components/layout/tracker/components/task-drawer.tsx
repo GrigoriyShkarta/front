@@ -121,7 +121,7 @@ export function TaskDrawer({
             />
 
               <Stack gap="xs" mt="md">
-                <Text size="sm" fw={800} tt="uppercase" color={theme.primaryColor} className="tracking-wider">{t('card.subtasks')}</Text>
+                <Text size="sm" fw={800} tt="uppercase" className="tracking-wider text-[var(--space-primary)]">{t('card.subtasks')}</Text>
                 {fields.map((field, index) => (
                   <Paper key={field.id} p="xs" withBorder className="bg-white/5 border-zinc-200 dark:border-white/10 rounded-xl group transition-all hover:bg-white/10">
                     <Group gap="xs" wrap="nowrap" align="start">
@@ -134,7 +134,7 @@ export function TaskDrawer({
                               checked={field.value} 
                               onChange={(e) => field.onChange(e.currentTarget.checked)} 
                               radius="xl"
-                              color={theme.primaryColor}
+                              color="var(--space-primary)"
                             />
                           )}
                         />
@@ -163,12 +163,13 @@ export function TaskDrawer({
                 ))}
                 <Button 
                   variant="light" 
+                  color="primary"
                   size="sm" 
                   leftSection={<IoAddOutline />} 
                   onClick={() => append({ id: crypto.randomUUID(), title: '', completed: false })}
-                  maw={200}
+                  maw={160}
                   radius="md"
-                  color={theme.primaryColor}
+                  className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors"
                 >
                   {t('card.add_subtask')}
                 </Button>
@@ -179,6 +180,8 @@ export function TaskDrawer({
                 fullWidth
                 disabled={!form.formState.isValid}
                 mt="md"
+                className="bg-primary text-white hover:bg-primary-hover transition-colors"
+                radius="md"
               >
                 {common_t('save')}
               </Button>

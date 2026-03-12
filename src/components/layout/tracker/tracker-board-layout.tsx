@@ -36,12 +36,18 @@ import { SettingsDrawer } from './components/settings-drawer';
  * Main layout for the tracker board
  * Orchestrates columns, tasks and management drawers
  */
-export function TrackerBoardLayout() {
+interface Props {
+  student_id?: string;
+  hide_header?: boolean;
+}
+
+export function TrackerBoardLayout({ student_id, hide_header }: Props) {
   const theme = useMantineTheme();
   const t = useTranslations('Tracker');
   const tNav = useTranslations('Navigation');
   const params = useParams();
-  const userId = params?.userId as string;
+  
+  const userId = student_id || (params?.userId as string) || (params?.id as string);
   const { user: current_user } = useAuth();
   
   const { 
@@ -66,39 +72,67 @@ export function TrackerBoardLayout() {
 
   return (
     <Stack gap="lg" h="100%" className="tracker-board-container">
-      <Stack gap="xs">
-        <Group justify="space-between" align="center" wrap="nowrap">
-            <Breadcrumbs separator="→" className="opacity-70">{breadcrumb_items}</Breadcrumbs>
-            {is_admin && (
-                <Group gap="sm">
-                    <Button 
-                        variant="light"
-                        color="gray"
-                        leftSection={<IoSettingsOutline size={20} />} 
-                        onClick={() => drawers.settings.setOpened(true)}
-                        radius="md"
-                    >
-                        {t('settings.button')}
-                    </Button>
-                    <Button 
-                        variant="gradient" 
-                        gradient={{ from: theme.primaryColor + '.5', to: theme.primaryColor + '.7' }}
-                        leftSection={<IoAddOutline size={20} />} 
-                        onClick={() => handlers.handleCreateColumn()}
-                        radius="md"
-                        className="shadow-md"
-                    >
-                    {t('add_column')}
-                    </Button>
-                </Group>
-            )}
-        </Group>
-        <Title order={2} className="text-zinc-800 dark:text-zinc-100 font-bold">
-            {t('title')} {student_name && `— ${student_name}`}
-        </Title>
-      </Stack>
+      {hide_header ? (
+        is_admin && (
+          <Group justify="flex-end" mb="xs">
+            <Button 
+                variant="light"
+                color="primary"
+                size="sm"
+                leftSection={<IoSettingsOutline size={18} />} 
+                onClick={() => drawers.settings.setOpened(true)}
+                radius="md"
+                className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors"
+            >
+                {t('settings.button')}
+            </Button>
+            <Button 
+                size="sm"
+                leftSection={<IoAddOutline size={18} />} 
+                onClick={() => handlers.handleCreateColumn()}
+                radius="md"
+                color="primary"
+                className="bg-primary shadow-md text-white hover:opacity-90 transition-all"
+            >
+              {t('add_column')}
+            </Button>
+          </Group>
+        )
+      ) : (
+        <Stack gap="xs">
+          <Group justify="space-between" align="center" wrap="nowrap">
+              <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
+              {is_admin && (
+                  <Group gap="sm">
+                      <Button 
+                          variant="light"
+                          color="primary"
+                          leftSection={<IoSettingsOutline size={20} />} 
+                          onClick={() => drawers.settings.setOpened(true)}
+                          radius="md"
+                          className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors"
+                      >
+                          {t('settings.button')}
+                      </Button>
+                      <Button 
+                          leftSection={<IoAddOutline size={20} />} 
+                          onClick={() => handlers.handleCreateColumn()}
+                          radius="md"
+                          color="primary"
+                          className="bg-primary shadow-md text-white hover:opacity-90 transition-all"
+                      >
+                      {t('add_column')}
+                      </Button>
+                  </Group>
+              )}
+          </Group>
+          <Title order={2} className="text-zinc-800 dark:text-zinc-100 font-bold">
+              {t('title')} {student_name && `— ${student_name}`}
+          </Title>
+        </Stack>
+      )}
 
-      <Box className="flex-1 relative min-h-[600px] mt-4 overflow-hidden">
+      <Box className="flex-1 relative mt-4 overflow-hidden">
         <LoadingOverlay visible={loading} overlayProps={{ blur: 2, bg: 'transparent' }} />
         
         {!loading && (
@@ -111,7 +145,7 @@ export function TrackerBoardLayout() {
                     ref={provided.innerRef}
                     align="stretch" 
                     gap="lg" 
-                    className="h-full overflow-x-auto pb-3 pt-2 px-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:bg-zinc-300 dark:[&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
+                    className="h-full overflow-x-auto pb-3 pt-2 px-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:bg-secondary/30 hover:[&::-webkit-scrollbar-thumb]:bg-primary [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
                     wrap="nowrap"
                   >
                     {columns.map((column, index) => (

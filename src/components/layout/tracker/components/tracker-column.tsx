@@ -149,10 +149,10 @@ export function TrackerColumn({
                       variant="light" 
                       fullWidth
                       size="sm" 
-                      color="gray" 
+                      color="primary" 
                       leftSection={<IoAddOutline />}
                       onClick={() => onAddTask(column.id)}
-                      className="border-dashed border-2 opacity-60 hover:opacity-100 transition-opacity rounded-xl mt-4 shrink-0"
+                      className="border-dashed border-2 !bg-primary/5 !text-primary border-primary/20 opacity-80 hover:opacity-100 hover:!bg-primary/10 transition-all rounded-xl mt-4 shrink-0"
                     >
                       {t('card.add_card')}
                     </Button>

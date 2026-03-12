@@ -88,7 +88,7 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
           backgroundColor: read_only ? 'transparent' : 'var(--mantine-color-body)',
           opacity: isDragging ? 0.4 : 1,
           border: isDragging 
-            ? '2px dashed var(--mantine-color-blue-6)' 
+            ? '2px dashed var(--mantine-primary-color-filled)' 
             : (read_only ? 'none' : '1px solid var(--mantine-color-default-border)'),
         }
       }}

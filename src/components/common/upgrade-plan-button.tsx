@@ -44,7 +44,7 @@ export function UpgradePlanButton({ collapsed, className, ...props }: Props) {
       leftSection={<IoRocketOutline size={20} />}
       radius="xl"
       className={cn(
-        "shadow-lg hover:shadow-blue-500/20 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0",
+        "shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0",
         className
       )}
       style={{

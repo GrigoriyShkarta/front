@@ -114,6 +114,8 @@ export function ColumnDrawer({ opened, onClose, onSubmit, initialName, initialCo
             onClick={handleSubmit}
             disabled={!name.trim()}
             mt="md"
+            radius="md"
+            className="bg-primary text-white hover:bg-primary-hover transition-colors"
           >
             {initialName ? common_t('save') : common_t('add')}
           </Button>

@@ -37,7 +37,7 @@ export function AdditionalMaterialsTable({ lessons, on_toggle_access, is_mutatin
                 <Group gap="sm" wrap="nowrap">
                   <IoBookOutline 
                     size={20} 
-                    style={{ color: `var(--mantine-color-${theme.primaryColor}-filled)` }} 
+                    style={{ color: 'var(--space-primary)' }} 
                   />
                   <Link 
                     href={`/main/materials/lessons/${lesson.id}`}
@@ -54,7 +54,7 @@ export function AdditionalMaterialsTable({ lessons, on_toggle_access, is_mutatin
                       key={cat.id} 
                       variant="light" 
                       size="xs" 
-                      color={cat.color || 'gray'}
+                      color={cat.color || 'primary'}
                     >
                       {cat.name}
                     </Badge>

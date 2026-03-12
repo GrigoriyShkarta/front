@@ -49,7 +49,7 @@ function ColorCircle({ option, selected, onClick, is_premium_user }: {
         className={cn(
           "w-9 h-9 rounded-full border-2 transition-all duration-200 hover:scale-110 hover:shadow-lg relative",
           selected 
-            ? "border-white scale-110 shadow-md ring-2 ring-offset-2 ring-blue-500" 
+            ? "border-white scale-110 shadow-md ring-2 ring-offset-2 ring-primary" 
             : "border-transparent hover:border-gray-300 dark:hover:border-gray-600"
         )}
         style={{ backgroundColor: option.hex }}
@@ -152,6 +152,7 @@ export function ColorSelect({
                 size="compact-xs" 
                 leftSection={<IoColorPaletteOutline />}
                 rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-primary)' }} />}
+                className="!text-primary hover:!bg-primary/5"
               >
                 {t('custom_color')}
               </Button>
@@ -159,13 +160,13 @@ export function ColorSelect({
               <Popover.Dropdown p="xs">
                 <Stack gap="xs">
                   <ColorPicker 
-                    value={is_custom_solid ? value : '#2563eb'} 
+                    value={is_custom_solid ? value : 'var(--space-primary)'} 
                     onChange={onChange} 
                     format="hex"
                     fullWidth
                   />
                   <ColorInput 
-                    value={is_custom_solid ? value : '#2563eb'} 
+                    value={is_custom_solid ? value : 'var(--space-primary)'} 
                     onChange={onChange}
                     placeholder={t('enter_hex')}
                     size="xs"
@@ -211,7 +212,7 @@ export function ColorSelect({
             {is_custom_solid && (
                <Tooltip label={t('custom_color')} position="top" withArrow>
                   <UnstyledButton
-                    className="w-9 h-9 rounded-full border-2 border-white scale-110 shadow-md ring-2 ring-offset-2 ring-blue-500"
+                    className="w-9 h-9 rounded-full border-2 border-white scale-110 shadow-md ring-2 ring-offset-2 ring-primary"
                     style={{ backgroundColor: value }}
                   />
                </Tooltip>
@@ -235,6 +236,7 @@ export function ColorSelect({
                     size="compact-xs" 
                     leftSection={<IoSparklesOutline />}
                     rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-primary)' }} />}
+                    className="!text-primary hover:!bg-primary/5"
                 >
                   {t('build_gradient')}
                 </Button>
@@ -269,6 +271,7 @@ export function ColorSelect({
                             size="compact-xs" 
                             leftSection={<IoAddOutline />} 
                             onClick={add_color}
+                            className="!text-primary !bg-primary/10 hover:!bg-primary/20"
                           >
                             {t('add_color_stop')}
                           </Button>
@@ -295,11 +298,16 @@ export function ColorSelect({
                     style={{ background: generated_gradient }} 
                    />
                    
-                   <Button size="xs" fullWidth onClick={() => {
-                     handle_apply_gradient();
-                   }}>
-                     {t('apply_gradient')}
-                   </Button>
+                    <Button 
+                      size="xs" 
+                      fullWidth 
+                      className="!bg-primary hover:opacity-90 transition-all shadow-md"
+                      onClick={() => {
+                        handle_apply_gradient();
+                      }}
+                    >
+                      {t('apply_gradient')}
+                    </Button>
                  </Stack>
                </Popover.Dropdown>
              </Popover>
@@ -313,7 +321,7 @@ export function ColorSelect({
                   className={cn(
                     "w-12 h-9 rounded-lg border-2 transition-all duration-200 hover:scale-110 hover:shadow-lg relative",
                     value === option.id 
-                      ? "border-white scale-110 shadow-md ring-2 ring-offset-2 ring-blue-500" 
+                      ? "border-white scale-110 shadow-md ring-2 ring-offset-2 ring-primary" 
                       : "border-transparent hover:border-gray-300 dark:hover:border-gray-600"
                   )}
                   style={{ background: option.gradient }}
@@ -332,7 +340,7 @@ export function ColorSelect({
             {is_custom_gradient && (
                <Tooltip label={t('custom_gradient')} position="top" withArrow>
                   <UnstyledButton
-                    className="w-12 h-9 rounded-lg border-2 border-white scale-110 shadow-md ring-2 ring-offset-2 ring-blue-500"
+                    className="w-12 h-9 rounded-lg border-2 border-white scale-110 shadow-md ring-2 ring-offset-2 ring-primary"
                     style={{ background: value }}
                   />
                </Tooltip>

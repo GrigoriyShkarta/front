@@ -156,7 +156,7 @@ export default function LessonsLayout() {
                                 leftSection={<IoAddOutline size={18} />} 
                                 component={Link}
                                 href="/main/materials/lessons/create"
-                                className="bg-blue-600 hover:bg-blue-700"
+                                className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
                             >
                                 {t('add_lesson')}
                             </Button>
@@ -246,7 +246,7 @@ export default function LessonsLayout() {
                                 </Text>
                                 {!is_student && (
                                     <Group mt="sm">
-                                        <Button variant="light" component={Link} href="/main/materials/lessons/create">
+                                        <Button variant="light" component={Link} href="/main/materials/lessons/create" className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors">
                                             {t('add_lesson')}
                                         </Button>
                                     </Group>

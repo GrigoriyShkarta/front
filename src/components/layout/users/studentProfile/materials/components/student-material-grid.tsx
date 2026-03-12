@@ -16,6 +16,7 @@ interface Props {
 
 export function StudentMaterialGrid({ items, type, on_toggle_access, on_item_click, is_mutating }: Props) {
   const t = useTranslations('Materials');
+  const common_t = useTranslations('Common');
   const theme = useMantineTheme();
 
   const get_youtube_id = (url: string) => {
@@ -39,6 +40,16 @@ export function StudentMaterialGrid({ items, type, on_toggle_access, on_item_cli
     return null;
   };
 
+  if (items.length === 0) {
+    return (
+      <Box py={60}>
+        <Text ta="center" c="dimmed">
+          {t(`${type}.empty_title`) || common_t?.('no_data') || 'No materials found'}
+        </Text>
+      </Box>
+    );
+  }
+
   return (
     <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 4, lg: 5 }} spacing="lg">
       {items.map((item) => {
@@ -53,7 +64,7 @@ export function StudentMaterialGrid({ items, type, on_toggle_access, on_item_cli
             withBorder
             className={cn(
               'group transition-all duration-300 hover:shadow-md h-full cursor-pointer',
-              item.has_access ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-500/5 dark:bg-blue-900/10' : 'bg-white/5 border-white/10'
+              item.has_access ? 'border-primary ring-1 ring-primary/30 bg-primary/5 dark:bg-primary/10' : 'bg-white/5 border-white/10'
             )}
             onClick={() => on_item_click(item)}
           >
@@ -114,7 +125,7 @@ export function StudentMaterialGrid({ items, type, on_toggle_access, on_item_cli
               {item.categories && item.categories.length > 0 && (
                   <Group gap={4} mt={6} className="flex-wrap">
                     {item.categories.slice(0, 3).map((cat: any) => (
-                      <Badge key={cat.id} color={cat.color || 'blue'} variant="light" size="xs" radius="sm" className="max-w-[100px] truncate">
+                      <Badge key={cat.id} color={cat.color || 'primary'} variant="light" size="xs" radius="sm" className="max-w-[100px] truncate">
                         {cat.name}
                       </Badge>
                     ))}

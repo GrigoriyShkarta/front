@@ -25,6 +25,35 @@ export interface ThemeConfig {
 }
 
 /**
+ * Converts a HEX color string to an RGB string (r, g, b).
+ */
+function hexToRgb(hex: string): string {
+  // Handle cases where the color might be a name or invalid
+  if (!hex || typeof hex !== 'string') return '37, 99, 235';
+  
+  // Remove # if present
+  const clean_hex = hex.replace(/^#/, '');
+
+  // Parse 3 or 6 digit hex
+  let r = 0, g = 0, b = 0;
+  if (clean_hex.length === 3) {
+    r = parseInt(clean_hex[0] + clean_hex[0], 16);
+    g = parseInt(clean_hex[1] + clean_hex[1], 16);
+    b = parseInt(clean_hex[2] + clean_hex[2], 16);
+  } else if (clean_hex.length === 6) {
+    r = parseInt(clean_hex.substring(0, 2), 16);
+    g = parseInt(clean_hex.substring(2, 4), 16);
+    b = parseInt(clean_hex.substring(4, 6), 16);
+  }
+
+  if (isNaN(r) || isNaN(g) || isNaN(b)) {
+    return '37, 99, 235';
+  }
+
+  return `${r}, ${g}, ${b}`;
+}
+
+/**
  * Applies the theme configuration to the document root using CSS variables.
  * Updated to handle HEX and full Gradient strings directly.
  */
@@ -51,11 +80,13 @@ export function applyTheme(config: ThemeConfig) {
     const to_color = colors?.[1] || from_color;
 
     root.style.setProperty('--space-primary', from_color);
+    root.style.setProperty('--space-primary-rgb', hexToRgb(from_color));
     root.style.setProperty('--space-primary-hover', to_color);
     root.style.setProperty('--space-primary-bg', primary_val);
     root.style.setProperty('--mantine-primary-color-filled', from_color);
   } else {
     root.style.setProperty('--space-primary', primary_val);
+    root.style.setProperty('--space-primary-rgb', hexToRgb(primary_val));
     root.style.setProperty('--space-primary-hover', primary_val);
     root.style.setProperty('--space-primary-bg', primary_val);
     root.style.setProperty('--mantine-primary-color-filled', primary_val);
@@ -64,6 +95,7 @@ export function applyTheme(config: ThemeConfig) {
   // --- Apply Secondary Color ---
   const secondary_val = config.secondary || '#64748b';
   root.style.setProperty('--space-secondary', secondary_val);
+  root.style.setProperty('--space-secondary-rgb', hexToRgb(secondary_val));
   root.style.setProperty('--space-secondary-hover', secondary_val);
 
   // --- Apply Background Color/Gradient ---

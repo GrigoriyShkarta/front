@@ -46,7 +46,7 @@ export function PhotoGrid({ data, selected_ids, on_selection_change, on_edit, on
             withBorder
             className={cn(
               'group transition-all duration-300 hover:shadow-md h-full cursor-pointer',
-              is_selected ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-50/5 dark:bg-blue-900/10' : 'bg-white/5 border-white/10'
+              is_selected ? 'border-primary ring-1 ring-primary bg-primary/5' : 'bg-white/5 border-white/10'
             )}
             onClick={() => on_preview(item)}
           >
@@ -130,7 +130,7 @@ export function PhotoGrid({ data, selected_ids, on_selection_change, on_edit, on
                {item.categories && item.categories.length > 0 && (
                    <Group gap={4} mt={6} className="flex-wrap">
                      {item.categories.slice(0, 3).map((cat) => (
-                       <Badge key={cat.id} color={cat.color || 'blue'} variant="light" size="xs" radius="sm" className="max-w-[100px] truncate">
+                       <Badge key={cat.id} color={cat.color || 'gray'} variant="light" size="xs" radius="sm" className={cn("max-w-[100px] truncate", !cat.color && "!text-primary !bg-primary/10")}>
                          {cat.name}
                        </Badge>
                      ))}

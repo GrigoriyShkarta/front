@@ -76,7 +76,11 @@ export function UserFilterDrawer({
           <Button variant="subtle" color="gray" onClick={handle_clear}>
             {common_t('clear')}
           </Button>
-          <Button onClick={handle_apply}>
+          <Button 
+            onClick={handle_apply}
+            color="primary"
+            className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
+          >
             {common_t('apply')}
           </Button>
         </Group>

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* Force rebuild 2 */
+
 
 @theme inline {
   --color-background: var(--space-bg);
@@ -16,6 +18,10 @@
   --space-bg: #ffffff;
   --space-primary: #2563eb;
   --space-primary-hover: #1d4ed8;
+  --space-primary-bg: var(--space-primary);
+  --space-primary-rgb: 37, 99, 235;
+  --space-secondary: #64748b;
+  --space-secondary-rgb: 100, 116, 139;
   --background: var(--space-bg);
   --foreground: #171717;
   
@@ -48,7 +54,7 @@ body {
 /* Glassmorphism for Mantine components */
 .mantine-Input-input {
   background-color: var(--space-input-bg) !important;
-  border-color: var(--space-secondary) !important;
+  border-color: rgba(var(--space-secondary-rgb), 0.3) !important;
   backdrop-filter: blur(8px);
   transition: all 0.2s ease;
 }
@@ -58,6 +64,7 @@ body {
   box-shadow: 0 0 0 2px rgba(var(--space-primary-rgb), 0.1);
 }
 
+/* Primary/Main Buttons */
 .mantine-Button-root[data-variant="filled"], 
 .mantine-ActionIcon-root[data-variant="filled"],
 .mantine-Badge-root[data-variant="filled"],
@@ -73,8 +80,28 @@ body {
 .bg-primary:hover,
 .bg-primary-hover:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(var(--space-primary-rgb), 0.15);
   filter: brightness(1.1);
+}
+
+/* Secondary Buttons: bg-primary/10 */
+.mantine-Button-root[data-variant="light"],
+.mantine-ActionIcon-root[data-variant="light"],
+.mantine-Badge-root[data-variant="light"],
+.bg-primary-light,
+.bg-primary\/5,
+.bg-primary\/10 {
+  background-color: rgba(var(--space-primary-rgb), 0.1) !important;
+  color: var(--space-primary) !important;
+  border: none !important;
+}
+
+.mantine-Button-root[data-variant="light"]:hover,
+.mantine-ActionIcon-root[data-variant="light"]:hover,
+.bg-primary-light:hover,
+.bg-primary\/5:hover,
+.bg-primary\/10:hover {
+  background-color: rgba(var(--space-primary-rgb), 0.15) !important;
 }
 
 .text-gradient-primary {
@@ -84,14 +111,47 @@ body {
   background-clip: text;
 }
 
+/* Brand Checkbox/Radio Styling */
+.mantine-Checkbox-input:checked,
+.mantine-Radio-input:checked {
+  background-color: var(--space-primary) !important;
+  border-color: var(--space-primary) !important;
+}
+
+.mantine-Checkbox-input:focus,
+.mantine-Radio-input:focus {
+  border-color: var(--space-primary) !important;
+}
+
 .space-bg-dynamic {
   background: var(--space-bg);
   background-attachment: fixed;
 }
 
+/* All borders secondary color override */
+[data-with-border],
+.mantine-Paper-root[data-with-border],
+.mantine-Card-root,
+.mantine-Modal-content,
+.mantine-Menu-dropdown,
+.mantine-Table-tr,
+.mantine-Table-th,
+.mantine-Table-td,
+.mantine-Tabs-list,
+.mantine-Divider-root,
+.border-secondary,
+.border-white\/10,
+.border-zinc-200,
+.border-gray-200,
+.border,
+hr {
+  border-color: rgba(var(--space-secondary-rgb), 0.3) !important;
+}
+
 /* Custom scrollbar for premium look */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -99,9 +159,9 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--space-secondary);
+  background: rgba(var(--space-secondary-rgb), 0.5);
   border-radius: 10px;
-  opacity: 0.5;
+  transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -128,4 +188,52 @@ body {
 .animate-bell {
   animation: bell-ring 1.5s ease-in-out infinite;
   transform-origin: top center;
+}
+
+/* Global Breadcrumbs Styling */
+.mantine-Breadcrumbs-root {
+  font-weight: 500;
+}
+
+.mantine-Breadcrumbs-root a, 
+.mantine-Breadcrumbs-root .mantine-Anchor-root {
+  color: var(--space-primary) !important;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.mantine-Breadcrumbs-root a:hover,
+.mantine-Breadcrumbs-root .mantine-Anchor-root:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.mantine-Breadcrumbs-separator {
+  color: var(--space-primary) !important;
+  opacity: 0.4;
+  margin-inline: 8px;
+}
+
+/* Global Mantine Tabs Styling */
+.mantine-Tabs-tab {
+  transition: all 0.2s ease;
+}
+
+/* Default/Outline variant underline and text color */
+.mantine-Tabs-tab[data-active] {
+  color: var(--space-primary) !important;
+  border-color: var(--space-primary) !important;
+}
+
+/* Pills variant background and text color */
+.mantine-Tabs-root[data-variant="pills"] .mantine-Tabs-tab[data-active],
+.mantine-Tabs-tab[data-active][data-variant="pills"] {
+  background-color: var(--space-primary) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(var(--space-primary-rgb), 0.2);
+}
+
+/* Hover states */
+.mantine-Tabs-tab:hover:not([data-active]) {
+  background-color: rgba(var(--space-primary-rgb), 0.05) !important;
 }

@@ -58,7 +58,7 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
             withBorder
             className={cn(
               'group transition-all duration-300 hover:shadow-md h-full cursor-pointer overflow-hidden',
-              is_selected ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-50/5 dark:bg-blue-900/10' : 'bg-white/5 border-white/10 shadow-sm'
+              is_selected ? 'border-primary ring-1 ring-primary bg-primary/5' : 'bg-white/5 border-white/10 shadow-sm'
             )}
             onClick={() => on_play(item)}
           >
@@ -81,7 +81,7 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
                 ) : (
                   <Box 
                     className="w-full h-full flex items-center justify-center"
-                    style={{ backgroundColor: is_selected ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.02)' }}
+                    style={{ backgroundColor: is_selected ? 'var(--space-primary-10)' : 'rgba(255,255,255,0.02)' }}
                   >
                     <IoVideocamOutline size={40} className="text-white/10" />
                   </Box>
@@ -95,7 +95,7 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
                        YouTube
                     </Badge>
                  ) : (
-                    <Badge color="blue" size="xs" variant="filled" leftSection={<IoVideocamOutline size={10} />}>
+                    <Badge color="primary" size="xs" variant="filled" leftSection={<IoVideocamOutline size={10} />}>
                        FILE
                     </Badge>
                  )}
@@ -174,7 +174,7 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
               {item.categories && item.categories.length > 0 && (
                   <Group gap={4} mt={6} className="flex-wrap">
                     {item.categories.slice(0, 3).map((cat) => (
-                      <Badge key={cat.id} color={cat.color || 'blue'} variant="light" size="xs" radius="sm" className="max-w-[100px] truncate">
+                      <Badge key={cat.id} color={cat.color || 'gray'} variant="light" size="xs" radius="sm" className={cn("max-w-[100px] truncate", !cat.color && "!text-primary !bg-primary/10")}>
                         {cat.name}
                       </Badge>
                     ))}

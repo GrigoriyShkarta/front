@@ -160,7 +160,7 @@ export function PhotoDrawer({ opened, onClose, photo, initial_files, on_submit, 
             maxSize={10 * 1024 ** 2} // 10MB for photos
             accept={IMAGE_MIME_TYPE}
             maxFiles={10 - files.length}
-            className="border-2 border-dashed border-white/10 hover:border-blue-500/50 bg-white/5 transition-colors rounded-xl"
+            className="border-2 border-dashed border-white/10 hover:border-primary/50 bg-white/5 transition-colors rounded-xl"
           >
             <Group justify="center" gap="xl" mih={120} style={{ pointerEvents: 'none' }}>
               <Dropzone.Accept>
@@ -205,9 +205,10 @@ export function PhotoDrawer({ opened, onClose, photo, initial_files, on_submit, 
                           name: f.name,
                           file_url: f.file ? URL.createObjectURL(f.file) : (photo && f.id === photo.id ? photo.file_url : ''),
                           file_key: photo?.file_key || '',
+                          accessible_student_ids: photo?.accessible_student_ids || [],
                           created_at: photo?.created_at || new Date().toISOString(),
                           updated_at: photo?.updated_at || new Date().toISOString(),
-                          categories: [] // Need to match type
+                          categories: (all_categories || []).filter(c => f.categories.includes(c.id))
                         })).filter(p => p.file_url);
 
                         const current_photo = drawer_photos.find(p => p.id === fileObj.id);
@@ -285,7 +286,7 @@ export function PhotoDrawer({ opened, onClose, photo, initial_files, on_submit, 
                       <Text size="xs" c="dimmed">{t('form.uploading')}</Text>
                       <Text size="xs" fw={500}>{fileObj.progress}%</Text>
                     </Group>
-                    <Progress value={fileObj.progress} size="xs" animated color="blue" />
+                    <Progress value={fileObj.progress} size="xs" animated color="primary" />
                   </Stack>
                 )}
 
@@ -305,7 +306,7 @@ export function PhotoDrawer({ opened, onClose, photo, initial_files, on_submit, 
             onClick={handle_submit}
             loading={is_loading}
             disabled={is_submit_disabled || files.length === 0}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
           >
             {photo ? common_t('save') : common_t('save')}
           </Button>

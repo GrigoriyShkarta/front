@@ -33,7 +33,16 @@ async function fetchUser(): Promise<User> {
       'Expires': '0',
     },
   });
-  return user_schema.parse(response.data);
+  
+  try {
+    return user_schema.parse(response.data);
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error('[Zod Validation Error for /me]:', (err as any).errors || err.message);
+      console.log('[Original User Data]:', response.data);
+    }
+    throw err;
+  }
 }
 
 /**

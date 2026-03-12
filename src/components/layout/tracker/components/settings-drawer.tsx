@@ -85,6 +85,8 @@ export function SettingsDrawer({ opened, onClose, settings, onSubmit }: Props) {
             fullWidth 
             onClick={() => onSubmit(localSettings)}
             mt="md"
+            radius="md"
+            className="bg-primary text-white hover:bg-primary-hover transition-colors"
           >
             {common_t('save')}
           </Button>
