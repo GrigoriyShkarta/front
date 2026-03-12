@@ -64,15 +64,39 @@ body {
   box-shadow: 0 0 0 2px rgba(var(--space-primary-rgb), 0.1);
 }
 
-/* Primary/Main Buttons */
-.mantine-Button-root[data-variant="filled"], 
-.mantine-ActionIcon-root[data-variant="filled"],
-.mantine-Badge-root[data-variant="filled"],
+/* Primary/Main Buttons & Accents */
+.mantine-Button-root[data-variant="filled"]:not([data-color]),
+.mantine-Button-root[data-variant="filled"][data-color="primary"], 
+.mantine-ActionIcon-root[data-variant="filled"]:not([data-color]),
+.mantine-ActionIcon-root[data-variant="filled"][data-color="primary"],
+.mantine-Badge-root[data-variant="filled"]:not([data-color]),
+.mantine-Badge-root[data-variant="filled"][data-color="primary"],
+.mantine-Pagination-control[data-active],
 .bg-primary, 
-.bg-primary-hover {
+.bg-primary-hover,
+.bg-primary-light[data-active],
+.bg-primary\/5[data-active],
+.bg-primary\/10[data-active],
+[style*="var(--mantine-primary-color-filled)"] {
   background: var(--space-primary-bg) !important;
+  color: var(--space-primary-text) !important;
   border: none !important;
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease !important;
+}
+
+/* Force dynamic text color on anything with text-white if it's on a primary background */
+.bg-primary.text-white,
+.bg-primary .text-white,
+[style*="var(--mantine-primary-color-filled)"].text-white,
+[style*="var(--mantine-primary-color-filled)"] .text-white,
+.mantine-Button-root[data-variant="filled"][data-color="primary"] .text-white,
+.mantine-Button-root[data-variant="filled"]:not([data-color]) .text-white,
+.mantine-Pagination-control[data-active] {
+  color: var(--space-primary-text) !important;
+}
+
+.text-primary-foreground {
+  color: var(--space-primary-text) !important;
 }
 
 .mantine-Button-root[data-variant="filled"]:hover,
@@ -229,8 +253,17 @@ hr {
 .mantine-Tabs-root[data-variant="pills"] .mantine-Tabs-tab[data-active],
 .mantine-Tabs-tab[data-active][data-variant="pills"] {
   background-color: var(--space-primary) !important;
-  color: white !important;
+  color: var(--space-primary-text) !important;
   box-shadow: 0 4px 12px rgba(var(--space-primary-rgb), 0.2);
+}
+
+/* SegmentedControl Active Label Color */
+.mantine-SegmentedControl-label[data-active] {
+  color: var(--space-primary-text) !important;
+}
+
+.mantine-SegmentedControl-indicator {
+  background-color: var(--space-primary) !important;
 }
 
 /* Hover states */

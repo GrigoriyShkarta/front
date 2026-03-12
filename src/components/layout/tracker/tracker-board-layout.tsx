@@ -92,7 +92,7 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
                 onClick={() => handlers.handleCreateColumn()}
                 radius="md"
                 color="primary"
-                className="bg-primary shadow-md text-white hover:opacity-90 transition-all"
+                className="bg-primary shadow-md text-primary-foreground hover:opacity-90 transition-all"
             >
               {t('add_column')}
             </Button>
@@ -119,7 +119,7 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
                           onClick={() => handlers.handleCreateColumn()}
                           radius="md"
                           color="primary"
-                          className="bg-primary shadow-md text-white hover:opacity-90 transition-all"
+                          className="bg-primary shadow-md text-primary-foreground hover:opacity-90 transition-all"
                       >
                       {t('add_column')}
                       </Button>

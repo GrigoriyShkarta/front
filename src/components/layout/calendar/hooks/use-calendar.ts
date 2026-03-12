@@ -352,6 +352,12 @@ export function useCalendar({ student_id }: UseCalendarProps = {}) {
   };
 
   const handle_event_click = (event: CalendarEvent) => {
+    if (is_student) {
+      set_selected_event(event);
+      set_modal_opened(true);
+      return;
+    }
+
     if (check_is_lesson(event)) {
       set_selected_lesson(event);
       set_lesson_drawer_opened(true);

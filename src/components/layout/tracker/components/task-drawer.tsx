@@ -180,7 +180,7 @@ export function TaskDrawer({
                 fullWidth
                 disabled={!form.formState.isValid}
                 mt="md"
-                className="bg-primary text-white hover:bg-primary-hover transition-colors"
+                className="bg-primary text-primary-foreground hover:bg-primary-hover transition-colors"
                 radius="md"
               >
                 {common_t('save')}

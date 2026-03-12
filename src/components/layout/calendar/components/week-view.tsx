@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, SimpleGrid, Text, Paper, Stack, ScrollArea, Tooltip } from '@mantine/core';
+import { Box, SimpleGrid, Text, Paper, Stack, ScrollArea, Tooltip, Group } from '@mantine/core';
 import dayjs from 'dayjs';
 import { IoSchoolOutline, IoPersonOutline } from 'react-icons/io5';
 import { FaGoogle } from 'react-icons/fa';
@@ -74,9 +74,9 @@ export function WeekView({ current_date, events, on_event_click, on_navigate, on
                   className={cn(
                     'w-7 h-7 flex items-center justify-center rounded-full mt-1 cursor-pointer hover:bg-white/10 transition-colors',
                     is_today && 'border-2 border-primary text-primary',
-                    is_selected && 'bg-primary text-white shadow-sm'
+                    is_selected && 'bg-primary text-primary-foreground shadow-sm'
                   )}
-                  c={is_selected ? 'white' : undefined}
+                  style={{ color: is_selected ? 'var(--space-primary-text)' : undefined }}
                 >
                   {d.date()}
                 </Text>
@@ -195,14 +195,16 @@ export function WeekView({ current_date, events, on_event_click, on_navigate, on
                               </Text>
                             </Box>
                             {is_lesson && (
-                              <Text size="10px" fw={600} className="opacity-80 flex items-center gap-1">
+                              <Group gap={4} className="opacity-80" wrap="nowrap">
                                 <Box className={cn(
                                   "w-1.5 h-1.5 rounded-full shrink-0",
                                   event.status === 'scheduled' ? "bg-blue-400" : 
                                   event.status === 'rescheduled' ? "bg-yellow-400" : "bg-red-400"
                                 )} />
-                                {st(event.status === 'rescheduled' ? 'transfered' : event.status)}
-                              </Text>
+                                <Text size="10px" fw={600} className="truncate">
+                                  {st(event.status === 'rescheduled' ? 'transfered' : event.status)}
+                                </Text>
+                              </Group>
                             )}
                             {is_lesson && event.subtitle && (
                               <Text size="10px" className="truncate opacity-80">

@@ -195,7 +195,7 @@ export function UserTable({
                 color="gray"
                 style={{ 
                   backgroundColor: category.color || 'transparent',
-                  color: category.color ? 'var(--mantine-color-white)' : undefined,
+                  color: category.color ? 'var(--space-primary-text)' : undefined,
                   border: category.color ? 'none' : '1px solid var(--mantine-color-gray-4)',
                 }}
               >

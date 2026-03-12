@@ -65,9 +65,9 @@ export function DayView({ current_date, events, on_event_click, on_date_click, o
             fw={700}
             className={cn(
               is_today && 'border-4 border-primary text-primary',
-              day.isSame(dayjs(current_date), 'day') && 'bg-primary rounded-full text-white shadow-lg shadow-primary/20'
+              day.isSame(dayjs(current_date), 'day') && 'bg-primary rounded-full text-primary-foreground shadow-lg shadow-primary/20'
             )}
-            c={day.isSame(dayjs(current_date), 'day') ? 'white' : undefined}
+            style={{ color: day.isSame(dayjs(current_date), 'day') ? 'var(--space-primary-text)' : undefined }}
           >
             {day.date()}
           </Text>
@@ -144,7 +144,7 @@ export function DayView({ current_date, events, on_event_click, on_date_click, o
                         key={event.id}
                         onClick={() => on_event_click?.(event)}
                         className={cn(
-                          'absolute rounded-lg p-3 text-sm font-semibold transition-all cursor-pointer overflow-hidden z-10 shadow-md',
+                          'absolute rounded-lg p-1.5 text-xs font-semibold transition-all cursor-pointer overflow-hidden z-10 shadow-md',
                           'border-l-8 active:scale-[0.98] hover:z-20',
                           !is_student && is_lesson && 'cursor-move',
                           get_event_style(color)
@@ -159,8 +159,8 @@ export function DayView({ current_date, events, on_event_click, on_date_click, o
                           top: `${top}px`,
                           height: `${height}px`,
                           minHeight: '40px',
-                          left: event_layout ? `calc(${event_layout.left}% + 16px)` : '16px',
-                          width: event_layout ? `calc(${event_layout.width}% - 32px)` : 'calc(100% - 32px)',
+                          left: event_layout ? `calc(${event_layout.left}% + 8px)` : '8px',
+                          width: event_layout ? `calc(${event_layout.width}% - 16px)` : 'calc(100% - 16px)',
                         }}
                       >
                         <Stack gap={4}>
@@ -169,13 +169,13 @@ export function DayView({ current_date, events, on_event_click, on_date_click, o
                               {is_google && <FaGoogle size={14} className="shrink-0 opacity-70" />}
                               {is_lesson && <IoSchoolOutline size={16} className="shrink-0 opacity-80" />}
                               {is_personal_event(event) && <IoPersonOutline size={16} className="shrink-0 opacity-80" />}
-                              <Text fw={700} size="md" className="truncate">
+                              <Text fw={700} size="sm" className="truncate">
                                 {event.title}
                               </Text>
                             </Group>
-                            <Text size="xs" opacity={0.8} className="shrink-0">
-                              {start.format('HH:mm')} - {end.format('HH:mm')}
-                            </Text>
+                            <Text size="10px" opacity={0.8} className="shrink-0">
+                               {start.format('HH:mm')} - {end.format('HH:mm')}
+                             </Text>
                           </Group>
 
                           {/* Subtitle: student name for lessons */}

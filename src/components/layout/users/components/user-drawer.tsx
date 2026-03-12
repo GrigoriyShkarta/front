@@ -101,7 +101,7 @@ export function UserDrawer({
                     height: '44px',
                     borderRadius: '10px',
                     background: isActive ? tab.color : 'rgba(255, 255, 255, 0.05)',
-                    color: isActive ? 'white' : 'var(--mantine-color-dimmed)',
+                    color: isActive ? 'var(--space-primary-text)' : 'var(--mantine-color-dimmed)',
                     transition: 'all 0.2s ease',
                     boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.1)' : 'none'
                   }}
@@ -152,7 +152,7 @@ export function UserDrawer({
                   pointerEvents: 'auto',
                   transition: 'all 0.3s ease',
                   boxShadow: 'rgba(0, 0, 0, 0.2) 0px 10px 15px -3px',
-                  color: 'white',
+                  color: 'var(--space-primary-text)',
                   background: tab.color,
                   width: isActive ? '180px' : '52px',
                   opacity: isActive ? 1 : 0.8,

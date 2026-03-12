@@ -126,6 +126,7 @@ export function CalendarLayout({ student_id }: Props = {}) {
             on_date_click={handle_date_click}
             on_navigate={(d) => handle_navigate(d, 'day')}
             on_event_click={handle_event_click}
+            is_student={is_student}
           />
         );
     }
@@ -179,6 +180,7 @@ export function CalendarLayout({ student_id }: Props = {}) {
             opened={modal_opened}
             event={selected_event}
             is_loading={is_mutating}
+            is_student={is_student}
             onClose={() => set_modal_opened(false)}
             onSubmit={handle_modal_submit}
             onDelete={handle_modal_delete}
@@ -202,6 +204,7 @@ export function CalendarLayout({ student_id }: Props = {}) {
             opened={lesson_drawer_opened}
             lesson={selected_lesson}
             isLoading={is_mutating}
+            is_student={is_student}
             onClose={() => set_lesson_drawer_opened(false)}
             onSubmit={(data) => {
               if (selected_lesson) {

@@ -71,7 +71,10 @@ export function MonthView({
           return (
             <Box
               key={d.toISOString()}
-              onClick={() => on_date_click?.(d.toDate())}
+              onClick={() => {
+                if (is_student) return;
+                on_date_click?.(d.toDate());
+              }}
               className={cn(
                 'min-h-[120px] p-2 border-r border-b border-white/10 transition-colors group',
                 !is_current_month && 'bg-black/20 opacity-40',
@@ -110,10 +113,10 @@ export function MonthView({
                     className={cn(
                       'w-7 h-7 flex items-center justify-center rounded-full transition-transform group-hover:scale-110 z-10 cursor-pointer',
                       is_today && 'border-2 border-primary text-primary',
-                      is_selected && 'bg-primary text-white shadow-lg shadow-primary/20'
+                      is_selected && 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
                     )}
                   >
-                    <Text size="sm" fw={is_selected || is_today ? 700 : 500} c={is_selected ? 'white' : undefined}>
+                    <Text size="sm" fw={is_selected || is_today ? 700 : 500} style={{ color: is_selected ? 'var(--space-primary-text)' : undefined }}>
                       {d.date()}
                     </Text>
                   </Box>

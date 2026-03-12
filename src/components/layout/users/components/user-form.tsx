@@ -219,7 +219,7 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
                         {...props} 
                         variant="filled" 
                         leftSection={<IoCloudUploadOutline size={16} />}
-                        className="bg-primary shadow-sm hover:shadow-md transition-all"
+                        className="bg-primary text-primary-foreground shadow-sm hover:shadow-md transition-all"
                       >
                         {t('form.upload')}
                       </Button>
@@ -371,7 +371,7 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
           disabled={!isValid || is_loading}
           mt="md"
           color="primary"
-          className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
+          className="bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-md shadow-primary/20"
         >
           {common_t('save')}
         </Button>

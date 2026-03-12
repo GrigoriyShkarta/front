@@ -69,11 +69,11 @@ export function CalendarSidebar({
       <Box className="flex flex-col gap-2">
         {!isLoadingGoogleStatus && (
           googleCalendarStatus?.isConnected ? (
-            <Group justify="space-between" className="bg-green-500/10 border border-green-500/20 rounded-md p-2">
-              <Text size="xs" fw={500} c="green" className="flex items-center gap-1">
+            <Group justify="space-between" className="bg-white/5 border border-white/10 rounded-md p-2">
+              <Text size="xs" fw={500} c="dimmed" className="flex items-center gap-1">
                 {t('google_calendar_connected')}
               </Text>
-              <Button size="compact-xs" variant="light" color="red" onClick={on_disconnect_google}>
+              <Button size="compact-xs" variant="subtle" color="red" onClick={on_disconnect_google}>
                 {t('google_calendar_disconnect')}
               </Button>
             </Group>

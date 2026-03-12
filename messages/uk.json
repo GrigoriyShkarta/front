@@ -47,6 +47,7 @@
     "delete": "Видалити",
     "save": "Зберегти",
     "cancel": "Скасувати",
+    "close": "Закрити",
     "add": "Додати",
     "back": "Назад",
     "show": "Показати",
@@ -196,11 +197,14 @@
     "event_modal": {
       "title": "Додати подію",
       "edit_title": "Редагувати подію",
+      "details_title": "Деталі події",
       "name": "Назва події",
       "date": "Дата початку",
       "start_date": "Дата початку",
       "end_date": "Дата завершення",
       "time": "Час",
+      "time_date_label": "Час та дата",
+      "subscription_label": "Абонемент",
       "description": "Опис",
       "save": "Зберегти",
       "delete": "Видалити",
@@ -212,7 +216,12 @@
       "next_button": "Далі",
       "add_student": "Додати учня",
       "attendees": "Учасники",
-      "invalid_date_range": "Дата завершення має бути пізніше дати початку"
+      "invalid_date_range": "Дата завершення має бути пізніше дати початку",
+      "statuses": {
+        "scheduled": "Заплановано",
+        "transfered": "Перенесено",
+        "burned": "Згорів"
+      }
     },
     "upcoming": "Найближчі",
     "no_events": "Подій не знайдено",
@@ -233,6 +242,7 @@
       "subscription": "Абонемент",
       "status": "Статус",
       "date": "Дата та час",
+      "time_date_label": "Час та дата",
       "save": "Зберегти",
       "transfer_week": "Перенести на наступний тиждень",
       "to_subscription": "До абонемента",

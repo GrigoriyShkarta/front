@@ -197,7 +197,7 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
                   size="sm"
                   variant="filled"
                   color="primary"
-                  className="bg-primary shadow-sm hover:shadow-md transition-all"
+                  className="bg-primary text-primary-foreground shadow-sm hover:shadow-md transition-all"
                 >
                   {common_t('edit')}
                 </Button>
