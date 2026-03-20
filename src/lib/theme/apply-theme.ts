@@ -108,6 +108,35 @@ export function applyTheme(config: ThemeConfig) {
   }
 
   root.style.setProperty('--space-bg', bg_val);
+
+  // --- Sync call room background with space bg ---
+  // background-color doesn't support gradients, so extract the first solid color
+  let call_bg_solid = bg_val;
+  if (bg_val.includes('gradient')) {
+    const colors = bg_val.match(/#[a-fA-F0-9]{3,6}/g);
+    call_bg_solid = colors?.[0] || (is_dark ? '#0d0f14' : '#f0f2f5');
+  }
+  root.style.setProperty('--call-bg', call_bg_solid);
+
+  // call-surface: derive a slightly contrasted surface from the solid bg
+  // We parse the solid color hex and shift it to create a secondary surface
+  const bg_rgb = hexToRgb(call_bg_solid); // "r, g, b"
+  const [r, g, b] = bg_rgb.split(',').map((v) => parseInt(v.trim(), 10));
+  let call_surface: string;
+  if (is_dark) {
+    // Lighten slightly for dark mode
+    const shift = 20;
+    call_surface = `rgb(${Math.min(255, r + shift)}, ${Math.min(255, g + shift)}, ${Math.min(255, b + shift)})`;
+  } else {
+    // Darken slightly for light mode
+    const shift = 14;
+    call_surface = `rgb(${Math.max(0, r - shift)}, ${Math.max(0, g - shift)}, ${Math.max(0, b - shift)})`;
+  }
+  root.style.setProperty('--call-surface', call_surface);
+  root.style.setProperty(
+    '--call-text',
+    is_dark ? '#f1f5f9' : '#111827',
+  );
   
   // --- Apply Global Styles for Inputs & Cards ---
   const glass_bg = is_dark ? 'rgba(0, 0, 0, 0.25)' : 'rgba(255, 255, 255, 0.35)';

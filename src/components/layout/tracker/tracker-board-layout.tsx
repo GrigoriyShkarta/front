@@ -126,8 +126,8 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
                   </Group>
               )}
           </Group>
-          <Title order={2} className="text-zinc-800 dark:text-zinc-100 font-bold">
-              {t('title')} {student_name && `— ${student_name}`}
+          <Title order={2} className="font-bold">
+              {t('title')}
           </Title>
         </Stack>
       )}

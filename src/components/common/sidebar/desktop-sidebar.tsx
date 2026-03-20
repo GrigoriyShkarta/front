@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Stack, Box, ActionIcon, Title, Text, ScrollArea, Avatar, Group } from '@mantine/core';
+import { Stack, Box, ActionIcon, Title, ScrollArea, Avatar, Group } from '@mantine/core';
 import { IoMenuOutline, IoArrowBackOutline } from 'react-icons/io5';
 import { SidebarItem } from './sidebar-item';
 import { SidebarControls } from './sidebar-controls';
-import { UserDropdown } from './user-dropdown';
 import { MAIN_NAVIGATION } from '../navigation-config';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';

@@ -24,6 +24,13 @@
   --space-secondary-rgb: 100, 116, 139;
   --background: var(--space-bg);
   --foreground: #171717;
+
+  /* Video call room colors - light mode */
+  /* These defaults are overridden dynamically by applyTheme() to match space settings */
+  --call-bg: var(--space-bg, #f0f2f5);
+  --call-surface: rgba(0, 0, 0, 0.04);
+  --call-border: rgba(0, 0, 0, 0.08);
+  --call-text: #111827;
   
   /* Auth Gradients */
   --auth-bg: linear-gradient(135deg, #f0f2f5 0%, #ffffff 100%);
@@ -35,6 +42,13 @@
 
 [data-mantine-color-scheme="dark"] {
   --foreground: #ededed;
+
+  /* Video call room colors - dark mode */
+  /* These defaults are overridden dynamically by applyTheme() to match space settings */
+  --call-bg: var(--space-bg, #0d0f14);
+  --call-surface: rgba(255, 255, 255, 0.05);
+  --call-border: rgba(255, 255, 255, 0.08);
+  --call-text: #f1f5f9;
 
   /* Auth Gradients */
   --auth-bg: linear-gradient(135deg, #09090b 0%, #18181b 100%);
@@ -270,3 +284,251 @@ hr {
 .mantine-Tabs-tab:hover:not([data-active]) {
   background-color: rgba(var(--space-primary-rgb), 0.05) !important;
 }
+
+/* .str-video__icon {
+  display: none !important;
+} */
+
+/* Stream Video Customization */
+.str-video {
+  --str-video__primary-color: var(--space-primary) !important;
+  --str-video__secondary-color: var(--space-secondary) !important;
+  --str-video__font-family: var(--font-sans) !important;
+  --str-video__border-radius-md: 12px;
+  --str-video__border-radius-sm: 8px;
+  --str-video__border-radius-circle: 50%;
+}
+
+.str-video.dark {
+  --str-video__background-color: var(--call-bg) !important;
+  --str-video__base-color: var(--call-surface) !important;
+  --str-video__text-color1: var(--call-text) !important;
+  --str-video__text-color2: rgba(237, 237, 237, 0.7) !important;
+  --str-video__call-controls-background-color: var(--call-surface) !important;
+  --str-video__call-controls-border-color: var(--call-border) !important;
+  --str-video__participant-placeholder-background-color: var(--call-surface) !important;
+}
+
+.str-video.light {
+  --str-video__background-color: var(--call-bg) !important;
+  --str-video__base-color: var(--call-surface) !important;
+  --str-video__text-color1: var(--call-text) !important;
+  --str-video__text-color2: #374151 !important;
+  
+  /* Surface & Menu */
+  --str-video__surface-color1: var(--call-surface) !important;
+  --str-video__surface-color2: var(--call-bg) !important;
+  --str-video__surface-color3: var(--call-surface) !important;
+  --str-video__active-surface-color: var(--space-primary) !important;
+  --str-video__hover-surface-color: var(--call-surface) !important;
+  
+  /* Dropdown / Menu specific */
+  --str-video__menu-background-color: var(--call-surface) !important;
+  --str-video__menu-item-hover-background-color: var(--call-bg) !important;
+  --str-video__menu-text-color: var(--call-text) !important;
+  --str-video__menu-border-color: var(--call-border) !important;
+  --str-video__menu-box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  
+  /* Icons & Labels */
+  --str-video__icon-color: var(--call-text) !important;
+  --str-video__icon-fill: var(--call-text) !important;
+  --str-video__label-text-color: var(--call-text) !important;
+  
+  /* Participant & Video */
+  --str-video__video-background-color: var(--call-surface) !important;
+  --str-video__participant-details-background-color: rgba(255, 255, 255, 0.9) !important;
+  --str-video__participant-placeholder-background-color: var(--call-surface) !important;
+  --str-video__participant-label-background-color: rgba(0, 0, 0, 0.05) !important;
+  
+  /* Layout */
+  --str-video__call-layout-background-color: var(--call-bg) !important;
+  
+  /* Fix for possible hardcoded dark elements */
+  & .str-video__menu-container,
+  & .str-video__dropdown,
+  & .str-video__generic-menu {
+    background-color: var(--call-surface) !important;
+    color: var(--call-text) !important;
+    border-color: var(--call-border) !important;
+    padding: 8px !important;
+
+    button {
+      background-color: var(--call-bg) !important;
+      color: var(--call-text) !important;
+    }
+
+    .str-video__icon,
+    svg {
+      color: var(--call-text) !important;
+      fill: var(--call-text) !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* Grey buttons in menu */
+  & .str-video__menu-item {
+    background-color: var(--call-bg) !important;
+    color: var(--call-text) !important;
+    border-radius: 8px !important;
+    margin-bottom: 4px !important;
+    transition: all 0.2s ease !important;
+
+    & *, 
+    & svg, 
+    & svg path, 
+    & .str-video__icon {
+      color: var(--call-text) !important;
+      fill: var(--call-text) !important;
+      background-color: transparent;
+    }
+
+    & .str-video__icon[style*="mask-image"] {
+      background-color: var(--call-text) !important;
+    }
+
+    button {
+      background-color: transparent !important;
+      color: var(--call-text) !important;
+    }
+  }
+
+  & .str-video__menu-item:hover {
+    background-color: var(--call-border) !important;
+    color: var(--call-text) !important;
+  }
+
+  /* Reset background-color for actual SVGs so we don't get a black box */
+  & :not(.str-video__call-controls) svg,
+  & :not(.str-video__call-controls) svg path {
+    background-color: transparent !important;
+  }
+}
+
+.str-video__paginated-grid-layout__wrapper {
+  height: 100%;
+}
+
+.str-video__paginated-grid-layout .str-video__paginated-grid-layout__group {
+  margin: unset !important;
+  max-width: unset !important;
+  height: 100%;
+}
+
+/* В полноэкранном режиме растягиваем layout на всю ширину, убирая любые max-width */
+:fullscreen .str-video,
+:fullscreen .str-video__paginated-grid-layout,
+:fullscreen .str-video__paginated-grid-layout__wrapper,
+:fullscreen .str-video__paginated-grid-layout__group {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+
+
+/* Global portal fix - adapts to color scheme */
+[data-mantine-color-scheme="light"] .str-video__menu-container,
+[data-mantine-color-scheme="light"] .str-video__dropdown,
+[data-mantine-color-scheme="light"] .str-video__generic-menu {
+  & svg,
+  & [class*="str-video__icon"],
+  & .str-video__icon {
+    filter: brightness(0) !important;
+    fill: var(--call-text) !important;
+    background-color: var(--call-text) !important;
+  }
+  
+  & svg, & svg path {
+    background-color: transparent !important;
+  }
+}
+
+.str-video__participant-view {
+  max-width: unset !important;
+}
+
+/* Participant name label — always white text with dark backdrop for readability in any theme */
+.str-video__participant-details {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%) !important;
+}
+
+.str-video__participant-details__name {
+  color: #ffffff !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Hide record button for specific roles */
+[data-user-role="student"] .str-video__record-call-button,
+[data-user-role="student"] .str-video__call-controls__button--record,
+[data-user-role="student"] .str-video__call-controls__button-container--record,
+[data-user-role="student"] button[title*="Record"],
+[data-user-role="student"] button[title*="Запис"],
+[data-user-role="student"] button[aria-label*="Record"],
+[data-user-role="student"] button[aria-label*="Запис"],
+[data-user-role="student"] [data-testid="recording-start-button"],
+[data-user-role="student"] .str-video__call-controls > *:nth-last-child(2) {
+  display: none !important;
+}
+
+/* Participants List Customization */
+.str-video__participants-list {
+  background: transparent !important;
+  color: var(--call-text) !important;
+}
+
+.str-video__participants-list-header {
+  display: none !important; /* We use our own header */
+}
+
+.str-video__participants-list-container {
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.str-video__participant-list-item {
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  transition: background 0.2s ease !important;
+  margin-bottom: 4px !important;
+}
+
+.str-video__participant-list-item:hover {
+  background: rgba(var(--space-primary-rgb), 0.05) !important;
+}
+
+.str-video__participant-list-item__name {
+  color: var(--call-text) !important;
+  font-weight: 500 !important;
+}
+
+.str-video__search-input-container {
+  margin-bottom: 16px !important;
+  background: var(--call-bg) !important;
+  border: 1px solid var(--call-border) !important;
+  border-radius: 10px !important;
+  padding: 4px 12px !important;
+}
+
+.str-video__search-input {
+  background: transparent !important;
+  color: var(--call-text) !important;
+  font-size: 14px !important;
+}
+
+.str-video__search-input::placeholder {
+  color: var(--call-text) !important;
+  opacity: 0.5 !important;
+}
+
+/* .str-video__call-controls__button {
+  display: none !important;
+} */
+
+
+
+
+
+
+
+
+
+

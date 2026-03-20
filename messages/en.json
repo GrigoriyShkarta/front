@@ -122,7 +122,8 @@
     "deactivation_reminder": {
       "title": "Access is expiring",
       "description": "Your access to the platform will be limited on {date}. Extend your studies to maintain access to materials."
-    }
+    },
+    "loading": "Loading..."
   },
   "Auth": {
     "login": {
@@ -183,6 +184,8 @@
     "confirm": "Confirm",
     "tracker": "Tracker",
     "calendar": "Calendar",
+    "lesson_recordings": "Lesson Recordings",
+    "boards": "Boards",
     "add": "Add",
     "save": "Save"
   },
@@ -222,7 +225,8 @@
         "scheduled": "Scheduled",
         "transfered": "Rescheduled",
         "burned": "Missed"
-      }
+      },
+      "join_lesson": "Join Lesson"
     },
     "upcoming": "Upcoming",
     "no_events": "No events found",
@@ -251,8 +255,69 @@
         "scheduled": "Scheduled",
         "transfered": "Rescheduled",
         "burned": "Missed"
+      },
+      "join_lesson": "Join Lesson"
+    },
+    "lesson_room": {
+      "joining": "Joining room...",
+      "preparing": "Preparing...",
+      "initializing": "Initializing lesson room...",
+      "error_join": "Could not join the lesson room. Please check your connection or permissions.",
+      "error_title": "Error",
+      "you": "You",
+      "layout": "Layout",
+      "layout_grid": "Grid",
+      "layout_speaker_left": "Speaker Left",
+      "layout_speaker_right": "Speaker Right",
+      "layout_pip": "Student (PIP)",
+      "participants": "Participants",
+      "stats": "Call Stats",
+      "leave": "Leave Call",
+      "expand": "Expand",
+      "camera_off": "Camera Off",
+      "loading": "Loading...",
+      "fullscreen": "Fullscreen mode",
+      "settings": "Lesson Settings",
+      "recording_permanent": "Permanent Recording",
+      "recording_permanent_desc": "Save recording forever (if disabled, auto-deleted in 2 weeks)",
+      "student_download": "Allow Download",
+      "student_download_desc": "Allow student to download the lesson recording",
+      "tab_lesson": "Lesson",
+      "tab_tech": "Audio & Video",
+      "noise_suppression": "Noise Suppression",
+      "noise_suppression_desc": "Removes background noises during the call",
+      "speaker_volume": "Speaker Volume",
+      "camera": "Camera",
+      "microphone": "Microphone",
+      "speaker": "Speaker",
+      "settings_saved": "Settings updated",
+      "success_title": "Success",
+      "recording_started": "Lesson recording started",
+      "recording_stopped": "Lesson recording stopped",
+      "recording_failed": "Failed to start recording",
+      "recordings_ui": {
+        "title": "Lesson Recordings",
+        "no_recordings": "No lesson recordings yet",
+        "period": "Period: {start} — {end}",
+        "download": "Download",
+        "delete": "Delete",
+        "edit": "Edit",
+        "youtube_video": "YouTube Video",
+        "delete_confirm": "Are you sure you want to delete this recording?",
+        "recording_deleted": "Recording successfully deleted",
+        "insert_link": "Insert link",
+        "no_recording_yet": "No recording yet"
       }
     }
+  },
+  "Boards": {
+    "title": "Boards",
+    "users_title": "Select a student for the board",
+    "users_subtitle": "Pick a student to view or update their whiteboard",
+    "open_board": "Open Board",
+    "board_title": "Board: {name}",
+    "save_success": "Board saved successfully",
+    "save_error": "Failed to save board"
   },
   "Tracker": {
     "title": "Tracker",
@@ -442,6 +507,7 @@
       "general": "General Details",
       "subscriptions": "Servants",
       "lesson_history": "Lesson History",
+      "recordings": "Lesson Recordings",
       "activity": "Activity"
     },
     "tabs_drawer": {

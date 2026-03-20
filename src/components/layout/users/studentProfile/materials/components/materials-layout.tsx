@@ -28,6 +28,8 @@ export function MaterialsLayout({ student_id, initial_tab = 'courses' }: Props) 
     );
   }
 
+  const is_white_text = user?.space?.personalization?.is_white_sidebar_color;
+
   return (
     <Stack gap="md">
       <Tabs 
@@ -37,7 +39,7 @@ export function MaterialsLayout({ student_id, initial_tab = 'courses' }: Props) 
         color="primary"
         classNames={{
           list: 'border-b border-white/5 mb-4 gap-2',
-          tab: 'px-4 py-3 transition-all font-semibold data-[active]:!text-primary border-b-2 border-transparent data-[active]:!border-primary hover:bg-white/5 text-zinc-500'
+          tab: `px-4 py-3 transition-all font-semibold border-b-2 border-transparent data-[active]:!border-primary hover:bg-white/5 ${is_white_text ? 'text-white data-[active]:!text-white' : 'text-black data-[active]:!text-black'}`
         }}
       >
         <Tabs.List>

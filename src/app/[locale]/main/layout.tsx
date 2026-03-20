@@ -5,6 +5,9 @@ import { UserInitializer } from '@/components/common/user-initializer';
 import { Sidebar } from '@/components/common/sidebar';
 import { Header } from '@/components/common/header';
 import { DynamicThemeProvider } from '@/context/dynamic-theme-provider';
+import { StreamVideoProvider } from '@/providers/stream-video-provider';
+import { ActiveCallProvider } from '@/context/active-call-context';
+import { FloatingCallWrapper } from '@/components/layout/lesson-call/floating-call-wrapper';
 
 export default async function MainLayout({
   children,
@@ -20,13 +23,18 @@ export default async function MainLayout({
     <NextIntlClientProvider messages={messages} locale={locale}>
       <UserInitializer />
       <DynamicThemeProvider>
-        <div className="flex flex-col md:flex-row min-h-screen transition-colors duration-500 h-screen overflow-y-auto">
-          <Sidebar />
-          <main className="flex-1 flex flex-col h-screen overflow-y-auto relative">
-            <Header />
-            {children}
-          </main>
-        </div>
+        <StreamVideoProvider>
+          <ActiveCallProvider>
+            <div className="flex flex-col md:flex-row min-h-screen transition-colors duration-500 h-screen overflow-y-auto">
+              <Sidebar />
+              <main className="flex-1 flex flex-col h-screen overflow-y-auto relative">
+                <Header />
+                {children}
+              </main>
+            </div>
+            <FloatingCallWrapper />
+          </ActiveCallProvider>
+        </StreamVideoProvider>
       </DynamicThemeProvider>
     </NextIntlClientProvider>
   );

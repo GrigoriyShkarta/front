@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, Stack, Title, Paper, Text, Breadcrumbs, Anchor, Box, LoadingOverlay, Group, Avatar, Badge, Button } from '@mantine/core';
-import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoSchoolOutline, IoListOutline } from 'react-icons/io5';
+import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoSchoolOutline, IoListOutline, IoVideocamOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { useUserQuery } from '../hooks/use-user-query';
@@ -9,18 +9,29 @@ import { useUsersQuery } from '../hooks/use-users-query';
 import { useParams } from 'next/navigation';
 import { useState, useMemo } from 'react';
 import { UserDrawer } from '../components/user-drawer';
+import { StudentRecordingsList } from './recordings/recordings-list';
 
 interface Props {
   id?: string;
   children: React.ReactNode;
   is_own_profile?: boolean;
+  hide_user_info?: boolean;
+  hide_tabs?: boolean;
+  custom_breadcrumbs?: { title: string; href: string }[];
 }
 
 /**
  * Shared Shell for Student Profile (Personal or Admin view)
  * Handles header, breadcrumbs, tabs navigation and drawer.
  */
-export function StudentProfileShell({ id: prop_id, children, is_own_profile }: Props) {
+export function StudentProfileShell({ 
+  id: prop_id, 
+  children, 
+  is_own_profile,
+  hide_user_info,
+  hide_tabs,
+  custom_breadcrumbs,
+}: Props) {
   const params = useParams();
   const id = (params?.id as string) || prop_id || '';
   const pathname = usePathname();
@@ -38,23 +49,27 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
   // Determine active tab based on pathname
   const active_tab = pathname.endsWith('/subscriptions') 
     ? 'subscriptions' 
-    : pathname.endsWith('/materials') 
-      ? 'materials' 
+    : pathname.endsWith('/materials')
+      ? 'materials'
       : pathname.endsWith('/tracker')
         ? 'tracker'
-        : 'general';
+        : pathname.endsWith('/recordings')
+          ? 'recordings'
+          : 'general';
 
   const breadcrumb_items = useMemo(() => {
-    const items = [
+    const items = custom_breadcrumbs || [
       { title: tNav('dashboard'), href: '/main' },
     ];
 
-    if (!is_own_profile) {
-      items.push({ title: tNav('users'), href: '/main/users' });
-    }
+    if (!custom_breadcrumbs) {
+      if (!is_own_profile) {
+        items.push({ title: tNav('users'), href: '/main/users' });
+      }
 
-    if (user) {
-      items.push({ title: user.name, href: is_own_profile ? '/main/profile' : `/main/users/${id}` });
+      if (user) {
+        items.push({ title: user.name, href: is_own_profile ? '/main/profile' : `/main/users/${id}` });
+      }
     }
 
     return items.map((item, index) => (
@@ -62,7 +77,7 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
         {item.title}
       </Anchor>
     ));
-  }, [is_own_profile, tNav, user, id]);
+  }, [is_own_profile, tNav, user, id, custom_breadcrumbs]);
 
   if (is_loading) {
     return (
@@ -104,89 +119,73 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
 
   return (
     <Stack gap="lg">
-      <Stack gap="xs">
-        <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
-        <Group justify="space-between" align="center" wrap="nowrap" className="flex-col sm:flex-row items-start sm:items-center">
-          <Group gap="md" wrap="nowrap">
-            <Avatar src={user.avatar} size="xl" radius="md" className="hidden xs:block">
-              {user.name.charAt(0)}
-            </Avatar>
-            <Stack gap={0}>
-              <Title order={2} size="h3" className="sm:text-3xl">{user.name}</Title>
-              <Group gap="xs">
-                <Text c="dimmed" size="sm" className="hidden sm:block">{user.email}</Text>
-                {user.role === 'student' && current_user?.role !== 'student' && (
-                  <Badge 
-                    color={user.status === 'active' ? 'green' : 'red'} 
-                    variant="outline" 
-                    size="sm"
-                  >
-                    {user.status === 'active' ? t('form.status_active') : t('form.status_inactive')}
-                  </Badge>
-                )}
-              </Group>
-            </Stack>
+      <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
+
+      {!hide_user_info && (
+        <Stack gap="xs">
+          <Group justify="space-between" align="center" wrap="nowrap" className="flex-col sm:flex-row items-start sm:items-center">
+            <Group gap="md" wrap="nowrap">
+              <Avatar src={user.avatar} size="xl" radius="md" className="hidden xs:block">
+                {user.name.charAt(0)}
+              </Avatar>
+              <Stack gap={0}>
+                <Title order={2} size="h3" className="sm:text-3xl">{user.name}</Title>
+                <Group gap="xs">
+                  <Text c="dimmed" size="sm" className="hidden sm:block">{user.email}</Text>
+                  {user.role === 'student' && current_user?.role !== 'student' && (
+                    <Badge 
+                      color={user.status === 'active' ? 'green' : 'red'} 
+                      variant="outline" 
+                      size="sm"
+                    >
+                      {user.status === 'active' ? t('form.status_active') : t('form.status_inactive')}
+                    </Badge>
+                  )}
+                </Group>
+              </Stack>
+            </Group>
           </Group>
-        </Group>
-      </Stack>
+        </Stack>
+      )}
 
       <Paper withBorder radius="md" p={0} className="bg-secondary/5 border-secondary/20 overflow-hidden">
         <Tabs 
           value={active_tab} 
-          variant="outline" 
-          color="primary"
           onChange={(val) => {
-            if (val === 'general') router.push(basePath);
-            if (val === 'subscriptions') router.push(`${basePath}/subscriptions`);
-            if (val === 'materials') router.push(`${basePath}/materials`);
-            if (val === 'tracker') router.push(`${basePath}/tracker`);
+            const path = val === 'general' ? '' : `/${val}`;
+            router.push(`${basePath}${path}`);
           }}
-          classNames={{
-            list: 'flex flex-nowrap overflow-x-auto overflow-y-hidden scrollbar-hide px-4 border-b border-secondary/20 scroll-smooth overscroll-x-contain gap-1',
-            tab: 'h-[50px] transition-all whitespace-nowrap px-6 flex-shrink-0 font-medium data-[active=true]:!bg-primary/10 data-[active=true]:!border-primary/50 hover:bg-secondary/10'
-          }}
-          styles={{
-            list: {
-              flexWrap: 'nowrap',
-              display: 'flex',
-              scrollbarWidth: 'thin',
-              msOverflowStyle: 'none',
-              '&::-webkit-scrollbar': {
-                height: '4px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: 'transparent',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: 'rgba(var(--space-secondary-rgb), 0.2)',
-                borderRadius: '10px',
-              },
-              '&::-webkit-scrollbar-thumb:hover': {
-                background: 'rgba(var(--space-primary-rgb), 0.5)',
-              }
-            }
-          }}
+          variant="pills"
+          radius="md"
+          className="bg-transparent"
         >
-          <Tabs.List>
-            <Tabs.Tab value="general" leftSection={<IoPersonOutline size={16} />}>
-              {t('tabs.general') || 'General'}
-            </Tabs.Tab>
-            {user.role === 'student' && (
-              <>
-                <Tabs.Tab value="subscriptions" leftSection={<IoCardOutline size={16} />}>
-                  {t('tabs.lesson_history')}
-                </Tabs.Tab>
-                {current_user?.role !== 'student' && (
-                  <Tabs.Tab value="materials" leftSection={<IoBookOutline size={16} />}>
-                    {tNav('materials') || 'Materials'}
+          {!hide_tabs && (
+            <Tabs.List className="px-4 py-3 border-b border-secondary/10 sticky top-0 z-10 overflow-x-auto flex-nowrap hide-scrollbar">
+              <Tabs.Tab value="general" leftSection={<IoPersonOutline size={16} />}>
+                {t('tabs.general') || 'General'}
+              </Tabs.Tab>
+              {user.role === 'student' && (
+                <>
+                  <Tabs.Tab value="subscriptions" leftSection={<IoCardOutline size={16} />}>
+                    {t('tabs.lesson_history')}
                   </Tabs.Tab>
-                )}
-                <Tabs.Tab value="tracker" leftSection={<IoListOutline size={16} />}>
-                  {tNav('tracker') || 'Tracker'}
-                </Tabs.Tab>
-              </>
-            )}
-          </Tabs.List>
+                  {current_user?.role !== 'student' && (
+                    <Tabs.Tab value="materials" leftSection={<IoBookOutline size={16} />}>
+                      {tNav('materials') || 'Materials'}
+                    </Tabs.Tab>
+                  )}
+                  {current_user?.role !== 'student' && (
+                    <Tabs.Tab value="tracker" leftSection={<IoListOutline size={16} />}>
+                      {tNav('tracker') || 'Tracker'}
+                    </Tabs.Tab>
+                  )}
+                  <Tabs.Tab value="recordings" leftSection={<IoVideocamOutline size={16} />}>
+                    {t('tabs.recordings') || 'Recordings'}
+                  </Tabs.Tab>
+                </>
+              )}
+            </Tabs.List>
+          )}
 
           <Box p={{ base: 'md', sm: 'xl' }}>
             {active_tab === 'general' && (
@@ -203,6 +202,7 @@ export function StudentProfileShell({ id: prop_id, children, is_own_profile }: P
                 </Button>
               </Group>
             )}
+            {active_tab === 'recordings' && <StudentRecordingsList />}
             {children}
           </Box>
         </Tabs>

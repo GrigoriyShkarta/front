@@ -20,9 +20,7 @@ export function DynamicThemeProvider({ children }: Props) {
   const [is_mounted, set_is_mounted] = useState(false);
 
   useEffect(() => {
-    console.log('[DynamicThemeProvider] MOUNTED');
     set_is_mounted(true);
-    return () => console.log('[DynamicThemeProvider] UNMOUNTED');
   }, []);
 
   const space = user?.space?.personalization;

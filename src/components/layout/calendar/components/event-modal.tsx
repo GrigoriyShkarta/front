@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import dayjs from 'dayjs';
+import { Link } from '@/i18n/routing';
 import { Modal, TextInput, Textarea, Button, Group, Stack, Tabs, Select, Text, MultiSelect, LoadingOverlay, Box } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarEvent, ManualEvent, manual_event_schema } from '../schemas/event-schema';
 import { useUsersQuery } from '@/components/layout/users/hooks/use-users-query';
 import { resolve_event_color, get_event_style } from '../utils/calendar-utils';
-import { IoTimeOutline, IoPersonOutline, IoAddOutline, IoDocumentTextOutline, IoReceiptOutline } from 'react-icons/io5';
+import { IoTimeOutline, IoPersonOutline, IoAddOutline, IoDocumentTextOutline, IoReceiptOutline, IoVideocamOutline } from 'react-icons/io5';
 import { UserDrawer } from '@/components/layout/users/components/user-drawer';
 import { UserFormData } from '@/schemas/users';
 import { useDisclosure } from '@mantine/hooks';
@@ -285,6 +286,21 @@ export function EventModal({ opened, event, onClose, onSubmit, onDelete, onCreat
                   </Text>
                 </Box>
               </Stack>
+            )}
+            
+            {event && 'source' in event && event.source === 'lesson' && (
+              <Button
+                component={Link}
+                href={`/main/lesson/${event.id}`}
+                size="lg"
+                fullWidth
+                variant="filled"
+                className="bg-primary text-primary-foreground shadow-lg shadow-primary/20 mt-4 h-14 rounded-2xl"
+                leftSection={<IoVideocamOutline size={20} />}
+                onClick={onClose}
+              >
+                {t('join_lesson') || 'Join Lesson'}
+              </Button>
             )}
 
             <Group justify="flex-end" mt="xl">

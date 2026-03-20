@@ -48,6 +48,7 @@ export const user_schema = z.object({
   learning_goals: z.string().nullable().optional(),
   is_premium: z.boolean().optional().default(false),
   payment_reminder_date: z.string().nullable().optional(),
+  stream_token: z.string().optional().nullable(),
   deactivation_date: z.string().nullable().optional(),
   space: z.object({
     personalization: personalization_schema.nullable().optional(),
@@ -66,7 +67,9 @@ export const user_schema = z.object({
     is_read: z.boolean().optional().default(false),
     created_at: z.string().optional().nullable(),
     payload: z.record(z.string(), z.any()).optional().nullable(),
-  })).optional().nullable()
+  })).optional().nullable(),
+  is_recording_enabled: z.boolean().optional().default(false),
+  can_student_download_recording: z.boolean().optional().default(false),
 });
 
 export type UserProfile = z.infer<typeof user_schema>;

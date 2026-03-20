@@ -1,12 +1,12 @@
 'use client';
 
 import { Drawer, Stack, Button, Group, Text, Divider, Box, Avatar, Badge, Select, Anchor } from '@mantine/core';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { DateTimePicker } from '@mantine/dates';
 import { useTranslations, useLocale } from 'next-intl';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { IoTimeOutline, IoArrowForwardOutline, IoSchoolOutline, IoPersonOutline, IoReceiptOutline } from 'react-icons/io5';
+import { IoTimeOutline, IoArrowForwardOutline, IoSchoolOutline, IoPersonOutline, IoReceiptOutline, IoVideocamOutline } from 'react-icons/io5';
 import { LessonEvent } from '../schemas/event-schema';
 import { cn } from '@/lib/utils';
 import { resolve_event_color, get_event_style } from '../utils/calendar-utils';
@@ -135,6 +135,18 @@ export function LessonDrawer({ opened, lesson, onClose, onSubmit, isLoading, is_
                 </Text>
               </Stack>
             </Group>
+
+            <Button
+              component={Link}
+              href={`/main/lesson/${lesson.id}`}
+              size="lg"
+              fullWidth
+              variant="filled"
+              className="bg-primary text-primary-foreground shadow-lg shadow-primary/20 mt-4 h-14 rounded-2xl"
+              leftSection={<IoVideocamOutline size={20} />}
+            >
+              {t('join_lesson') || 'Join Lesson'}
+            </Button>
           </Stack>
         ) : (
           <>
@@ -214,6 +226,18 @@ export function LessonDrawer({ opened, lesson, onClose, onSubmit, isLoading, is_
                 {t('transfer_week')}
               </Button>
             )}
+
+            <Button
+              component={Link}
+              href={`/main/lesson/${lesson.id}`}
+              size="lg"
+              fullWidth
+              variant="filled"
+              className="bg-primary text-primary-foreground shadow-lg shadow-primary/20 h-14 rounded-2xl"
+              leftSection={<IoVideocamOutline size={20} />}
+            >
+              {t('join_lesson') || 'Join Lesson'}
+            </Button>
           </>
         )}
       </Stack>

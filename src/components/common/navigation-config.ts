@@ -1,5 +1,6 @@
 import { IconType } from 'react-icons';
-import { IoSettingsOutline, IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline } from 'react-icons/io5';
+import { FaPaintbrush } from 'react-icons/fa6';
 
 export interface NavItem {
   label: string; // Translation key
@@ -17,16 +18,10 @@ export const MAIN_NAVIGATION: NavItem[] = [
     roles: ['super_admin', 'admin', 'teacher', 'student'],
   },
   {
-    label: 'tracker',
-    href: '/main/tracker',
-    icon: IoCheckmarkDoneOutline,
-    roles: ['super_admin', 'admin', 'teacher', 'student'],
-  },
-  {
-    label: 'calendar',
-    href: '/main/calendar',
-    icon: IoCalendarOutline,
-    roles: ['super_admin', 'admin', 'teacher', 'student'],
+    label: 'users',
+    href: '/main/users',
+    icon: IoPeopleOutline,
+    roles: ['super_admin', 'admin', 'teacher'],
   },
   {
     label: 'profile',
@@ -35,16 +30,28 @@ export const MAIN_NAVIGATION: NavItem[] = [
     roles: ['student'],
   },
   {
-    label: 'personalization',
-    href: '/main/personalization',
-    icon: IoSettingsOutline,
-    roles: ['super_admin'],
+    label: 'calendar',
+    href: '/main/calendar',
+    icon: IoCalendarOutline,
+    roles: ['super_admin', 'admin', 'teacher', 'student'],
   },
   {
-    label: 'users',
-    href: '/main/users',
-    icon: IoPeopleOutline,
-    roles: ['super_admin', 'admin', 'teacher'],
+    label: 'lesson_recordings',
+    href: '/main/profile/recordings',
+    icon: IoVideocamOutline,
+    roles: ['student'],
+  },
+  {
+    label: 'tracker',
+    href: '/main/tracker',
+    icon: IoCheckmarkDoneOutline,
+    roles: ['super_admin', 'admin', 'teacher', 'student'],
+  },
+  {
+    label: 'boards',
+    href: '/main/boards',
+    icon: FaPaintbrush,
+    roles: ['super_admin', 'admin', 'teacher', 'student'],
   },
   {
     label: 'categories',

@@ -8,8 +8,8 @@ import { useTranslations } from 'next-intl';
 export const useStudentSubscriptions = (studentId: string) => {
   const queryClient = useQueryClient();
   const common_t = useTranslations('Common');
-
   const finance_t = useTranslations('Finance.subscriptions.notifications');
+  const materials_t = useTranslations('Materials.lessons.notifications');
 
   const query = useQuery({
     queryKey: ['student-subscriptions', studentId],
@@ -67,14 +67,56 @@ export const useStudentSubscriptions = (studentId: string) => {
       queryClient.invalidateQueries({ queryKey: ['calendar'] });
       notifications.show({
         title: common_t('success'),
-        message: finance_t('update_success'), // Reuse for now
+        message: materials_t('update_success'),
         color: 'green',
       });
     },
     onError: (error: any) => {
       notifications.show({
         title: common_t('error'),
-        message: error?.response?.data?.message || finance_t('update_error'),
+        message: error?.response?.data?.message || materials_t('update_error'),
+        color: 'red',
+      });
+    },
+  });
+
+  const update_lesson_recording_mutation = useMutation({
+    mutationFn: ({ lessonId, data }: { lessonId: string; data: { recording_url: string } }) => studentSubscriptionActions.update_lesson_recording(lessonId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['student-subscriptions', studentId] });
+      queryClient.invalidateQueries({ queryKey: ['finance'] });
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
+      notifications.show({
+        title: common_t('success'),
+        message: materials_t('update_success'),
+        color: 'green',
+      });
+    },
+    onError: (error: any) => {
+      notifications.show({
+        title: common_t('error'),
+        message: error?.response?.data?.message || materials_t('update_error'),
+        color: 'red',
+      });
+    },
+  });
+
+  const delete_lesson_recording_mutation = useMutation({
+    mutationFn: (lessonId: string) => studentSubscriptionActions.delete_lesson_recording(lessonId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['student-subscriptions', studentId] });
+      queryClient.invalidateQueries({ queryKey: ['finance'] });
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
+      notifications.show({
+        title: common_t('success'),
+        message: materials_t('update_success'),
+        color: 'green',
+      });
+    },
+    onError: (error: any) => {
+      notifications.show({
+        title: common_t('error'),
+        message: error?.response?.data?.message || materials_t('update_error'),
         color: 'red',
       });
     },
@@ -108,10 +150,14 @@ export const useStudentSubscriptions = (studentId: string) => {
     is_creating: create_mutation.isPending,
     is_updating: update_mutation.isPending,
     is_updating_lesson: update_lesson_mutation.isPending,
+    is_updating_lesson_recording: update_lesson_recording_mutation.isPending,
+    is_deleting_lesson_recording: delete_lesson_recording_mutation.isPending,
     is_deleting: delete_mutation.isPending,
     create_subscription: create_mutation.mutateAsync,
     update_subscription: update_mutation.mutateAsync,
     update_lesson: update_lesson_mutation.mutateAsync,
+    update_lesson_recording: update_lesson_recording_mutation.mutateAsync,
+    delete_lesson_recording: delete_lesson_recording_mutation.mutateAsync,
     delete_subscription: delete_mutation.mutateAsync,
     refresh: query.refetch,
   };

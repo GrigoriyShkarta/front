@@ -8,6 +8,9 @@ export interface SubscriptionLesson {
   student_subscription_id: string;
   date: string | Date;
   status: SubscriptionLessonStatus;
+  is_recording_enabled: boolean;
+  can_student_download_recording: boolean;
+  recording_url: string | null;
   created_at: string;
   updated_at: string;
 }

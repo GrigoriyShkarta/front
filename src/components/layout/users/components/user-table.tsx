@@ -6,6 +6,7 @@ import { UserListItem } from '@/schemas/users';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { Link } from '@/i18n/routing';
+import { cn } from '@/lib/utils';
 
 interface Props {
   users: UserListItem[];
@@ -147,9 +148,13 @@ export function UserTable({
         <Table.Td>
           {user.role === 'student' && (
             <Badge 
-              color={user.status === 'active' ? 'green' : 'red'} 
               variant="light" 
               size="sm"
+              className={cn(
+                user.status === 'active' 
+                  ? '!text-green-500 !bg-green-500/10' 
+                  : '!text-red-500 !bg-red-500/10'
+              )}
             >
               {user.status === 'active' ? t('form.status_active') : t('form.status_inactive')}
             </Badge>
@@ -158,14 +163,14 @@ export function UserTable({
         <Table.Td>
           {(user.role === 'student' || last_sub) && (
             <Badge 
-              color={
-                last_sub?.payment_status === 'paid' ? 'green' : 
-                last_sub?.payment_status === 'partially_paid' ? 'orange' : 
-                last_sub?.payment_status === 'unpaid' ? 'red' :
-                'gray'
-              } 
               variant="light" 
               size="sm"
+              className={cn(
+                last_sub?.payment_status === 'paid' ? '!text-green-500 !bg-green-500/10' : 
+                last_sub?.payment_status === 'partially_paid' ? '!text-yellow-500 !bg-yellow-500/10' : 
+                last_sub?.payment_status === 'unpaid' ? '!text-red-500 !bg-red-500/10' :
+                '!text-zinc-500 !bg-zinc-500/10'
+              )}
             >
               {last_sub?.payment_status 
                 ? common_t(`payment_statuses.${last_sub.payment_status}`) 

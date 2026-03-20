@@ -3,6 +3,7 @@
 import { Menu, UnstyledButton, Group, Avatar, Text, Box, rem, Modal, Button, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IoPersonOutline, IoChevronUpOutline, IoChevronDownOutline, IoLogOutOutline } from 'react-icons/io5';
+import { FaPaintbrush } from 'react-icons/fa6';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslations } from 'next-intl';
@@ -97,6 +98,16 @@ export function UserDropdown({ collapsed, hide_email, className, style }: Props)
         >
           {t('profile')}
         </Menu.Item>
+
+        {user.role === 'super_admin' && (
+          <Menu.Item
+            component={Link}
+            href="/main/personalization"
+            leftSection={<FaPaintbrush style={{ width: rem(14), height: rem(14) }} />}
+          >
+            {t('personalization')}
+          </Menu.Item>
+        )}
         
         <Menu.Divider />
         

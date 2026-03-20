@@ -35,6 +35,22 @@ export const studentSubscriptionActions = {
   },
 
   /**
+   * Update a lesson recording URL
+   */
+  update_lesson_recording: async (lessonId: string, data: { recording_url: string }): Promise<any> => {
+    const response = await api.patch(`/finance/subscriptions/lesson/${lessonId}/recording`, data);
+    return response.data;
+  },
+
+  /**
+   * Delete a lesson recording
+   */
+  delete_lesson_recording: async (lessonId: string): Promise<any> => {
+    const response = await api.delete(`/finance/subscriptions/lesson/${lessonId}/recording`);
+    return response.data;
+  },
+
+  /**
    * Delete a student subscription
    */
   delete_student_subscription: async (id: string): Promise<void> => {

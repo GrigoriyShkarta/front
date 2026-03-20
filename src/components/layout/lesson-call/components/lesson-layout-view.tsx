@@ -1,0 +1,105 @@
+'use client';
+
+import { 
+  PaginatedGridLayout, 
+  ParticipantView, 
+  DefaultParticipantViewUI,
+} from '@stream-io/video-react-sdk';
+
+import { ResizableSpeakerLayout } from './resizable-speaker-layout';
+import { ResizableGridLayout } from './resizable-grid-layout';
+
+/** ParticipantViewUI without the three-dot menu button */
+const NoMenuParticipantViewUI = () => (
+  <DefaultParticipantViewUI showMenuButton={false} />
+);
+
+interface LessonLayoutViewProps {
+  layout: 'grid' | 'speaker-left' | 'speaker-right' | 'pip';
+  fullscreenEl: Element | null;
+  localParticipant: any;
+  participants: any[];
+}
+
+/**
+ * Renders the appropriate video layout based on settings and participants.
+ */
+export function LessonLayoutView({ 
+  layout, 
+  fullscreenEl, 
+  localParticipant, 
+  participants 
+}: LessonLayoutViewProps) {
+  
+  if (fullscreenEl && layout === 'grid' && localParticipant) {
+    const count = participants.length;
+    const cols = count <= 1 ? 1 : count === 2 ? 2 : 3;
+    const rows = Math.ceil(count / cols);
+
+    return (
+      <div
+        style={{
+          display: 'grid',
+          width: '100%',
+          height: '100%',
+          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+          gridTemplateRows: `repeat(${rows}, 1fr)`,
+          gap: 8,
+        }}
+      >
+        {participants.map((p) => (
+          <div
+            key={p.sessionId}
+            className="relative w-full h-full overflow-hidden rounded-xl border border-white/5"
+          >
+            <ParticipantView 
+              participant={p} 
+              className="w-full h-full"
+              ParticipantViewUI={NoMenuParticipantViewUI}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  switch (layout) {
+    case 'grid':
+      if (participants.length === 2 && localParticipant) {
+        return (
+          <ResizableGridLayout 
+            local_participant={localParticipant}
+            participants={participants}
+          />
+        );
+      }
+      return <PaginatedGridLayout ParticipantViewUI={NoMenuParticipantViewUI} />;
+    case 'pip':
+      const remote = participants.find(p => p.sessionId !== localParticipant?.sessionId) || participants[0];
+      return (
+        <div className="relative w-full h-full overflow-hidden rounded-xl">
+          <ParticipantView 
+            participant={remote} 
+            className="w-full h-full"
+            ParticipantViewUI={NoMenuParticipantViewUI}
+          />
+        </div>
+      );
+    case 'speaker-right':
+      return (
+        <ResizableSpeakerLayout
+          bar_position="left"
+          local_participant={localParticipant}
+          participants={participants}
+        />
+      );
+    default:
+      return (
+        <ResizableSpeakerLayout
+          bar_position="right"
+          local_participant={localParticipant}
+          participants={participants}
+        />
+      );
+  }
+}

@@ -121,7 +121,8 @@
     "deactivation_reminder": {
       "title": "Термін доступу закінчується",
       "description": "Ваш доступ до платформи буде обмежено {date}. Подовжіть навчання, щоб зберегти доступ до матеріалів."
-    }
+    },
+    "loading": "Завантаження..."
   },
   "Auth": {
     "login": {
@@ -182,6 +183,8 @@
     "confirm": "Підтвердити",
     "tracker": "Трекер",
     "calendar": "Календар",
+    "lesson_recordings": "Записи уроків",
+    "boards": "Дошки",
     "add": "Додати",
     "save": "Зберегти"
   },
@@ -221,7 +224,8 @@
         "scheduled": "Заплановано",
         "transfered": "Перенесено",
         "burned": "Згорів"
-      }
+      },
+      "join_lesson": "Приєднатися до уроку"
     },
     "upcoming": "Найближчі",
     "no_events": "Подій не знайдено",
@@ -250,8 +254,69 @@
         "scheduled": "Заплановано",
         "transfered": "Перенесено",
         "burned": "Згорів"
+      },
+      "join_lesson": "Приєднатися до уроку"
+    },
+    "lesson_room": {
+      "joining": "Приєднуємось до кімнати...",
+      "preparing": "Підготовка...",
+      "initializing": "Ініціалізація кімнати уроку...",
+      "error_join": "Не вдалося приєднатися до уроку. Перевірте з'єднання або права доступу.",
+      "error_title": "Помилка",
+      "you": "Ви",
+      "layout": "Розкладка",
+      "layout_grid": "Сітка",
+      "layout_speaker_left": "Доповідач зліва",
+      "layout_speaker_right": "Доповідач справа",
+      "layout_pip": "Учень (PIP)",
+      "participants": "Учасники",
+      "stats": "Статистика дзвінка",
+      "leave": "Вийти з дзвінка",
+      "expand": "Розгорнути",
+      "camera_off": "Камера вимкнена",
+      "loading": "Завантаження...",
+      "fullscreen": "Повноекранний режим",
+      "settings": "Налаштування уроку",
+      "recording_permanent": "Постійний запис",
+      "recording_permanent_desc": "Зберігати запис назавжди (якщо вимкнено — видаляється через 2 тижні)",
+      "student_download": "Дозволити скачування",
+      "student_download_desc": "Дозволити студенту завантажувати запис уроку",
+      "tab_lesson": "Урок",
+      "tab_tech": "Аудіо та Відео",
+      "noise_suppression": "Шумозаглушення",
+      "noise_suppression_desc": "Видаляє фонові шуми під час дзвінка",
+      "speaker_volume": "Гучність динаміка",
+      "camera": "Камера",
+      "microphone": "Мікрофон",
+      "speaker": "Динамік",
+      "settings_saved": "Налаштування оновлено",
+      "success_title": "Успішно",
+      "recording_started": "Запис уроку розпочато",
+      "recording_stopped": "Запис уроку завершено",
+      "recording_failed": "Не вдалося розпочати запис",
+      "recordings_ui": {
+        "title": "Записи уроків",
+        "no_recordings": "Записів уроків ще немає",
+        "period": "Період: {start} — {end}",
+        "download": "Завантажити",
+        "delete": "Видалити",
+        "edit": "Редагувати",
+        "youtube_video": "Відео на YouTube",
+        "delete_confirm": "Ви впевнені, що хочете видалити цей запис?",
+        "recording_deleted": "Запис успішно видалено",
+        "insert_link": "Вставити посилання",
+        "no_recording_yet": "Запису ще немає"
       }
     }
+  },
+  "Boards": {
+    "title": "Дошки",
+    "users_title": "Оберіть студента для дошки",
+    "users_subtitle": "Оберіть учня, щоб переглянути або оновити його дошку",
+    "open_board": "Відкрити дошку",
+    "board_title": "Дошка: {name}",
+    "save_success": "Дошку успішно збережено",
+    "save_error": "Не вдалось зберегти дошку"
   },
   "Tracker": {
     "title": "Трекер",
@@ -443,6 +508,7 @@
       "general": "Загальна інформація",
       "subscriptions": "Послуги",
       "lesson_history": "Історія уроків",
+      "recordings": "Записи уроків",
       "activity": "Активність"
     },
     "tabs_drawer": {
