@@ -1,6 +1,7 @@
 import { IconType } from 'react-icons';
 import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline } from 'react-icons/io5';
 import { FaPaintbrush } from 'react-icons/fa6';
+import { FaChalkboard } from "react-icons/fa";
 
 export interface NavItem {
   label: string; // Translation key
@@ -50,7 +51,7 @@ export const MAIN_NAVIGATION: NavItem[] = [
   {
     label: 'boards',
     href: '/main/boards',
-    icon: FaPaintbrush,
+    icon: FaChalkboard,
     roles: ['super_admin', 'admin', 'teacher', 'student'],
   },
   {

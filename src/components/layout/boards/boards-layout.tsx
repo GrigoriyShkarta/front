@@ -1,26 +1,25 @@
 'use client';
 
-import "@excalidraw/excalidraw/index.css";
-
 import { 
   Stack, 
   Title, 
   Group, 
-  Button, 
-  Breadcrumbs, 
-  Anchor, 
+  ActionIcon,
+  Tooltip,
   Box, 
   LoadingOverlay,
   useMantineColorScheme
 } from '@mantine/core';
-import { IoSaveOutline } from 'react-icons/io5';
+import { useDisclosure } from '@mantine/hooks';
+import { IoLibraryOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
-import { Link } from '@/i18n/routing';
 import { useAuth } from '@/hooks/use-auth';
 import { useBoardData } from './hooks/use-board-data';
+import { MaterialsPickerModal } from './components/materials-picker-modal';
 import dynamic from 'next/dynamic';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import "@excalidraw/excalidraw/index.css";
 
 // Excalidraw is client-side only
 const Excalidraw = dynamic(
@@ -30,75 +29,130 @@ const Excalidraw = dynamic(
 
 export function BoardsLayout() {
   const t = useTranslations('Boards');
-  const tNav = useTranslations('Navigation');
   const params = useParams();
   const { colorScheme } = useMantineColorScheme();
-
-  console.log(colorScheme);
   
-  const studentId = (params?.userId as string) || (params?.id as string);
+  const studentId = params?.userId as string;
+  const boardId = params?.boardId as string;
   const locale = (params?.locale as string) || 'uk';
   const { user: current_user } = useAuth();
-  const { loading, student_name, board_data, saving, saveBoard } = useBoardData(studentId);
+  
+  const { loading, current_board } = useBoardData(studentId, boardId);
 
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
+  const [pickerOpened, { open: openPicker, close: closePicker }] = useDisclosure(false);
 
-  const is_admin = current_user?.role === 'super_admin' || current_user?.role === 'admin' || current_user?.role === 'teacher';
-
-  // Map app locale to Excalidraw langCode
   const langCode = locale === 'uk' ? 'uk-UA' : 'en';
 
-  const breadcrumb_items = [
-    { title: tNav('dashboard'), href: '/main' },
-    { title: tNav('boards'), href: '/main/boards' },
-    ...(is_admin && student_name ? [{ title: student_name, href: '#' }] : []),
-  ].map((item, index) => (
-    <Anchor component={Link} href={item.href} key={index} size="sm">
-      {item.title}
-    </Anchor>
-  ));
-
-  console.log('check', colorScheme === 'dark');
-  
-
-  const handleSave = () => {
+  const handleSelectMaterial = async (type: string, material: any) => {
     if (!excalidrawAPI) return;
+
     const elements = excalidrawAPI.getSceneElements();
     const appState = excalidrawAPI.getAppState();
-    saveBoard(elements, appState);
+    
+    const zoom = appState.zoom.value;
+    // Correct formula: scrollX/scrollY in Excalidraw are negative offsets
+    // To get the scene coordinates of the viewport center:
+    const centerX = (-appState.scrollX + window.innerWidth / 2) / zoom;
+    const centerY = (-appState.scrollY + window.innerHeight / 2) / zoom;
+
+    if (type === 'photo') {
+      try {
+        const proxyUrl = `/api/proxy?url=${encodeURIComponent(material.file_url)}`;
+        const resp = await fetch(proxyUrl);
+        if (!resp.ok) throw new Error(`Proxy failed: ${resp.status}`);
+
+        const blob = await resp.blob();
+        const dataURL: string = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+
+        const fileId = material.id as string;
+
+        excalidrawAPI.updateScene({
+          elements: [
+            ...elements,
+            {
+              type: 'image',
+              fileId,
+              status: 'pending',
+              x: centerX - 150,
+              y: centerY - 150,
+              width: 300,
+              height: 300,
+              version: elements.length + 1,
+              versionNonce: Math.floor(Math.random() * 1e9),
+              isDeleted: false,
+              angle: 0,
+              opacity: 100,
+              seed: Math.floor(Math.random() * 1e9),
+            }
+          ],
+          files: {
+            [fileId]: {
+              id: fileId,
+              dataURL,
+              mimeType: blob.type || 'image/png',
+              created: Date.now(),
+            }
+          }
+        });
+      } catch (e) {
+        console.error('Image load via proxy failed:', e);
+        addTextLink(elements, material, centerX, centerY, '🖼️');
+      }
+    } else {
+      const icon = type === 'video' ? '🎬' : type === 'audio' ? '🎵' : '📄';
+      addTextLink(elements, material, centerX, centerY, icon);
+    }
   };
 
-  // Sync background and theme whenever colorScheme changes and API is ready
-  useEffect(() => {
-    if (excalidrawAPI && !loading) {
-      excalidrawAPI.updateScene({
-        appState: {
-          viewBackgroundColor: '#121212',
-          theme: 'dark',
+  const addTextLink = (elements: any[], material: any, x: number, y: number, icon: string) => {
+    excalidrawAPI.updateScene({
+      elements: [
+        ...elements,
+        {
+          type: 'text',
+          text: `${icon} ${material.name}`,
+          x: x - 80,
+          y: y - 15,
+          fontSize: 20,
+          link: material.file_url,
+          strokeColor: '#3b82f6',
+          version: elements.length + 1,
+          versionNonce: Math.floor(Math.random() * 1e9),
+          isDeleted: false,
+          angle: 0,
+          opacity: 100,
+          seed: Math.floor(Math.random() * 1e9),
         }
-      });
-    }
-  }, [excalidrawAPI, colorScheme, loading]);
+      ]
+    });
+  };
+
 
   return (
-    <Stack gap="lg" h="calc(100vh - 120px)" className="boards-container">
-      <Stack gap="xs">
-        <Group justify="space-between" align="center" wrap="nowrap">
-          <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
-          <Button 
-            leftSection={<IoSaveOutline size={20} />}
-            loading={saving}
-            onClick={handleSave}
-            radius="md"
-            color="primary"
-          >
-            {useTranslations('Common')('save')}
-          </Button>
-        </Group>
+    <Stack gap="lg" h="100%" className="boards-container">
+      <Group justify="space-between" align="center">
         <Title order={2} className="font-bold">
-          {student_name ? t('board_title', { name: student_name }) : t('title')}
+          {current_board?.title || t('title')}
         </Title>
-      </Stack>
+        
+        <Tooltip label={t('picker_title')}>
+          <ActionIcon 
+            onClick={openPicker} 
+            variant="light" 
+            size="lg" 
+            radius="md" 
+            color="blue"
+          >
+            <IoLibraryOutline size={22} />
+          </ActionIcon>
+        </Tooltip>
+      </Group>
 
       <Box className="flex-1 relative border border-white/10 rounded-xl overflow-hidden bg-[#121212]">
         <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
@@ -107,11 +161,11 @@ export function BoardsLayout() {
           <Excalidraw 
             excalidrawAPI={(api) => setExcalidrawAPI(api)}
             initialData={{
-              elements: board_data?.elements || [],
+              elements: current_board?.elements || [],
               appState: { 
-                ...board_data?.appState,
+                ...current_board?.appState,
+                collaborators: new Map(),
                 theme: colorScheme === 'dark' ? 'dark' : 'light',
-                viewBackgroundColor: colorScheme === 'dark' ? '#121212' : '#ffffff',
               },
               scrollToContent: true,
             }}
@@ -120,6 +174,13 @@ export function BoardsLayout() {
           />
         )}
       </Box>
+
+      <MaterialsPickerModal 
+        opened={pickerOpened}
+        onClose={closePicker}
+        onSelect={handleSelectMaterial}
+        initialType="photo"
+      />
     </Stack>
   );
 }
