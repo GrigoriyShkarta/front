@@ -65,8 +65,9 @@ export const testAttemptActions = {
   /**
    * Get test statistics (admin view)
    */
-  get_test_stats: async (test_id: string): Promise<TestStats> => {
-    const response = await api.get(`/tests/admin/test/${test_id}/stats`);
+  get_test_stats: async (test_id?: string): Promise<TestStats> => {
+    const url = test_id ? `/tests/admin/test/${test_id}/stats` : '/tests/admin/stats';
+    const response = await api.get(url);
     return response.data;
   },
 

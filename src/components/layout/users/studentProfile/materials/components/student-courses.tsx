@@ -48,41 +48,66 @@ export function StudentCourses({ student_id }: Props) {
     set_modal_opened(true);
   };
 
-  const handle_submit_access = async (lesson_ids: string[]) => {
+  const handle_submit_access = async (data: { lesson_ids: string[], test_ids: string[] }) => {
     if (!selected_course) return;
 
-    // Get initial lesson IDs that had access
-    const initial_ids: string[] = [];
+    // Get initial material IDs that had access
+    const initial_lesson_ids: string[] = [];
+    const initial_test_ids: string[] = [];
+
     selected_course.content.forEach(item => {
       if (item.type === 'lesson') {
-        if (item.has_access) initial_ids.push(item.lesson_id);
+        if (item.has_access) initial_lesson_ids.push(item.lesson_id);
+      } else if (item.type === 'test') {
+        if (item.has_access) initial_test_ids.push(item.test_id);
       } else if (item.type === 'group') {
-        item.lessons.forEach(lesson => {
-          if (lesson.has_access) initial_ids.push(lesson.lesson_id);
+        (item.content || []).forEach(c => {
+          if (c.type === 'lesson' && (c as any).has_access) initial_lesson_ids.push((c as any).lesson_id);
+          if (c.type === 'test' && (c as any).has_access) initial_test_ids.push((c as any).test_id);
         });
       }
     });
 
-    // Calculate diff
-    const ids_to_grant = lesson_ids.filter(id => !initial_ids.includes(id));
-    const ids_to_revoke = initial_ids.filter(id => !lesson_ids.includes(id));
+    // Calculate diffs
+    const lesson_ids_to_grant = data.lesson_ids.filter(id => !initial_lesson_ids.includes(id));
+    const lesson_ids_to_revoke = initial_lesson_ids.filter(id => !data.lesson_ids.includes(id));
+
+    const test_ids_to_grant = data.test_ids.filter(id => !initial_test_ids.includes(id));
+    const test_ids_to_revoke = initial_test_ids.filter(id => !data.test_ids.includes(id));
 
     const promises = [];
 
-    if (ids_to_grant.length > 0) {
+    // Lessons
+    if (lesson_ids_to_grant.length > 0) {
       promises.push(grant_access({
         student_ids: [student_id],
-        material_ids: ids_to_grant,
+        material_ids: lesson_ids_to_grant,
         material_type: 'lesson',
         full_access: true,
       }));
     }
-
-    if (ids_to_revoke.length > 0) {
+    if (lesson_ids_to_revoke.length > 0) {
       promises.push(revoke_access({
         student_ids: [student_id],
-        material_ids: ids_to_revoke,
+        material_ids: lesson_ids_to_revoke,
         material_type: 'lesson',
+      }));
+    }
+
+    // Tests
+    if (test_ids_to_grant.length > 0) {
+      promises.push(grant_access({
+        student_ids: [student_id],
+        material_ids: test_ids_to_grant,
+        material_type: 'test',
+        full_access: true,
+      }));
+    }
+    if (test_ids_to_revoke.length > 0) {
+      promises.push(revoke_access({
+        student_ids: [student_id],
+        material_ids: test_ids_to_revoke,
+        material_type: 'test',
       }));
     }
 

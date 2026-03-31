@@ -15,7 +15,8 @@ import {
     Box, 
     rem,
     Textarea,
-    Slider
+    Slider,
+    NumberInput
 } from '@mantine/core';
 import { 
     IoTrashOutline, 
@@ -46,6 +47,7 @@ interface Props {
   on_open_bank: (type: 'image' | 'video' | 'audio' | 'file') => void;
   read_only?: boolean;
   is_preview?: boolean;
+  error?: string;
 }
 
 /**
@@ -66,7 +68,8 @@ export function QuestionBlock({
     on_duplicate, 
     on_open_bank,
     read_only = false,
-    is_preview = false
+    is_preview = false,
+    error
 }: Props) {
   const t = useTranslations('Materials.tests.editor');
   const [selected_options, setSelectedOptions] = useState<string[]>([]);
@@ -123,6 +126,7 @@ export function QuestionBlock({
             is_preview ? "bg-white/[0.02] border-white/5" : "bg-white/5 border-white/10 hover:border-white/20"
         )}
         shadow={is_preview ? "sm" : "none"}
+        id={`question-card-${id}`}
     >
       <Stack gap="md">
         {!is_preview && (
@@ -149,16 +153,17 @@ export function QuestionBlock({
                 </Group>
                 
                 <Group gap="xs">
-                    <TextInput
+                    <NumberInput
                         size="xs"
-                        type="number"
                         value={data.points}
-                        onChange={(e) => on_change({ ...data, points: parseInt(e.currentTarget.value) || 0 })}
+                        onChange={(val) => on_change({ ...data, points: Number(val) || 0 })}
                         label={data.points === 1 ? t('point') : t('points')}
                         styles={{ root: { display: 'flex', alignItems: 'center', gap: '8px' }, label: { order: 2, marginBottom: 0 } }}
                         className="w-24"
                         variant="filled"
                         disabled={read_only}
+                        min={0}
+                        hideControls
                     />
                     {!read_only && (
                         <>
@@ -199,6 +204,12 @@ export function QuestionBlock({
                         } 
                     }}
                 />
+            )}
+
+            {error && (
+                <Text size="xs" c="red.5" fw={500} px="md" className="animate-in slide-in-from-top-1 duration-200">
+                    {error}
+                </Text>
             )}
             
             {!read_only && !is_preview && (

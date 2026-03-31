@@ -10,7 +10,6 @@ import {
     Badge, 
     Avatar,
     Menu,
-    rem
 } from '@mantine/core';
 import { 
     IoPencilOutline, 
@@ -28,10 +27,10 @@ import dayjs from 'dayjs';
 interface Props {
     data: CourseMaterial[];
     selected_ids: string[];
+    is_loading?: boolean;
     on_selection_change: (ids: string[]) => void;
     on_edit: (course: CourseMaterial) => void;
     on_delete: (id: string) => void;
-    is_loading?: boolean;
 }
 
 export function CourseTable({ data, selected_ids, on_selection_change, on_edit, on_delete, is_loading }: Props) {

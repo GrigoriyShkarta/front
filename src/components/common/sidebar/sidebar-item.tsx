@@ -8,6 +8,7 @@ import { NavItem } from '../navigation-config';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
+import { useAuth } from '@/hooks/use-auth';
 
 interface Props {
   item: NavItem;
@@ -21,12 +22,17 @@ interface Props {
  * Handles active state, collapsed mode and sub-items.
  */
 export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
+  const { user } = useAuth();
   const pathname = usePathname();
   const t = useTranslations('Navigation');
   const [opened, setOpened] = useState(false);
   
-  const has_items = !!item.items?.length;
-  const is_active = pathname === item.href || item.items?.some(sub => pathname === sub.href);
+  const filtered_items = (item.items || []).filter(sub => 
+    sub.roles.includes(user?.role || 'student')
+  );
+  
+  const has_items = filtered_items.length > 0;
+  const is_active = pathname === item.href || filtered_items.some(sub => pathname === sub.href);
 
   useEffect(() => {
     if (is_active && has_items && !collapsed) {
@@ -83,7 +89,7 @@ export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
   const sub_items_list = has_items && !collapsed && (
     <Collapse in={opened}>
       <Stack gap={4} mt={4} className="border-l border-white/10 ml-6 pl-4 overflow-hidden">
-        {item.items?.map((sub) => {
+        {filtered_items.map((sub) => {
           const sub_active = pathname === sub.href;
           return (
             <UnstyledButton

@@ -12,7 +12,6 @@ import {
   Progress,
   MultiSelect,
   Tooltip,
-  rem
 } from '@mantine/core';
 import { Dropzone, FileWithPath } from '@mantine/dropzone';
 import { IoCloudUploadOutline, IoMusicalNotesOutline, IoCloseOutline, IoTrashOutline, IoAddOutline } from 'react-icons/io5';
@@ -38,14 +37,14 @@ interface FileWithMetadata {
 
 interface Props {
   opened: boolean;
-  onClose: () => void;
   audio?: AudioMaterial | null; // If present, we are editing
   initial_files?: FileWithMetadata[];
+  is_loading: boolean;
+  onClose: () => void;
   on_submit: (
     files: FileWithMetadata[], 
     update_file: (id: string, update: Partial<FileWithMetadata>) => void
   ) => Promise<void>;
-  is_loading: boolean;
 }
 
 export function AudioDrawer({ opened, onClose, audio, initial_files, on_submit, is_loading }: Props) {

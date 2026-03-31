@@ -18,6 +18,7 @@ import { useCourses } from '../hooks/use-courses';
 import { useLessons } from '@/components/layout/materials/lessons/hooks/use-lessons';
 import { CreateCourseForm } from '../schemas/course-schema';
 import { LessonMaterial } from '@/components/layout/materials/lessons/schemas/lesson-schema';
+import { useTests } from '@/components/layout/materials/tests/hooks/use-tests';
 import { CourseHero } from './course-hero';
 import { CourseStats } from './course-stats';
 import { CourseCurriculum } from './course-curriculum';
@@ -36,10 +37,13 @@ export function CourseView({ id }: Props) {
     const t_common = useTranslations('Common');
     const router = useRouter();
     
-    const { course, is_loading } = useCourse(id);
-    const { lessons: all_lessons } = useLessons({ page: 1, limit: 1000, search: '' });
+    const { course, is_loading: course_loading } = useCourse(id);
+    const { lessons: all_lessons, is_loading: lessons_loading } = useLessons({ page: 1, limit: 1000, search: '' });
+    const { tests: all_tests, is_loading: tests_loading } = useTests({ page: 1, limit: 1000, search: '' });
     const { update_course, is_saving } = useCourses();
     const [editor_opened, set_editor_opened] = useState(false);
+
+    const is_loading = course_loading || (lessons_loading && !all_lessons.length) || (tests_loading && !all_tests.length);
 
     if (is_loading) {
         return <Box mih={400} className="relative"><LoadingOverlay visible /></Box>;
@@ -73,12 +77,12 @@ export function CourseView({ id }: Props) {
             const lesson = all_lessons.find((l: LessonMaterial) => l.id === item.lesson_id);
             return acc + (item.duration || lesson?.duration || 0);
         } else if (item.type === 'group') {
-            const group_duration = (item.lessons || []).reduce((g_acc: number, l: any) => {
-                const lesson = all_lessons.find((all_l: LessonMaterial) => all_l.id === l.lesson_id);
-                return g_acc + (l.duration || lesson?.duration || 0);
-            }, 0) || (item.lesson_ids || []).reduce((g_acc: number, lid: string) => {
-                const lesson = all_lessons.find((l: LessonMaterial) => l.id === lid);
-                return g_acc + (lesson?.duration || 0);
+            const group_duration = (item.content || []).reduce((g_acc: number, c: any) => {
+                if (c.type === 'lesson') {
+                    const lesson = all_lessons.find((all_l: LessonMaterial) => all_l.id === c.lesson_id);
+                    return g_acc + (c.duration || lesson?.duration || 0);
+                }
+                return g_acc;
             }, 0);
             return acc + group_duration;
         }
@@ -87,7 +91,17 @@ export function CourseView({ id }: Props) {
 
     const lessons_count = filtered_content.reduce((acc: number, item: any) => {
         if (item.type === 'lesson') return acc + 1;
-        if (item.type === 'group') return acc + (item.lessons?.length || item.lesson_ids?.length || 0);
+        if (item.type === 'group') {
+            return acc + (item.content || []).filter((c: any) => c.type === 'lesson').length;
+        }
+        return acc;
+    }, 0);
+
+    const tests_count = filtered_content.reduce((acc: number, item: any) => {
+        if (item.type === 'test') return acc + 1;
+        if (item.type === 'group') {
+            return acc + (item.content || []).filter((c: any) => c.type === 'test').length;
+        }
         return acc;
     }, 0);
 
@@ -111,6 +125,7 @@ export function CourseView({ id }: Props) {
                         <CourseCurriculum 
                             content={filtered_content}
                             all_lessons={all_lessons}
+                            all_tests={all_tests}
                             course_id={id}
                         />
                     </Grid.Col>
@@ -119,6 +134,7 @@ export function CourseView({ id }: Props) {
                         <Stack gap="xl" className="sticky top-24">
                             <CourseStats 
                                 lessons_count={lessons_count}
+                                tests_count={tests_count}
                                 total_duration={total_duration}
                             />
                         </Stack>
@@ -128,11 +144,12 @@ export function CourseView({ id }: Props) {
 
             <CourseEditorDrawer 
                 opened={editor_opened}
-                onClose={() => set_editor_opened(false)}
+                on_close={() => set_editor_opened(false)}
                 course={course}
-                onSave={handle_save}
+                on_save={handle_save}
                 is_saving={is_saving}
             />
         </div>
     );
 }
+

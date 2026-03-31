@@ -936,7 +936,10 @@
     "tests": {
       "title": "Tests",
       "subtitle": "A specialized testing system designed to track and evaluate your progress.",
-      "add_test": "Create Test",
+      "single_title": "Test",
+      "passed": "Passed",
+      "add_test": "Add Test",
+      "create_test": "Create Test",
       "edit_test": "Edit Test",
       "delete_test": "Delete Test",
       "empty_title": "No tests found",
@@ -960,7 +963,9 @@
         "settings": {
           "title": "Test Settings",
           "passing_score": "Passing Score (%)",
-          "time_limit": "Time Limit"
+          "time_limit": "Time Limit",
+          "courses": "Add to Courses",
+          "select_courses": "Select courses to add"
         },
         "question_placeholder": "Enter question text...",
         "option_placeholder": "Option text...",
@@ -989,6 +994,13 @@
         "time_out_modal": {
           "title": "Time's Up!",
           "message": "The time allocated for the test has expired. Your answers have been automatically saved."
+        },
+        "errors": {
+          "empty_title": "Test title cannot be empty",
+          "empty_question": "Question text cannot be empty",
+          "single_choice": "Select exactly one correct answer",
+          "multiple_choice": "Select at least two correct answers",
+          "fill_blank": "Provide the correct word or phrase"
         }
       },
       "take": {
@@ -999,36 +1011,40 @@
         "point": "point",
         "points": "points",
         "next": "Next",
-        "prev": "Previous",
-        "submit": "Submit Test",
+        "prev": "Back",
+        "submit": "Finish Test",
         "not_found": "Test not found",
-        "back_to_tests": "Back to Tests",
-        "question_nav": "Questions Navigation",
+        "back_to_tests": "Back to Materials",
+        "question_nav": "Question Navigation",
         "status_answered": "Answered",
         "status_skipped": "Skipped",
         "status_unanswered": "Unanswered",
         "question_number": "Question {current} of {total}",
         "fill_placeholder": "Enter your answer here...",
-        "detailed_placeholder": "Write your detailed response here...",
-        "error": "Submission Error",
-        "submit_error": "Failed to submit test. Please check your connection.",
+        "detailed_placeholder": "Write your detailed answer here...",
+        "error": "Error submitting",
+        "submit_error": "Failed to submit test. Please check your internet connection.",
         "start_modal": {
-          "title": "Test Preparation",
-          "questions": "Questions",
+          "title": "Prepare for Test",
+          "questions": "Questions Count",
           "time_limit": "Time Limit",
-          "max_score": "Maximum Score",
-          "minutes": "minutes",
+          "max_score": "Max Score",
+          "minutes": "min",
           "points": "points",
-          "begin": "Begin Test",
+          "begin": "Start Test",
           "cancel": "Cancel",
-          "time_warning": "Warning: The timer will start immediately after you click Begin."
+          "time_warning": "Warning: The timer will start immediately after clicking 'Start Test'."
         },
         "confirm_submit": {
           "title": "Finish Test?",
-          "message": "You still have {count} unanswered questions. Are you sure you want to submit?",
-          "confirm": "Yes, submit",
-          "cancel": "No, keep working"
+          "message": "You have {count} unanswered questions. Are you sure you want to finish the test?",
+          "confirm": "Yes, finish",
+          "cancel": "No, continue"
         }
+      },
+      "reviews": {
+        "title": "Test Checking",
+        "description": "Student attempts that require your attention or manual review."
       },
       "results": {
         "title": "Test Results",
@@ -1059,6 +1075,7 @@
         },
         "table": {
           "student": "Student",
+          "test_name": "Test Name",
           "date": "Date",
           "score": "Score",
           "time": "Time",
@@ -1103,7 +1120,7 @@
       "no_extra_filters": "Additional filters can be added here.",
       "subtitle": "Structured learning programs designed for systematic knowledge mastery.",
       "placeholder_description": "Unlock your potential with this comprehensive course covering all essential aspects of the subject.",
-      "add_course": "Create Course",
+      "create_course": "Create Course",
       "edit_course": "Edit Course",
       "delete_course": "Delete Course",
       "bulk_delete": "Delete Selected ({count})",
@@ -1120,11 +1137,14 @@
       "form": {
         "name": "Course Name",
         "description": "Description",
+        "content": "Course Content",
         "image": "Course Image",
         "upload_image": "Upload Image",
         "library_upload_hint": "Library / Upload",
         "add_lesson": "Add Lesson",
+        "add_test": "Add Test",
         "add_group": "Add Group",
+        "test": "Test",
         "group_title": "Group Title",
         "no_groups": "No groups or lessons added yet",
         "placeholder_name": "Enter course name",
@@ -1164,7 +1184,8 @@
       "select_students": "Select students",
       "search_students": "Search by name...",
       "grant_button": "Grant Access",
-      "manage_access": "Manage lessons access",
+      "manage_access": "Manage materials access",
+      "all_materials": "All materials",
       "all_lessons": "All lessons",
       "full": "Full",
       "partial": "Partial",
@@ -1172,7 +1193,7 @@
       "partial_config": "Manage partial access",
       "unsaved_changes": {
         "title": "Unsaved changes",
-        "message": "You have unsaved changes. Would you like to save them before leaving?",
+        "message": "You have unsaved changes in material access. Would you like to save them before leaving?",
         "save_and_go": "Save and leave",
         "go_without_saving": "Don't save",
         "back": "Back"

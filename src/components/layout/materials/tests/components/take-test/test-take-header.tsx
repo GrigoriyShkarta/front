@@ -12,7 +12,7 @@ interface Props {
   answered_count: number;
   total_questions: number;
   on_submit: () => void;
-  is_submitting: boolean;
+  is_submitting?: boolean;
 }
 
 /**
@@ -104,6 +104,7 @@ export function TestTakeHeader({
               </Group>
             </Paper>
           )}
+
 
           {/* Submit */}
           <Button

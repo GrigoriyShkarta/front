@@ -51,7 +51,7 @@ export function TestQuestionNav({ questions, current_index, on_go_to, get_status
       </div>
 
       {/* Legend */}
-      <Stack gap={4} mt="sm">
+      {/* <Stack gap={4} mt="sm">
         <Group gap={6}>
           <Box className="w-3 h-3 rounded-sm bg-emerald-500/20 border border-emerald-500/30" />
           <Text size="xs" c="dimmed">{t('status_answered')}</Text>
@@ -64,7 +64,7 @@ export function TestQuestionNav({ questions, current_index, on_go_to, get_status
           <Box className="w-3 h-3 rounded-sm bg-white/5 border border-white/10" />
           <Text size="xs" c="dimmed">{t('status_unanswered')}</Text>
         </Group>
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 }

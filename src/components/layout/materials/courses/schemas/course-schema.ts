@@ -31,12 +31,25 @@ export const course_content_item_schema = z.discriminatedUnion('type', [
     type: z.literal('group'),
     id: z.string(), // UUID for the group
     title: z.string().min(1, 'errors.required'),
-    lesson_ids: z.array(z.string()),
+    content: z.array(z.discriminatedUnion('type', [
+      z.object({
+        type: z.literal('lesson'),
+        id: z.string(), // UUID for the item
+        lesson_id: z.string(),
+      }),
+      z.object({
+        type: z.literal('test'),
+        id: z.string(), // UUID for the item
+        test_id: z.string(),
+        is_passed: z.boolean().optional(),
+      })
+    ])).default([]),
   }),
   z.object({
     type: z.literal('test'),
     id: z.string(), // UUID for the item itself
     test_id: z.string(),
+    is_passed: z.boolean().optional(),
   })
 ]);
 

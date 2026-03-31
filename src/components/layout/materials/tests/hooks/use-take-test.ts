@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { notifications } from '@mantine/notifications';
 import { useTranslations } from 'next-intl';
 
@@ -32,6 +32,7 @@ interface UseTakeTestProps {
  */
 export function useTakeTest({ test_id, questions, time_limit }: UseTakeTestProps) {
   const t = useTranslations('Materials.tests.take');
+  const queryClient = useQueryClient();
 
   const [is_started, set_is_started] = useState(false);
   const [is_finished, set_is_finished] = useState(false);
@@ -142,6 +143,7 @@ export function useTakeTest({ test_id, questions, time_limit }: UseTakeTestProps
     onSuccess: (data) => {
       set_is_finished(true);
       set_result(data);
+      queryClient.invalidateQueries({ queryKey: ['tests'] });
       if (timer_ref.current) clearInterval(timer_ref.current);
     },
     onError: () => {

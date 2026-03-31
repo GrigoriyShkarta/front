@@ -26,7 +26,7 @@ import {
     IoEyeOutline,
     IoEyeOffOutline
 } from 'react-icons/io5';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
@@ -37,6 +37,7 @@ import { useCategories } from '@/components/layout/categories/hooks/use-categori
 import { CategoryDrawer as CreateCategoryDrawer } from '@/components/layout/categories/components/category-drawer';
 import { CreateCategoryForm } from '@/components/layout/categories/schemas/category-schema';
 import { MediaPickerModal } from '@/components/layout/materials/lessons/components/media-picker-modal';
+import { useCourses } from '@/components/layout/materials/courses/hooks/use-courses';
 
 interface Props {
     id?: string;
@@ -73,6 +74,11 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
 
   // Questions
   const [questions, setQuestions] = useState<TestQuestion[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Courses
+  const [courseIds, setCourseIds] = useState<string[]>([]);
+  const { courses: all_courses } = useCourses({ limit: 100 });
   
   // Bank modal state
   const [bankOpened, setBankOpened] = useState(false);
@@ -86,6 +92,7 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
         setCategoryIds(test.categories?.map(c => c.id) || []);
         setPassingScore(test.settings.passing_score);
         setTimeLimit(test.settings.time_limit || null);
+        setCourseIds(test.course_ids || []);
         
         if (test.content) {
             try {
@@ -137,6 +144,60 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
 
   const isDirty = title.trim() !== '' || questions.some(q => q.question.trim() !== '');
 
+  const validate = () => {
+    const new_errors: Record<string, string> = {};
+    let first_invalid_id: string | null = null;
+    
+    if (!title.trim()) {
+        new_errors['title'] = 'editor.errors.empty_title';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setErrors(new_errors);
+        return false;
+    }
+
+    questions.forEach(q => {
+        let error_key = '';
+        if (!q.question.trim()) {
+            error_key = 'editor.errors.empty_question';
+        } else if (q.type === QUESTION_TYPES.SINGLE_CHOICE) {
+            const count = q.options?.filter(o => o.is_correct).length || 0;
+            if (count !== 1) error_key = 'editor.errors.single_choice';
+        } else if (q.type === QUESTION_TYPES.MULTIPLE_CHOICE) {
+            const count = q.options?.filter(o => o.is_correct).length || 0;
+            if (count < 2) error_key = 'editor.errors.multiple_choice';
+        } else if (q.type === QUESTION_TYPES.FILL_IN_BLANK) {
+            if (!q.correct_answer_text?.trim()) error_key = 'editor.errors.fill_blank';
+        }
+        
+        if (error_key) {
+            new_errors[q.id] = error_key;
+            if (!first_invalid_id) first_invalid_id = q.id;
+        }
+    });
+    
+    setErrors(new_errors);
+    
+    if (first_invalid_id) {
+        document.getElementById(`question-card-${first_invalid_id}`)?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        return false;
+    }
+    
+    return true;
+  };
+
+  const clearError = (id: string) => {
+    if (errors[id]) {
+        setErrors(prev => {
+            const next = { ...prev };
+            delete next[id];
+            return next;
+        });
+    }
+  };
+
   const handleBack = () => {
     if (isDirty && !id && !readOnly) {
         setDiscardModalOpened(true);
@@ -146,6 +207,8 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
   };
 
   const handleSave = async () => {
+    if (!validate()) return;
+
     const payload = {
         name: title,
         description,
@@ -154,7 +217,8 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
             passing_score: passingScore,
             time_limit: timeLimit
         },
-        content: JSON.stringify(questions)
+        content: JSON.stringify(questions),
+        course_ids: courseIds
     };
 
     try {
@@ -182,6 +246,7 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
 
   const updateQuestion = (q_id: string, data: TestQuestion) => {
     setQuestions(prev => prev.map(q => q.id === q_id ? data : q));
+    clearError(q_id);
   };
 
   const removeQuestion = (q_id: string) => {
@@ -300,11 +365,10 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
                     {common_t('additional')}
                 </Button>
                 <Button 
-                    variant={!title.trim() ? "light" : "filled"}
-                    color={!title.trim() ? "gray" : "primary"}
+                    variant="filled"
+                    color="primary"
                     onClick={handleSave}
                     loading={is_saving}
-                    disabled={!title.trim()}
                     radius="md"
                 >
                     {t('editor.save')}
@@ -322,7 +386,11 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
                 variant="unstyled"
                 size="42px"
                 value={title}
-                onChange={(e) => setTitle(e.currentTarget.value)}
+                onChange={(e) => {
+                    setTitle(e.currentTarget.value);
+                    clearError('title');
+                }}
+                error={errors['title'] ? t(errors['title']) : null}
                 styles={{
                     input: {
                         fontSize: '3rem',
@@ -330,6 +398,12 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
                         height: 'auto',
                         padding: 0,
                         textAlign: 'center',
+                    },
+                    error: {
+                        fontSize: rem(14),
+                        fontWeight: 500,
+                        textAlign: 'center',
+                        marginTop: rem(8),
                     }
                 }}
             />
@@ -349,6 +423,7 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
             on_open_bank={(type) => { setActiveQuestionId(q.id); setBankType(type); setBankOpened(true); }}
             read_only={readOnly || isPreview}
             is_preview={isPreview}
+            error={errors[q.id] ? t(errors[q.id]) : undefined}
           />
         ))}
       </Stack>
@@ -430,13 +505,23 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
                 </Button>
             </Group>
 
+            <MultiSelect
+                label={t('editor.settings.courses') || 'Курси'}
+                placeholder={t('editor.settings.select_courses') || 'Оберіть курси'}
+                data={all_courses.map(c => ({ value: c.id, label: c.name }))}
+                value={courseIds}
+                onChange={setCourseIds}
+                searchable
+                clearable
+                variant="filled"
+            />
+
             <Button 
                 fullWidth 
-                variant={!title.trim() ? "light" : "filled"}
-                color={!title.trim() ? "gray" : "primary"}
+                variant="filled"
+                color="primary"
                 onClick={handleSave} 
                 loading={is_saving}
-                disabled={!title.trim()}
                 size="md"
                 radius="md"
             >

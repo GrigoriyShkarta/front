@@ -11,6 +11,8 @@ import {
   RingProgress,
   ThemeIcon,
   Collapse,
+  Loader,
+  Center,
 } from '@mantine/core';
 import {
   IoCheckmarkCircleOutline,
@@ -20,11 +22,13 @@ import {
   IoChevronUpOutline,
   IoHourglassOutline,
 } from 'react-icons/io5';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { useQuery } from '@tanstack/react-query';
+import { testAttemptActions } from '../../actions/test-attempt-actions';
 
 import { cn } from '@/lib/utils';
-import { TestAttempt, ATTEMPT_STATUSES } from '../../schemas/test-attempt-schema';
+import { TestAttempt, ATTEMPT_STATUSES, TestAnswer } from '../../schemas/test-attempt-schema';
 import { TestQuestion, QUESTION_TYPES } from '../../schemas/test-schema';
 
 interface Props {
@@ -49,8 +53,36 @@ export function TestResultScreen({ attempt, questions, on_back }: Props) {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+    
+  // Fetch the full attempt to ensure we have the correct answers (sometimes completion response is light)
+  const { data: full_attempt, isLoading: is_loading_full } = useQuery({
+    queryKey: ['test-attempt-details', attempt.id],
+    queryFn: () => testAttemptActions.get_attempt(attempt.id),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  const display_attempt = full_attempt || attempt;
+
+  // Use questions from the attempt if available (enriched with correct answers by backend)
+  const enriched_questions: TestQuestion[] = useMemo(() => {
+    const content = display_attempt.test?.content || questions;
+    if (content) {
+      try {
+        return typeof content === 'string' ? JSON.parse(content) : content;
+      } catch (e) {
+        console.error('Failed to parse test content', e);
+      }
+    }
+    return questions;
+  }, [display_attempt.test?.content, questions]);
 
   const ring_color = has_pending ? 'orange' : is_passed ? 'teal' : 'red';
+
+  // Safety fallbacks for score calculation
+  const max_score = attempt.max_score ?? (attempt as any).total_points ?? questions.reduce((sum, q) => sum + (q.points || 0), 0);
+  const score = attempt.score ?? 0;
+  const raw_percentage = attempt.percentage ?? (max_score > 0 ? (score / max_score) * 100 : 0);
+  const display_percentage = Math.round(raw_percentage);
 
   return (
     <Stack gap="xl" maw={700} mx="auto" py="xl" className="animate-in fade-in zoom-in-95 duration-500">
@@ -60,11 +92,11 @@ export function TestResultScreen({ attempt, questions, on_back }: Props) {
           size={160}
           thickness={12}
           roundCaps
-          sections={[{ value: attempt.percentage, color: ring_color }]}
+          sections={[{ value: raw_percentage, color: ring_color }]}
           label={
             <Stack align="center" gap={0}>
               <Text size="2rem" fw={800} className="tabular-nums">
-                {Math.round(attempt.percentage)}%
+                {display_percentage}%
               </Text>
             </Stack>
           }
@@ -82,7 +114,7 @@ export function TestResultScreen({ attempt, questions, on_back }: Props) {
         <StatCard
           icon={<IoCheckmarkCircleOutline size={20} />}
           label={t('score')}
-          value={`${attempt.score}/${attempt.max_score}`}
+          value={`${score}/${max_score}`}
           color="primary"
         />
         <StatCard
@@ -121,14 +153,23 @@ export function TestResultScreen({ attempt, questions, on_back }: Props) {
       </Button>
 
       <Collapse in={show_details}>
-        <AnswerBreakdown attempt={attempt} questions={questions} />
+        {is_loading_full && !full_attempt ? (
+            <Center py="xl">
+                <Stack align="center" gap="xs">
+                    <Loader size="sm" />
+                    <Text size="xs" c="dimmed">Завантаження деталей...</Text>
+                </Stack>
+            </Center>
+        ) : (
+            <AnswerBreakdown attempt={display_attempt} questions={enriched_questions} />
+        )}
       </Collapse>
 
-      <Group justify="center">
+      {/* <Group justify="center">
         <Button variant="light" color="gray" onClick={on_back} radius="md" size="md">
           {t('back_to_tests')}
         </Button>
-      </Group>
+      </Group> */}
     </Stack>
   );
 }
@@ -226,12 +267,25 @@ function AnswerBreakdown({
               </Box>
             </Group>
 
-            {/* Show correct answer for wrong answers (not for detailed) */}
-            {is_wrong && q.type !== QUESTION_TYPES.DETAILED_ANSWER && (
-              <Text size="xs" mt="xs" c="dimmed">
-                {t('correct_answer')}: {get_correct_answer_text(q)}
+            {/* Show student result */}
+            <Stack gap={4} mt="sm">
+              <Text size="xs">
+                <Text span fw={600} mr={4}>{t('your_answer')}:</Text>
+                <Text span c={is_correct ? 'emerald.4' : 'red.4'}>
+                  {get_student_answer_text(q, answer) || '—'}
+                </Text>
               </Text>
-            )}
+
+              {/* Show correct answer for wrong answers (not for detailed) */}
+              {(is_wrong || is_correct) && q.type !== QUESTION_TYPES.DETAILED_ANSWER && (
+                <Text size="xs">
+                  <Text span fw={600} mr={4}>{t('correct_answer')}:</Text>
+                  <Text span c="emerald.4">
+                    {get_correct_answer_text(q) || '—'}
+                  </Text>
+                </Text>
+              )}
+            </Stack>
 
             {is_pending && (
               <Text size="xs" mt="xs" c="orange.4" fs="italic">
@@ -252,6 +306,23 @@ function AnswerBreakdown({
 }
 
 /**
+ * Helper to extract student's answer text from an answer
+ */
+function get_student_answer_text(q: TestQuestion, answer?: TestAnswer): string {
+  if (!answer) return '';
+  if (q.type === QUESTION_TYPES.FILL_IN_BLANK || q.type === QUESTION_TYPES.DETAILED_ANSWER) {
+    return answer.text_answer || '';
+  }
+  if (q.options && answer.selected_option_ids) {
+    return q.options
+      .filter(o => answer.selected_option_ids?.includes(o.id))
+      .map(o => o.text)
+      .join(', ');
+  }
+  return '';
+}
+
+/**
  * Helper to extract correct answer text from a question
  */
 function get_correct_answer_text(question: TestQuestion): string {
@@ -259,10 +330,15 @@ function get_correct_answer_text(question: TestQuestion): string {
     return question.correct_answer_text || '';
   }
   if (question.options) {
-    return question.options
-      .filter(o => o.is_correct)
-      .map(o => o.text)
-      .join(', ');
+    const correct = question.options.filter((o: any) => 
+        o.is_correct === true || 
+        o.is_correct === 'true' || 
+        o.isCorrect === true || 
+        o.correct === true
+    );
+    if (correct.length > 0) {
+      return correct.map(o => o.text).join(', ');
+    }
   }
   return '';
 }

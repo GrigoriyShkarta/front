@@ -127,6 +127,7 @@ export function TestResultsLayout({ test_id }: Props) {
           <TestResultsTable
             attempts={attempts}
             on_view={handle_view_attempt}
+            show_test_name={!test_id}
           />
 
           {/* Empty state */}

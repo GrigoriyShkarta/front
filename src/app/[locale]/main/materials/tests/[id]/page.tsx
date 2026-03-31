@@ -7,14 +7,17 @@ export const metadata = {
 
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function TestDetailPage({ params }: Props) {
+export default async function TestDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const sParams = await searchParams;
+  const course_id = typeof sParams.courseId === 'string' ? sParams.courseId : undefined;
 
   return (
     <PageContainer>
-      <TestDetailLayout test_id={id} />
+      <TestDetailLayout test_id={id} course_id={course_id} />
     </PageContainer>
   );
 }

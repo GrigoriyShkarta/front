@@ -13,6 +13,7 @@ import {
   Box,
   Textarea,
   NumberInput,
+  Select,
   Button,
   RingProgress,
   Divider,
@@ -233,14 +234,17 @@ function AnswerReviewCard({
             <Text size="xs" fw={600} c="orange.4">
               {t('review_drawer.review_section')}
             </Text>
-            <NumberInput
+            <Select
               label={t('review_drawer.points_label')}
-              value={review_points}
+              value={review_points.toString()}
               onChange={(val) => set_review_points(Number(val))}
-              min={0}
-              max={question.points}
+              data={Array.from({ length: question.points + 1 }, (_, i) => ({
+                value: i.toString(),
+                label: i.toString(),
+              }))}
               size="sm"
               variant="filled"
+              allowDeselect={false}
             />
             <Textarea
               label={t('review_drawer.comment_label')}
@@ -259,7 +263,7 @@ function AnswerReviewCard({
               onClick={() =>
                 on_review({
                   attempt_id,
-                  answer_id: answer?.id || '',
+                  answer_id: answer?.id || question.id,
                   data: {
                     points_awarded: review_points,
                     teacher_comment: review_comment || undefined,

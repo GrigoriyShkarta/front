@@ -26,15 +26,13 @@ export function useTestResults({ test_id, page = 1, limit = 15, status }: UseTes
   // Fetch attempts list
   const { data: attempts_data, isLoading: is_loading_attempts } = useQuery({
     queryKey: ['test-attempts', test_id, page, limit, status],
-    queryFn: () => testAttemptActions.get_attempts({ test_id, page, limit, status }),
-    enabled: !!test_id,
+    queryFn: () => testAttemptActions.get_attempts({ test_id: test_id || undefined, page, limit, status }),
   });
 
   // Fetch test stats
   const { data: stats, isLoading: is_loading_stats } = useQuery({
     queryKey: ['test-stats', test_id],
-    queryFn: () => testAttemptActions.get_test_stats(test_id),
-    enabled: !!test_id,
+    queryFn: () => testAttemptActions.get_test_stats(test_id || undefined),
   });
 
   // Fetch individual attempt

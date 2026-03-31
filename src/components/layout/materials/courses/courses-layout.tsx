@@ -25,8 +25,6 @@ import { CourseEditorDrawer } from "./components/course-editor-drawer";
 import { CourseDeleteModal } from "./components/course-delete-modal";
 import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
 import { CourseMaterial, CreateCourseForm } from './schemas/course-schema';
-import { cn } from "@/lib/utils";
-
 import { useAuth } from "@/hooks/use-auth";
 
 export default function CoursesLayout() {
@@ -168,7 +166,7 @@ export default function CoursesLayout() {
                                 onClick={handle_create}
                                 className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
                             >
-                                {t('add_course')}
+                                {t('create_course')}
                             </Button>
                         )}
                     </Group>
@@ -265,9 +263,9 @@ export default function CoursesLayout() {
 
                 <CourseEditorDrawer 
                     opened={editor_opened}
-                    onClose={() => setEditorOpened(false)}
+                    on_close={() => setEditorOpened(false)}
                     course={editing_course}
-                    onSave={handle_save}
+                    on_save={handle_save}
                     is_saving={is_saving}
                 />
 

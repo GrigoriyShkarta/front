@@ -7,25 +7,15 @@ import { category_schema } from '@/components/layout/categories/schemas/category
 export const access_type_schema = z.enum(['none', 'full', 'partial']);
 
 /**
- * Lesson item in course content with access info
+ * Test item in course content with access info
  */
-export const course_lesson_access_schema = z.object({
-  lesson_id: z.string(),
+export const course_test_access_schema = z.object({
+  id: z.string(),
+  type: z.literal('test'),
+  test_id: z.string(),
   has_access: z.boolean(),
-  access_type: access_type_schema,
   name: z.string().optional(),
   title: z.string().optional(),
-});
-
-/**
- * Group item in course content with access info
- */
-export const course_group_access_schema = z.object({
-  id: z.string(),
-  type: z.literal('group'),
-  title: z.string(),
-  lesson_ids: z.array(z.string()),
-  lessons: z.array(course_lesson_access_schema),
 });
 
 /**
@@ -42,11 +32,28 @@ export const course_single_lesson_access_schema = z.object({
 });
 
 /**
+ * Group item in course content with access info
+ */
+export const course_group_access_schema = z.object({
+  id: z.string(),
+  type: z.literal('group'),
+  title: z.string(),
+  content: z.array(z.union([
+    course_single_lesson_access_schema,
+    course_test_access_schema
+  ])).default([]),
+  // Deprecated fields, keeping for safety
+  lesson_ids: z.array(z.string()).optional().default([]),
+  lessons: z.array(course_single_lesson_access_schema).optional().default([]),
+});
+
+/**
  * Union for course content with access
  */
 export const course_content_access_schema = z.discriminatedUnion('type', [
   course_single_lesson_access_schema,
   course_group_access_schema,
+  course_test_access_schema
 ]);
 
 /**
@@ -98,7 +105,7 @@ export type StudentCoursesResponse = z.infer<typeof student_courses_response_sch
 export const grant_access_schema = z.object({
   student_ids: z.array(z.string()),
   material_ids: z.array(z.string()),
-  material_type: z.enum(['lesson', 'course', 'audio', 'photo', 'video', 'file']),
+  material_type: z.enum(['lesson', 'course', 'audio', 'photo', 'video', 'file', 'test']),
   full_access: z.boolean(),
   accessible_blocks: z.array(z.string()).optional(), // if we need block-level access later
 });
@@ -111,7 +118,7 @@ export type GrantAccessForm = z.infer<typeof grant_access_schema>;
 export const revoke_access_schema = z.object({
   student_ids: z.array(z.string()),
   material_ids: z.array(z.string()),
-  material_type: z.enum(['lesson', 'course', 'audio', 'photo', 'video', 'file']),
+  material_type: z.enum(['lesson', 'course', 'audio', 'photo', 'video', 'file', 'test']),
 });
 
 export type RevokeAccessForm = z.infer<typeof revoke_access_schema>;

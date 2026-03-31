@@ -25,8 +25,9 @@ export function TestResultsStats({ stats }: Props) {
   const t = useTranslations('Materials.tests.results');
 
   const format_time = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const total_seconds = Math.round(seconds);
+    const mins = Math.floor(total_seconds / 60);
+    const secs = total_seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 

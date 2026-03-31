@@ -11,14 +11,15 @@ import { TestAttempt, ATTEMPT_STATUSES } from '../../schemas/test-attempt-schema
 interface Props {
   attempts: Omit<TestAttempt, 'answers'>[];
   on_view: (attempt_id: string) => void;
+  show_test_name?: boolean;
 }
 
 /**
- * Table showing test attempt results for admin.
- * Columns: student, date, score, time, status, actions.
+ * Columns: student, test_name (optional), date, score, time, status, actions.
  */
-export function TestResultsTable({ attempts, on_view }: Props) {
-  const t = useTranslations('Materials.tests.results');
+export function TestResultsTable({ attempts, on_view, show_test_name }: Props) {
+  const t = useTranslations('Materials.tests.results.table');
+  const common_t = useTranslations('Materials.tests.results');
 
   const format_time = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -76,12 +77,13 @@ export function TestResultsTable({ attempts, on_view }: Props) {
       <Table verticalSpacing="sm" highlightOnHover>
         <Table.Thead className="bg-white/5 border-b border-white/10">
           <Table.Tr>
-            <Table.Th>{t('table.student')}</Table.Th>
-            <Table.Th>{t('table.date')}</Table.Th>
-            <Table.Th>{t('table.score')}</Table.Th>
-            <Table.Th>{t('table.time')}</Table.Th>
-            <Table.Th>{t('table.status')}</Table.Th>
-            <Table.Th w={50}>{t('table.actions')}</Table.Th>
+            <Table.Th>{t('student')}</Table.Th>
+            {show_test_name && <Table.Th>{t('test_name')}</Table.Th>}
+            <Table.Th>{t('date')}</Table.Th>
+            <Table.Th>{t('score')}</Table.Th>
+            <Table.Th>{t('time')}</Table.Th>
+            <Table.Th>{t('status')}</Table.Th>
+            <Table.Th w={50}>{t('actions')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -100,6 +102,13 @@ export function TestResultsTable({ attempts, on_view }: Props) {
                   </Text>
                 </Group>
               </Table.Td>
+              {show_test_name && (
+                <Table.Td>
+                  <Text size="sm" fw={600} className="truncate max-w-[200px]">
+                    {attempt.test_name || attempt.test?.name || '—'}
+                  </Text>
+                </Table.Td>
+              )}
               <Table.Td>
                 <Text size="sm" c="dimmed">
                   {dayjs(attempt.started_at).format('DD.MM.YYYY HH:mm')}
@@ -128,7 +137,7 @@ export function TestResultsTable({ attempts, on_view }: Props) {
                   variant="subtle"
                   color="gray"
                   onClick={() => on_view(attempt.id)}
-                  title={t('view_details')}
+                  title={common_t('view_details')}
                 >
                   <IoEyeOutline size={18} />
                 </ActionIcon>

@@ -70,6 +70,9 @@ export const test_schema = z.object({
   categories: z.array(category_schema).optional().default([]),
   created_at: z.string(),
   updated_at: z.string(),
+  is_passed: z.boolean().optional(),
+  last_attempt: z.any().nullable().optional(), 
+  course_ids: z.array(z.string()).optional(),
 });
 
 export type TestMaterial = z.infer<typeof test_schema>;
@@ -83,6 +86,7 @@ export const create_test_schema = z.object({
   settings: test_settings_schema.optional(),
   content: z.string(), // JSON stringified TestQuestion[]
   category_ids: z.array(z.string()).optional(),
+  course_ids: z.array(z.string()).optional(),
 });
 
 export type CreateTestForm = z.infer<typeof create_test_schema>;

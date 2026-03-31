@@ -8,19 +8,21 @@ import {
     Paper, 
     Divider
 } from '@mantine/core';
-import { IoBookOutline, IoTimeOutline } from 'react-icons/io5';
+import { IoBookOutline, IoTimeOutline, IoDocumentTextOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 
 interface Props {
     lessons_count: number;
+    tests_count: number;
     total_duration: number;
 }
 
 /**
  * Sidebar statistics for the course
  */
-export function CourseStats({ lessons_count, total_duration }: Props) {
+export function CourseStats({ lessons_count, tests_count, total_duration }: Props) {
     const t = useTranslations('Materials.courses');
+    const t_test = useTranslations('Materials.tests');
 
     const format_duration = (mins: number) => {
         if (mins < 60) return `${mins} ${t('min')}`;
@@ -41,6 +43,17 @@ export function CourseStats({ lessons_count, total_duration }: Props) {
                     </Group>
                     <Text size="sm" fw={600}>{lessons_count}</Text>
                 </Group>
+                
+                {tests_count > 0 && (
+                    <Group justify="space-between">
+                        <Group gap="xs">
+                            <IoDocumentTextOutline style={{ color: 'var(--mantine-primary-color-filled)' }} />
+                            <Text size="sm">{t_test('title') || 'Tests'}</Text>
+                        </Group>
+                        <Text size="sm" fw={600}>{tests_count}</Text>
+                    </Group>
+                )}
+
                 <Group justify="space-between">
                     <Group gap="xs">
                         <IoTimeOutline style={{ color: 'var(--mantine-primary-color-filled)' }} />

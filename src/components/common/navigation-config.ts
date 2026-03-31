@@ -1,6 +1,5 @@
 import { IconType } from 'react-icons';
 import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
-import { FaPaintbrush } from 'react-icons/fa6';
 import { FaChalkboard } from "react-icons/fa";
 
 export interface NavItem {
@@ -100,7 +99,7 @@ export const MAIN_NAVIGATION: NavItem[] = [
         label: 'tests',
         href: '/main/materials/tests',
         icon: IoClipboardOutline,
-        roles: ['super_admin', 'admin', 'teacher', 'student'],
+        roles: ['super_admin', 'admin', 'teacher'],
       },
       {
         label: 'test_reviews',
@@ -112,7 +111,7 @@ export const MAIN_NAVIGATION: NavItem[] = [
         label: 'courses',
         href: '/main/materials/courses',
         icon: IoSchoolOutline,
-        roles: ['super_admin', 'admin', 'teacher'],
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
       },
     ]
   },

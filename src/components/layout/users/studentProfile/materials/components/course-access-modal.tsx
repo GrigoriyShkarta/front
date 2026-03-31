@@ -11,7 +11,6 @@ import {
   ScrollArea,
   Collapse,
   ActionIcon,
-  Box,
   Badge,
   Tooltip,
   UnstyledButton
@@ -21,52 +20,68 @@ import { useState, useEffect } from 'react';
 import { 
   IoChevronDownOutline, 
   IoChevronForwardOutline, 
-  IoBookOutline, 
   IoFolderOutline,
   IoShieldHalfOutline,
-  IoArrowBackOutline
+  IoArrowBackOutline,
+  IoPlayCircleOutline,
+  IoCheckmarkDoneCircleOutline
 } from 'react-icons/io5';
-import { Link, useRouter } from '@/i18n/routing';
+import { useRouter } from '@/i18n/routing';
 import { StudentCourseItem } from '../schemas/materials-schema';
 
 interface Props {
   opened: boolean;
-  on_close: () => void;
   course: StudentCourseItem | null;
   student_id: string;
-  on_submit: (lesson_ids: string[]) => Promise<void>;
   is_loading?: boolean;
+  on_close: () => void;
+  on_submit: (data: { lesson_ids: string[], test_ids: string[] }) => Promise<void>;
 }
 
 export function CourseAccessModal({ opened, on_close, course, student_id, on_submit, is_loading }: Props) {
   const t = useTranslations('Materials.access');
+  const t_course = useTranslations('Materials.courses');
   const common_t = useTranslations('Common');
   
-  const [selected_ids, set_selected_ids] = useState<string[]>([]);
-  const [initial_ids, set_initial_ids] = useState<string[]>([]);
+  const [selected_lesson_ids, set_selected_lesson_ids] = useState<string[]>([]);
+  const [selected_test_ids, set_selected_test_ids] = useState<string[]>([]);
+  const [initial_lesson_ids, set_initial_lesson_ids] = useState<string[]>([]);
+  const [initial_test_ids, set_initial_test_ids] = useState<string[]>([]);
+
   const [expanded_groups, set_expanded_groups] = useState<string[]>([]);
   const [confirm_opened, set_confirm_opened] = useState(false);
   const [pending_url, set_pending_url] = useState<string | null>(null);
   
   const router = useRouter();
 
-  const has_changes = JSON.stringify([...initial_ids].sort()) !== JSON.stringify([...selected_ids].sort());
+  const has_changes = 
+    JSON.stringify([...initial_lesson_ids].sort()) !== JSON.stringify([...selected_lesson_ids].sort()) ||
+    JSON.stringify([...initial_test_ids].sort()) !== JSON.stringify([...selected_test_ids].sort());
 
   // Initialize selected IDs from course content
   useEffect(() => {
     if (opened && course) {
-      const initial_ids: string[] = [];
+      const lessons: string[] = [];
+      const tests: string[] = [];
+
       course.content.forEach(item => {
         if (item.type === 'lesson') {
-          if (item.has_access) initial_ids.push(item.lesson_id);
+          if (item.has_access) lessons.push(item.lesson_id);
+        } else if (item.type === 'test') {
+          if (item.has_access) tests.push(item.test_id);
         } else if (item.type === 'group') {
-          item.lessons.forEach(lesson => {
-            if (lesson.has_access) initial_ids.push(lesson.lesson_id);
+          (item.content || []).forEach(c => {
+             if (c.type === 'lesson' && c.has_access) lessons.push(c.lesson_id);
+             if (c.type === 'test' && c.has_access) tests.push(c.test_id);
           });
         }
       });
-      set_selected_ids(initial_ids);
-      set_initial_ids(initial_ids);
+
+      set_selected_lesson_ids(lessons);
+      set_selected_test_ids(tests);
+      set_initial_lesson_ids(lessons);
+      set_initial_test_ids(tests);
+      
       // Auto-expand all groups
       set_expanded_groups(course.content.filter(i => i.type === 'group').map(i => i.id));
     }
@@ -74,60 +89,76 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
 
   if (!course) return null;
 
-  // Flattened list of all lesson IDs in the course
-  const all_lesson_ids = course.content.reduce((acc: string[], item) => {
-    if (item.type === 'lesson') acc.push(item.lesson_id);
-    if (item.type === 'group') acc.push(...item.id ? item.lesson_ids : []); // Wait, group lesson_ids
-    return acc;
-  }, []);
+  // Flattened list of all material IDs in the course
+  const get_all_material_ids = () => {
+    const lessons: string[] = [];
+    const tests: string[] = [];
 
-  // Correctly get all lesson IDs
-  const get_all_lesson_ids = () => {
-    const ids: string[] = [];
     course.content.forEach(item => {
-      if (item.type === 'lesson') ids.push(item.lesson_id);
-      if (item.type === 'group') ids.push(...item.lesson_ids);
+      if (item.type === 'lesson') lessons.push(item.lesson_id);
+      if (item.type === 'test') tests.push(item.test_id);
+      if (item.type === 'group') {
+        (item.content || []).forEach(c => {
+          if (c.type === 'lesson') lessons.push((c as any).lesson_id);
+          if (c.type === 'test') tests.push((c as any).test_id);
+        });
+      }
     });
-    return ids;
+    return { lessons, tests };
   };
 
-  const current_all_ids = get_all_lesson_ids();
+  const { lessons: all_l_ids, tests: all_t_ids } = get_all_material_ids();
 
   const toggle_all_course = () => {
-    if (selected_ids.length === current_all_ids.length) {
-      set_selected_ids([]);
+    const is_all_selected = selected_lesson_ids.length === all_l_ids.length && selected_test_ids.length === all_t_ids.length;
+    if (is_all_selected) {
+      set_selected_lesson_ids([]);
+      set_selected_test_ids([]);
     } else {
-      set_selected_ids(current_all_ids);
+      set_selected_lesson_ids(all_l_ids);
+      set_selected_test_ids(all_t_ids);
     }
   };
 
-  const toggle_group = (group_lesson_ids: string[]) => {
-    const all_selected = group_lesson_ids.every(id => selected_ids.includes(id));
+  const toggle_group = (group_l_ids: string[], group_t_ids: string[]) => {
+    const all_selected = group_l_ids.every(id => selected_lesson_ids.includes(id)) && 
+                         group_t_ids.every(id => selected_test_ids.includes(id));
+    
     if (all_selected) {
-      set_selected_ids(prev => prev.filter(id => !group_lesson_ids.includes(id)));
+      set_selected_lesson_ids(prev => prev.filter(id => !group_l_ids.includes(id)));
+      set_selected_test_ids(prev => prev.filter(id => !group_t_ids.includes(id)));
     } else {
-      set_selected_ids(prev => [...new Set([...prev, ...group_lesson_ids])]);
+      set_selected_lesson_ids(prev => [...new Set([...prev, ...group_l_ids])]);
+      set_selected_test_ids(prev => [...new Set([...prev, ...group_t_ids])]);
     }
   };
 
   const toggle_lesson = (lesson_id: string) => {
-    set_selected_ids(prev => 
-      prev.includes(lesson_id) 
-        ? prev.filter(id => id !== lesson_id) 
-        : [...prev, lesson_id]
+    set_selected_lesson_ids(prev => 
+      prev.includes(lesson_id) ? prev.filter(id => id !== lesson_id) : [...prev, lesson_id]
+    );
+  };
+
+  const toggle_test = (test_id: string) => {
+    set_selected_test_ids(prev => 
+      prev.includes(test_id) ? prev.filter(id => id !== test_id) : [...prev, test_id]
     );
   };
 
   const toggle_expand = (group_id: string) => {
     set_expanded_groups(prev => 
-      prev.includes(group_id) 
-        ? prev.filter(id => id !== group_id) 
-        : [...prev, group_id]
+      prev.includes(group_id) ? prev.filter(id => id !== group_id) : [...prev, group_id]
     );
   };
 
-  const handle_navigate = (lesson_id: string, is_partial: boolean = false) => {
-    const url = `/main/materials/lessons/${lesson_id}${is_partial ? `?partial_access=true&student_id=${student_id}` : ''}`;
+  const handle_navigate = (id: string, type: 'lesson' | 'test', is_partial: boolean = false) => {
+    let url = '';
+    if (type === 'test') {
+      url = `/main/materials/tests/${id}`;
+    } else {
+      url = `/main/materials/lessons/${id}${is_partial ? `?partial_access=true&student_id=${student_id}` : ''}`;
+    }
+
     if (has_changes) {
       set_pending_url(url);
       set_confirm_opened(true);
@@ -137,7 +168,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
   };
 
   const handle_confirm_save = async () => {
-    await on_submit(selected_ids);
+    await on_submit({ lesson_ids: selected_lesson_ids, test_ids: selected_test_ids });
     if (pending_url) {
       router.push(pending_url);
     }
@@ -158,7 +189,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
       title={
         <Stack gap={0}>
           <Text fw={600}>{course.name}</Text>
-          <Text size="xs" c="dimmed">{t('manage_access') || 'Manage lessons access'}</Text>
+          <Text size="xs" c="dimmed">{t('manage_access') || 'Manage materials access'}</Text>
         </Stack>
       }
       size="lg"
@@ -166,10 +197,10 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
     >
       <Stack gap="md">
         <Group justify="space-between" align="center" px="xs" py="sm" className="bg-white/5 rounded-md">
-          <Text size="sm" fw={500}>{t('all_lessons') || 'All lessons'}</Text>
+          <Text size="sm" fw={500}>{t('all_materials') || 'All materials'}</Text>
           <Checkbox 
-            checked={selected_ids.length === current_all_ids.length && current_all_ids.length > 0}
-            indeterminate={selected_ids.length > 0 && selected_ids.length < current_all_ids.length}
+            checked={selected_lesson_ids.length === all_l_ids.length && selected_test_ids.length === all_t_ids.length && (all_l_ids.length > 0 || all_t_ids.length > 0)}
+            indeterminate={(selected_lesson_ids.length > 0 || selected_test_ids.length > 0) && (selected_lesson_ids.length < all_l_ids.length || selected_test_ids.length < all_t_ids.length)}
             onChange={toggle_all_course}
           />
         </Group>
@@ -182,8 +213,8 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
               return (
                 <Group key={item.id} justify="space-between" px="md">
                   <Group gap="xs">
-                    <IoBookOutline size={16} />
-                    <UnstyledButton onClick={() => handle_navigate(item.lesson_id)}>
+                    <IoPlayCircleOutline size={16} />
+                    <UnstyledButton onClick={() => handle_navigate(item.lesson_id, 'lesson')}>
                       <Text size="sm" color="primary" className="hover:underline">{item.title || item.name || item.lesson_id}</Text>
                     </UnstyledButton>
                     {item.access_type && item.access_type !== 'none' && (
@@ -198,13 +229,13 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
                         variant="subtle" 
                         size="sm" 
                         color="gray"
-                        onClick={() => handle_navigate(item.lesson_id, true)}
+                        onClick={() => handle_navigate(item.lesson_id, 'lesson', true)}
                       >
                         <IoShieldHalfOutline size={16} />
                       </ActionIcon>
                     </Tooltip>
                     <Checkbox 
-                      checked={selected_ids.includes(item.lesson_id)}
+                      checked={selected_lesson_ids.includes(item.lesson_id)}
                       onChange={() => toggle_lesson(item.lesson_id)}
                     />
                   </Group>
@@ -212,10 +243,33 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
               );
             }
 
+            if (item.type === 'test') {
+              return (
+                <Group key={item.id} justify="space-between" px="md">
+                  <Group gap="xs">
+                    <IoCheckmarkDoneCircleOutline size={16} />
+                    <UnstyledButton onClick={() => handle_navigate(item.test_id, 'test')}>
+                        <Text size="sm" color="primary" className="hover:underline">{item.title || item.name || item.test_id}</Text>
+                    </UnstyledButton>
+
+                  </Group>
+                  <Checkbox 
+                    checked={selected_test_ids.includes(item.test_id)}
+                    onChange={() => toggle_test(item.test_id)}
+                  />
+                </Group>
+              );
+            }
+
             if (item.type === 'group') {
-              const group_lesson_ids = item.lesson_ids;
-              const all_group_selected = group_lesson_ids.every(id => selected_ids.includes(id));
-              const some_group_selected = group_lesson_ids.some(id => selected_ids.includes(id));
+              const group_content = item.content || [];
+              const group_l_ids = group_content.filter(c => c.type === 'lesson').map(c => (c as any).lesson_id);
+              const group_t_ids = group_content.filter(c => c.type === 'test').map(c => (c as any).test_id);
+              
+              const all_group_selected = group_l_ids.every(id => selected_lesson_ids.includes(id)) && 
+                                       group_t_ids.every(id => selected_test_ids.includes(id));
+              const some_group_selected = group_l_ids.some(id => selected_lesson_ids.includes(id)) || 
+                                        group_t_ids.some(id => selected_test_ids.includes(id));
               const is_expanded = expanded_groups.includes(item.id);
 
               return (
@@ -229,44 +283,65 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
                       <Text size="sm" fw={600}>{item.title}</Text>
                     </Group>
                     <Checkbox 
-                      checked={all_group_selected && group_lesson_ids.length > 0}
+                      checked={all_group_selected && (group_l_ids.length > 0 || group_t_ids.length > 0)}
                       indeterminate={some_group_selected && !all_group_selected}
-                      onChange={() => toggle_group(group_lesson_ids)}
+                      onChange={() => toggle_group(group_l_ids, group_t_ids)}
                     />
                   </Group>
                   <Collapse in={is_expanded}>
                     <Stack gap="xs" pl="xl" py="xs">
-                      {item.lessons.map((lesson) => (
-                        <Group key={lesson.lesson_id} justify="space-between" py={4} pr="md">
-                          <Group gap="xs">
-                            <IoBookOutline size={14} />
-                            <UnstyledButton onClick={() => handle_navigate(lesson.lesson_id)}>
-                              <Text size="sm" color="primary" className="hover:underline">{lesson.title || lesson.name || lesson.lesson_id}</Text>
-                            </UnstyledButton>
-                            {lesson.access_type && lesson.access_type !== 'none' && (
-                              <Badge size="xs" variant="outline" color={lesson.access_type === 'full' ? 'green' : 'orange'}>
-                                {t(lesson.access_type) || lesson.access_type}
-                              </Badge>
-                            )}
-                          </Group>
-                          <Group gap="xs">
-                            <Tooltip label={t('partial_config') || 'Manage partial access'}>
-                              <ActionIcon 
-                                variant="subtle" 
-                                size="sm" 
-                                color="gray"
-                                onClick={() => handle_navigate(lesson.lesson_id, true)}
-                              >
-                                <IoShieldHalfOutline size={14} />
-                              </ActionIcon>
-                            </Tooltip>
-                            <Checkbox 
-                              checked={selected_ids.includes(lesson.lesson_id)}
-                              onChange={() => toggle_lesson(lesson.lesson_id)}
-                            />
-                          </Group>
-                        </Group>
-                      ))}
+                      {group_content.map((c: any) => {
+                        if (c.type === 'lesson') {
+                          return (
+                            <Group key={c.lesson_id} justify="space-between" py={4} pr="md">
+                              <Group gap="xs">
+                                <IoPlayCircleOutline size={14} />
+                                <UnstyledButton onClick={() => handle_navigate(c.lesson_id, 'lesson')}>
+                                  <Text size="sm" color="primary" className="hover:underline">{c.title || c.name || c.lesson_id}</Text>
+                                </UnstyledButton>
+                                {c.access_type && c.access_type !== 'none' && (
+                                  <Badge size="xs" variant="outline" color={c.access_type === 'full' ? 'green' : 'orange'}>
+                                    {t(c.access_type) || c.access_type}
+                                  </Badge>
+                                )}
+                              </Group>
+                              <Group gap="xs">
+                                <Tooltip label={t('partial_config') || 'Manage partial access'}>
+                                  <ActionIcon 
+                                    variant="subtle" 
+                                    size="sm" 
+                                    color="gray"
+                                    onClick={() => handle_navigate(c.lesson_id, 'lesson', true)}
+                                  >
+                                    <IoShieldHalfOutline size={14} />
+                                  </ActionIcon>
+                                </Tooltip>
+                                <Checkbox 
+                                  checked={selected_lesson_ids.includes(c.lesson_id)}
+                                  onChange={() => toggle_lesson(c.lesson_id)}
+                                />
+                              </Group>
+                            </Group>
+                          );
+                        }
+                        if (c.type === 'test') {
+                          return (
+                            <Group key={c.test_id} justify="space-between" py={4} pr="md">
+                              <Group gap="xs">
+                                <IoCheckmarkDoneCircleOutline size={14} color="var(--mantine-primary-color-filled)" />
+                                <UnstyledButton onClick={() => handle_navigate(c.test_id, 'test')}>
+                                    <Text size="sm" color="primary" className="hover:underline">{c.title || c.name || c.test_id}</Text>
+                                </UnstyledButton>
+                              </Group>
+                              <Checkbox 
+                                checked={selected_test_ids.includes(c.test_id)}
+                                onChange={() => toggle_test(c.test_id)}
+                              />
+                            </Group>
+                          );
+                        }
+                        return null;
+                      })}
                     </Stack>
                   </Collapse>
                 </Stack>
@@ -283,7 +358,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
             {common_t('cancel') || 'Cancel'}
           </Button>
           <Button 
-            onClick={() => on_submit(selected_ids)} 
+            onClick={() => on_submit({ lesson_ids: selected_lesson_ids, test_ids: selected_test_ids })} 
             loading={is_loading}
             color="primary"
             className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
