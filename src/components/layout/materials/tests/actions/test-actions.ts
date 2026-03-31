@@ -13,7 +13,7 @@ export const testActions = {
    * Get paginated list of tests
    */
   get_tests: async (params: GetTestsParams): Promise<TestListResponse> => {
-    const response = await api.get('/materials/tests', { params });
+    const response = await api.get('/tests', { params });
     return response.data;
   },
 
@@ -21,7 +21,7 @@ export const testActions = {
    * Get single test by ID
    */
   get_test: async (id: string): Promise<TestMaterial> => {
-    const response = await api.get(`/materials/tests/${id}`);
+    const response = await api.get(`/tests/${id}`);
     return response.data;
   },
 
@@ -29,7 +29,7 @@ export const testActions = {
    * Create new test
    */
   create_test: async (data: CreateTestForm): Promise<TestMaterial> => {
-    const response = await api.post('/materials/tests', data);
+    const response = await api.post('/tests', data);
     return response.data;
   },
 
@@ -37,7 +37,7 @@ export const testActions = {
    * Update existing test
    */
   update_test: async (id: string, data: Partial<CreateTestForm>): Promise<TestMaterial> => {
-    const response = await api.patch(`/materials/tests/${id}`, data);
+    const response = await api.patch(`/tests/${id}`, data);
     return response.data;
   },
 
@@ -45,13 +45,13 @@ export const testActions = {
    * Delete single test
    */
   delete_test: async (id: string): Promise<void> => {
-    await api.delete(`/materials/tests/${id}`);
+    await api.delete(`/tests/${id}`);
   },
 
   /**
    * Delete multiple tests
    */
   bulk_delete_tests: async (ids: string[]): Promise<void> => {
-    await api.delete('/materials/tests', { data: { ids } });
+    await api.delete('/tests', { data: { ids } });
   }
 };

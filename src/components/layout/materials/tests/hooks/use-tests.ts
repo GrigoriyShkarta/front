@@ -60,7 +60,7 @@ export function useTests({ page = 1, limit = 10, search = '', category_ids = [] 
     tests: data?.data || [],
     meta: data?.meta,
     is_loading: isLoading,
-    total_pages: data?.meta.total_pages || 1,
+    total_pages: data?.meta?.total_pages || 1,
     delete_test: deleteMutation.mutate,
     bulk_delete_tests: bulkDeleteMutation.mutate,
   };

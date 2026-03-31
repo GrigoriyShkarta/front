@@ -550,8 +550,6 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
             </>
         )}
 
-
-
         {editing_text_id && elements.find(el => el.id === editing_text_id) && (
             <EditableText 
               element={elements.find(el => el.id === editing_text_id) as TextElement}

@@ -38,6 +38,7 @@ import { CategoryDrawer } from '@/components/layout/categories/components/catego
 import { MediaPickerModal } from '@/components/layout/materials/lessons/components/media-picker-modal';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
+import { useTests } from '@/components/layout/materials/tests/hooks/use-tests';
 
 interface Props {
     opened: boolean;
@@ -52,6 +53,7 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
     const t = useTranslations('Materials.courses');
     const common_t = useTranslations('Common');
     const tCat = useTranslations('Categories');
+    const tTest = useTranslations('Materials.tests');
     
     const { categories, create_category, is_pending: is_cat_pending } = useCategories();
     const [cat_drawer_opened, setCatDrawerOpened] = useState(false);
@@ -62,6 +64,13 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
         page: 1, 
         limit: 100, 
         search: '' 
+    });
+
+    // Fetch tests
+    const { tests: all_tests } = useTests({
+        page: 1,
+        limit: 100,
+        search: ''
     });
 
     const {
@@ -75,7 +84,7 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
         formState: { errors, isValid }
     } = useForm<CreateCourseForm>({
         mode: 'onChange',
-        resolver: zodResolver(create_course_schema),
+        resolver: zodResolver(create_course_schema) as any,
         defaultValues: {
             name: '',
             description: '',
@@ -112,7 +121,7 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
         }
     }, [course, opened, reset]);
 
-    const onSubmitHandler: SubmitHandler<CreateCourseForm> = async (values) => {
+    const onSubmitHandler = async (values: CreateCourseForm) => {
         const success = await onSave(values);
         if (success) {
             onClose();
@@ -133,6 +142,14 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
             type: 'lesson',
             id: crypto.randomUUID(),
             lesson_id: lesson_id
+        });
+    };
+
+    const handle_add_test = (test_id: string) => {
+        append({
+            type: 'test',
+            id: crypto.randomUUID(),
+            test_id: test_id
         });
     };
 
@@ -167,13 +184,20 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
         }
     };
 
-    // Helper to get all lesson IDs already used in the course
+    // Helper to get all IDs already used in the course
     const content_watch = watch('content');
     const used_lesson_ids = content_watch.reduce((acc: string[], item: any) => {
         if (item.type === 'lesson') {
             acc.push(item.lesson_id);
         } else if (item.type === 'group') {
             acc.push(...(item.lesson_ids || []));
+        }
+        return acc;
+    }, []);
+
+    const used_test_ids = content_watch.reduce((acc: string[], item: any) => {
+        if (item.type === 'test') {
+            acc.push(item.test_id);
         }
         return acc;
     }, []);
@@ -193,67 +217,66 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
                 body: { height: 'calc(100vh - 80px)', display: 'flex', flexDirection: 'column' }
             }}
         >
-            <form onSubmit={handleSubmit(onSubmitHandler)} className="flex flex-col h-full">
+            <form onSubmit={handleSubmit(onSubmitHandler as any)} className="flex flex-col h-full">
                 <ScrollArea className="flex-1 -mx-4 px-4">
                     <Stack gap="xl" pb="xl">
-                        {/* Basic Info */}
                         <Stack gap="md">
                             <Group justify="center" className="w-full">
-                            <Box className="w-full flex flex-col gap-2">
-                                <Box 
-                                    className="w-full h-44 rounded-xl bg-black/5 border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer overflow-hidden relative hover:border-[var(--mantine-primary-color-filled)]"
-                                    onClick={() => setMediaPickerOpened(true)}
-                                >
-                                    {watch('image_url') || user?.space?.personalization?.icon ? (
-                                        <>
-                                            <img 
-                                                src={(watch('image_url') || user?.space?.personalization?.icon) || undefined} 
-                                                className={cn(
-                                                    "w-full h-full object-cover",
-                                                    !watch('image_url') && "opacity-40 grayscale blur-[2px]"
-                                                )} 
-                                            />
-                                            <Box className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
-                                                <IoImageOutline size={20} color="white" />
-                                                <Text c="white" size="xs" fw={500}>{t('form.upload_image')}</Text>
-                                            </Box>
-                                            {!watch('image_url') && (
-                                                <Box className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                                    <IoImageOutline size={32} color="white" className="drop-shadow-md" />
-                                                    <Text size="xs" c="white" fw={600} className="drop-shadow-sm">
-                                                        {t('form.upload_image')}
-                                                    </Text>
+                                <Box className="w-full flex flex-col gap-2">
+                                    <Box 
+                                        className="w-full h-44 rounded-xl bg-black/5 border-2 border-dashed border-white/10 flex flex-col items-center justify-center gap-2 transition-colors cursor-pointer overflow-hidden relative hover:border-[var(--mantine-primary-color-filled)]"
+                                        onClick={() => setMediaPickerOpened(true)}
+                                    >
+                                        {watch('image_url') || user?.space?.personalization?.icon ? (
+                                            <>
+                                                <img 
+                                                    src={(watch('image_url') || user?.space?.personalization?.icon) || undefined} 
+                                                    className={cn(
+                                                        "w-full h-full object-cover",
+                                                        !watch('image_url') && "opacity-40 grayscale blur-[2px]"
+                                                    )} 
+                                                />
+                                                <Box className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
+                                                    <IoImageOutline size={20} color="white" />
+                                                    <Text c="white" size="xs" fw={500}>{t('form.upload_image')}</Text>
                                                 </Box>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <IoImageOutline size={32} color="gray" />
-                                            <Stack gap={2} align="center">
-                                                <Text size="xs" c="dimmed" fw={500}>{t('form.upload_image')}</Text>
-                                                <Text size="xs" c="dimmed" fs="italic">
-                                                    {t('form.library_upload_hint')}
-                                                </Text>
-                                            </Stack>
-                                        </>
+                                                {!watch('image_url') && (
+                                                    <Box className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                                        <IoImageOutline size={32} color="white" className="drop-shadow-md" />
+                                                        <Text size="xs" c="white" fw={600} className="drop-shadow-sm">
+                                                            {t('form.upload_image')}
+                                                        </Text>
+                                                    </Box>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <IoImageOutline size={32} color="gray" />
+                                                <Stack gap={2} align="center">
+                                                    <Text size="xs" c="dimmed" fw={500}>{t('form.upload_image')}</Text>
+                                                    <Text size="xs" c="dimmed" fs="italic">
+                                                        {t('form.library_upload_hint')}
+                                                    </Text>
+                                                </Stack>
+                                            </>
+                                        )}
+                                    </Box>
+                                    {watch('image_url') && (
+                                        <Button 
+                                            variant="subtle" 
+                                            color="red" 
+                                            size="compact-xs" 
+                                            leftSection={<IoTrashOutline size={14} />}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setValue('image_url', '');
+                                            }}
+                                        >
+                                            {common_t('clear')}
+                                        </Button>
                                     )}
                                 </Box>
-                                {watch('image_url') && (
-                                    <Button 
-                                        variant="subtle" 
-                                        color="red" 
-                                        size="compact-xs" 
-                                        leftSection={<IoTrashOutline size={14} />}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setValue('image_url', '');
-                                        }}
-                                    >
-                                        {common_t('clear')}
-                                    </Button>
-                                )}
-                            </Box>
-                        </Group>
+                            </Group>
 
                             <TextInput
                                 label={t('form.name')}
@@ -306,14 +329,11 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
 
                         <Divider label={t('form.add_group')} labelPosition="center" />
 
-                        {/* Content (Mixed) */}
                         <Stack gap="md">
                             {fields.map((field, index) => {
                                 const content_item = field as unknown as CourseContentItem;
-                                
                                 return (
                                     <Paper key={field.id} withBorder p="md" radius="md" className="bg-white/2 relative">
-                                        {/* Reorder Controls (Internal) */}
                                         <Group justify="space-between" mb="xs" wrap="nowrap">
                                             <Group gap={4}>
                                                 <ActionIcon variant="light" size="sm" onClick={() => move_up(index)} disabled={index === 0}>
@@ -324,12 +344,7 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
                                                 </ActionIcon>
                                                 <Badge variant="outline" size="xs" color="gray">#{index + 1}</Badge>
                                             </Group>
-                                            <ActionIcon 
-                                                color="red" 
-                                                variant="subtle" 
-                                                size="sm"
-                                                onClick={() => remove(index)}
-                                            >
+                                            <ActionIcon color="red" variant="subtle" size="sm" onClick={() => remove(index)}>
                                                 <IoTrashOutline size={16} />
                                             </ActionIcon>
                                         </Group>
@@ -347,8 +362,6 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
                                                         styles={{ input: { fontSize: rem(16) } }}
                                                     />
                                                 </Group>
-
-                                                {/* Lessons inside group */}
                                                 <Stack gap={4} pl="md" className="border-l border-white/10">
                                                     {(watch(`content.${index}.lesson_ids` as any) || []).map((lessonId: string, lessonIndex: number) => {
                                                         const lesson = all_lessons.find(l => l.id === lessonId);
@@ -357,49 +370,29 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
                                                                 <Group justify="space-between" wrap="nowrap">
                                                                     <Group gap="xs" wrap="nowrap">
                                                                         <Group gap={2}>
-                                                                            <ActionIcon 
-                                                                                size="xs" 
-                                                                                variant="light" 
-                                                                                onClick={() => handle_move_lesson_in_group(index, lessonIndex, lessonIndex - 1)}
-                                                                                disabled={lessonIndex === 0}
-                                                                            >
+                                                                            <ActionIcon size="xs" variant="light" onClick={() => handle_move_lesson_in_group(index, lessonIndex, lessonIndex - 1)} disabled={lessonIndex === 0}>
                                                                                 <IoChevronUpOutline size={10} />
                                                                             </ActionIcon>
-                                                                            <ActionIcon 
-                                                                                size="xs" 
-                                                                                variant="light" 
-                                                                                onClick={() => handle_move_lesson_in_group(index, lessonIndex, lessonIndex + 1)}
-                                                                                disabled={lessonIndex === (watch(`content.${index}.lesson_ids` as any) || []).length - 1}
-                                                                            >
+                                                                            <ActionIcon size="xs" variant="light" onClick={() => handle_move_lesson_in_group(index, lessonIndex, lessonIndex + 1)} disabled={lessonIndex === (watch(`content.${index}.lesson_ids` as any) || []).length - 1}>
                                                                                 <IoChevronDownOutline size={10} />
                                                                             </ActionIcon>
                                                                         </Group>
                                                                         <IoBookOutline size={14} color="var(--mantine-primary-color-filled)" />
                                                                         <Text size="xs">{lesson?.name || 'Unknown Lesson'}</Text>
                                                                     </Group>
-                                                                    <ActionIcon 
-                                                                        size="xs" 
-                                                                        color="gray" 
-                                                                        variant="subtle"
-                                                                        onClick={() => handle_remove_lesson_from_group(index, lessonIndex)}
-                                                                    >
+                                                                    <ActionIcon size="xs" color="gray" variant="subtle" onClick={() => handle_remove_lesson_from_group(index, lessonIndex)}>
                                                                         <IoTrashOutline size={12} />
                                                                     </ActionIcon>
                                                                 </Group>
                                                             </Paper>
                                                         );
                                                     })}
-
                                                     <MultiSelect
                                                         placeholder={t('form.add_lesson')}
-                                                        data={all_lessons
-                                                            .filter(l => !used_lesson_ids.includes(l.id))
-                                                            .map(l => ({ value: l.id, label: l.name }))}
+                                                        data={all_lessons.filter(l => !used_lesson_ids.includes(l.id)).map(l => ({ value: l.id, label: l.name }))}
                                                         onChange={(selected) => {
                                                             const last = selected[selected.length - 1];
-                                                            if (last) {
-                                                                handle_add_lesson_to_group(index, last);
-                                                            }
+                                                            if (last) handle_add_lesson_to_group(index, last);
                                                         }}
                                                         value={[]}
                                                         searchable
@@ -409,22 +402,29 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
                                                     />
                                                 </Stack>
                                             </Stack>
+                                        ) : content_item.type === 'lesson' ? (
+                                            <Group gap="xs">
+                                                <IoMenuOutline className="text-gray-400" />
+                                                <Box className="flex-1 bg-white/5 py-2 px-3 rounded-md border border-white/5">
+                                                    <Group gap="xs">
+                                                        <IoBookOutline size={18} color="var(--mantine-primary-color-filled)" />
+                                                        <Text size="sm" fw={500}>{all_lessons.find(l => l.id === (content_item as any).lesson_id)?.name || 'Unknown Lesson'}</Text>
+                                                    </Group>
+                                                </Box>
+                                            </Group>
                                         ) : (
-                                            <Stack gap="sm">
-                                                <Group gap="xs" className="flex-1">
-                                                    <IoMenuOutline className="text-gray-400" />
-                                                    <Box className="flex-1 bg-white/5 py-2 px-3 rounded-md border border-white/5">
-                                                        <Group justify="space-between">
-                                                            <Group gap="xs">
-                                                                <IoBookOutline size={18} color="var(--mantine-primary-color-filled)" />
-                                                                <Text size="sm" fw={500}>
-                                                                    {all_lessons.find(l => l.id === (content_item as any).lesson_id)?.name || 'Unknown Lesson'}
-                                                                </Text>
-                                                            </Group>
-                                                        </Group>
-                                                    </Box>
-                                                </Group>
-                                            </Stack>
+                                            <Group gap="xs">
+                                                <IoMenuOutline className="text-gray-400" />
+                                                <Box className="flex-1 bg-[var(--mantine-primary-color-light)] py-2 px-3 rounded-md border border-[var(--mantine-primary-color-light-hover)]">
+                                                    <Group gap="xs">
+                                                        <IoBookOutline size={18} color="var(--mantine-primary-color-filled)" />
+                                                        <Stack gap={0}>
+                                                            <Text size="xs" c="dimmed" fw={700} lts={1} tt="uppercase">{tTest('single_title')}</Text>
+                                                            <Text size="sm" fw={600}>{all_tests.find(t => t.id === (content_item as any).test_id)?.name || 'Unknown Test'}</Text>
+                                                        </Stack>
+                                                    </Group>
+                                                </Box>
+                                            </Group>
                                         )}
                                     </Paper>
                                 );
@@ -437,22 +437,34 @@ export function CourseEditorDrawer({ opened, onClose, course, onSave, is_saving 
                             )}
 
                             <Group grow>
-                                <Button 
-                                    variant="light" 
-                                    leftSection={<IoAddOutline size={18} />}
-                                    onClick={handle_add_group}
-                                >
+                                <Button variant="light" leftSection={<IoAddOutline size={18} />} onClick={handle_add_group}>
                                     {t('form.add_group')}
                                 </Button>
-                                
+                            </Group>
+
+                            <Group grow>
                                 <MultiSelect
                                     placeholder={t('form.add_lesson')}
-                                    data={all_lessons
-                                        .filter(l => !used_lesson_ids.includes(l.id))
-                                        .map(l => ({ value: l.id, label: l.name }))}
+                                    data={all_lessons.filter(l => !used_lesson_ids.includes(l.id)).map(l => ({ value: l.id, label: l.name }))}
                                     onChange={(selected) => {
                                         const last = selected[selected.length - 1];
                                         if (last) handle_add_lesson(last);
+                                    }}
+                                    value={[]}
+                                    searchable
+                                    variant="light"
+                                    radius="md"
+                                    leftSection={<IoBookOutline size={18} color="var(--mantine-primary-color-filled)" />}
+                                />
+
+                                <MultiSelect
+                                    placeholder={tTest('add_test') || 'Add test'}
+                                    data={all_tests
+                                        .filter(t => !used_test_ids.includes(t.id))
+                                        .map(t => ({ value: t.id, label: t.name }))}
+                                    onChange={(selected) => {
+                                        const last = selected[selected.length - 1];
+                                        if (last) handle_add_test(last);
                                     }}
                                     value={[]}
                                     searchable

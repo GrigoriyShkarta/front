@@ -174,6 +174,7 @@
     "video_materials": "Video",
     "file_materials": "Files",
     "tests": "Tests",
+    "test_reviews": "Checking Tests",
     "categories": "Categories",
     "theme": "Theme",
     "languages": "Languages",
@@ -989,6 +990,111 @@
           "title": "Time's Up!",
           "message": "The time allocated for the test has expired. Your answers have been automatically saved."
         }
+      },
+      "take": {
+        "start_button": "Start Test",
+        "begin": "Begin Test",
+        "cancel": "Cancel",
+        "minutes": "min",
+        "point": "point",
+        "points": "points",
+        "next": "Next",
+        "prev": "Previous",
+        "submit": "Submit Test",
+        "not_found": "Test not found",
+        "back_to_tests": "Back to Tests",
+        "question_nav": "Questions Navigation",
+        "status_answered": "Answered",
+        "status_skipped": "Skipped",
+        "status_unanswered": "Unanswered",
+        "question_number": "Question {current} of {total}",
+        "fill_placeholder": "Enter your answer here...",
+        "detailed_placeholder": "Write your detailed response here...",
+        "error": "Submission Error",
+        "submit_error": "Failed to submit test. Please check your connection.",
+        "start_modal": {
+          "title": "Test Preparation",
+          "questions": "Questions",
+          "time_limit": "Time Limit",
+          "max_score": "Maximum Score",
+          "minutes": "minutes",
+          "points": "points",
+          "begin": "Begin Test",
+          "cancel": "Cancel",
+          "time_warning": "Warning: The timer will start immediately after you click Begin."
+        },
+        "confirm_submit": {
+          "title": "Finish Test?",
+          "message": "You still have {count} unanswered questions. Are you sure you want to submit?",
+          "confirm": "Yes, submit",
+          "cancel": "No, keep working"
+        }
+      },
+      "results": {
+        "title": "Test Results",
+        "status_passed": "Passed",
+        "status_failed": "Failed",
+        "status_pending": "Pending",
+        "status_in_progress": "In Progress",
+        "status_timed_out": "Timed Out",
+        "passed_title": "Congratulations, you passed!",
+        "failed_title": "Test failed. Better luck next time!",
+        "pending_title": "Test submitted for review",
+        "score": "Score",
+        "time_spent": "Time Spent",
+        "pending_review_message": "Some questions in this test require manual review by a teacher. Your final score will be updated soon.",
+        "show_details": "Show Answer Details",
+        "hide_details": "Hide Answer Details",
+        "back_to_tests": "Back to Materials",
+        "correct_answer": "Correct answer",
+        "awaiting_review": "Awaiting teacher review",
+        "points_label": "points",
+        "stats": {
+          "total_attempts": "Total Attempts",
+          "unique_students": "Unique Students",
+          "average_score": "Average Score",
+          "pass_rate": "Pass Rate",
+          "average_time": "Average Time",
+          "pending_reviews": "Pending Reviews"
+        },
+        "table": {
+          "student": "Student",
+          "date": "Date",
+          "score": "Score",
+          "time": "Time",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "filter": {
+          "all": "All statuses",
+          "completed": "Completed",
+          "pending_review": "Pending Review",
+          "reviewed": "Reviewed",
+          "in_progress": "In Progress"
+        },
+        "attempts_title": "Student Attempts",
+        "view_details": "View detailed attempt",
+        "no_attempts": "No attempts found yet",
+        "review_drawer": {
+          "title": "Attempt Review",
+          "no_answer": "No answer provided",
+          "student_answer": "Student's Answer",
+          "correct_answer": "Correct Answer",
+          "teacher_comment": "Teacher's Comment",
+          "review_section": "Manual Review",
+          "points_label": "Points to award",
+          "comment_label": "Comment (optional)",
+          "comment_placeholder": "Write your feedback...",
+          "confirm_review": "Confirm Grade"
+        },
+        "review_success_title": "Review Saved",
+        "review_success": "Grade and comment have been successfully applied.",
+        "review_error_title": "Review Error",
+        "review_error": "Failed to save the review. Please try again."
+      },
+      "detail": {
+        "tab_content": "Test Content",
+        "tab_results": "Results / Statistics"
       }
     },
     "courses": {

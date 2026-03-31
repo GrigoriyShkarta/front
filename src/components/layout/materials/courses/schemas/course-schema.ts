@@ -32,6 +32,11 @@ export const course_content_item_schema = z.discriminatedUnion('type', [
     id: z.string(), // UUID for the group
     title: z.string().min(1, 'errors.required'),
     lesson_ids: z.array(z.string()),
+  }),
+  z.object({
+    type: z.literal('test'),
+    id: z.string(), // UUID for the item itself
+    test_id: z.string(),
   })
 ]);
 
@@ -45,7 +50,7 @@ export const course_schema = z.object({
   name: z.string().min(1, 'errors.required'),
   description: z.string().optional(),
   image_url: z.string().nullable().optional(),
-  categories: z.array(category_schema).optional().default([]),
+  categories: z.array(category_schema).default([]),
   content: z.array(course_content_item_schema).default([]),
   created_at: z.string(),
   updated_at: z.string(),
@@ -60,7 +65,7 @@ export const create_course_schema = z.object({
   name: z.string().min(1, 'errors.required'),
   description: z.string().optional(),
   image_url: z.string().nullable().optional(),
-  category_ids: z.array(z.string()).optional(),
+  category_ids: z.array(z.string()),
   content: z.array(course_content_item_schema),
 });
 
