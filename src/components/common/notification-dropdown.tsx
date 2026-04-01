@@ -87,6 +87,16 @@ export function NotificationDropdown() {
        }
        return '/main/users';
     }
+
+    // 3. Test Type -> Link to Test Reviews Page (Teacher/Admin view)
+    if (message_type === 'test') {
+      return '/main/materials/tests/reviews';
+    }
+
+    // 4. Lesson Type -> Link to Lesson Page
+    if (message_type === 'lesson') {
+       return payload?.lesson_id ? `/main/materials/lessons/${payload.lesson_id}` : '/main/materials/lessons';
+    }
     
     return '#';
   };
@@ -162,7 +172,10 @@ export function NotificationDropdown() {
           type="hover"
           scrollbarSize={6}
           styles={{
-            viewport: { paddingRight: '0 !important' },
+            viewport: { 
+              paddingRight: '0 !important',
+              overflowX: 'hidden'
+            },
             scrollbar: {
               '&[data-orientation="vertical"]': {
                 width: 6,
@@ -225,9 +238,19 @@ export function NotificationDropdown() {
                       </Group>
                       <Text size="xs" c="zinc.500" className="leading-relaxed font-medium break-words">
                         {t(`messages.${notification.message}`)}
+                        {notification.payload?.test_name && (
+                          <Text component="span" fw={800} inherit ml={4} className="text-zinc-900 dark:text-zinc-100">
+                             {notification.payload.test_name}
+                          </Text>
+                        )}
                         {notification.payload?.task_name && (
                           <Text component="span" fw={800} inherit ml={4} className="text-zinc-900 dark:text-zinc-100">
                              {notification.payload.task_name}
+                          </Text>
+                        )}
+                        {notification.payload?.lesson_name && (
+                          <Text component="span" fw={800} inherit ml={4} className="text-primary-600 dark:text-primary-400">
+                             {notification.payload.lesson_name}
                           </Text>
                         )}
                       </Text>

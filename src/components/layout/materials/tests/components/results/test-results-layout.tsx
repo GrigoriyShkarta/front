@@ -98,7 +98,7 @@ export function TestResultsLayout({ test_id }: Props) {
         <LoadingOverlay visible={is_loading} overlayProps={{ blur: 2 }} zIndex={40} />
 
         {/* Stats */}
-        {stats && <TestResultsStats stats={stats} />}
+        {test_id && stats && <TestResultsStats stats={stats} />}
 
         {/* Filters */}
         <Paper withBorder radius="md" mt="lg" className="bg-white/5 border-white/10 overflow-hidden">

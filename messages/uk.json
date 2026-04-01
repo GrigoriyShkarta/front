@@ -73,7 +73,8 @@
       "invalid_color": "Невірний формат кольору",
       "subscription_name_required": "Назва послуги обов'язкова",
       "subscription_price_required": "Ціна обов'язкова",
-      "subscription_lessons_count_required": "Кількість занять повинна бути не менше 1"
+      "subscription_lessons_count_required": "Кількість занять повинна бути не менше 1",
+      "at_least_one_day": "Оберіть хоча б один день"
     },
     "roles": {
       "super_admin": "Головний адмін",
@@ -126,7 +127,9 @@
       "description": "Ваш доступ до платформи буде обмежено {date}. Подовжіть навчання, щоб зберегти доступ до матеріалів."
     },
     "loading": "Завантаження...",
-    "uploading": "Завантаження..."
+    "uploading": "Завантаження...",
+    "confirm": "Підтвердити",
+    "required": "Обов'язкове поле"
   },
   "Auth": {
     "login": {
@@ -192,11 +195,19 @@
     "boards": "Дошки",
     "add": "Додати",
     "save": "Зберегти",
+    "feedback": "Зворотний зв’язок",
     "edit_title": "Редагувати назву",
     "delete_confirm_desc": "Ви впевнені, що хочете видалити цю дошку?",
     "unlink": "Видалити посилання"
   },
   "Calendar": {
+    "reminder": {
+      "lesson_starts_soon": "Урок розпочнеться найближчим часом!",
+      "lesson_ongoing": "Урок вже триває!",
+      "with_student": "з учнем {name}",
+      "with_teacher": "з вчителем {name}",
+      "join_button": "Приєднатися до уроку"
+    },
     "title": "Календар",
     "today": "Сьогодні",
     "views": {
@@ -953,8 +964,10 @@
         "actions": "Дії"
       },
       "notifications": {
-        "delete_success": "Тест успішно видалено",
-        "delete_error": "Не вдалося видалити тест"
+        "delete_success": "Курс успішно видалено",
+        "delete_error": "Не вдалося видалити курс",
+        "save_success": "Курс успішно збережено",
+        "save_error": "Не вдалося зберегти курс"
       },
       "editor": {
         "back": "Назад",
@@ -1003,162 +1016,225 @@
           "empty_question": "Текст запитання не може бути порожнім",
           "single_choice": "Виберіть рівно одну правильну відповідь",
           "multiple_choice": "Виберіть як мінімум дві правильних відповіді",
-          "fill_blank": "Введіть слово або фразу для відповіді"
+          "fill_blank": "Введіть слово або фраз� курс, щоб структурувати навчання для учнів.",
+          "table": {
+            "name": "Назва курсу",
+            "date": "Дата створення",
+            "actions": "Дії",
+            "categories": "Категорії",
+            "image": "Зображення",
+            "progress": "Прогрес"
+          },
+          "form": {
+            "name": "Назва курсу",
+            "description": "Опис",
+            "content": "Зміст курсу",
+            "image": "Зображення курсу",
+            "upload_image": "Завантажити зображення",
+            "library_upload_hint": "Бібліотека / Завантажити",
+            "add_lesson": "Додати урок",
+            "add_test": "Додати тест",
+            "add_group": "Додати групу",
+            "test": "Тест",
+            "group_title": "Назва групи",
+            "no_groups": "Ще не додано жодних груп або уроків",
+            "placeholder_name": "Введіть назву курсу",
+            "placeholder_description": "Введіть опис курсу"
+          },
+          "notifications": {
+            "delete_success": "Курс успішно видалено",
+            "delete_error": "Не вдалося видалити курс",
+            "save_success": "Курс успішно збережено",
+            "save_error": "Не вдалося зберегти курс"
+          },
+          "delete_confirm": {
+            "title": "Підтвердження видалення",
+            "description": "Ви впевнені, що хочете видалити цей курс? Цю дію неможливо скасувати.",
+            "bulk_description": "Ви впевнені, що хочете видалити {count} вибраних курсів? Цю дію неможливо скасувати."
+          },
+          "course_structure": "Структура курсу",
+          "number_of_lessons": "Кількість уроків",
+          "items": "{count} елементів",
+          "lessons_count": "{count} уроків",
+          "min": "хв",
+          "h": "год",
+          "m": "хв",
+          "stats": {
+            "title": "Швидка статистика",
+            "estimated_time": "Оціночний час",
+            "blocks": "{count} блоків",
+            "lessons": "Уроки",
+            "categories": "Категорії",
+            "no_preview": "Прев'ю недоступне"
+          },
+          "current": "Зараз",
+          "no_access": "Немає доступу"
+        },
+        "courses_tab": "Курси",
+        "additional_tab": "Уроки",
+        "audio_tab": "Аудіо",
+        "photo_tab": "Фото",
+        "video_tab": "Відео",
+        "files_tab": "Файли",
+        "additional_materials_empty": "Уроків не знайдено",
+        "audio_materials_empty": "Аудіоматеріалів не знайдено",
+        "photo_materials_empty": "Фотоматеріалів не знайдено",
+        "video_materials_empty": "Відеоматеріалів не знайдено",
+        "file_materials_empty": "Файлових матеріалів не знайдено",
+        "additional": {
+          "access": "Доступ",
+          "name": "Назва уроку",
+          "categories": "Категорії",
+          "no_lessons": "Уроків не знайдено",
+          "search_placeholder": "Пошук за назвою уроку..."
+        },
+        "access": {
+          "grant_access": "Надати доступ",
+          "full_access": "Повний доступ",
+          "grant_title": "Надання доступу",
+          "select_students": "Виберіть студентів",
+          "search_students": "Пошук за ім'ям...",
+          "grant_button": "Надати доступ",
+          "manage_access": "Керування доступом до матеріалів",
+          "all_materials": "Всі матеріали",
+          "all_lessons": "Всі уроки",
+          "full": "Повний",
+          "partial": "Частковий",
+          "none": "Немає",
+          "partial_config": "Налаштувати частковий доступ",
+          "unsaved_changes": {
+            "title": "Незбережені зміни",
+            "message": "У вас є незбережені зміни в доступах до матеріалів. Бажаєте зберегти їх перед переходом?",
+            "save_and_go": "Зберегти та перейти",
+            "go_without_saving": "Перейти без збереження",
+            "back": "Назад"
+          },
+          "notifications": {
+            "access_granted": "Доступ оновлено успішно",
+            "access_error": "Помилка при оновленні доступу"
+          }
         }
       },
-      "take": {
-        "start_button": "Почати тест",
-        "begin": "Почати тестування",
-        "cancel": "Скасувати",
-        "minutes": "хв",
-        "point": "бал",
-        "points": "бали",
-        "next": "Далі",
-        "prev": "Назад",
-        "submit": "Завершити тест",
-        "not_found": "Тест не знайдено",
-        "back_to_tests": "До списку тестів",
-        "question_nav": "Навігація за запитаннями",
-        "status_answered": "Відповідь надана",
-        "status_skipped": "Пропущено",
-        "status_unanswered": "Немає відповіді",
-        "question_number": "Запитання {current} з {total}",
-        "fill_placeholder": "Введіть вашу відповідь тут...",
-        "detailed_placeholder": "Напишіть вашу розгорнуту відповідь тут...",
-        "error": "Помилка відправки",
-        "submit_error": "Не вдалося відправити тест. Перевірте з'єднання з інтернетом.",
-        "start_modal": {
-          "title": "Підготовка до тесту",
-          "questions": "Кількість запитань",
-          "time_limit": "Ліміт часу",
-          "max_score": "Максимальний бал",
-          "minutes": "хв",
-          "points": "балів",
-          "begin": "Почати тест",
-          "cancel": "Скасувати",
-          "time_warning": "Увага: Таймер почнеться відразу після натискання кнопки «Почати тест»."
-        },
-        "confirm_submit": {
-          "title": "Завершити тест?",
-          "message": "У вас залишилося {count} запитань без відповіді. Ви впевнені, що хочете завершити тест?",
-          "confirm": "Так, завершити",
-          "cancel": "Ні, продовжуємо"
-        }
-      },
-      "reviews": {
-        "title": "Перевірка тестів",
-        "description": "Спроби студентів, які потребують вашої уваги або ручної перевірки."
-      },
-      "results": {
-        "title": "Результати тесту",
-        "status_passed": "Складено",
-        "status_failed": "Не складено",
-        "status_pending": "Очікує перевірки",
-        "status_in_progress": "У процесі",
-        "status_timed_out": "Час вийшов",
-        "passed_title": "Вітаємо, ви склали тест!",
-        "failed_title": "Тест не складено. Спробуйте ще раз!",
-        "pending_title": "Тест відправлено на перевірку",
-        "score": "Ваш результат",
-        "time_spent": "Витрачений час",
-        "pending_review_message": "Деякі запитання у цьому тесті потребують ручної перевірки викладачем. Ваш остаточний результат буде оновлено незабаром.",
-        "show_details": "Показати деталі відповідей",
-        "hide_details": "Приховати деталі відповідей",
-        "back_to_tests": "Повернутись до матеріалів",
-        "correct_answer": "Правильна відповідь",
-        "your_answer": "Ваша відповідь",
-        "awaiting_review": "Очікує на перевірку викладачем",
-        "points_label": "балів",
-        "stats": {
-          "total_attempts": "Всього спроб",
-          "unique_students": "Унікальних студентів",
-          "average_score": "Середній бал",
-          "pass_rate": "Відсоток успіху",
-          "average_time": "Середній час",
-          "pending_reviews": "Спроби до перевірки"
-        },
+      "Categories": {
+        "title": "Категорії",
+        "add_category": "Додати категорію",
+        "edit_category": "Редагувати категорію",
+        "delete_category": "Видалити категорію",
+        "select_category": "Вибрати категорію",
         "table": {
+          "name": "Назва категорії",
+          "color": "Колір",
+          "actions": "Дії",
+          "empty": "Категорій ще не створено"
+        },
+        "select_categories": "Вибрати категорії",
+        "subtitle_empty": "Ви ще не створили жодноної категорії. Додайте категорії, щоб упорядкувати ваші матеріали.",
+        "notifications": {
+          "create_success": "Категорію успішно створено",
+          "create_error": "Не вдалося створити категорію",
+          "update_success": "Категорію успішно оновлено",
+          "update_error": "Не вдалося оновити категорію",
+          "delete_success": "Категорію успішно видалено",
+          "delete_error": "Не вдалося видалити категорію",
+          "bulk_delete_success": "Вибрані категорії успішно видалено",
+          "bulk_delete_error": "Не вдалося видалити вибрані категорії"
+        },
+        "modal": {
+          "create_title": "Створити категорію",
+          "edit_title": "Редагувати категорію",
+          "name_placeholder": "Введіть назву категорії",
+          "bulk_delete_confirm": "Ви впевнені, що хочете видалити вибрані категорії?"
+        },
+        "bulk_delete": "Видалити вибрані ({count})",
+        "add_another": "Додати ще одну категорію",
+        "delete_confirm": {
+          "title": "Підтвердження видалення",
+          "description": "Ви впевнені, що хочете видалити цю категорію? Цю дію неможливо скасувати.",
+          "bulk_description": "Ви впевнені, що хочете видалити {count} вибраних категорій? Цю дію неможливо скасувати."
+        }
+      },
+      "Finance": {
+        "subscriptions": {
+          "title": "Послуги",
+          "subtitle": "Керуйте послугами для ваших студентів.",
+          "add_subscription": "Додати послугу",
+          "edit_subscription": "Редагувати послугу",
+          "delete_subscription": "Видалити послугу",
+          "bulk_delete": "Видалити вибрані ({count})",
+          "empty_title": "Послуг не знайдено",
+          "empty_description": "Наразі немає доступних послуг. Створіть першу, щоб почати.",
+          "table": {
+            "name": "Назва",
+            "lessons_count": "Занять",
+            "price": "Ціна",
+            "date": "Дата створення",
+            "actions": "Дії"
+          },
+          "form": {
+            "name_placeholder": "Введіть назву послуги",
+            "lessons_count": "Кількість занять",
+            "lessons_count_placeholder": "8",
+            "price": "Ціна",
+            "price_placeholder": "99.99"
+          },
+          "notifications": {
+            "create_success": "Послугу успішно створено",
+            "create_error": "Не вдалося створити послугу",
+            "update_success": "Послугу успішно оновлено",
+            "update_error": "Не вдалося оновити послугу",
+            "delete_success": "Послугу успішно видалено",
+            "delete_error": "Не вдалося видалити послугу",
+            "bulk_delete_success": "Вибрані послуги успішно видалено",
+            "bulk_delete_error": "Не вдалося видалити вибрані послуги"
+          },
+          "validation": {
+            "name_required": "Назва послуги обов'язкова",
+            "lessons_count_required": "Кількість занять повинна бути не менше 1",
+            "price_required": "Ціна обов'язкова",
+            "price_non_negative": "Ціна не може бути від'ємною",
+            "at_least_one_day": "Виберіть хоча б один день занять",
+            "paid_amount_required": "Сума оплати обов'язкова"
+          },
+          "delete_confirm": {
+            "title": "Підтвердження видалення",
+            "description": "Ви впевнені, що хочете видалити цю послугу? Цю дію неможливо скасувати.",
+            "bulk_description": "Ви впевнені, що хочете видалити {count} вибраних послуг? Цю дію неможливо скасувати."
+          }
+        },
+        "reports": {
+          "title": "Фінансові звіти",
+          "subtitle": "Аналітика доходів та статистика за вибраний період.",
+          "total_revenue": "Загальний дохід",
+          "expected_revenue": "Очікуваний дохід",
+          "active_students": "Активні студенти",
+          "sold_subscriptions": "Продано послуг",
+          "real_income_tab": "Реальний дохід",
+          "expected_income_tab": "Очікуваний дохід",
           "student": "Студент",
-          "test_name": "Назва тесту",
+          "amount": "Сума",
           "date": "Дата",
-          "score": "Результат",
-          "time": "Час",
-          "status": "Статус",
-          "actions": "Дії"
-        },
-        "filter": {
-          "all": "Всі статуси",
-          "completed": "Завершено",
-          "pending_review": "Очікує перевірки",
-          "reviewed": "Перевірено",
-          "in_progress": "У процесі"
-        },
-        "attempts_title": "Спроби студентів",
-        "view_details": "Переглянути деталі спроби",
-        "no_attempts": "Спроб поки немає",
-        "review_drawer": {
-          "title": "Перевірка спроби",
-          "no_answer": "Відповідь не надана",
-          "student_answer": "Відповідь студента",
-          "correct_answer": "Правильна відповідь",
-          "teacher_comment": "Коментар викладача",
-          "review_section": "Ручна перевірка",
-          "points_label": "Кількість балів",
-          "comment_label": "Коментар (необов'язково)",
-          "comment_placeholder": "Ваш відгук студенту...",
-          "confirm_review": "Зберегти оцінку"
-        },
-        "review_success_title": "Оцінку збережено",
-        "review_success": "Бали та коментар були успішно застосовані.",
-        "review_error_title": "Помилка перевірки",
-        "review_error": "Не вдалося зберегти результати перевірки. Спробуйте ще раз."
+          "subscription": "Послуга",
+          "breakdown_title": "Розподіл за послугами",
+          "sold_count": "Продано",
+          "revenue_share": "Частка доходу",
+          "no_data": "Немає даних за цей період",
+          "no_breakdown_data": "Немає даних про продаж послуг",
+          "payment_types": {
+            "renewal": "Продовження",
+            "balance": "Доплата",
+            "paid": "Сплачено"
+          },
+          "select_period": "Оберіть період"
+        }
       },
-      "detail": {
-        "tab_content": "Зміст тесту",
-        "tab_results": "Результати та статистика"
-      }
-    },
-    "courses": {
-      "title": "Курси",
-      "search_lessons": "Пошук за назвою уроку...",
-      "no_extra_filters": "Додаткові фільтри можна буде додати тут.",
-      "subtitle": "Структуровані навчальні програми для системного опанування знань.",
-      "placeholder_description": "Розкрийте свій потенціал за допомогою цього комплексного курсу, що охоплює всі основні аспекти предмета.",
-      "create_course": "Створити курс",
-      "edit_course": "Редагувати курс",
-      "delete_course": "Видалити курс",
-      "bulk_delete": "Видалити вибрані ({count})",
-      "empty_title": "Курсів не знайдено",
-      "empty_description": "Ви ще не створили жодного курсу. Об'єднайте свої уроки в курс, щоб структурувати навчання для учнів.",
-      "table": {
-        "name": "Назва курсу",
-        "date": "Дата створення",
-        "actions": "Дії",
-        "categories": "Категорії",
-        "image": "Зображення",
-        "progress": "Прогрес"
-      },
-      "form": {
-        "name": "Назва курсу",
-        "description": "Опис",
-        "content": "Зміст курсу",
-        "image": "Зображення курсу",
-        "upload_image": "Завантажити зображення",
-        "library_upload_hint": "Бібліотека / Завантажити",
-        "add_lesson": "Додати урок",
-        "add_test": "Додати тест",
+      "Notifications": {
+        "title": "Сповіщення",
         "add_group": "Додати групу",
         "test": "Тест",
         "group_title": "Назва групи",
         "no_groups": "Ще не додано жодних груп або уроків",
         "placeholder_name": "Введіть назву курсу",
         "placeholder_description": "Введіть опис курсу"
-      },
-      "notifications": {
-        "delete_success": "Курс успішно видалено",
-        "delete_error": "Не вдалося видалити курс",
-        "save_success": "Курс успішно збережено",
-        "save_error": "Не вдалося зберегти курс"
       },
       "delete_confirm": {
         "title": "Підтвердження видалення",
@@ -1181,7 +1257,125 @@
         "no_preview": "Прев'ю недоступне"
       },
       "current": "Зараз",
-      "no_access": "Немає доступу"
+      "no_access": "Немає доступу",
+      "take": {
+        "start_button": "Почати тест",
+        "begin": "Розпочати тест",
+        "cancel": "Скасувати",
+        "minutes": "хв",
+        "point": "бал",
+        "points": "балів",
+        "next": "Далі",
+        "prev": "Назад",
+        "submit": "Завершити тест",
+        "not_found": "Тест не знайдено",
+        "back_to_tests": "Назад до матеріалів",
+        "question_nav": "Навігація",
+        "status_answered": "Відповідь надана",
+        "status_skipped": "Пропущено",
+        "status_unanswered": "Немає відповіді",
+        "question_number": "Запитання {current} з {total}",
+        "fill_placeholder": "Введіть вашу відповідь тут...",
+        "detailed_placeholder": "Напишіть розгорнуту відповідь тут...",
+        "error": "Помилка при відправці",
+        "submit_error": "Не вдалося відправити тест. Перевірте підключення до інтернету.",
+        "start_modal": {
+          "title": "Підготовка до тесту",
+          "questions": "Кількість запитань",
+          "time_limit": "Ліміт часу",
+          "max_score": "Макс. бал",
+          "minutes": "хв",
+          "points": "балів",
+          "begin": "Почати тест",
+          "cancel": "Скасувати",
+          "time_warning": "Попередження: Таймер розпочнеться одразу після натискання 'Почати тест'."
+        },
+        "confirm_submit": {
+          "title": "Завершити тест?",
+          "message": "У вас є {count} запитань без відповіді. Ви впевнені, що хочете завершити тест?",
+          "confirm": "Так, завершити",
+          "cancel": "Ні, продовжити"
+        },
+        "editor": {
+          "course_navigation": "Навігація по курсу"
+        }
+      },
+      "reviews": {
+        "title": "Перевірка тестів",
+        "description": "Спроби студентів, які потребують вашої уваги або ручної перевірки."
+      },
+      "results": {
+        "title": "Результати тесту",
+        "status_passed": "Складено",
+        "status_failed": "Не складено",
+        "status_pending": "Очікує перевірки",
+        "status_in_progress": "У процесі",
+        "status_timed_out": "Час вийшов",
+        "passed_title": "Вітаємо, ви склали тест!",
+        "failed_title": "Тест не складено. Спробуйте ще раз!",
+        "pending_title": "Тест відправлено на перевірку",
+        "score": "Результат",
+        "time_spent": "Витрачений час",
+        "pending_review_message": "Деякі запитання в цьому тесті потребують ручної перевірки вчителем. Ваш остаточний бал буде оновлено незабаром.",
+        "show_details": "Показати деталі відповідей",
+        "hide_details": "Приховати деталі відповідей",
+        "back_to_tests": "Назад до матеріалів",
+        "correct_answer": "Правильна відповідь",
+        "awaiting_review": "Очікує перевірки вчителем",
+        "points_label": "балів",
+        "stats": {
+          "total_attempts": "Всього спроб",
+          "unique_students": "Студенти",
+          "average_score": "Середній бал",
+          "pass_rate": "Відсоток успіху",
+          "average_time": "Середній час",
+          "pending_reviews": "Очікують перевірки"
+        },
+        "table": {
+          "student": "Студент",
+          "test_name": "Назва тесту",
+          "date": "Дата",
+          "score": "Бал",
+          "time": "Час",
+          "status": "Статус",
+          "status_passed": "Складено",
+          "status_failed": "Не складено",
+          "status_pending": "Очікує",
+          "status_in_progress": "У процесі",
+          "status_timed_out": "Час вийшов",
+          "actions": "Дії"
+        },
+        "filter": {
+          "all": "Всі статуси",
+          "completed": "Завершено",
+          "pending_review": "Очікує перевірки",
+          "reviewed": "Перевірено",
+          "in_progress": "У процесі"
+        },
+        "attempts_title": "Спроби студентів",
+        "view_details": "Переглянути детальну спробу",
+        "no_attempts": "Спроб поки не знайдено",
+        "review_drawer": {
+          "title": "Перевірка спроби",
+          "no_answer": "Відповідь не надана",
+          "student_answer": "Відповідь студента",
+          "correct_answer": "Правильна відповідь",
+          "teacher_comment": "Коментар вчителя",
+          "review_section": "Ручна перевірка",
+          "points_label": "Бали за відповідь",
+          "comment_label": "Коментар (необов'язково)",
+          "comment_placeholder": "Напишіть ваш відгук...",
+          "confirm_review": "Підтвердити оцінку"
+        },
+        "review_success_title": "Оцінку збережено",
+        "review_success": "Бал та коментар було успішно застосовано.",
+        "review_error_title": "Помилка перевірки",
+        "review_error": "Не вдалося зберегти перевірку. Спробуйте ще раз."
+      },
+      "detail": {
+        "tab_content": "Зміст тесту",
+        "tab_results": "Результати / Статистика"
+      }
     },
     "courses_tab": "Курси",
     "additional_tab": "Уроки",
@@ -1226,6 +1420,71 @@
         "access_granted": "Доступ оновлено успішно",
         "access_error": "Помилка при оновленні доступу"
       }
+    },
+    "courses": {
+      "title": "Курси",
+      "search_lessons": "Пошук за назвою уроку...",
+      "no_extra_filters": "Тут можна додати додаткові фільтри.",
+      "gallery": "Галерея",
+      "table_view": "Таблиця",
+      "subtitle": "Структуровані навчальні програми, розроблені для систематичного засвоєння знань.",
+      "placeholder_description": "Розкрийте свій потенціал за допомогою цього комплексного курсу, що охоплює всі основні аспекти предмета.",
+      "create_course": "Створити курс",
+      "edit_course": "Редагувати курс",
+      "delete_course": "Видалити курс",
+      "bulk_delete": "Видалити вибрані ({count})",
+      "empty_title": "Курсів не знайдено",
+      "empty_description": "Ви ще не створили жодного курсу. Об'єднайте свої уроки в курс, щоб направляти своїх студентів.",
+      "table": {
+        "name": "Назва курсу",
+        "date": "Дата створення",
+        "actions": "Дії",
+        "categories": "Категорії",
+        "image": "Зображення",
+        "progress": "Прогрес"
+      },
+      "form": {
+        "name": "Назва курсу",
+        "description": "Опис",
+        "content": "Зміст курсу",
+        "image": "Зображення курсу",
+        "upload_image": "Завантажити зображення",
+        "library_upload_hint": "Бібліотека / Завантажити",
+        "add_lesson": "Додати урок",
+        "add_test": "Додати тест",
+        "add_group": "Додати групу",
+        "test": "Тест",
+        "group_title": "Заголовок групи",
+        "no_groups": "Груп або уроків ще не додано",
+        "placeholder_name": "Введіть назву курсу",
+        "placeholder_description": "Розкрийте свій потенціал за допомогою цього комплексного курсу, що охоплює всі основні аспекти предмета."
+      },
+      "notifications": {
+        "delete_success": "Курс успішно видалено",
+        "delete_error": "Не вдалося видалити курс",
+        "save_success": "Курс успішно збережено",
+        "save_error": "Не вдалося зберегти курс"
+      },
+      "delete_confirm": {
+        "title": "Підтвердження видалення",
+        "description": "Ви впевнені, що хочете видалити цей курс? Цю дію неможливо скасувати.",
+        "bulk_description": "Ви впевнені, що хочете видалити {count} вибраних курсів? Цю дію неможливо скасувати."
+      },
+      "course_structure": "Структура курсу",
+      "number_of_lessons": "Кількість уроків",
+      "items": "{count} елементів",
+      "lessons_count": "{count} уроків",
+      "min": "хв",
+      "h": "год",
+      "m": "хв",
+      "stats": {
+        "title": "Швидка статистика",
+        "estimated_time": "Орієнтовний час",
+        "blocks": "{count} блоків",
+        "no_preview": "Попередній перегляд недоступний"
+      },
+      "current": "Поточний",
+      "no_access": "Немає доступу"
     }
   },
   "Categories": {
@@ -1338,17 +1597,24 @@
         "paid": "Сплачено"
       },
       "select_period": "Оберіть період"
+    },
+    "Notifications": {
+      "title": "Сповіщення",
+      "no_notifications": "У вас поки немає сповіщень",
+      "mark_all_read": "Позначити всі як прочитані",
+      "clear_all": "Очистити все",
+      "view_all": "Переглянути всі",
+      "messages": {
+        "new_task_created": "Створено нову задачу",
+        "task_column_changed": "Статус задачі змінено",
+        "test_completed": "Тест завершено!",
+        "lesson_access_granted": "Надано доступ до уроку!"
+      }
     }
   },
   "Notifications": {
-    "title": "Сповіщення",
-    "no_notifications": "У вас поки немає сповіщень",
-    "mark_all_read": "Позначити всі як прочитані",
-    "clear_all": "Очистити все",
-    "view_all": "Переглянути всі",
     "messages": {
-      "new_task_created": "Створено нову задачу",
-      "task_column_changed": "Статус задачі змінено"
+      "lesson_access_granted": "Надано доступ до уроку:"
     }
   }
 }

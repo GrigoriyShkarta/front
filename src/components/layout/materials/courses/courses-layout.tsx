@@ -16,11 +16,12 @@ import {
   Breadcrumbs,
   Anchor
 } from "@mantine/core";
-import { IoLibraryOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoFilterOutline } from "react-icons/io5";
+import { IoLibraryOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoFilterOutline, IoGridOutline, IoListOutline } from "react-icons/io5";
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useCourses } from "./hooks/use-courses";
 import { CourseTable } from "./components/course-table";
+import { CourseGallery } from "./components/course-gallery";
 import { CourseEditorDrawer } from "./components/course-editor-drawer";
 import { CourseDeleteModal } from "./components/course-delete-modal";
 import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
@@ -56,6 +57,7 @@ export default function CoursesLayout() {
     // Editor state
     const [editor_opened, setEditorOpened] = useState(false);
     const [editing_course, setEditingCourse] = useState<CourseMaterial | null>(null);
+    const [view_mode, setViewMode] = useState<'table' | 'gallery'>('gallery');
 
     // Data fetching
     const { 
@@ -190,20 +192,55 @@ export default function CoursesLayout() {
                                 className="flex-1"
                                 variant="filled"
                             />
+
+                            <Group gap="xs">
+                                <Button.Group>
+                                    <Button 
+                                        variant={view_mode === 'gallery' ? "light" : "subtle"} 
+                                        color={view_mode === 'gallery' ? "primary" : "gray"}
+                                        size="xs"
+                                        px={12}
+                                        onClick={() => setViewMode('gallery')}
+                                        leftSection={<IoGridOutline size={16} />}
+                                    >
+                                        {t('gallery')}
+                                    </Button>
+                                    <Button 
+                                        variant={view_mode === 'table' ? "light" : "subtle"} 
+                                        color={view_mode === 'table' ? "primary" : "gray"}
+                                        size="xs"
+                                        px={12}
+                                        onClick={() => setViewMode('table')}
+                                        leftSection={<IoListOutline size={16} />}
+                                    >
+                                        {t('table_view')}
+                                    </Button>
+                                </Button.Group>
+                            </Group>
                         </Group>
                     </Box>
 
                     {!is_loading && (
                         has_data ? (
                             <>
-                                <CourseTable 
-                                    data={courses}
-                                    selected_ids={selected_ids}
-                                    on_selection_change={setSelectedIds}
-                                    on_edit={handle_edit}
-                                    on_delete={handle_delete_click}
-                                    is_loading={is_loading}
-                                />
+                                {view_mode === 'table' ? (
+                                    <CourseTable 
+                                        data={courses}
+                                        selected_ids={selected_ids}
+                                        on_selection_change={setSelectedIds}
+                                        on_edit={handle_edit}
+                                        on_delete={handle_delete_click}
+                                        is_loading={is_loading}
+                                    />
+                                ) : (
+                                    <CourseGallery 
+                                        data={courses}
+                                        selected_ids={selected_ids}
+                                        on_selection_change={setSelectedIds}
+                                        on_edit={handle_edit}
+                                        on_delete={handle_delete_click}
+                                    />
+                                )}
                                 
                                 {/* Pagination */}
                                 <Box className="p-4 border-t border-white/10 bg-white/2">

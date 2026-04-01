@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 
 import { testAttemptActions } from '../actions/test-attempt-actions';
 import { ReviewAnswerPayload } from '../schemas/test-attempt-schema';
+import { queryKeys } from '@/lib/query-keys';
 
 interface UseTestResultsProps {
   test_id: string;
@@ -59,6 +60,7 @@ export function useTestResults({ test_id, page = 1, limit = 15, status }: UseTes
       query_client.invalidateQueries({ queryKey: ['test-attempts', test_id] });
       query_client.invalidateQueries({ queryKey: ['test-attempt', selected_attempt_id] });
       query_client.invalidateQueries({ queryKey: ['test-stats', test_id] });
+      query_client.invalidateQueries({ queryKey: queryKeys.auth.user() });
       notifications.show({
         title: t('review_success_title'),
         message: t('review_success'),

@@ -128,7 +128,8 @@
       "description": "Your access to the platform will be limited on {date}. Extend your studies to maintain access to materials."
     },
     "loading": "Loading...",
-    "uploading": "Uploading..."
+    "uploading": "Uploading...",
+    "confirm": "Confirm"
   },
   "Auth": {
     "login": {
@@ -193,9 +194,17 @@
     "lesson_recordings": "Lesson Recordings",
     "boards": "Boards",
     "add": "Add",
-    "save": "Save"
+    "save": "Save",
+    "feedback": "Feedback"
   },
   "Calendar": {
+    "reminder": {
+      "lesson_starts_soon": "The lesson will start soon!",
+      "lesson_ongoing": "The lesson is already in progress!",
+      "with_student": "with student {name}",
+      "with_teacher": "with teacher {name}",
+      "join_button": "Join Lesson"
+    },
     "title": "Calendar",
     "today": "Today",
     "views": {
@@ -1040,6 +1049,9 @@
           "message": "You have {count} unanswered questions. Are you sure you want to finish the test?",
           "confirm": "Yes, finish",
           "cancel": "No, continue"
+        },
+        "editor": {
+          "course_navigation": "Course Navigation"
         }
       },
       "reviews": {
@@ -1067,7 +1079,7 @@
         "points_label": "points",
         "stats": {
           "total_attempts": "Total Attempts",
-          "unique_students": "Unique Students",
+          "unique_students": "Students",
           "average_score": "Average Score",
           "pass_rate": "Pass Rate",
           "average_time": "Average Time",
@@ -1080,6 +1092,11 @@
           "score": "Score",
           "time": "Time",
           "status": "Status",
+          "status_passed": "Passed",
+          "status_failed": "Failed",
+          "status_pending": "Pending",
+          "status_in_progress": "In Progress",
+          "status_timed_out": "Timed Out",
           "actions": "Actions"
         },
         "filter": {
@@ -1118,6 +1135,8 @@
       "title": "Courses",
       "search_lessons": "Search by lesson name...",
       "no_extra_filters": "Additional filters can be added here.",
+      "gallery": "Gallery",
+      "table_view": "Table",
       "subtitle": "Structured learning programs designed for systematic knowledge mastery.",
       "placeholder_description": "Unlock your potential with this comprehensive course covering all essential aspects of the subject.",
       "create_course": "Create Course",
@@ -1341,7 +1360,9 @@
     "view_all": "View all",
     "messages": {
       "new_task_created": "New task created",
-      "task_column_changed": "Task status changed"
+      "task_column_changed": "Task status changed",
+      "test_completed": "Test completed!",
+      "lesson_access_granted": "Access to the lesson granted:"
     }
   }
 }

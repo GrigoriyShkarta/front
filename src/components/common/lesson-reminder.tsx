@@ -1,0 +1,125 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+import dayjs from 'dayjs';
+import { Box, Group, Text, Button, Paper, Transition, ActionIcon } from '@mantine/core';
+import { IoVideocamOutline, IoCloseOutline, IoArrowForwardOutline } from 'react-icons/io5';
+import { useUpcomingLesson } from '@/hooks/use-upcoming-lesson';
+import { useAuth } from '@/hooks/use-auth';
+import { Link } from '@/i18n/routing';
+import { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
+import { is_lesson_event } from '../layout/calendar/schemas/event-schema';
+
+/**
+ * A sticky notification banner that appears 5 minutes before a lesson starts.
+ * Features a modern, premium design with a gradient and glassmorphism.
+ */
+export function LessonReminder() {
+  const t = useTranslations('Calendar.reminder');
+  const { user } = useAuth();
+  const { lesson } = useUpcomingLesson();
+  const [visible, set_visible] = useState(false);
+  const [closed_id, set_closed_id] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (lesson && lesson.id !== closed_id) {
+      set_visible(true);
+    } else {
+      set_visible(false);
+    }
+  }, [lesson, closed_id]);
+
+  if (!lesson || !is_lesson_event(lesson)) return null;
+
+  const now = dayjs();
+  const start_time = dayjs(lesson.start_date);
+  const is_ongoing = now.isAfter(start_time);
+  
+  const student_name = lesson.subscription?.student?.name;
+  const teacher_name = user?.teacher?.name;
+
+  const person_display = user?.role === 'student' 
+    ? t('with_teacher', { name: teacher_name || 'Teacher' })
+    : t('with_student', { name: student_name || 'Student' });
+
+  return (
+    <Transition mounted={visible} transition="slide-down" duration={400} timingFunction="ease">
+      {(styles) => (
+        <Box 
+          style={styles}
+          className="fixed top-0 left-0 right-0 z-[100] px-4 pt-2 md:left-[240px] pointer-events-none"
+        >
+          <Paper 
+            withBorder
+            radius="lg" 
+            p="md"
+            className="pointer-events-auto max-w-4xl mx-auto shadow-2xl relative overflow-hidden group"
+            style={{ 
+              background: 'linear-gradient(135deg, var(--space-primary) 0%, #1e40af 100%)',
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+              backdropFilter: 'blur(10px)',
+              color: 'white'
+            }}
+          >
+            {/* Animated background decoration */}
+            <Box 
+              className="absolute top-0 right-0 w-64 h-64 opacity-10 pointer-events-none -translate-y-1/2 translate-x-1/2"
+              style={{ 
+                background: 'radial-gradient(circle, white 0%, transparent 70%)',
+                filter: 'blur(40px)'
+              }}
+            />
+
+            <Group justify="space-between" wrap="nowrap" gap="xl">
+              <Group gap="md" wrap="nowrap">
+                <Box 
+                  className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0 shadow-inner"
+                >
+                  <IoVideocamOutline size={26} className="animate-pulse" />
+                </Box>
+                
+                <Box>
+                  <Text fw={700} size="lg" className="tracking-tight leading-tight">
+                    {is_ongoing ? t('lesson_ongoing') : t('lesson_starts_soon')}
+                  </Text>
+                  <Text size="sm" className="opacity-90 font-medium">
+                    {person_display} • {start_time.format('HH:mm')}
+                  </Text>
+                </Box>
+              </Group>
+
+              <Group gap="xs">
+                <Button 
+                  component={Link}
+                  href={`/main/lesson/${lesson.id}`}
+                  size="md"
+                  radius="md"
+                  // color="white"
+                  className="text-blue-700 shadow-lg px-6 font-bold transition-all hover:scale-105 active:scale-95"
+                  rightSection={<IoArrowForwardOutline size={18} />}
+                >
+                  {t('join_button')}
+                </Button>
+                
+                <ActionIcon 
+                  variant="subtle" 
+                  color="white" 
+                  size="lg" 
+                  radius="md"
+                  onClick={() => {
+                    set_visible(false);
+                    set_closed_id(lesson.id);
+                  }}
+                  className="hover:bg-white/10"
+                >
+                  <IoCloseOutline size={24} />
+                </ActionIcon>
+              </Group>
+            </Group>
+          </Paper>
+        </Box>
+      )}
+    </Transition>
+  );
+}

@@ -10,6 +10,7 @@ import { useParams } from 'next/navigation';
 import { useState, useMemo } from 'react';
 import { UserDrawer } from '../components/user-drawer';
 import { StudentRecordingsList } from './recordings/recordings-list';
+import { useUpcomingLesson } from '@/hooks/use-upcoming-lesson';
 
 interface Props {
   id?: string;
@@ -43,8 +44,11 @@ export function StudentProfileShell({
   const common_t = useTranslations('Common');
   const tNav = useTranslations('Navigation');
   
-  const { user, is_loading, is_error, error, refresh } = useUserQuery(id as string);
+  const { user: profile_user, is_loading, is_error, error, refresh } = useUserQuery(id as string);
   const { update_user, teachers, current_user, is_mutating } = useUsersQuery();
+  const { lesson } = useUpcomingLesson(is_own_profile ? undefined : id as string);
+  
+  const tCalendar = useTranslations('Calendar.event_modal');
 
   // Determine active tab based on pathname
   const active_tab = pathname.endsWith('/subscriptions') 
@@ -67,8 +71,8 @@ export function StudentProfileShell({
         items.push({ title: tNav('users'), href: '/main/users' });
       }
 
-      if (user) {
-        items.push({ title: user.name, href: is_own_profile ? '/main/profile' : `/main/users/${id}` });
+      if (profile_user) {
+        items.push({ title: profile_user.name, href: is_own_profile ? '/main/profile' : `/main/users/${id}` });
       }
     }
 
@@ -77,7 +81,7 @@ export function StudentProfileShell({
         {item.title}
       </Anchor>
     ));
-  }, [is_own_profile, tNav, user, id, custom_breadcrumbs]);
+  }, [is_own_profile, tNav, profile_user, id, custom_breadcrumbs]);
 
   if (is_loading) {
     return (
@@ -101,7 +105,7 @@ export function StudentProfileShell({
     );
   }
 
-  if (!user) {
+  if (!profile_user) {
     return (
       <Paper p="xl" withBorder>
         <Text ta="center">{t('not_found')}</Text>
@@ -125,23 +129,40 @@ export function StudentProfileShell({
         <Stack gap="xs">
           <Group justify="space-between" align="center" wrap="nowrap" className="flex-col sm:flex-row items-start sm:items-center">
             <Group gap="md" wrap="nowrap">
-              <Avatar src={user.avatar} size="xl" radius="md" className="hidden xs:block">
-                {user.name.charAt(0)}
+              <Avatar src={profile_user.avatar} size="xl" radius="md" className="hidden xs:block">
+                {profile_user.name.charAt(0)}
               </Avatar>
               <Stack gap={0}>
-                <Title order={2} size="h3" className="sm:text-3xl">{user.name}</Title>
+                <Group gap="md">
+                  <Title order={2} size="h3" className="sm:text-3xl">{profile_user.name}</Title>
+                </Group>
                 <Group gap="xs">
-                  <Text c="dimmed" size="sm" className="hidden sm:block">{user.email}</Text>
-                  {user.role === 'student' && current_user?.role !== 'student' && (
+                  <Text c="dimmed" size="sm" className="hidden sm:block">{profile_user.email}</Text>
+                  {profile_user.role === 'student' && current_user?.role !== 'student' && (
                     <Badge 
-                      color={user.status === 'active' ? 'green' : 'red'} 
+                      color={profile_user.status === 'active' ? 'green' : 'red'} 
                       variant="outline" 
                       size="sm"
                     >
-                      {user.status === 'active' ? t('form.status_active') : t('form.status_inactive')}
+                      {profile_user.status === 'active' ? t('form.status_active') : t('form.status_inactive')}
                     </Badge>
                   )}
                 </Group>
+
+                {lesson && (
+                    <Button
+                      component={Link}
+                      href={`/main/lesson/${lesson.id}`}
+                      variant="filled"
+                      color="green"
+                      size="xs"
+                      radius="xl"
+                      leftSection={<IoVideocamOutline size={14} />}
+                      className="animate-pulse shadow-md hover:scale-105 active:scale-95 transition-all mt-2"
+                    >
+                      {tCalendar('join_lesson')}
+                    </Button>
+                )}
               </Stack>
             </Group>
           </Group>
@@ -164,7 +185,7 @@ export function StudentProfileShell({
               <Tabs.Tab value="general" leftSection={<IoPersonOutline size={16} />}>
                 {t('tabs.general') || 'General'}
               </Tabs.Tab>
-              {user.role === 'student' && (
+              {profile_user.role === 'student' && (
                 <>
                   <Tabs.Tab value="subscriptions" leftSection={<IoCardOutline size={16} />}>
                     {t('tabs.lesson_history')}
@@ -211,7 +232,7 @@ export function StudentProfileShell({
       <UserDrawer 
         opened={drawerOpened}
         on_close={() => setDrawerOpened(false)}
-        initial_data={user}
+        initial_data={profile_user}
         teachers={teachers}
         current_user={current_user}
         on_submit={handle_submit}

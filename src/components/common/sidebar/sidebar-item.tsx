@@ -2,7 +2,7 @@
 
 import { Link } from '@/i18n/routing';
 import { usePathname } from '@/i18n/routing';
-import { Tooltip, UnstyledButton, Text, Box, Collapse, Stack } from '@mantine/core';
+import { Tooltip, UnstyledButton, Text, Box, Collapse, Stack, Badge } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { NavItem } from '../navigation-config';
 import { cn } from '@/lib/utils';
@@ -30,6 +30,9 @@ export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
   const filtered_items = (item.items || []).filter(sub => 
     sub.roles.includes(user?.role || 'student')
   );
+
+  const review_count = user?.tests_to_review_count || 0;
+  const is_feedback_group = item.label === 'feedback';
   
   const has_items = filtered_items.length > 0;
   const is_active = pathname === item.href || filtered_items.some(sub => pathname === sub.href);
@@ -72,12 +75,28 @@ export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
         color: is_active ? 'var(--space-sidebar-text)' : 'var(--space-sidebar-text-muted)'
       }}
     >
-      <item.icon size={20} className={cn(!collapsed ? 'mr-3' : 'mr-0')} />
+      <Box pos="relative" className={cn(!collapsed ? 'mr-3' : 'mr-0')}>
+        <item.icon size={20} />
+        {collapsed && is_feedback_group && review_count > 0 && (
+          <Box 
+            className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 border-2 border-white border-solid flex items-center justify-center pointer-events-none shadow-sm"
+          >
+            <Text size="9px" fw={800} c="white" lh={1}>{review_count}</Text>
+          </Box>
+        )}
+      </Box>
       {!collapsed && (
         <>
-          <Text size="sm" fw={500} className="flex-1">
+          <Text size="sm" fw={500} className="flex-1 truncate">
             {t(item.label)}
           </Text>
+          {is_feedback_group && review_count > 0 && !opened && (
+            <Box 
+              className="mr-2 h-[20px] min-w-[20px] px-1 rounded-full bg-red-600 border-2 border-white border-solid shadow-md flex items-center justify-center"
+            >
+              <Text size="10px" fw={800} c="white" lh={1}>{review_count}</Text>
+            </Box>
+          )}
           {has_items && (
             opened ? <IoChevronUpOutline size={14} /> : <IoChevronDownOutline size={14} />
           )}
@@ -105,9 +124,16 @@ export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
               )}
             >
               {sub.icon && <sub.icon size={14} className="mr-3 opacity-70 group-hover/sub:opacity-100 transition-opacity" />}
-              <Text size="sm" fw={sub_active ? 500 : 400} className="truncate">
+              <Text size="sm" fw={sub_active ? 500 : 400} className="truncate flex-1">
                 {t(sub.label)}
               </Text>
+              {sub.label === 'test_reviews' && review_count > 0 && (
+                <Box 
+                  className="mr-1 h-[20px] min-w-[20px] px-1 rounded-full bg-red-600 border-2 border-white border-solid shadow-sm flex items-center justify-center"
+                >
+                  <Text size="10px" fw={800} c="white" lh={1}>{review_count}</Text>
+                </Box>
+              )}
             </UnstyledButton>
           );
         })}

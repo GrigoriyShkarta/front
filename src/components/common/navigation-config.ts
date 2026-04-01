@@ -1,6 +1,8 @@
 import { IconType } from 'react-icons';
 import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
 import { FaChalkboard } from "react-icons/fa";
+import { VscFeedback } from "react-icons/vsc";
+
 
 export interface NavItem {
   label: string; // Translation key
@@ -102,16 +104,24 @@ export const MAIN_NAVIGATION: NavItem[] = [
         roles: ['super_admin', 'admin', 'teacher'],
       },
       {
-        label: 'test_reviews',
-        href: '/main/materials/tests/reviews',
-        icon: IoShieldCheckmarkOutline,
-        roles: ['super_admin', 'admin', 'teacher'],
-      },
-      {
         label: 'courses',
         href: '/main/materials/courses',
         icon: IoSchoolOutline,
         roles: ['super_admin', 'admin', 'teacher', 'student'],
+      },
+    ]
+  },
+  {
+    label: 'feedback',
+    href: '/main/materials/tests/reviews',
+    icon: VscFeedback,
+    roles: ['super_admin', 'admin', 'teacher'],
+    items: [
+      {
+        label: 'test_reviews',
+        href: '/main/materials/tests/reviews',
+        icon: IoCheckmarkDoneOutline,
+        roles: ['super_admin', 'admin', 'teacher'],
       },
     ]
   },

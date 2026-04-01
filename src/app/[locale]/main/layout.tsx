@@ -8,6 +8,7 @@ import { DynamicThemeProvider } from '@/context/dynamic-theme-provider';
 import { StreamVideoProvider } from '@/providers/stream-video-provider';
 import { ActiveCallProvider } from '@/context/active-call-context';
 import { FloatingCallWrapper } from '@/components/layout/lesson-call/floating-call-wrapper';
+import { LessonReminder } from '@/components/common/lesson-reminder';
 
 export default async function MainLayout({
   children,
@@ -33,6 +34,7 @@ export default async function MainLayout({
               </main>
             </div>
             <FloatingCallWrapper />
+            <LessonReminder />
           </ActiveCallProvider>
         </StreamVideoProvider>
       </DynamicThemeProvider>
