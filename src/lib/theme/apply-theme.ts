@@ -156,9 +156,11 @@ export function applyTheme(config: ThemeConfig) {
 
   // --- Apply Sidebar & Global Primary Text Color ---
   const primary_text_color = config.is_white_sidebar_color ? '#ffffff' : '#000000';
+  const primary_text_rgb = config.is_white_sidebar_color ? '255, 255, 255' : '0, 0, 0';
   const sidebar_text_color_muted = config.is_white_sidebar_color ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
   
   root.style.setProperty('--space-primary-text', primary_text_color);
+  root.style.setProperty('--space-primary-text-rgb', primary_text_rgb);
   root.style.setProperty('--space-sidebar-text', primary_text_color);
   root.style.setProperty('--space-sidebar-text-muted', sidebar_text_color_muted);
 

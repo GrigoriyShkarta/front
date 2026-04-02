@@ -56,25 +56,32 @@ export function LessonReminder() {
             p="md"
             className="pointer-events-auto max-w-4xl mx-auto shadow-2xl relative overflow-hidden group"
             style={{ 
-              background: 'linear-gradient(135deg, var(--space-primary) 0%, #1e40af 100%)',
-              borderColor: 'rgba(255, 255, 255, 0.2)',
+              backgroundColor: 'var(--space-primary)',
+              backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%)',
               backdropFilter: 'blur(10px)',
-              color: 'white'
+              color: 'var(--space-primary-text)'
             }}
           >
+            {/* Using a separate div for border to handle opacity without affecting text */}
+            <Box 
+               className="absolute inset-0 border pointer-events-none opacity-20"
+               style={{ borderColor: 'var(--space-primary-text)' }}
+            />
+
             {/* Animated background decoration */}
             <Box 
               className="absolute top-0 right-0 w-64 h-64 opacity-10 pointer-events-none -translate-y-1/2 translate-x-1/2"
               style={{ 
-                background: 'radial-gradient(circle, white 0%, transparent 70%)',
+                background: 'radial-gradient(circle, var(--space-primary-text) 0%, transparent 70%)',
                 filter: 'blur(40px)'
               }}
             />
 
-            <Group justify="space-between" wrap="nowrap" gap="xl">
+            <Group justify="space-between" wrap="nowrap" gap="xl" pos="relative">
               <Group gap="md" wrap="nowrap">
                 <Box 
-                  className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0 shadow-inner"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-inner"
+                  style={{ backgroundColor: 'rgba(var(--space-primary-text-rgb), 0.15)' }}
                 >
                   <IoVideocamOutline size={26} className="animate-pulse" />
                 </Box>
@@ -83,7 +90,7 @@ export function LessonReminder() {
                   <Text fw={700} size="lg" className="tracking-tight leading-tight">
                     {is_ongoing ? t('lesson_ongoing') : t('lesson_starts_soon')}
                   </Text>
-                  <Text size="sm" className="opacity-90 font-medium">
+                  <Text size="sm" className="opacity-80 font-medium">
                     {person_display} • {start_time.format('HH:mm')}
                   </Text>
                 </Box>
@@ -95,8 +102,12 @@ export function LessonReminder() {
                   href={`/main/lesson/${lesson.id}`}
                   size="md"
                   radius="md"
-                  // color="white"
-                  className="text-blue-700 shadow-lg px-6 font-bold transition-all hover:scale-105 active:scale-95"
+                  variant="white"
+                  style={{ 
+                    backgroundColor: 'var(--space-primary-text)', 
+                    color: 'var(--space-primary)' 
+                  }}
+                  className="shadow-lg px-6 font-bold transition-all hover:scale-105 active:scale-95"
                   rightSection={<IoArrowForwardOutline size={18} />}
                 >
                   {t('join_button')}
@@ -104,14 +115,14 @@ export function LessonReminder() {
                 
                 <ActionIcon 
                   variant="subtle" 
-                  color="white" 
                   size="lg" 
                   radius="md"
                   onClick={() => {
                     set_visible(false);
                     set_closed_id(lesson.id);
                   }}
-                  className="hover:bg-white/10"
+                  style={{ color: 'var(--space-primary-text)' }}
+                  className="hover:bg-black/5 dark:hover:bg-white/5"
                 >
                   <IoCloseOutline size={24} />
                 </ActionIcon>

@@ -33,9 +33,8 @@ export function CourseGallery({
     return (
         <Box p="lg">
             <SimpleGrid 
-                cols={{ base: 1, sm: 2, md: 3, lg: 3 }} 
-                spacing="xl" 
-                verticalSpacing="xl"
+                cols={{ base: 1, xs: 2, sm: 3, md: 4, lg: 5 }} 
+                spacing="lg" 
             >
                 {data.map((course) => (
                     <CourseCard 

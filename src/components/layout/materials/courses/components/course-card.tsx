@@ -119,7 +119,7 @@ export function CourseCard({ course, selected, on_select, on_edit, on_delete }: 
 
             <Link href={`/main/materials/courses/${course.id}`} className="no-underline text-inherit block h-full">
                 {/* Image Section */}
-                <Box className="relative aspect-[16/10] overflow-hidden bg-white/5 border-b border-white/5">
+                <Box className="relative aspect-square overflow-hidden bg-white/5 border-b border-white/5">
                     {course.image_url ? (
                         <img 
                             src={course.image_url} 
@@ -138,7 +138,7 @@ export function CourseCard({ course, selected, on_select, on_edit, on_delete }: 
                             variant="filled" 
                             color="dark" 
                             size="sm" 
-                            className="bg-black/60 backdrop-blur-md border border-white/10"
+                            className="bg-black/60 backdrop-blur-md border border-white/10 shadow-sm"
                             leftSection={<IoLayersOutline size={12} />}
                          >
                             {items_count}
@@ -156,9 +156,9 @@ export function CourseCard({ course, selected, on_select, on_edit, on_delete }: 
                         </Group>
 
                         {/* Categories */}
-                        <Group gap={4} className="min-h-[22px]">
-                            {course.categories && course.categories.length > 0 ? (
-                                course.categories.slice(0, 2).map((cat) => (
+                        {course.categories && course.categories.length > 0 && (
+                            <Group gap={4}>
+                                {course.categories.slice(0, 2).map((cat) => (
                                     <Badge 
                                         key={cat.id} 
                                         size="xs" 
@@ -168,16 +168,14 @@ export function CourseCard({ course, selected, on_select, on_edit, on_delete }: 
                                     >
                                         {cat.name}
                                     </Badge>
-                                ))
-                            ) : (
-                                <Box h={20} />
-                            )}
-                            {course.categories && course.categories.length > 2 && (
-                                <Badge size="xs" variant="filled" color="gray" className="bg-white/5">
-                                    +{course.categories.length - 2}
-                                </Badge>
-                            )}
-                        </Group>
+                                ))}
+                                {course.categories.length > 2 && (
+                                    <Badge size="xs" variant="filled" color="gray" className="bg-white/5">
+                                        +{course.categories.length - 2}
+                                    </Badge>
+                                )}
+                            </Group>
+                        )}
 
                         {/* Footer info */}
                         <Group justify="space-between" mt="sm" pt="sm" className="border-t border-white/5">

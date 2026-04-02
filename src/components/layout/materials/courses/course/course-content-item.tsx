@@ -106,7 +106,7 @@ export function CourseContentItemRenderer({ item: _item, all_lessons, all_tests 
         const test_data = all_tests.find((t: any) => t.id === test_id);
         const is_active = active_lesson_id === test_id;
         const has_access = !is_student || is_active || !!test_data || item.has_access === true;
-        const is_passed = item.is_passed || test_data?.is_passed;
+        const is_passed = (item.is_passed || test_data?.is_passed) && is_student;
 
         const TestCard = (
             <Paper 

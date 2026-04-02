@@ -983,6 +983,38 @@
           "courses": "Додати до курсів",
           "select_courses": "Оберіть курси для додавання"
         },
+        "results": {
+          "title": "Результати тестів",
+          "title_global": "Перевірки тестів",
+          "points": "балів",
+          "review_drawer": {
+            "title": "Перевірка спроби",
+            "no_answer": "Відповідь не надана",
+            "student_answer": "Відповідь студента",
+            "correct_answer": "Правильна відповідь",
+            "teacher_comment": "Коментар вчителя",
+            "review_section": "Ручна перевірка",
+            "points_label": "Бали за відповідь",
+            "comment_label": "Коментар (необов'язково)",
+            "comment_placeholder": "Напишіть ваш відгук...",
+            "confirm_review": "Підтвердити оцінку"
+          },
+          "review_description": "Перевірте відповіді студента та оцініть відкриті питання.",
+          "back_to_list": "Назад до списку",
+          "points": "балів",
+          "review_drawer": {
+            "title": "Перевірка спроби",
+            "no_answer": "Відповідь не надана",
+            "student_answer": "Відповідь студента",
+            "correct_answer": "Правильна відповідь",
+            "teacher_comment": "Коментар вчителя",
+            "review_section": "Ручна перевірка",
+            "points_label": "Бали за відповідь",
+            "comment_label": "Коментар (необов'язково)",
+            "comment_placeholder": "Напишіть ваш відгук...",
+            "confirm_review": "Підтвердити оцінку"
+          }
+        },
         "question_placeholder": "Введіть текст запитання...",
         "option_placeholder": "Варіант відповіді...",
         "add_option": "Додати варіант",
@@ -1305,7 +1337,23 @@
         "description": "Спроби студентів, які потребують вашої уваги або ручної перевірки."
       },
       "results": {
-        "title": "Результати тесту",
+        "title": "Результати тестів",
+        "title_global": "Перевірки тестів",
+        "review_description": "Перевірте відповіді студента та оцініть відкриті питання.",
+        "back_to_list": "Назад до списку",
+        "points": "балів",
+        "review_drawer": {
+          "title": "Перевірка спроби",
+          "no_answer": "Відповідь не надана",
+          "student_answer": "Відповідь студента",
+          "correct_answer": "Правильна відповідь",
+          "teacher_comment": "Коментар вчителя",
+          "review_section": "Ручна перевірка",
+          "points_label": "Бали за відповідь",
+          "comment_label": "Коментар (необов'язково)",
+          "comment_placeholder": "Напишіть ваш відгук...",
+          "confirm_review": "Підтвердити оцінку"
+        },
         "status_passed": "Складено",
         "status_failed": "Не складено",
         "status_pending": "Очікує перевірки",
@@ -1321,6 +1369,8 @@
         "hide_details": "Приховати деталі відповідей",
         "back_to_tests": "Назад до матеріалів",
         "correct_answer": "Правильна відповідь",
+        "your_answer": "Ваша відповідь",
+        "teacher_comment": "Коментар вчителя",
         "awaiting_review": "Очікує перевірки вчителем",
         "points_label": "балів",
         "stats": {
@@ -1355,18 +1405,6 @@
         "attempts_title": "Спроби студентів",
         "view_details": "Переглянути детальну спробу",
         "no_attempts": "Спроб поки не знайдено",
-        "review_drawer": {
-          "title": "Перевірка спроби",
-          "no_answer": "Відповідь не надана",
-          "student_answer": "Відповідь студента",
-          "correct_answer": "Правильна відповідь",
-          "teacher_comment": "Коментар вчителя",
-          "review_section": "Ручна перевірка",
-          "points_label": "Бали за відповідь",
-          "comment_label": "Коментар (необов'язково)",
-          "comment_placeholder": "Напишіть ваш відгук...",
-          "confirm_review": "Підтвердити оцінку"
-        },
         "review_success_title": "Оцінку збережено",
         "review_success": "Бал та коментар було успішно застосовано.",
         "review_error_title": "Помилка перевірки",
@@ -1613,7 +1651,15 @@
     }
   },
   "Notifications": {
+    "title": "Сповіщення",
+    "no_notifications": "У вас поки немає сповіщень",
+    "mark_all_read": "Позначити всі як прочитані",
+    "clear_all": "Очистити все",
+    "view_all": "Переглянути всі",
     "messages": {
+      "new_task_created": "Створено нову задачу",
+      "task_column_changed": "Статус задачі змінено",
+      "test_completed": "Тест завершено!",
       "lesson_access_granted": "Надано доступ до уроку:"
     }
   }

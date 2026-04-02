@@ -276,6 +276,14 @@ function AnswerBreakdown({
                 </Text>
               </Text>
 
+              {/* Show teacher comment if available */}
+              {answer?.teacher_comment && (
+                <Box mt={4} className="p-3 rounded-lg bg-white/5 border border-white/5">
+                  <Text size="xs" fw={600} mb={2} c="dimmed">{t('teacher_comment')}:</Text>
+                  <Text size="xs">{answer.teacher_comment}</Text>
+                </Box>
+              )}
+
               {/* Show correct answer for wrong answers (not for detailed) */}
               {(is_wrong || is_correct) && q.type !== QUESTION_TYPES.DETAILED_ANSWER && (
                 <Text size="xs">

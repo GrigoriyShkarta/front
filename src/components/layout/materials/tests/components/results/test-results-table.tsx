@@ -83,14 +83,14 @@ export function TestResultsTable({ attempts, on_view, show_test_name }: Props) {
             <Table.Th>{t('score')}</Table.Th>
             <Table.Th>{t('time')}</Table.Th>
             <Table.Th>{t('status')}</Table.Th>
-            <Table.Th w={50}>{t('actions')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {attempts.map((attempt) => (
             <Table.Tr
               key={attempt.id}
-              className="transition-colors border-b border-white/5 last:border-0 hover:bg-white/5"
+              className="transition-colors border-b border-white/5 last:border-0 hover:bg-white/5 cursor-pointer"
+              onClick={() => on_view(attempt.id)}
             >
               <Table.Td>
                 <Group gap="sm" wrap="nowrap">
@@ -131,16 +131,6 @@ export function TestResultsTable({ attempts, on_view, show_test_name }: Props) {
               </Table.Td>
               <Table.Td>
                 {get_status_badge(attempt.status, attempt.is_passed)}
-              </Table.Td>
-              <Table.Td>
-                <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                  onClick={() => on_view(attempt.id)}
-                  title={common_t('view_details')}
-                >
-                  <IoEyeOutline size={18} />
-                </ActionIcon>
               </Table.Td>
             </Table.Tr>
           ))}
