@@ -180,6 +180,7 @@
     "tests": "Тести",
     "homework": "Домашні завдання",
     "test_reviews": "Перевірка тестів",
+    "homework_reviews": "Перевірка ДЗ",
     "categories": "Категорії",
     "theme": "Тема",
     "languages": "Мови",
@@ -880,6 +881,7 @@
         "date": "Дата створення",
         "actions": "Дії",
         "courses": "Курси",
+        "categories": "Категорії",
         "view_courses": "Переглянути курси",
         "courses_title": "Курси уроку"
       },
@@ -1061,6 +1063,7 @@
             "add_test": "Додати тест",
             "add_group": "Додати групу",
             "test": "Тест",
+            "lesson": "Урок",
             "group_title": "Назва групи",
             "no_groups": "Ще не додано жодних груп або уроків",
             "placeholder_name": "Введіть назву курсу",
@@ -1393,7 +1396,8 @@
           "completed": "Завершено",
           "pending_review": "Очікує перевірки",
           "reviewed": "Перевірено",
-          "in_progress": "У процесі"
+          "in_progress": "У процесі",
+          "no_results_for_filter": "Немає результатів за цим фільтром"
         },
         "attempts_title": "Спроби студентів",
         "view_details": "Переглянути детальну спробу",
@@ -1485,6 +1489,7 @@
         "add_test": "Додати тест",
         "add_group": "Додати групу",
         "test": "Тест",
+        "lesson": "Урок",
         "group_title": "Заголовок групи",
         "no_groups": "Груп або уроків ще не додано",
         "placeholder_name": "Введіть назву курсу",
@@ -1518,7 +1523,7 @@
       "no_access": "Немає доступу"
     },
     "homework": {
-      "title": "Домашні завдання",
+      "title": "Домашнє завдання",
       "subtitle": "Управління домашніми завданнями для ваших уроків.",
       "add_homework": "Додати завдання",
       "edit_homework": "Редагувати завдання",
@@ -1552,6 +1557,7 @@
           "reviewed": "Перевірено"
         },
         "feedback": "Відгук",
+        "teacher_feedback": "Відгук викладача",
         "score": "Оцінка"
       },
       "notifications": {
@@ -1575,6 +1581,48 @@
         "lesson": "Урок",
         "search_lesson": "Оберіть урок",
         "back": "Назад"
+      },
+      "reviews": {
+        "title": "Перевірка ДЗ",
+        "description": "Відповіді студентів на домашні завдання, які потребують вашої перевірки та відгуку.",
+        "empty_title": "Домашніх завдань ще немає",
+        "empty_description": "Жодного домашнього завдання ще не створено.",
+        "no_submissions": "Немає відповідей для цього статусу",
+        "loading": "Завантаження відповідей...",
+        "review_success": "Перевірку успішно збережено",
+        "review_description_success": "Відгук відправлено.",
+        "search_placeholder": "Пошук студентів або уроків...",
+        "no_results_found": "За вашим запитом відповідей не знайдено.",
+        "review_error": "Не вдалося зберегти перевірку. Спробуйте ще раз.",
+        "filter": {
+          "all": "Всі статуси",
+          "pending": "Очікує перевірки",
+          "reviewed": "Перевірено"
+        },
+        "table": {
+          "student": "Ім'я студента",
+          "lesson": "Назва уроку",
+          "date": "Дата здачі",
+          "status": "Статус",
+          "actions": "Дії"
+        },
+        "status_pending": "Очікує",
+        "status_reviewed": "Перевірено",
+        "drawer_title": "Перевірка ДЗ",
+        "student_label": "Учень",
+        "student_answer": "Відповідь учня",
+        "attachments": "Вкладення",
+        "submitted_at": "Здано",
+        "feedback_label": "Відгук",
+        "leave_feedback": "Залишити відгук",
+        "edit_feedback": "Оновити відгук",
+        "feedback_placeholder": "Напишіть відгук для учня...",
+        "confirm_review": "Підтвердити та зберегти",
+        "update_review": "Оновити перевірку",
+        "score_label": "Оцінка / Бал",
+        "teacher_review": "Перевірка викладача",
+        "no_text_answer": "Учень не надав текстової відповіді.",
+        "unknown_student": "Невідомий учень"
       }
     },
     "picker_title_homework": "Оберіть домашнє завдання",
@@ -1592,7 +1640,8 @@
       "status": {
         "pending": "Очікує перевірки",
         "reviewed": "Перевірено"
-      }
+      },
+      "score": "Оцінка"
     }
   },
   "Categories": {
@@ -1731,7 +1780,9 @@
       "task_column_changed": "Статус задачі змінено",
       "test_completed": "Тест завершено!",
       "lesson_access_granted": "Надано доступ до уроку:",
-      "homework_completed": "Домашнє завдання виконано!"
+      "homework_completed": "Домашнє завдання виконано!",
+      "homework_reviewed": "Вчитель перевірив домашнє завдання",
+      "test_access_granted": "Надано доступ до тесту:"
     }
   }
 }

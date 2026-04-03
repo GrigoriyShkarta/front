@@ -180,6 +180,7 @@
     "tests": "Tests",
     "homework": "Homework",
     "test_reviews": "Checking Tests",
+    "homework_reviews": "Checking Homeworks",
     "categories": "Categories",
     "theme": "Theme",
     "languages": "Languages",
@@ -875,6 +876,7 @@
         "date": "Created Date",
         "actions": "Actions",
         "courses": "Courses",
+        "categories": "Categories",
         "view_courses": "View courses",
         "courses_title": "Lesson Courses"
       },
@@ -1136,7 +1138,8 @@
         "review_success_title": "Review Saved",
         "review_success": "Grade and comment have been successfully applied.",
         "review_error_title": "Review Error",
-        "review_error": "Failed to save the review. Please try again."
+        "review_error": "Failed to save the review. Please try again.",
+        "no_results_for_filter": "No results for this filter"
       },
       "detail": {
         "tab_content": "Test Content",
@@ -1176,6 +1179,7 @@
         "add_test": "Add Test",
         "add_group": "Add Group",
         "test": "Test",
+        "lesson": "Lesson",
         "group_title": "Group Title",
         "no_groups": "No groups or lessons added yet",
         "placeholder_name": "Enter course name",
@@ -1287,6 +1291,7 @@
           "reviewed": "Reviewed"
         },
         "feedback": "Feedback",
+        "teacher_feedback": "Teacher's Feedback",
         "score": "Score"
       },
       "notifications": {
@@ -1310,6 +1315,48 @@
         "lesson": "Lesson",
         "search_lesson": "Select lesson",
         "back": "Back"
+      },
+      "reviews": {
+        "title": "Homework Review",
+        "description": "Student homework submissions that require your review and feedback.",
+        "empty_title": "No homework yet",
+        "empty_description": "There are no homework assignments created yet.",
+        "no_submissions": "No submissions for this status",
+        "loading": "Loading submissions...",
+        "review_success": "Review saved successfully",
+        "review_description_success": "Feedback sent.",
+        "search_placeholder": "Search students or lessons...",
+        "no_results_found": "No submissions found for your search.",
+        "review_error": "Failed to save review. Please try again.",
+        "filter": {
+          "all": "All statuses",
+          "pending": "Pending review",
+          "reviewed": "Reviewed"
+        },
+        "table": {
+          "student": "Student name",
+          "lesson": "Lesson title",
+          "date": "Submitted date",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "status_pending": "Pending",
+        "status_reviewed": "Reviewed",
+        "drawer_title": "Homework Review",
+        "student_label": "Student",
+        "student_answer": "Student's Answer",
+        "attachments": "Attachments",
+        "submitted_at": "Submitted",
+        "feedback_label": "Feedback",
+        "leave_feedback": "Leave Feedback",
+        "edit_feedback": "Update Feedback",
+        "feedback_placeholder": "Write your feedback for the student...",
+        "confirm_review": "Confirm & Save",
+        "update_review": "Update Review",
+        "score_label": "Grade / Score",
+        "teacher_review": "Teacher Review",
+        "no_text_answer": "Student did not provide a text response.",
+        "unknown_student": "Unknown Student"
       }
     },
     "picker_title_homework": "Select homework",
@@ -1327,7 +1374,8 @@
       "status": {
         "pending": "Pending Review",
         "reviewed": "Reviewed"
-      }
+      },
+      "score": "Grade"
     }
   },
   "Categories": {
@@ -1452,7 +1500,9 @@
       "task_column_changed": "Task status changed",
       "test_completed": "Test completed!",
       "lesson_access_granted": "Access to the lesson granted:",
-      "homework_completed": "Homework completed!"
+      "homework_completed": "Homework completed!",
+      "homework_reviewed": "Teacher reviewed homework",
+      "test_access_granted": "Access to the test granted:"
     }
   }
 }

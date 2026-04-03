@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
-import { Stack, Box, LoadingOverlay, Pagination, Group, Text, Select, Paper } from '@mantine/core';
+import { Stack, Box, LoadingOverlay, Pagination, Group, Text, Select, Paper, TextInput } from '@mantine/core';
 import { useTranslations } from 'next-intl';
+import { useDebouncedValue } from '@mantine/hooks';
+import { IoSearchOutline } from 'react-icons/io5';
 
 import { useRouter } from '@/i18n/routing';
 import { useTestResults } from '../../hooks/use-test-results';
@@ -27,6 +29,8 @@ export function TestResultsLayout({ test_id }: Props) {
   const [page, set_page] = useState(1);
   const [limit, set_limit] = useState('15');
   const [status_filter, set_status_filter] = useState<string | null>(test_id ? null : 'pending_review');
+  const [search, set_search] = useState('');
+  const [debounced_search] = useDebouncedValue(search, 400);
 
   // If we have a test_id, we fetch stats for that test
   const { test } = useTestEditor({ id: test_id || '' });
@@ -42,7 +46,13 @@ export function TestResultsLayout({ test_id }: Props) {
     page,
     limit: parseInt(limit),
     status: status_filter || undefined,
+    search: debounced_search,
   });
+
+  // Reset to first page on status or search change
+  useEffect(() => {
+    set_page(1);
+  }, [status_filter, limit, debounced_search]);
 
   const handle_view_attempt = (attempt_id: string) => {
     router.push(`/main/materials/tests/reviews/${attempt_id}`);
@@ -52,7 +62,6 @@ export function TestResultsLayout({ test_id }: Props) {
     { value: 'completed', label: t('filter.completed') },
     { value: 'pending_review', label: t('filter.pending_review') },
     { value: 'reviewed', label: t('filter.reviewed') },
-    { value: 'in_progress', label: t('filter.in_progress') },
   ];
 
   return (
@@ -67,12 +76,18 @@ export function TestResultsLayout({ test_id }: Props) {
         <Paper withBorder radius="md" mt="lg" className="bg-white/5 border-white/10 overflow-hidden">
           <Box className="p-4 border-b border-white/10 bg-white/2">
             <Group justify="space-between">
-              <Text size="sm" fw={600}>
-                {t('attempts_title')}
-                {meta && (
-                  <Text span c="dimmed" ml="xs">({meta.total_items})</Text>
-                )}
-              </Text>
+
+                <TextInput
+                  placeholder={common_t('search') + '...'}
+                  size="xs"
+                  w={200}
+                  leftSection={<IoSearchOutline size={14} />}
+                  value={search}
+                  onChange={(e) => set_search(e.currentTarget.value)}
+                  radius="md"
+                  variant="filled"
+                />
+
               <Select
                 data={status_options}
                 value={status_filter}
@@ -82,6 +97,7 @@ export function TestResultsLayout({ test_id }: Props) {
                 size="xs"
                 w={180}
                 variant="filled"
+                radius="md"
               />
             </Group>
           </Box>
@@ -95,31 +111,40 @@ export function TestResultsLayout({ test_id }: Props) {
 
           {/* Empty state */}
           {!is_loading && attempts.length === 0 && (
-            <Box py={60} className="text-center">
-              <Text c="dimmed">{t('no_attempts')}</Text>
+            <Box py={80} className="text-center">
+              <Stack align="center" gap="md">
+                <Text size="lg" fw={700} c="dimmed">{t('no_attempts')}</Text>
+                <Text size="sm" c="dimmed">
+                  {status_filter ? t('filter.no_results_for_filter') || 'No attempts for this status' : t('filter.no_attempts_yet') || 'No attempts recorded yet'}
+                </Text>
+              </Stack>
             </Box>
           )}
 
-          {/* Pagination */}
+          {/* Footer with Pagination and Limit selector */}
           {!is_loading && attempts.length > 0 && (
             <Box className="p-4 border-t border-white/10 bg-white/2">
-              <Group justify="center">
+              <Group justify="center" gap="xl">
                 <Group gap="xs">
-                  <Text size="sm" c="dimmed">{common_t('show')}</Text>
+                  <Text size="xs" c="dimmed" fw={600} tt="uppercase" lts={1}>{common_t('show')}</Text>
                   <Select
                     data={['15', '30', '50']}
                     value={limit}
                     onChange={(val) => set_limit(val || '15')}
+                    variant="filled"
                     size="xs"
                     w={70}
+                    radius="md"
                   />
-                  <Text size="sm" c="dimmed">{common_t('per_page')}</Text>
+                  <Text size="xs" c="dimmed" fw={600} tt="uppercase" lts={1}>{common_t('per_page')}</Text>
                 </Group>
+                
                 <Pagination
                   total={total_pages}
                   value={page}
                   onChange={set_page}
                   size="sm"
+                  radius="md"
                   withEdges
                 />
               </Group>

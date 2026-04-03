@@ -13,6 +13,7 @@ interface UseTestResultsProps {
   page?: number;
   limit?: number;
   status?: string;
+  search?: string;
 }
 
 /**
@@ -20,14 +21,14 @@ interface UseTestResultsProps {
  * @param props - test_id, pagination, and status filter
  * @returns attempts list, stats, and review actions
  */
-export function useTestResults({ test_id, page = 1, limit = 15, status }: UseTestResultsProps) {
+export function useTestResults({ test_id, page = 1, limit = 15, status, search }: UseTestResultsProps) {
   const query_client = useQueryClient();
   const t = useTranslations('Materials.tests.results');
 
   // Fetch attempts list
   const { data: attempts_data, isLoading: is_loading_attempts } = useQuery({
-    queryKey: ['test-attempts', test_id, page, limit, status],
-    queryFn: () => testAttemptActions.get_attempts({ test_id: test_id || undefined, page, limit, status }),
+    queryKey: ['test-attempts', test_id, page, limit, status, search],
+    queryFn: () => testAttemptActions.get_attempts({ test_id: test_id || undefined, page, limit, status, search }),
   });
 
   // Fetch test stats

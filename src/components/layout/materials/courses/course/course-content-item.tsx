@@ -186,6 +186,8 @@ export function CourseContentItemRenderer({ item: _item, all_lessons, all_tests 
         name: item.title || lesson_from_all?.name || '',
         duration: item.duration || lesson_from_all?.duration || 0,
         full_access: item.has_access !== undefined ? item.has_access : (lesson_from_all?.full_access ?? true),
+        homework_id: item.homework ? item.homework.id : (item.homework === null ? undefined : lesson_from_all?.homework_id),
+        homework_status: item.homework?.status || item.homework_status || lesson_from_all?.homework_status,
     } as any;
 
     return (

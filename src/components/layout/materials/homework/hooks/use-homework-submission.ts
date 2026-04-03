@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { homeworkSubmissionActions } from '../actions/homework-submission-actions';
 
-export function useHomeworkSubmission(homework_id?: string) {
+export function useHomeworkSubmission(homework_id?: string, initial_data?: any) {
     const queryClient = useQueryClient();
     const common_t = useTranslations('Common');
     const t = useTranslations('Materials.homework.submission');
@@ -15,6 +15,7 @@ export function useHomeworkSubmission(homework_id?: string) {
         queryKey: ['homework_submission', homework_id],
         queryFn: () => homeworkSubmissionActions.get_my_submission(homework_id!),
         enabled: !!homework_id,
+        initialData: initial_data,
     });
 
     const submit_mutation = useMutation({
@@ -22,6 +23,7 @@ export function useHomeworkSubmission(homework_id?: string) {
             homeworkSubmissionActions.submit(homework_id!, text, file_urls, files),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['homework_submission', homework_id] });
+            queryClient.invalidateQueries({ queryKey: ['lesson'] });
             notifications.show({
                 title: common_t('success'),
                 message: t('submit_success'),

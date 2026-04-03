@@ -1,9 +1,17 @@
 import { api } from "@/lib/api";
 
+export interface HomeworkSubmissionStudent {
+    id: string;
+    name: string;
+    email?: string;
+    avatar_url?: string;
+}
+
 export interface HomeworkSubmission {
     id: string;
     homework_id: string;
     student_id: string;
+    student?: HomeworkSubmissionStudent;
     text: string;
     file_urls: string[];
     status: 'pending' | 'reviewed';

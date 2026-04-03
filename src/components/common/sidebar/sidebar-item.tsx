@@ -31,7 +31,10 @@ export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
     sub.roles.includes(user?.role || 'student')
   );
 
-  const review_count = user?.tests_to_review_count || 0;
+  const tests_count = user?.tests_to_review_count || 0;
+  const homeworks_count = user?.homeworks_to_review_count || 0;
+  const total_count = tests_count + homeworks_count;
+  
   const is_feedback_group = item.label === 'feedback';
   
   const has_items = filtered_items.length > 0;
@@ -77,11 +80,11 @@ export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
     >
       <Box pos="relative" className={cn(!collapsed ? 'mr-3' : 'mr-0')}>
         <item.icon size={20} />
-        {collapsed && is_feedback_group && review_count > 0 && (
+        {collapsed && is_feedback_group && total_count > 0 && (
           <Box 
             className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 border-2 border-white border-solid flex items-center justify-center pointer-events-none shadow-sm"
           >
-            <Text size="9px" fw={800} c="white" lh={1}>{review_count}</Text>
+            <Text size="9px" fw={800} c="white" lh={1}>{total_count}</Text>
           </Box>
         )}
       </Box>
@@ -90,11 +93,11 @@ export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
           <Text size="sm" fw={500} className="flex-1 truncate">
             {t(item.label)}
           </Text>
-          {is_feedback_group && review_count > 0 && !opened && (
+          {is_feedback_group && total_count > 0 && !opened && (
             <Box 
               className="mr-2 h-[20px] min-w-[20px] px-1 rounded-full bg-red-600 border-2 border-white border-solid shadow-md flex items-center justify-center"
             >
-              <Text size="10px" fw={800} c="white" lh={1}>{review_count}</Text>
+              <Text size="10px" fw={800} c="white" lh={1}>{total_count}</Text>
             </Box>
           )}
           {has_items && (
@@ -110,6 +113,11 @@ export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
       <Stack gap={4} mt={4} className="border-l border-white/10 ml-6 pl-4 overflow-hidden">
         {filtered_items.map((sub) => {
           const sub_active = pathname === sub.href;
+          
+          let sub_count = 0;
+          if (sub.label === 'test_reviews') sub_count = tests_count;
+          if (sub.label === 'homework_reviews') sub_count = homeworks_count;
+
           return (
             <UnstyledButton
               key={sub.href}
@@ -127,11 +135,11 @@ export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
               <Text size="sm" fw={sub_active ? 500 : 400} className="truncate flex-1">
                 {t(sub.label)}
               </Text>
-              {sub.label === 'test_reviews' && review_count > 0 && (
+              {sub_count > 0 && (
                 <Box 
                   className="mr-1 h-[20px] min-w-[20px] px-1 rounded-full bg-red-600 border-2 border-white border-solid shadow-sm flex items-center justify-center"
                 >
-                  <Text size="10px" fw={800} c="white" lh={1}>{review_count}</Text>
+                  <Text size="10px" fw={800} c="white" lh={1}>{sub_count}</Text>
                 </Box>
               )}
             </UnstyledButton>

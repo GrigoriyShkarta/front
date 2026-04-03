@@ -13,6 +13,7 @@ export const homework_schema = z.object({
   category_ids: z.array(z.string()).optional(),
   author_id: z.string(),
   super_admin_id: z.string(),
+  submissions: z.array(z.any()).optional(),
   created_at: z.string(),
   updated_at: z.string(),
 });

@@ -2,6 +2,7 @@ import { IconType } from 'react-icons';
 import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoShieldCheckmarkOutline, IoDocumentTextOutline } from 'react-icons/io5';
 import { FaChalkboard } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
+import { IoMdCheckboxOutline } from "react-icons/io";
 
 
 export interface NavItem {
@@ -109,12 +110,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
         icon: IoSchoolOutline,
         roles: ['super_admin', 'admin', 'teacher', 'student'],
       },
-      {
-        label: 'homework',
-        href: '/main/materials/homework',
-        icon: IoDocumentTextOutline,
-        roles: ['super_admin', 'admin', 'teacher', 'student'],
-      },
+      // {
+      //   label: 'homework',
+      //   href: '/main/materials/homework',
+      //   icon: IoDocumentTextOutline,
+      //   roles: ['super_admin', 'admin', 'teacher', 'student'],
+      // },
     ]
   },
   {
@@ -126,7 +127,13 @@ export const MAIN_NAVIGATION: NavItem[] = [
       {
         label: 'test_reviews',
         href: '/main/materials/tests/reviews',
-        icon: IoCheckmarkDoneOutline,
+        icon: IoMdCheckboxOutline ,
+        roles: ['super_admin', 'admin', 'teacher'],
+      },
+      {
+        label: 'homework_reviews',
+        href: '/main/materials/homeworks/reviews',
+        icon: IoDocumentTextOutline,
         roles: ['super_admin', 'admin', 'teacher'],
       },
     ]
@@ -152,3 +159,4 @@ export const MAIN_NAVIGATION: NavItem[] = [
     ]
   }
 ];
+

@@ -88,14 +88,33 @@ export function NotificationDropdown() {
        return '/main/users';
     }
 
-    // 3. Test Type -> Link to Test Reviews Page (Teacher/Admin view)
+    // 3. Test Type
     if (message_type === 'test') {
+      if (notification.message === 'test_access_granted') {
+        const id = payload?.id || payload?.test_id || notification.message_id;
+        return id ? `/main/materials/tests/${id}` : '/main/materials/tests';
+      }
       return '/main/materials/tests/reviews';
     }
 
     // 4. Lesson Type -> Link to Lesson Page
     if (message_type === 'lesson') {
-       return payload?.lesson_id ? `/main/materials/lessons/${payload.lesson_id}` : '/main/materials/lessons';
+       const id = payload?.lesson_id || payload?.id || notification.message_id;
+       return id ? `/main/materials/lessons/${id}` : '/main/materials/lessons';
+    }
+
+    // 5. Homework Completion Type (Admin) -> Link to Review Page
+    if (message_type === 'homework') {
+      return payload?.submission_id 
+        ? `/main/materials/homeworks/reviews/${payload.submission_id}` 
+        : '/main/materials/homeworks/reviews';
+    }
+
+    // 6. Homework Reviewed Type (Student) -> Link to Lesson Page
+    if (message_type === 'homework_reviewed') {
+      return notification.message_id 
+        ? `/main/materials/lessons/${notification.message_id}` 
+        : '/main/materials/lessons';
     }
     
     return '#';
@@ -248,9 +267,19 @@ export function NotificationDropdown() {
                              {notification.payload.task_name}
                           </Text>
                         )}
-                        {notification.payload?.lesson_name && (
+                        {(notification.payload?.lesson_name || (notification.message === 'lesson_access_granted' && notification.payload?.name)) && (
                           <Text component="span" fw={800} inherit ml={4} className="text-primary-600 dark:text-primary-400">
-                             {notification.payload.lesson_name}
+                             {notification.payload.lesson_name || notification.payload?.name}
+                          </Text>
+                        )}
+                        {(notification.payload?.test_name || (notification.message === 'test_access_granted' && notification.payload?.name)) && (
+                          <Text component="span" fw={800} inherit ml={4} className="text-primary-600 dark:text-primary-400">
+                             {notification.payload.test_name || notification.payload?.name}
+                          </Text>
+                        )}
+                        {notification.payload?.homework_name && (
+                          <Text component="span" fw={800} inherit ml={4} className="text-primary-600 dark:text-primary-400">
+                             {notification.payload.homework_name}
                           </Text>
                         )}
                       </Text>

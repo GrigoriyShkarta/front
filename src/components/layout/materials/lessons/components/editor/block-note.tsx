@@ -687,7 +687,7 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
 
   return (
     <div 
-      className={`block-note-wrapper max-w-[940px] ${read_only ? 'is-read-only' : ''}`}
+      className={`block-note-wrapper ${read_only ? 'is-read-only' : ''}`}
       onClick={handleWrapperClick}
     >
       <BlockNoteView

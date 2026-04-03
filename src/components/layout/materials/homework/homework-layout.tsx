@@ -29,8 +29,6 @@ import { useAuth } from '@/hooks/use-auth';
 import { useHomework } from '@/components/layout/materials/homework/hooks/use-homework';
 import { HomeworkTable } from '@/components/layout/materials/homework/components/homework-table';
 import { HomeworkDeleteModal } from '@/components/layout/materials/homework/components/homework-delete-modal';
-import { cn } from '@/lib/utils';
-import { HomeworkMaterial } from './schemas/homework-schema';
 import { useRouter } from '@/i18n/routing';
 
 export default function HomeworkLayout() {

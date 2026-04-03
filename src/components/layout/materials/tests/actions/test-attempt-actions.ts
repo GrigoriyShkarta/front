@@ -13,6 +13,7 @@ interface GetAttemptsParams {
   limit?: number;
   status?: string;
   student_id?: string;
+  search?: string;
 }
 
 /**

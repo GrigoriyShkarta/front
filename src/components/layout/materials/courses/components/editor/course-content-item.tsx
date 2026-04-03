@@ -9,6 +9,7 @@ import {
     MultiSelect, 
     rem,
     ThemeIcon,
+    Badge,
 } from '@mantine/core';
 import { UseFormRegister, UseFormWatch } from 'react-hook-form';
 import { 
@@ -17,6 +18,7 @@ import {
     IoTrashOutline, 
     IoPlayCircleOutline,
     IoCheckmarkDoneCircleOutline,
+    IoDocumentTextOutline,
 } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
@@ -66,6 +68,7 @@ export function ContentItem({
 }: Props) {
     const t = useTranslations('Materials.courses');
     const t_test = useTranslations('Materials.tests');
+    const t_hw = useTranslations('Materials.homework');
 
     const group_content = watch(`content.${index}.content` as any) || [];
 
@@ -76,8 +79,8 @@ export function ContentItem({
         <Paper 
             key={field_id} 
             withBorder 
-            p="md" 
-            radius="20px" 
+            p="sm" 
+            radius="lg" 
             className={cn(
                 "relative transition-all border-white/10 shadow-sm",
                 is_group ? "bg-white/5" : "bg-white/2"
@@ -100,7 +103,7 @@ export function ContentItem({
             </Group>
 
             {is_group ? (
-                <Stack gap="md">
+                <Stack gap="sm">
                     <Group gap="sm" className="flex-1 px-1">
                         <TextInput
                             placeholder={t('form.group_title')}
@@ -125,9 +128,9 @@ export function ContentItem({
                                         <Paper 
                                             key={`${item.id}-${item_idx}`} 
                                             withBorder 
-                                            px="md" 
-                                            py={8} 
-                                            radius="xl" 
+                                            px="sm" 
+                                            py={6} 
+                                            radius="lg" 
                                             className={cn(
                                                 "border-white/5",
                                                 is_item_lesson ? "bg-white/5" : "bg-orange-500/5 border-orange-500/10"
@@ -151,6 +154,11 @@ export function ContentItem({
                                                     <Text size="xs" fw={is_item_lesson ? 500 : 600}>
                                                         {is_item_lesson ? (lesson?.name || 'Unknown Lesson') : (test?.name || 'Unknown Test')}
                                                     </Text>
+                                                    {is_item_lesson && lesson?.homework_id && (
+                                                        <Badge size="xs" variant="light" color="indigo" radius="sm" leftSection={<Text span mt={2}><IoDocumentTextOutline size={10} /></Text>}>
+                                                            {t_hw('title')}
+                                                        </Badge>
+                                                    )}
                                                 </Group>
                                                 <ActionIcon size="xs" color="gray" variant="subtle" onClick={() => on_remove_item_from_group(index, item_idx)}>
                                                     <IoTrashOutline size={14} />
@@ -197,23 +205,35 @@ export function ContentItem({
                     </Stack>
                 </Stack>
             ) : is_lesson ? (
-                <Group gap="sm" wrap="nowrap" className="px-1">
-                    <Box className="flex-1 bg-green-500/5 py-3 px-4 rounded-[16px] border border-green-500/10">
-                        <Group gap="md">
-                            <ThemeIcon variant="light" color="green" size="md" radius="md">
-                                <IoPlayCircleOutline size={20} />
-                            </ThemeIcon>
-                            <Stack gap={0}>
-                                <Text size="xs" c="dimmed" fw={700} tt="uppercase" lts={1}>{t('form.lesson')}</Text>
-                                <Text size="sm" fw={600} className="line-clamp-1">{all_lessons.find(l => l.id === (content_item as any).lesson_id)?.name || 'Unknown Lesson'}</Text>
-                            </Stack>
+                (() => {
+                    const lesson = all_lessons.find(l => l.id === (content_item as any).lesson_id);
+                    return (
+                        <Group gap="sm" wrap="nowrap" className="px-1">
+                            <Box className="flex-1 bg-green-500/5 py-2 px-3 rounded-xl border border-green-500/10">
+                                <Group justify="space-between" wrap="nowrap">
+                                    <Group gap="sm">
+                                        <ThemeIcon variant="light" color="green" size="md" radius="md">
+                                            <IoPlayCircleOutline size={20} />
+                                        </ThemeIcon>
+                                        <Stack gap={0}>
+                                            <Text size="xs" c="dimmed" fw={700} tt="uppercase" lts={1}>{t('form.lesson')}</Text>
+                                            <Text size="sm" fw={600} className="line-clamp-1">{lesson?.name || 'Unknown Lesson'}</Text>
+                                        </Stack>
+                                    </Group>
+                                    {lesson?.homework_id && (
+                                        <Badge size="xs" variant="light" color="indigo" radius="sm" leftSection={<Text span mt={2}><IoDocumentTextOutline size={12} /></Text>}>
+                                            {t_hw('title')}
+                                        </Badge>
+                                    )}
+                                </Group>
+                            </Box>
                         </Group>
-                    </Box>
-                </Group>
+                    );
+                })()
             ) : (
                 <Group gap="sm" wrap="nowrap" className="px-1">
-                    <Box className="flex-1 bg-orange-500/5 py-3 px-4 rounded-[16px] border border-orange-500/10">
-                        <Group gap="md">
+                    <Box className="flex-1 bg-orange-500/5 py-2 px-3 rounded-xl border border-orange-500/10">
+                        <Group gap="sm">
                             <ThemeIcon variant="light" color="orange" size="md" radius="md">
                                 <IoCheckmarkDoneCircleOutline size={20} />
                             </ThemeIcon>

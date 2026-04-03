@@ -6,7 +6,8 @@ import {
     Paper, 
     Text, 
     ThemeIcon,
-    Stack
+    Stack,
+    Badge
 } from '@mantine/core';
 import { IoDocumentTextOutline, IoOpenOutline, IoLockClosedOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,7 @@ interface Props {
 export function LessonRow({ lesson, index, is_standalone, course_id, active_lesson_id }: Props) {
     const is_active = lesson?.id === active_lesson_id;
     const t = useTranslations('Materials.courses');
+    const t_hw = useTranslations('Materials.homework');
     const { user } = useAuth();
     const is_student = user?.role === 'student';
     const has_access = lesson?.full_access !== false || !is_student;
@@ -38,6 +40,38 @@ export function LessonRow({ lesson, index, is_standalone, course_id, active_less
         const h = Math.floor(mins / 60);
         const m = mins % 60;
         return m > 0 ? `${h}${t('h')} ${m}${t('m')}` : `${h}${t('h')}`;
+    };
+
+    const render_homework_badge = () => {
+        if (!lesson?.homework_id) return null;
+
+        if (!is_student) {
+            return (
+                <Badge size="xs" variant="light" color="indigo" radius="sm" leftSection={<Text span mt={2}><IoDocumentTextOutline size={12} /></Text>}>
+                    {t_hw('title')}
+                </Badge>
+            );
+        }
+
+        const status = lesson.homework_status || 'not_submitted';
+        
+        return (
+            <Group gap={4}>
+                <Badge size="xs" variant="light" color="indigo" radius="sm" leftSection={<Text span mt={2}><IoDocumentTextOutline size={12} /></Text>}>
+                    {t_hw('title')}
+                </Badge>
+                {status === 'reviewed' && (
+                    <Badge size="xs" variant="light" color="green" radius="sm">
+                        {t_hw('submission.status.reviewed')}
+                    </Badge>
+                )}
+                {status === 'pending' && (
+                    <Badge size="xs" variant="light" color="orange" radius="sm">
+                        {t_hw('submission.status.pending')}
+                    </Badge>
+                )}
+            </Group>
+        );
     };
 
     if (!lesson) return null;
@@ -110,6 +144,12 @@ export function LessonRow({ lesson, index, is_standalone, course_id, active_less
                                 <Text size="xs" c="dimmed" fw={500}>
                                   • {t('no_access') || 'Locked'}
                                 </Text>
+                            )}
+                            {lesson?.homework_id && (
+                                <Group gap={4}>
+                                    <Text size="xs" c="dimmed">•</Text>
+                                    {render_homework_badge()}
+                                </Group>
                             )}
                         </Group>
                     </Stack>

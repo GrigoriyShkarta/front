@@ -12,10 +12,10 @@ import { Link } from '@/i18n/routing';
 interface Props {
   data: HomeworkMaterial[];
   selected_ids: string[];
+  is_loading?: boolean;
   on_selection_change: (ids: string[]) => void;
   on_delete: (id: string) => void;
   on_edit: (hw: HomeworkMaterial) => void;
-  is_loading?: boolean;
 }
 
 export function HomeworkTable({ data, selected_ids, on_selection_change, on_delete, on_edit, is_loading }: Props) {

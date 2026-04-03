@@ -71,6 +71,7 @@ export const user_schema = z.object({
   is_recording_enabled: z.boolean().optional().default(false),
   can_student_download_recording: z.boolean().optional().default(false),
   tests_to_review_count: z.number().optional().default(0),
+  homeworks_to_review_count: z.number().optional().default(0),
 });
 
 export type UserProfile = z.infer<typeof user_schema>;

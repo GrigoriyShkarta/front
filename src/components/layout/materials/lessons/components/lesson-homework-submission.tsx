@@ -15,9 +15,10 @@ interface Props {
     content?: any[];
   };
   homework_status?: 'not_submitted' | 'pending' | 'reviewed';
+  my_submission?: any;
 }
 
-export function LessonHomeworkSubmission({ homework, homework_status }: Props) {
+export function LessonHomeworkSubmission({ homework, homework_status, my_submission: initial_submission }: Props) {
   const t = useTranslations('Materials.homework.submission');
   const common_t = useTranslations('Common');
   
@@ -26,7 +27,7 @@ export function LessonHomeworkSubmission({ homework, homework_status }: Props) {
   const [local_files, set_local_files] = useState<File[]>([]);
   const [uploading_files, set_uploading_files] = useState(false);
   
-  const { my_submission, is_loading_submission, submit, is_submitting } = useHomeworkSubmission(homework.id);
+  const { my_submission, is_loading_submission, submit, is_submitting } = useHomeworkSubmission(homework.id, initial_submission);
 
   if (is_loading_submission && homework_status !== 'not_submitted') return (
     <Paper withBorder p="xl" radius="md" className="flex items-center justify-center min-h-[100px]">
@@ -149,7 +150,7 @@ export function LessonHomeworkSubmission({ homework, homework_status }: Props) {
           </Box>
           {my_submission.file_urls?.length > 0 && (
             <Group gap="xs">
-                {my_submission.file_urls.map((url, idx) => (
+                {my_submission.file_urls.map((url: string, idx: number) => (
                     <Badge 
                         key={idx} 
                         variant="light" 
@@ -168,8 +169,16 @@ export function LessonHomeworkSubmission({ homework, homework_status }: Props) {
           {my_submission.feedback && (
             <>
               <Divider label={t('teacher_feedback')} labelPosition="center" />
-              <Paper p="sm" bg="primary.0" className="dark:bg-primary-9/20">
-                <Text size="sm" fs="italic">{my_submission.feedback}</Text>
+              <Paper p="sm" bg="secondary.0" className="dark:bg-secondary-9/20 border border-secondary/10">
+                <Stack gap={4}>
+                  <Text size="sm" fs="italic" className="whitespace-pre-wrap">{my_submission.feedback}</Text>
+                  {my_submission.score !== undefined && my_submission.score !== null && (
+                    <Group gap="xs" mt="xs">
+                        <Text size="xs" fw={700} tt="uppercase" c="dimmed">{t('score') || 'Grade'}:</Text>
+                        <Badge variant="dot" color="blue" size="lg">{my_submission.score}</Badge>
+                    </Group>
+                  )}
+                </Stack>
               </Paper>
             </>
           )}
