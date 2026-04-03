@@ -49,7 +49,6 @@ const YoutubeBlock = createReactBlockSpec(
   {
     type: "youtube",
     propSchema: {
-      id: { default: "" },
       url: { default: "" },
       videoId: { default: "" },
       alignment: { default: "center", values: ["left", "center", "right"] },
@@ -133,7 +132,6 @@ const AudioBlock = createReactBlockSpec(
   {
     type: "audio",
     propSchema: {
-      id: { default: "" },
       url: { default: "" },
       name: { default: "Audio File" },
       alignment: { default: "center", values: ["left", "center", "right"] },
@@ -181,7 +179,6 @@ const FileBlock = createReactBlockSpec(
   {
     type: "file",
     propSchema: {
-      id: { default: "" },
       url: { default: "" },
       name: { default: "Document" },
       extension: { default: "" },
@@ -293,6 +290,141 @@ interface Props {
   read_only?: boolean;
 }
 
+const generateId = () => {
+  try {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+  } catch (e) {}
+  return Math.random().toString(36).substring(2, 11) + Date.now().toString(36).substring(2, 11);
+};
+
+const ensureBlockId = (block: any) => ({
+  ...block,
+  id: block.id || generateId(),
+});
+
+/**
+ * Recursively ensures all blocks and their children have valid IDs and types.
+ * Also unwraps "material-style" blocks where content is a JSON string of other blocks.
+ */
+const normalizeBlocks = (blocks: any[]): any[] => {
+  if (!Array.isArray(blocks)) return [];
+  
+  const result: any[] = [];
+  const generateId = () => {
+    try {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+    } catch (e) {}
+    return Math.random().toString(36).substring(2, 11) + Date.now().toString(36).substring(2, 11);
+  };
+
+  for (const block of blocks) {
+    if (typeof block !== 'object' || block === null || Array.isArray(block)) {
+      result.push({
+        id: generateId(),
+        type: 'paragraph',
+        content: [{ type: 'text', text: String(block || ''), styles: {} }],
+        children: []
+      });
+      continue;
+    }
+
+    // Handle "wrapper" blocks (material-style or generic wrappers)
+    // If it has no type but has content as a JSON string that looks like an array, try to unwrap it
+    if (!block.type && typeof block.content === 'string' && block.content.trim().startsWith('[')) {
+      try {
+        const inner = JSON.parse(block.content);
+        if (Array.isArray(inner)) {
+          result.push(...normalizeBlocks(inner));
+          continue;
+        }
+      } catch (e) {
+        // Not a valid JSON array, treat as regular paragraph
+      }
+    }
+
+    const normalized: any = {
+      id: block.id || generateId(),
+      type: block.type || 'paragraph',
+      props: block.props || {},
+      content: block.content,
+      children: Array.isArray(block.children) ? normalizeBlocks(block.children) : [],
+    };
+
+    if (!normalized.id) {
+      normalized.id = generateId();
+    }
+
+    // Paragraph blocks must have content array
+    if (normalized.type === 'paragraph' && !Array.isArray(normalized.content)) {
+      if (typeof normalized.content === 'string') {
+          normalized.content = [{ type: 'text', text: normalized.content, styles: {} }];
+      } else {
+          normalized.content = [];
+      }
+    }
+
+    result.push(normalized);
+  }
+
+  return result;
+};
+
+/**
+ * Robustly parses initial content, handling various data wrappers and structures.
+ */
+const parseContent = (initial_content: any) => {
+    if (!initial_content) return undefined;
+
+    try {
+        const parsed = typeof initial_content === 'string'
+            ? JSON.parse(initial_content)
+            : initial_content;
+
+        // Unwrap "main" block wrapper if it exists ([{ id: "main", content: "..." }])
+        // This is a common pattern in the backend where an array of blocks is wrapped in a JSON string
+        if (
+            Array.isArray(parsed) &&
+            parsed.length === 1 &&
+            !parsed[0]?.type &&
+            parsed[0]?.content &&
+            typeof parsed[0].content === 'string' &&
+            parsed[0].content.trim().startsWith('[')
+        ) {
+            try {
+                const inner = JSON.parse(parsed[0].content);
+                if (Array.isArray(inner)) {
+                    return normalizeBlocks(inner);
+                }
+            } catch (e) {
+                // Not a valid JSON array, proceed normally
+            }
+        }
+
+        // Standard case - it's already an array of blocks or a single block
+        const blocksArray = Array.isArray(parsed) ? parsed : [parsed];
+        const normalized = normalizeBlocks(blocksArray);
+        
+        console.log("INITIAL CONTENT (NORMALIZED):", normalized);
+        return normalized.length > 0 ? normalized : undefined;
+    } catch (e) {
+        console.error('Failed to parse BlockNote content:', e, initial_content);
+        // If parsing fails but we have a string, try to wrap it in a paragraph
+        if (typeof initial_content === 'string' && initial_content.trim() !== '') {
+            return [{
+                id: generateId(),
+                type: 'paragraph',
+                content: [{ type: 'text', text: initial_content, styles: {} }],
+                children: []
+            }];
+        }
+        return undefined;
+    }
+};
+
 const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content, on_change, on_open_bank, read_only = false }, ref) => {
   const { colorScheme } = useMantineColorScheme();
   const locale = useLocale();
@@ -307,7 +439,9 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
 
   const editor = useCreateBlockNote({
     schema,
-    initialContent: initial_content ? JSON.parse(initial_content) : undefined,
+    initialContent: useMemo(() => {
+        return parseContent(initial_content);
+    }, [initial_content]),
     dictionary: (locales as any)[locale] || locales.en,
     editable: !read_only,
     uploadFile: async (file: File) => {
@@ -397,11 +531,11 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
 
     // If current block is an empty paragraph, replace it
     if (current_block && current_block.type === 'paragraph' && (!current_block.content || (Array.isArray(current_block.content) && current_block.content.length === 0))) {
-      editor.replaceBlocks([current_block], [{ type: block_type, props: props }]);
+      editor.replaceBlocks([current_block.id], [ensureBlockId({ type: block_type, props: props })]);
     } else {
       editor.insertBlocks(
-        [{ type: block_type, props: props }],
-        current_block || editor.document[editor.document.length - 1],
+        [ensureBlockId({ type: block_type, props: props })],
+        current_block?.id || editor.document[editor.document.length - 1]?.id,
         "after"
       );
     }
@@ -441,33 +575,37 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
 
           if (youtube_match) {
             new_block = {
+              id: generateId(),
               type: 'youtube',
-              props: { url: text, videoId: youtube_match[1], id: Math.random().toString() },
+              props: { url: text, videoId: youtube_match[1] },
             };
           } else if (is_image) {
             new_block = {
+              id: generateId(),
               type: 'image',
               props: { url: text },
             };
           } else if (is_video) {
             new_block = {
+              id: generateId(),
               type: 'video',
               props: { url: text },
             };
           } else if (is_audio) {
             new_block = {
+              id: generateId(),
               type: 'audio',
-              props: { url: text, id: Math.random().toString(), name: text.split('/').pop() || 'Audio' },
+              props: { url: text, name: text.split('/').pop() || 'Audio' },
             };
           } else {
             // Check for other common file types
             const is_file = /\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|7z|txt|json|csv)$/i.test(clean_url);
             if (is_file) {
               new_block = {
+                id: generateId(),
                 type: 'file',
                 props: { 
                   url: text, 
-                  id: Math.random().toString(), 
                   name: text.split('/').pop() || 'Document',
                   extension: clean_url.split('.').pop()?.toUpperCase() || 'FILE'
                 },
@@ -476,12 +614,17 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
           }
 
           if (new_block) {
-            setTimeout(() => {
-              const current_block = editor.getBlock(block.id);
-              if (current_block && current_block.type === 'paragraph') {
-                editor.replaceBlocks([block.id], [new_block]);
-              }
-            }, 0);
+            const safe_block_id = block.id;
+            const safe_new_block = ensureBlockId(new_block);
+
+            if (safe_block_id) {
+                setTimeout(() => {
+                    const current_block = editor.getBlock(safe_block_id);
+                    if (current_block && current_block.type === 'paragraph') {
+                        editor.replaceBlocks([safe_block_id], [safe_new_block]);
+                    }
+                }, 0);
+            }
           }
         }
       }

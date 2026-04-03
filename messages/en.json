@@ -39,6 +39,7 @@
       "button": "View Pricing",
       "button_cancel": "Cancel"
     },
+    "upload": "Upload",
     "search": "Search",
     "success": "Success",
     "error": "Error",
@@ -129,7 +130,9 @@
     },
     "loading": "Loading...",
     "uploading": "Uploading...",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "warning": "Warning",
+    "selected": "selected"
   },
   "Auth": {
     "login": {
@@ -175,6 +178,7 @@
     "video_materials": "Video",
     "file_materials": "Files",
     "tests": "Tests",
+    "homework": "Homework",
     "test_reviews": "Checking Tests",
     "categories": "Categories",
     "theme": "Theme",
@@ -924,6 +928,8 @@
         "save": "Save",
         "duration": "Duration (min)",
         "duration_placeholder": "e.g. 15",
+        "homework": "Homework",
+        "select_homework": "Select homework assignment",
         "add_to_course": "Add to course",
         "add_to_course_placeholder": "Select courses",
         "discard_modal": {
@@ -1245,7 +1251,84 @@
     "audio_materials_empty": "No audio materials found",
     "photo_materials_empty": "No photo materials found",
     "video_materials_empty": "No video materials found",
-    "file_materials_empty": "No file materials found"
+    "file_materials_empty": "No file materials found",
+    "homework": {
+      "title": "Homework",
+      "subtitle": "Manage homework assignments for your lessons.",
+      "add_homework": "Add homework",
+      "edit_homework": "Edit homework",
+      "delete_homework": "Delete homework",
+      "bulk_delete": "Delete selected ({count})",
+      "empty_title": "No homework found",
+      "empty_description": "You haven't created any homework yet. Create your first assignment.",
+      "table": {
+        "name": "Title",
+        "lesson": "Lesson",
+        "date": "Created Date",
+        "actions": "Actions"
+      },
+      "submission": {
+        "submit_button": "Submit homework",
+        "submit_title": "Submit your work",
+        "task_description": "Homework Task",
+        "your_entry": "Your response",
+        "placeholder": "Write your answer or add files...",
+        "attachments": "Attached files",
+        "send": "Send",
+        "cancel": "Cancel",
+        "submit_success": "Homework submitted successfully",
+        "submit_error": "Failed to submit homework",
+        "loading_submission": "Loading your submission...",
+        "pending_review_title": "Submitted for Review",
+        "pending_review_message": "Your teacher will review your work soon. You will receive a notification once it is reviewed.",
+        "your_answer_content": "Your answer:",
+        "status": {
+          "pending": "Awaiting review",
+          "reviewed": "Reviewed"
+        },
+        "feedback": "Feedback",
+        "score": "Score"
+      },
+      "notifications": {
+        "delete_success": "Homework successfully deleted",
+        "delete_error": "Failed to delete homework",
+        "create_success": "Homework successfully created",
+        "create_error": "Failed to create homework",
+        "save_success": "Homework successfully saved",
+        "save_error": "Failed to save homework",
+        "update_success": "Homework updated successfully",
+        "update_error": "Failed to update homework"
+      },
+      "delete_confirm": {
+        "title": "Confirm Deletion",
+        "description": "Are you sure you want to delete this homework? This action cannot be undone.",
+        "bulk_description": "Are you sure you want to delete {count} selected homeworks? This action cannot be undone."
+      },
+      "form": {
+        "name": "Homework Title",
+        "name_placeholder": "Enter title",
+        "lesson": "Lesson",
+        "search_lesson": "Select lesson",
+        "back": "Back"
+      }
+    },
+    "picker_title_homework": "Select homework",
+    "homeworks": "Homeworks",
+    "submission": {
+      "submit_button": "Submit Homework",
+      "submit_title": "Submit Your Homework",
+      "placeholder": "Enter your answer or notes for the teacher...",
+      "attachments": "Attachments",
+      "send": "Send Answer",
+      "submit_success": "Homework submitted successfully!",
+      "submit_error": "Failed to submit homework",
+      "your_answer": "Your Submission",
+      "teacher_feedback": "Teacher's Feedback",
+      "status": {
+        "pending": "Pending Review",
+        "reviewed": "Reviewed"
+      }
+    }
   },
   "Categories": {
     "title": "Categories",
@@ -1368,7 +1451,8 @@
       "new_task_created": "New task created",
       "task_column_changed": "Task status changed",
       "test_completed": "Test completed!",
-      "lesson_access_granted": "Access to the lesson granted:"
+      "lesson_access_granted": "Access to the lesson granted:",
+      "homework_completed": "Homework completed!"
     }
   }
 }

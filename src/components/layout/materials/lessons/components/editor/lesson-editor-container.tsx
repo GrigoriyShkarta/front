@@ -1,6 +1,6 @@
 'use client';
 
-import { Stack, Button, Group, Text, Paper, ActionIcon, Box, TextInput, Modal, LoadingOverlay, Title, Drawer, MultiSelect, NumberInput, Switch, Tooltip, Grid, Divider } from '@mantine/core';
+import { Stack, Button, Group, Text, Paper, ActionIcon, Box, TextInput, Modal, LoadingOverlay, Title, Drawer, MultiSelect, NumberInput, Switch, Tooltip, Grid, Divider, Select } from '@mantine/core';
 import { IoAddOutline, IoImageOutline, IoTrashOutline, IoChevronBackOutline, IoPencilOutline, IoOptionsOutline } from 'react-icons/io5';
 import { useState, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,8 +10,9 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/use-auth';
 import { MediaPickerModal } from '../media-picker-modal';
+import { LessonHomeworkSubmission } from '../lesson-homework-submission';
 import { useLessonEditor } from '../../hooks/use-lesson-editor';
-import { BlockNoteEditorRef } from './block-note';
+import BlockNoteEditor, { BlockNoteEditorRef } from './block-note';
 import BlockItem from './block-item';
 import { useCategories } from '@/components/layout/categories/hooks/use-categories';
 import { useCourses } from '@/components/layout/materials/courses/hooks/use-courses';
@@ -19,6 +20,9 @@ import { CategoryDrawer as CreateCategoryDrawer } from '@/components/layout/cate
 import { CreateCategoryForm } from '@/components/layout/categories/schemas/category-schema';
 import { useCourse } from '@/components/layout/materials/courses/hooks/use-course';
 import { useLessons } from '@/components/layout/materials/lessons/hooks/use-lessons';
+import { useTests } from '@/components/layout/materials/tests/hooks/use-tests';
+import { useHomework } from '@/components/layout/materials/homework/hooks/use-homework';
+import { homeworkActions } from '@/components/layout/materials/homework/actions/homework-actions';
 import { CourseCurriculum } from '@/components/layout/materials/courses/course/course-curriculum';
 import { CourseContentItem } from '@/components/layout/materials/courses/schemas/course-schema';
 import { IoArrowForwardOutline, IoArrowBackOutline, IoListOutline } from 'react-icons/io5';
@@ -46,6 +50,7 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
   const t = useTranslations('Materials.lessons');
   const common_t = useTranslations('Common');
   const tCat = useTranslations('Categories');
+  const tHw = useTranslations('Materials.homework');
   const router = useRouter();
   const { user } = useAuth();
   const is_student = user?.role === 'student';
@@ -71,6 +76,13 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
   const [addFilesToMaterials, setAddFilesToMaterials] = useState(true);
   const { categories: all_categories, create_category, create_categories, is_pending: is_cat_pending } = useCategories();
   const { courses: all_courses } = useCourses({ limit: 100 });
+  const { tests: all_tests } = useTests({ limit: 1000 });
+  const { homeworks: all_homeworks } = useHomework({ limit: 1000 });
+  const [homeworkId, setHomeworkId] = useState<string | null>(null);
+  const [is_creating_hw, setIsCreatingHw] = useState(false);
+  const [is_editing_hw, setIsEditingHw] = useState(false);
+  const [hw_content, setHwContent] = useState('[]');
+  const [is_saving_hw, setIsSavingHw] = useState(false);
   const [category_drawer_opened, setCategoryDrawerOpened] = useState(false);
 
   const { course: context_course, is_loading: is_loading_context_course } = useCourse(course_id || '');
@@ -105,6 +117,9 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
         setDuration(lesson.duration || null);
         setIsCopyingDisabled(lesson.is_copying_disabled || false);
         setAddFilesToMaterials(lesson.add_files_to_materials ?? true);
+        if (lesson.homework_id || lesson.homework?.id) {
+            setHomeworkId(lesson.homework_id || lesson.homework?.id || null);
+        }
         if (lesson.content) {
             try {
                 const parsed = typeof lesson.content === 'string' 
@@ -154,6 +169,73 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
     }
   };
 
+  const handle_save_homework = async () => {
+    setIsSavingHw(true);
+    try {
+        if (is_editing_hw && homeworkId) {
+            await homeworkActions.update_homework(homeworkId, {
+                name: title,
+                content: Array.isArray(JSON.parse(hw_content)) ? JSON.parse(hw_content) : [],
+            });
+            setIsEditingHw(false);
+            notifications.show({
+                title: common_t('success'),
+                message: tHw('notifications.update_success'),
+                color: 'green'
+            });
+        } else {
+            const result = await homeworkActions.create_homework({
+                name: title,
+                content: Array.isArray(JSON.parse(hw_content)) ? JSON.parse(hw_content) : [],
+                lesson_id: id || null,
+                category_ids: []
+            });
+            setHomeworkId(result.id);
+            setIsCreatingHw(false);
+            notifications.show({
+                title: common_t('success'),
+                message: tHw('notifications.create_success'),
+                color: 'green'
+            });
+        }
+        queryClient.invalidateQueries({ queryKey: ['lesson', id] });
+        queryClient.invalidateQueries({ queryKey: ['homeworks'] });
+    } catch (e) {
+        notifications.show({
+            title: common_t('error'),
+            message: is_editing_hw ? tHw('notifications.update_error') : tHw('notifications.create_error'),
+            color: 'red'
+        });
+    } finally {
+        setIsSavingHw(false);
+    }
+  };
+
+  const handle_delete_homework = async () => {
+    if (!homeworkId) return;
+    
+    setIsSavingHw(true);
+    try {
+        await homeworkActions.delete_homework(homeworkId);
+        setHomeworkId(null);
+        notifications.show({
+            title: common_t('success'),
+            message: tHw('notifications.delete_success'),
+            color: 'green'
+        });
+        queryClient.invalidateQueries({ queryKey: ['lesson', id] });
+        queryClient.invalidateQueries({ queryKey: ['homeworks'] });
+    } catch (e) {
+        notifications.show({
+            title: common_t('error'),
+            message: tHw('notifications.delete_error'),
+            color: 'red'
+        });
+    } finally {
+        setIsSavingHw(false);
+    }
+  };
+
   const handleSave = async () => {
     const payload = {
         name: title,
@@ -164,6 +246,7 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
         duration: duration ? Number(duration) : null,
         is_copying_disabled: isCopyingDisabled,
         add_files_to_materials: addFilesToMaterials,
+        homework_id: homeworkId,
         content: JSON.stringify(blocks.map((b, i) => ({
             id: b.id,
             content: b.content,
@@ -572,6 +655,119 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
             </Button>
         </Group>
       )}
+
+      {!is_student && !homeworkId && !is_creating_hw && (
+          <Box mt={60} className='max-w-[940px]'>
+              <Button 
+                variant="light" 
+                leftSection={<IoAddOutline size={20} />}
+                onClick={() => {
+                    setHwContent('[]');
+                    setIsCreatingHw(true);
+                }}
+                fullWidth
+                h={50}
+                radius="md"
+              >
+                {tHw('add_homework')}
+              </Button>
+          </Box>
+      )}
+
+      {!is_student && homeworkId && !is_creating_hw && !is_editing_hw && (
+          <Box mt={60} className='max-w-[940px]'>
+              <Paper withBorder p="xl" radius="md">
+                  <Stack gap="lg">
+                      <Group justify="space-between">
+                        <Title order={3}>{tHw('title')}</Title>
+                        <Group gap="sm">
+                            <Button 
+                                variant="light" 
+                                color="blue" 
+                                leftSection={<IoPencilOutline size={18} />}
+                                onClick={() => {
+                                    setHwContent(typeof lesson?.homework?.content === 'string' ? lesson.homework.content : JSON.stringify(lesson?.homework?.content || []));
+                                    setIsEditingHw(true);
+                                }}
+                            >
+                                {tHw('edit_homework')}
+                            </Button>
+                            <Button 
+                                variant="light" 
+                                color="red" 
+                                leftSection={<IoTrashOutline size={18} />}
+                                onClick={handle_delete_homework}
+                                loading={is_saving_hw}
+                            >
+                                {tHw('delete_homework')}
+                            </Button>
+                        </Group>
+                      </Group>
+                      
+                      <Box style={{ opacity: 0.9 }}>
+                          <BlockNoteEditor 
+                            initial_content={typeof lesson?.homework?.content === 'string' ? lesson.homework.content : JSON.stringify(lesson?.homework?.content || [])} 
+                            read_only 
+                            on_change={() => {}}
+                            on_open_bank={() => {}}
+                          />
+                      </Box>
+                  </Stack>
+              </Paper>
+          </Box>
+      )}
+
+      {!is_student && (is_creating_hw || is_editing_hw) && (
+          <Box mt={60} className='max-w-[940px]'>
+              <Paper withBorder p="xl" radius="md" pos="relative">
+                  <LoadingOverlay visible={is_saving_hw} overlayProps={{ radius: 'md', blur: 2 }} />
+                  <Stack gap="lg">
+                      <Group justify="space-between">
+                        <Title order={3}>{is_editing_hw ? tHw('edit_homework') : tHw('title')}</Title>
+                        <ActionIcon variant="subtle" color="red" onClick={() => {
+                            setIsCreatingHw(false);
+                            setIsEditingHw(false);
+                        }}>
+                            <IoTrashOutline size={20} />
+                        </ActionIcon>
+                      </Group>
+
+                      <Box>
+                          <Text size="sm" fw={500} mb={8}>{tHw('submission.task_description')}</Text>
+                          <Box style={{ 
+                              border: '1px solid var(--mantine-color-default-border)', 
+                              borderRadius: 'var(--mantine-radius-md)',
+                              overflow: 'hidden'
+                          }}>
+                              <BlockNoteEditor 
+                                initial_content={hw_content}
+                                on_change={setHwContent}
+                                on_open_bank={() => {}}
+                              />
+                          </Box>
+                      </Box>
+
+                      <Group justify="flex-end">
+                          <Button variant="subtle" color="gray" onClick={() => {
+                            setIsCreatingHw(false);
+                            setIsEditingHw(false);
+                          }}>
+                              {tHw('submission.cancel')}
+                          </Button>
+                          <Button onClick={handle_save_homework} px={40}>
+                              {t('editor.save')}
+                          </Button>
+                      </Group>
+                  </Stack>
+              </Paper>
+          </Box>
+      )}
+
+      {is_student && lesson?.homework && (
+        <Box mt={60} className='max-w-[940px]'>
+            <LessonHomeworkSubmission homework={lesson.homework} homework_status={lesson.homework_status} />
+        </Box>
+      )}
             </Stack>
         </Grid.Col>
         
@@ -640,6 +836,7 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
                             <CourseCurriculum 
                                 content={context_course.content} 
                                 all_lessons={all_lessons_context} 
+                                all_tests={all_tests}
                                 course_id={course_id} 
                                 active_lesson_id={id}
                             />
@@ -660,6 +857,7 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
                         <CourseCurriculum 
                             content={context_course.content} 
                             all_lessons={all_lessons_context} 
+                            all_tests={all_tests}
                             course_id={course_id} 
                             active_lesson_id={id}
                         />
@@ -747,6 +945,17 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
                 onChange={setCourseIds}
                 label={t('editor.add_to_course')}
                 placeholder={t('editor.add_to_course_placeholder')}
+                searchable
+                clearable
+                variant="filled"
+            />
+
+            <Select
+                data={all_homeworks.map(h => ({ value: h.id, label: h.name }))}
+                value={homeworkId}
+                onChange={setHomeworkId}
+                label={t('editor.homework') || 'Homework'}
+                placeholder={t('editor.select_homework') || 'Select homework'}
                 searchable
                 clearable
                 variant="filled"

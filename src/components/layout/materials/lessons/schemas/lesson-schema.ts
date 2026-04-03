@@ -22,6 +22,13 @@ export const lesson_schema = z.object({
   accessible_blocks: z.array(z.string()).optional().default([]),
   full_access: z.boolean().optional().default(true),
   accessible_student_ids: z.array(z.string()).optional().default([]),
+  homework_id: z.string().nullable().optional(),
+  homework: z.object({
+    id: z.string(),
+    name: z.string(),
+    content: z.array(z.any()).optional(),
+  }).nullable().optional(),
+  homework_status: z.enum(['not_submitted', 'pending', 'reviewed']).optional(),
   created_at: z.string(),
   updated_at: z.string(),
 });
@@ -41,6 +48,7 @@ export const create_lesson_schema = z.object({
   course_ids: z.array(z.string()).optional(),
   is_copying_disabled: z.boolean().optional(),
   add_files_to_materials: z.boolean().optional(),
+  homework_id: z.string().nullable().optional(),
 });
 
 export type CreateLessonForm = z.infer<typeof create_lesson_schema>;

@@ -1,5 +1,5 @@
 import { IconType } from 'react-icons';
-import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoShieldCheckmarkOutline, IoDocumentTextOutline } from 'react-icons/io5';
 import { FaChalkboard } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
 
@@ -107,6 +107,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
         label: 'courses',
         href: '/main/materials/courses',
         icon: IoSchoolOutline,
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
+      },
+      {
+        label: 'homework',
+        href: '/main/materials/homework',
+        icon: IoDocumentTextOutline,
         roles: ['super_admin', 'admin', 'teacher', 'student'],
       },
     ]

@@ -1,0 +1,30 @@
+
+C:\Users\Dell\WebstormProjects\lirnexa\front\src\components\layout\materials\homework\components\editor\homework-editor-container.tsx
+  33:9  warning  'queryClient' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  59:9  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\Dell\WebstormProjects\lirnexa\front\src\components\layout\materials\homework\components\editor\homework-editor-container.tsx:59:9
+  57 |   useEffect(() => {
+  58 |     if (homework) {
+> 59 |         setTitle(homework.name);
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  60 |         setCategoryIds(homework.category_ids || []);
+  61 |         setLessonId(homework.lesson_id || null);
+  62 |  react-hooks/set-state-in-effect
+
+C:\Users\Dell\WebstormProjects\lirnexa\front\src\components\layout\materials\homework\components\homework-table.tsx
+  21:94  warning  'is_loading' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\Dell\WebstormProjects\lirnexa\front\src\components\layout\materials\homework\homework-layout.tsx
+  32:10  warning  'cn' is defined but never used                @typescript-eslint/no-unused-vars
+  33:10  warning  'HomeworkMaterial' is defined but never used  @typescript-eslint/no-unused-vars
+  61:24  warning  'meta' is assigned a value but never used     @typescript-eslint/no-unused-vars
+
+тЬЦ 6 problems (1 error, 5 warnings)
+
