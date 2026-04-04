@@ -64,13 +64,15 @@ function MyCallUI() {
     useCallCallingState, 
     useHasOngoingScreenShare, 
     useLocalParticipant, 
-    useParticipants 
+    useParticipants,
+    useIsCallRecordingInProgress
   } = useCallStateHooks();
   
   const callingState = useCallCallingState();
   const hasOngoingScreenShare = useHasOngoingScreenShare();
   const localParticipant = useLocalParticipant();
   const participants = useParticipants();
+  const isRecordingInProgress = useIsCallRecordingInProgress();
 
   // Custom Hooks
   const rootRef = useRef<HTMLElement | null>(null);
@@ -107,6 +109,13 @@ function MyCallUI() {
     if (callToEnd) {
       try {
         if (user && user.role !== 'student') {
+          if (isRecordingInProgress) {
+            try {
+              await callToEnd.stopRecording();
+            } catch (error) {
+              console.error('Failed to stop recording before ending call:', error);
+            }
+          }
           await callToEnd.endCall();
         } else {
           await callToEnd.leave();

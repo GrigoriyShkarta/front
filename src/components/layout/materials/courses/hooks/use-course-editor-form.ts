@@ -1,7 +1,8 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { create_course_schema, CreateCourseForm, CourseMaterial } from '../schemas/course-schema';
+import { DropResult, DragStart } from '@hello-pangea/dnd';
 
 interface UseCourseEditorFormProps {
     course?: CourseMaterial | null;
@@ -33,7 +34,7 @@ export function useCourseEditorForm({ course, opened }: UseCourseEditorFormProps
         }
     });
 
-    const { fields, append, remove, move } = useFieldArray({
+    const { fields, append, remove, move, insert } = useFieldArray({
         control,
         name: "content"
     });
@@ -59,6 +60,8 @@ export function useCourseEditorForm({ course, opened }: UseCourseEditorFormProps
             });
         }
     }, [course, opened, reset]);
+
+    const [is_dragging_group, set_is_dragging_group] = useState(false);
 
     const handle_add_group = () => {
         append({
@@ -126,6 +129,81 @@ export function useCourseEditorForm({ course, opened }: UseCourseEditorFormProps
         if (index < fields.length - 1) move(index, index + 1);
     };
 
+    const on_drag_start = (initial: DragStart) => {
+        if (initial.source.droppableId === 'root-course-content') {
+            const item = getValues(`content.${initial.source.index}` as any);
+            if (item && item.type === 'group') {
+                set_is_dragging_group(true);
+                return;
+            }
+        }
+        set_is_dragging_group(false);
+    };
+
+    const on_drag_end = (result: DropResult) => {
+        set_is_dragging_group(false);
+        if (!result.destination) return;
+        
+        const sourceId = result.source.droppableId;
+        const destId = result.destination.droppableId;
+        
+        if (sourceId === 'root-course-content' && destId === 'root-course-content') {
+            move(result.source.index, result.destination.index);
+        } else if (sourceId.startsWith('group-') && destId.startsWith('group-') && sourceId === destId) {
+            const group_index = parseInt(sourceId.split('-')[1], 10);
+            handle_move_item_in_group(group_index, result.source.index, result.destination.index);
+        } else if (sourceId === 'root-course-content' && destId.startsWith('group-')) {
+            const group_index = parseInt(destId.split('-')[1], 10);
+            const item_to_move = getValues(`content.${result.source.index}` as any);
+            
+            if (item_to_move.type === 'lesson' || item_to_move.type === 'test') {
+                const current_group_content = getValues(`content.${group_index}.content` as any) || [];
+                const new_group_content = [...current_group_content];
+                new_group_content.splice(result.destination.index, 0, {
+                    ...item_to_move,
+                    id: crypto.randomUUID()
+                });
+                
+                setValue(`content.${group_index}.content` as any, new_group_content, { shouldDirty: true });
+                remove(result.source.index);
+            }
+        } else if (sourceId.startsWith('group-') && destId === 'root-course-content') {
+            const group_index = parseInt(sourceId.split('-')[1], 10);
+            const current_group_content = getValues(`content.${group_index}.content` as any) || [];
+            const item_to_move = current_group_content[result.source.index];
+            
+            // Remove from group
+            const new_group_content = [...current_group_content];
+            new_group_content.splice(result.source.index, 1);
+            setValue(`content.${group_index}.content` as any, new_group_content, { shouldDirty: true });
+            
+            // Insert to root
+            insert(result.destination.index, {
+                ...item_to_move,
+                id: crypto.randomUUID()
+            });
+        } else if (sourceId.startsWith('group-') && destId.startsWith('group-') && sourceId !== destId) {
+            const source_group_index = parseInt(sourceId.split('-')[1], 10);
+            const dest_group_index = parseInt(destId.split('-')[1], 10);
+            
+            const source_content = getValues(`content.${source_group_index}.content` as any) || [];
+            const dest_content = getValues(`content.${dest_group_index}.content` as any) || [];
+            const item_to_move = source_content[result.source.index];
+            
+            const new_source_content = [...source_content];
+            new_source_content.splice(result.source.index, 1);
+            
+            const new_dest_content = [...dest_content];
+            new_dest_content.splice(result.destination.index, 0, {
+                ...item_to_move,
+                id: crypto.randomUUID()
+            });
+            
+            setValue(`content.${source_group_index}.content` as any, new_source_content, { shouldDirty: true });
+            setValue(`content.${dest_group_index}.content` as any, new_dest_content, { shouldDirty: true });
+        }
+    };
+
     const content_watch = watch('content');
     
     const used_lesson_ids = content_watch.reduce((acc: string[], item: any) => {
@@ -170,5 +248,8 @@ export function useCourseEditorForm({ course, opened }: UseCourseEditorFormProps
         handle_move_item_in_group,
         move_up,
         move_down,
+        on_drag_start,
+        on_drag_end,
+        is_dragging_group,
     };
 }

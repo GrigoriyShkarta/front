@@ -60,13 +60,13 @@ export function LessonSettingsDrawer({
                     />
                 </Box>
 
-                <Box>
+                {/* <Box>
                     <Text size="sm" fw={600} mb={8}>{t('editor.homework')}</Text>
                     <Select 
                         data={all_homeworks?.map(h => ({ value: h.id, label: h.name })) || []}
                         value={homeworkId} onChange={onHomeworkChange} placeholder={t('editor.select_homework')} clearable searchable
                     />
-                </Box>
+                </Box> */}
 
                 <Box>
                     <Text size="sm" fw={600} mb={8}>{t('editor.add_to_course')}</Text>

@@ -103,6 +103,11 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
         setAddFilesToMaterials(lesson.add_files_to_materials ?? true);
         if (lesson.homework_id || lesson.homework?.id) {
             setHomeworkId(lesson.homework_id || lesson.homework?.id || null);
+            if (lesson.homework) {
+                setHwContent(typeof lesson.homework.content === 'string' 
+                    ? lesson.homework.content 
+                    : JSON.stringify(lesson.homework.content || []));
+            }
         }
         if (lesson.content) {
             try {
@@ -142,48 +147,7 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
     }
   };
 
-  const handle_save_homework = async () => {
-    setIsSavingHw(true);
-    try {
-        if (is_editing_hw && homeworkId) {
-            await homeworkActions.update_homework(homeworkId, {
-                name: title,
-                content: Array.isArray(JSON.parse(hw_content)) ? JSON.parse(hw_content) : [],
-            });
-        } else {
-            const result = await homeworkActions.create_homework({
-                name: title,
-                content: Array.isArray(JSON.parse(hw_content)) ? JSON.parse(hw_content) : [],
-                lesson_id: id || null,
-                category_ids: []
-            });
-            setHomeworkId(result.id);
-        }
 
-        await Promise.all([
-            queryClient.invalidateQueries({ queryKey: ['lesson', id] }),
-            queryClient.invalidateQueries({ queryKey: ['homeworks'] }),
-            queryClient.refetchQueries({ queryKey: ['lesson', id] }),
-            queryClient.refetchQueries({ queryKey: ['homeworks'] })
-        ]);
-
-        setIsEditingHw(false);
-        setIsCreatingHw(false);
-        notifications.show({
-            title: common_t('success'), 
-            message: is_editing_hw ? tHw('notifications.update_success') : tHw('notifications.create_success'), 
-            color: 'green'
-        });
-    } catch (e) {
-        notifications.show({
-            title: common_t('error'),
-            message: is_editing_hw ? tHw('notifications.update_error') : tHw('notifications.create_error'),
-            color: 'red'
-        });
-    } finally {
-        setIsSavingHw(false);
-    }
-  };
 
   const handle_delete_homework = async () => {
     if (!homeworkId) return;
@@ -210,6 +174,39 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
   };
 
   const handleSave = async () => {
+    let currentHomeworkId = homeworkId;
+
+    if (!readOnly && (is_creating_hw || homeworkId)) {
+        setIsSavingHw(true);
+        try {
+            if (homeworkId) {
+                await homeworkActions.update_homework(homeworkId, {
+                    name: title,
+                    content: Array.isArray(JSON.parse(hw_content)) ? JSON.parse(hw_content) : [],
+                });
+            } else if (is_creating_hw) {
+                const result = await homeworkActions.create_homework({
+                    name: title,
+                    content: Array.isArray(JSON.parse(hw_content)) ? JSON.parse(hw_content) : [],
+                    lesson_id: id || null,
+                    category_ids: []
+                });
+                currentHomeworkId = result.id;
+                setHomeworkId(currentHomeworkId);
+            }
+        } catch (error) {
+            console.error('Failed to save homework:', error);
+            notifications.show({
+                title: common_t('error'),
+                message: homeworkId ? tHw('notifications.update_error') : tHw('notifications.create_error'),
+                color: 'red'
+            });
+            setIsSavingHw(false);
+            return; 
+        }
+        setIsSavingHw(false);
+    }
+
     const payload = {
         name: title,
         cover_url: cover,
@@ -219,7 +216,7 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
         duration: duration ? Number(duration) : null,
         is_copying_disabled: isCopyingDisabled,
         add_files_to_materials: addFilesToMaterials,
-        homework_id: homeworkId,
+        homework_id: currentHomeworkId,
         content: JSON.stringify(blocks.map((b, i) => ({
             id: b.id,
             content: b.content,
@@ -230,10 +227,18 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
     try {
         if (id) {
             await update_lesson(payload);
+            
+            // Invalidate queries to ensure homework updates propagate
+            queryClient.invalidateQueries({ queryKey: ['lesson', id] });
+            queryClient.invalidateQueries({ queryKey: ['homeworks'] });
+
             setReadOnly(true);
+            setIsCreatingHw(false);
             setAdditionalOpened(false);
         } else {
             await create_lesson(payload);
+            setReadOnly(true);
+            setIsCreatingHw(false);
         }
     } catch (error) {
         console.error('Failed to save lesson:', error);
@@ -365,7 +370,7 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
     hw_content, setHwContent, is_saving_hw, setIsSavingHw, category_drawer_opened, setCategoryDrawerOpened,
     context_course, is_loading_context_course, all_lessons_context, sidebar_opened, setSidebarOpened,
     blocks, setBlocks, bankOpened, setBankOpened, bankType, setBankType, activeBlockId, setActiveBlockId,
-    dragStartY, dragStartPos, containerRef, editorRefs, handleBack, handle_save_homework,
+    dragStartY, dragStartPos, containerRef, editorRefs, handleBack,
     handle_delete_homework, handleSave, is_saving_access, handleSaveAccess, startRepositioning,
     handleMouseDown, handleMouseMove, handleMouseUp, addBlock, removeBlock, updateBlockContent,
     handleToggleBlockAccess, handleToggleFullAccess, openBank, handleMediaSelect, moveBlock,

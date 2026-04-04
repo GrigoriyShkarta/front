@@ -207,7 +207,7 @@ export function VideoDrawer({ opened, onClose, video, initial_files, on_submit, 
       <Stack gap="xl">
         {!video && (
           <Tabs value={active_tab} onChange={setActiveTab} variant="pills" radius="xl">
-            <Tabs.List className="border border-white/10 p-1 rounded-full w-fit mx-auto">
+            <Tabs.List className="border border-white/10 p-1 rounded-full w-fit mx-auto flex-nowrap!">
               <Tabs.Tab value="file" leftSection={<IoCloudUploadOutline size={14} />}>
                 {t('tabs.file')}
               </Tabs.Tab>

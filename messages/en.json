@@ -30,6 +30,7 @@
     }
   },
   "Common": {
+    "name": "Name",
     "no_data": "No data found",
     "upgrade_plan": "Upgrade Plan",
     "pricing_title": "Pricing Plans",
@@ -132,7 +133,15 @@
     "uploading": "Uploading...",
     "confirm": "Confirm",
     "warning": "Warning",
-    "selected": "selected"
+    "selected": "selected",
+    "create_lesson": "Create Lesson",
+    "create_test": "Create Test",
+    "enter_name": "Enter name",
+    "create": "Create",
+    "success_title": "Success",
+    "item_created_transition_prompt": "Successfully created. Would you like to transition to the editor or stay here?",
+    "stay": "Stay",
+    "go_to_editor": "Go to Editor"
   },
   "Auth": {
     "login": {

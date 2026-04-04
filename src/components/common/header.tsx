@@ -16,10 +16,10 @@ export function Header() {
   return (
     <Box 
       component="header" 
-      className="hidden md:block h-[44px] border-b sticky top-0 z-30 transition-colors duration-300"
+      className="hidden md:block h-[44px] sticky top-0 z-30 transition-colors duration-300"
       style={{ 
         backgroundColor: 'var(--mantine-color-body)',
-        borderColor: 'var(--space-secondary)'
+        // borderColor: 'var(--space-secondary)'
       }}
     >
       <Container fluid h="44px" px="xl" className="max-w-[1920px] mx-auto">

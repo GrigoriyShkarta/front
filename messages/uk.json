@@ -30,6 +30,7 @@
     }
   },
   "Common": {
+    "name": "Назва",
     "no_data": "Даних не знайдено",
     "upgrade_plan": "Оновити тариф",
     "pricing_title": "Тарифні плани",
@@ -132,7 +133,15 @@
     "confirm": "Підтвердити",
     "required": "Обов'язкове поле",
     "warning": "Увага",
-    "selected": "вибрано"
+    "selected": "вибрано",
+    "create_lesson": "Створити урок",
+    "create_test": "Створити тест",
+    "enter_name": "Введіть назву",
+    "create": "Створити",
+    "success_title": "Успіх",
+    "item_created_transition_prompt": "Успішно створено. Бажаєте перейти до заповнення матеріалу чи залишитись тут?",
+    "stay": "Залишитись",
+    "go_to_editor": "Перейти до редактору"
   },
   "Auth": {
     "login": {

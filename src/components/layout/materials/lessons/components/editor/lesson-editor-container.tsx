@@ -68,10 +68,10 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
                 <LessonHomeworkSection 
                     is_student={state.is_student} homeworkId={state.homeworkId} is_creating_hw={state.is_creating_hw}
                     is_editing_hw={state.is_editing_hw} is_saving_hw={state.is_saving_hw} lesson={state.lesson} hw_content={state.hw_content}
+                    readOnly={state.readOnly}
                     onHwContentChange={state.setHwContent} onStartCreate={() => { state.setHwContent('[]'); state.setIsCreatingHw(true); }}
-                    onStartEdit={() => { state.setHwContent(typeof state.lesson?.homework?.content === 'string' ? state.lesson.homework.content : JSON.stringify(state.lesson?.homework?.content || [])); state.setIsEditingHw(true); }}
-                    onDelete={() => state.setDeleteHwModalOpened(true)} onCancel={() => { state.setIsCreatingHw(false); state.setIsEditingHw(false); }}
-                    onSave={state.handle_save_homework} t={state.t} tHw={state.tHw}
+                    onDelete={() => state.setDeleteHwModalOpened(true)}
+                    t={state.t} tHw={state.tHw}
                 />
             </Stack>
         </Grid.Col>

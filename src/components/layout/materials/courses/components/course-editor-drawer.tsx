@@ -7,11 +7,15 @@ import {
     Divider, 
     Box,
     ScrollArea,
-    rem
+    rem,
+    Group
 } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { IoSaveOutline } from 'react-icons/io5';
+import { IoSaveOutline, IoAddOutline } from 'react-icons/io5';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { CreateCourseForm, CourseMaterial } from '../schemas/course-schema';
 // ... (rest of imports unchanged)
 
@@ -26,6 +30,9 @@ import { CourseBasicInfo } from './editor/course-basic-info';
 import { ContentItem } from './editor/course-content-item';
 import { CourseAddActions } from './editor/course-add-actions';
 import { cn } from '@/lib/utils';
+import { Modal, TextInput } from '@mantine/core';
+import { lessonActions } from '@/components/layout/materials/lessons/actions/lesson-actions';
+import { testActions } from '@/components/layout/materials/tests/actions/test-actions';
 
 
 interface Props {
@@ -52,6 +59,14 @@ export function CourseEditorDrawer({ opened, on_close, course, on_save, is_savin
     const { lessons: all_lessons } = useLessons({ page: 1, limit: 100, search: '' });
     const { tests: all_tests } = useTests({ page: 1, limit: 100, search: '' });
 
+    const router = useRouter();
+    const queryClient = useQueryClient();
+
+    const [creation_modal, set_creation_modal] = useState<{ opened: boolean; type: 'lesson' | 'test'; target_group_index: number | null }>({ opened: false, type: 'lesson', target_group_index: null });
+    const [creation_name, set_creation_name] = useState('');
+    const [is_creating, set_is_creating] = useState(false);
+    const [success_modal, set_success_modal] = useState<{ opened: boolean; type: 'lesson' | 'test'; id: string } | null>(null);
+
     const {
         control,
         errors,
@@ -72,11 +87,46 @@ export function CourseEditorDrawer({ opened, on_close, course, on_save, is_savin
         handle_move_item_in_group,
         move_up,
         move_down,
+        on_drag_start,
+        on_drag_end,
+        is_dragging_group,
     } = useCourseEditorForm({ course, opened });
 
     const on_submit_handler = async (values: CreateCourseForm) => {
         const success = await on_save(values);
         if (success) on_close();
+    };
+
+    const handle_create_new_item = async () => {
+        if (!creation_name.trim()) return;
+        set_is_creating(true);
+        try {
+            let created_id = '';
+            if (creation_modal.type === 'lesson') {
+                const res = await lessonActions.create_lesson({ name: creation_name, course_ids: course?.id ? [course.id] : [] });
+                created_id = res.id;
+            } else {
+                const res = await testActions.create_test({ name: creation_name, content: '[]', course_ids: course?.id ? [course.id] : [] });
+                created_id = res.id;
+            }
+
+            if (creation_modal.target_group_index !== null) {
+                handle_add_item_to_group(creation_modal.target_group_index, creation_modal.type, created_id);
+            } else {
+                if (creation_modal.type === 'lesson') handle_add_lesson(created_id);
+                else handle_add_test(created_id);
+            }
+
+            queryClient.invalidateQueries({ queryKey: [creation_modal.type === 'lesson' ? 'lessons' : 'tests'] });
+            
+            set_creation_modal({ ...creation_modal, opened: false });
+            set_creation_name('');
+            set_success_modal({ opened: true, type: creation_modal.type, id: created_id });
+        } catch (e) {
+            console.error(e);
+        } finally {
+            set_is_creating(false);
+        }
     };
 
     return (
@@ -110,28 +160,41 @@ export function CourseEditorDrawer({ opened, on_close, course, on_save, is_savin
                         <Divider label={t('form.content')} labelPosition="center" />
 
                         <Stack gap="md">
-                            {fields.map((field, index) => (
-                                <ContentItem 
-                                    key={field.id}
-                                    field_id={field.id}
-                                    index={index}
-                                    content_item={field as any}
-                                    register={register}
-                                    watch={watch}
-                                    on_move_up={move_up}
-                                    on_move_down={move_down}
-                                    on_remove={remove}
-                                    is_first={index === 0}
-                                    is_last={index === fields.length - 1}
-                                    all_lessons={all_lessons || []}
-                                    all_tests={all_tests || []}
-                                    used_lesson_ids={used_lesson_ids}
-                                    used_test_ids={used_test_ids}
-                                    on_add_item_to_group={handle_add_item_to_group}
-                                    on_remove_item_from_group={handle_remove_item_from_group}
-                                    on_move_item_in_group={handle_move_item_in_group}
-                                />
-                            ))}
+                            <DragDropContext onDragEnd={on_drag_end} onDragStart={on_drag_start}>
+                                <Droppable droppableId="root-course-content" type="COURSE_ITEM">
+                                    {(provided) => (
+                                        <div 
+                                            {...provided.droppableProps} 
+                                            ref={provided.innerRef}
+                                            className="flex flex-col gap-4"
+                                        >
+                                            {fields.map((field, index) => (
+                                                <ContentItem 
+                                                    key={field.id}
+                                                    field_id={field.id}
+                                                    index={index}
+                                                    content_item={field as any}
+                                                    is_dragging_group={is_dragging_group}
+                                                    register={register}
+                                                    watch={watch}
+                                                    on_move_up={move_up}
+                                                    on_move_down={move_down}
+                                                    on_remove={remove}
+                                                    all_lessons={all_lessons || []}
+                                                    all_tests={all_tests || []}
+                                                    used_lesson_ids={used_lesson_ids}
+                                                    used_test_ids={used_test_ids}
+                                                    on_add_item_to_group={handle_add_item_to_group}
+                                                    on_remove_item_from_group={handle_remove_item_from_group}
+                                                    on_move_item_in_group={handle_move_item_in_group}
+                                                    on_create_item={(type: 'lesson' | 'test') => set_creation_modal({ opened: true, type, target_group_index: index })}
+                                                />
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </DragDropContext>
 
                             {fields.length === 0 && (
                                 <Box className="py-8 border-2 border-dashed border-white/5 rounded-xl flex flex-col items-center justify-center opacity-50">
@@ -139,15 +202,16 @@ export function CourseEditorDrawer({ opened, on_close, course, on_save, is_savin
                                 </Box>
                             )}
 
-                            <CourseAddActions 
-                                on_add_group={handle_add_group}
-                                on_add_lesson={handle_add_lesson}
-                                on_add_test={handle_add_test}
-                                all_lessons={all_lessons || []}
-                                all_tests={all_tests || []}
-                                used_lesson_ids={used_lesson_ids}
-                                used_test_ids={used_test_ids}
-                            />
+                                <CourseAddActions 
+                                    on_add_group={handle_add_group}
+                                    on_add_lesson={handle_add_lesson}
+                                    on_add_test={handle_add_test}
+                                    on_create_item={(type: 'lesson' | 'test') => set_creation_modal({ opened: true, type, target_group_index: null })}
+                                    all_lessons={all_lessons || []}
+                                    all_tests={all_tests || []}
+                                    used_lesson_ids={used_lesson_ids}
+                                    used_test_ids={used_test_ids}
+                                />
                         </Stack>
                     </Stack>
                 </ScrollArea>
@@ -192,6 +256,57 @@ export function CourseEditorDrawer({ opened, on_close, course, on_save, is_savin
                     set_media_picker_opened(false);
                 }}
             />
+
+            <Modal 
+                opened={creation_modal.opened} 
+                onClose={() => set_creation_modal({ ...creation_modal, opened: false })}
+                title={creation_modal.type === 'lesson' ? common_t('create_lesson') : common_t('create_test')}
+            >
+                <Stack>
+                    <TextInput 
+                        label={common_t('name')} 
+                        placeholder={common_t('enter_name')}
+                        value={creation_name}
+                        onChange={(e) => set_creation_name(e.currentTarget.value)}
+                        data-autofocus
+                        required
+                    />
+                    <Button 
+                        onClick={handle_create_new_item} 
+                        loading={is_creating}
+                        disabled={!creation_name.trim()}
+                    >
+                        {common_t('create')}
+                    </Button>
+                </Stack>
+            </Modal>
+
+            <Modal
+                opened={success_modal?.opened || false}
+                onClose={() => set_success_modal(null)}
+                title={common_t('success_title')}
+                centered
+            >
+                <Stack>
+                    <Box>{common_t('item_created_transition_prompt')}</Box>
+                    <Group justify="flex-end" mt="md">
+                        <Button variant="light" onClick={() => set_success_modal(null)} color="gray">
+                            {common_t('stay')}
+                        </Button>
+                        <Button 
+                            onClick={() => {
+                                if (success_modal) {
+                                    router.push(`/main/materials/${success_modal.type}s/${success_modal.id}/edit`);
+                                    set_success_modal(null);
+                                    on_close();
+                                }
+                            }}
+                        >
+                            {common_t('go_to_editor')}
+                        </Button>
+                    </Group>
+                </Stack>
+            </Modal>
         </Drawer>
     );
 }
