@@ -3,7 +3,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { 
   Paper, Stack, Group, Text, Select, ActionIcon, Tooltip, Badge, Button 
 } from '@mantine/core';
-import { DateTimePicker } from '@mantine/dates';
+import { DateInput, TimeInput } from '@mantine/dates';
 import { IoPencilOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
 
@@ -111,13 +111,35 @@ export function SubscriptionLessonItem({ lesson, isTeacher, statusColors, onUpda
 
         {rescheduleData && isTeacher && (
           <Stack gap={4} mt={4}>
-            <DateTimePicker
-              size="xs"
-              locale={locale}
-              placeholder="New date/time"
-              value={rescheduleData.date}
-              onChange={(val) => setRescheduleData(prev => prev ? { ...prev, date: val ? new Date(val) : new Date() } : null)}
-            />
+            <Stack gap="xs">
+              <DateInput
+                size="xs"
+                locale={locale}
+                placeholder="DD.MM.YYYY"
+                valueFormat="DD.MM.YYYY"
+                value={rescheduleData.date}
+                onChange={(val) => {
+                  if (!val || !rescheduleData) return;
+                  const newDate = new Date(rescheduleData.date);
+                  const parsed = new Date(val);
+                  newDate.setFullYear(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+                  setRescheduleData({ ...rescheduleData, date: newDate });
+                }}
+              />
+              <TimeInput
+                size="xs"
+                placeholder="HH:mm"
+                value={dayjs(rescheduleData.date).format('HH:mm')}
+                onChange={(e) => {
+                  if (!rescheduleData) return;
+                  const [hours, minutes] = e.currentTarget.value.split(':').map(Number);
+                  if (isNaN(hours) || isNaN(minutes)) return;
+                  const newDate = new Date(rescheduleData.date);
+                  newDate.setHours(hours, minutes);
+                  setRescheduleData({ ...rescheduleData, date: newDate });
+                }}
+              />
+            </Stack>
             <Button 
               size="compact-xs" 
               variant="filled" 

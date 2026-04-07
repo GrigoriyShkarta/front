@@ -1,7 +1,19 @@
 {
   "Dashboard": {
-    "welcome_title": "Привіт, {name}! 👋",
+    "welcome_morning": "Доброго ранку, {name}! ☕",
+    "welcome_afternoon": "Доброго дня, {name}! ☀️",
+    "welcome_evening": "Доброго вечора, {name}! 🌙",
     "welcome_description": "Раді бачити вас знову. Ось що відбувається у вашому просторі сьогодні.",
+    "stats": {
+      "active_students": "Активні учні",
+      "revenue": "Дохід за місяць",
+      "lessons_taught": "Уроків проведено",
+      "pending_reviews": "Очікують перевірки",
+      "homeworks": "Домашки",
+      "tests": "Тести",
+      "student_lessons_left": "Залишок уроків",
+      "student_completed": "Пройдено занять"
+    },
     "recent_students": {
       "title": "Нові учні"
     },
@@ -9,6 +21,23 @@
     "edit_modal_title": "Налаштування головної сторінки",
     "save_success": "Головну сторінку оновлено",
     "save_success_desc": "Налаштування успішно застосовано до вашого простору",
+    "banner_upload": "Змінити зображення",
+    "banner_crop_title": "Налаштувати зображення",
+    "banner_zoom": "Масштаб",
+    "banner_offset_x": "Зміщення по горизонталі",
+    "banner_offset_y": "Зміщення по вертикалі",
+    "banner_title_hint": "Можна використовувати {name} для імені користувача",
+    "announcement_title": "Оголошення",
+    "announcement_placeholder": "Введіть текст оголошення для студентів...",
+    "announcement_empty_hint": "Натисніть редагувати, щоб додати оголошення для студентів",
+    "today_lessons_title": "Уроки сьогодні",
+    "today_lessons_empty": "Сьогодні уроків немає",
+    "notifications_title": "Сповіщення",
+    "todo_title": "Список справ",
+    "todo_add_placeholder": "Додати нову справу...",
+    "todo_empty": "Список справ порожній",
+    "todo_remaining": "в очікуванні",
+    "todo_clear_done": "Видалити виконані",
     "actions": {
       "title": "Швидкі дії",
       "add_student": {
