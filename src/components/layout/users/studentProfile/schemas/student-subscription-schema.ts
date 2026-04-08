@@ -4,7 +4,10 @@ export const student_subscription_lesson_schema = z.object({
   id: z.string(),
   student_subscription_id: z.string(),
   date: z.any(), // Can be string or Date
-  status: z.enum(['scheduled', 'attended', 'cancelled', 'missed', 'transfered']),
+  status: z.enum(['scheduled', 'attended', 'cancelled', 'missed', 'rescheduled', 'burned', 'transfered']),
+  is_recording_enabled: z.boolean().default(false),
+  can_student_download_recording: z.boolean().default(false),
+  recording_url: z.string().nullable().default(null),
   created_at: z.string(),
   updated_at: z.string(),
 });
