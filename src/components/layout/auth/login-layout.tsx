@@ -21,8 +21,6 @@ import { AuthHeader } from './auth-header';
 import { loginUser } from './actions/auth.actions';
 import { IoMailOutline, IoLockClosedOutline } from 'react-icons/io5';
 import { useAuth } from '@/hooks/use-auth';
-import { setAuthCookies } from '@/lib/auth';
-
 export default function LoginLayout() {
   const { login } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -42,12 +40,9 @@ export default function LoginLayout() {
   const onSubmit = async (data: LoginFormData) => {
     setServerError(null);
     try {
-      const response = await loginUser(data);
+      await loginUser(data);
 
-      // 1. Set cookies
-      setAuthCookies(response.access_token, response.refresh_token);
-      
-      // 2. Fetch user and update context state
+      // 1. Fetch user and update context state (cookies are already set by backend)
       await login();
       
       // 3. Redirect to /main

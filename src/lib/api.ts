@@ -11,10 +11,8 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = Cookies.get('access_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  // We no longer manually add the Authorization header because we use HttpOnly cookies
+  // browser sends them automatically with 'withCredentials: true'
   return config;
 });
 
@@ -77,10 +75,8 @@ api.interceptors.response.use(
       return new Promise((resolve, reject) => {
         failed_requests.push({ resolve, reject });
       })
-        .then((token) => {
-          if (original_request.headers) {
-            original_request.headers.Authorization = `Bearer ${token}`;
-          }
+        .then(() => {
+          // No need to set new token in header, browser handles it
           return api(original_request);
         })
         .catch((err) => Promise.reject(err));
@@ -90,32 +86,16 @@ api.interceptors.response.use(
     is_refreshing = true;
 
     try {
-      const refresh_token = Cookies.get('refresh_token');
-
-      // If no refresh token, logout and redirect
-      if (!refresh_token) {
-        is_refreshing = false;
-        clearAuthCookies();
-        redirectToLogin();
-        return Promise.reject(error);
-      }
-      
-      const response = await axios.post(`${api.defaults.baseURL}/auth/refresh`, { 
-        refresh_token 
-      }, {
+      // We don't read refresh_token from JS cookies anymore as it's HttpOnly
+      // We just call the refresh endpoint and let the browser send the cookie
+      await axios.post(`${api.defaults.baseURL}/auth/refresh`, {}, {
         withCredentials: true
       });
 
-      const { access_token, refresh_token: new_refresh_token } = response.data;
-      
-      setAuthCookies(access_token, new_refresh_token);
-      
-      process_queue(null, access_token);
+      // After successful refresh, backend has set new cookies via Set-Cookie header
+      process_queue(null, "success");
       is_refreshing = false;
 
-      if (original_request.headers) {
-        original_request.headers.Authorization = `Bearer ${access_token}`;
-      }
       return api(original_request);
     } catch (refresh_error) {
       is_refreshing = false;
