@@ -11,6 +11,7 @@ export interface Board {
   id: string;
   title: string;
   elements: any[];
+  appState?: any;
   settings?: any;
   updated_at: string;
   created_at: string;

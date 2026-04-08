@@ -12,6 +12,7 @@ export interface BoardDataResponse {
     board_theme: string;
   };
   elements: BoardElement[];
+  appState?: any;
   preview_url?: string | null;
 }
 
