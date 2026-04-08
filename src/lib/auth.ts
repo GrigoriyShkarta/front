@@ -17,6 +17,7 @@ export const setAuthCookies = (access_token: string, refresh_token: string) => {
   });
 };
 
+
 export const clearAuthCookies = () => {
   Cookies.remove('access_token', { path: '/' });
   Cookies.remove('refresh_token', { path: '/' });
