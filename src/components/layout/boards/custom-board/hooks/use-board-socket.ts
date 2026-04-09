@@ -5,7 +5,11 @@ import { io, Socket } from 'socket.io-client';
 import Cookies from 'js-cookie';
 
 const backend_data_url = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
-const backend_url = backend_data_url.replace('/api', '');
+// For sockets on Vercel, we MUST use direct connection to the backend, not the /api-proxy
+const backend_url = process.env.NEXT_PUBLIC_SOCKET_URL || 
+                    (backend_data_url.includes('localhost') 
+                      ? backend_data_url.replace('/api', '') 
+                      : 'https://test-lirnexa-435a6bda28a0.herokuapp.com');
 const socket_path = '/socket.io';
 
 export interface ActiveParticipant {
