@@ -86,6 +86,16 @@ api.interceptors.response.use(
     is_refreshing = true;
 
     try {
+      // Check for the non-HttpOnly flag before attempting a refresh
+      const hasToken = Cookies.get('has_token');
+
+      if (!hasToken) {
+        is_refreshing = false;
+        clearAuthCookies();
+        redirectToLogin();
+        return Promise.reject(error);
+      }
+
       // We don't read refresh_token from JS cookies anymore as it's HttpOnly
       // We just call the refresh endpoint and let the browser send the cookie
       await axios.post(`${api.defaults.baseURL}/auth/refresh`, {}, {

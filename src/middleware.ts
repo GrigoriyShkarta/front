@@ -22,6 +22,13 @@ export default function middleware(request: NextRequest) {
   const isPublicPage = publicPages.includes(pathnameWithoutLocale);
   const isProtectedPage = protectedPages.some(page => pathnameWithoutLocale.startsWith(page));
 
+  // 0. Redirect from root / to /main or /login
+  if (pathnameWithoutLocale === '/') {
+    const locale = request.cookies.get('NEXT_LOCALE')?.value || routing.defaultLocale;
+    const target = accessToken ? '/main' : '/login';
+    return NextResponse.redirect(new URL(`/${locale}${target}`, request.url));
+  }
+
   // 1. If user is authenticated and tries to access public auth pages (login/register)
   if (accessToken && isPublicPage) {
     const locale = request.nextUrl.locale || routing.defaultLocale;

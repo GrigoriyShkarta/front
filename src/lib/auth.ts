@@ -47,10 +47,12 @@ export const clearAuthCookies = () => {
   const options = { path: '/', domain };
   Cookies.remove('access_token', options);
   Cookies.remove('refresh_token', options);
+  Cookies.remove('has_token', options);
   
   // Also try without domain just in case
   Cookies.remove('access_token', { path: '/' });
   Cookies.remove('refresh_token', { path: '/' });
+  Cookies.remove('has_token', { path: '/' });
 };
 
 export const getAccessToken = () => {
