@@ -22,10 +22,10 @@ import { useState } from 'react';
 import "@excalidraw/excalidraw/index.css";
 
 // Excalidraw is client-side only
-const Excalidraw = dynamic(
-  () => import('@excalidraw/excalidraw').then((mod) => mod.Excalidraw),
-  { ssr: false }
-);
+// const Excalidraw = dynamic(
+//   () => import('@excalidraw/excalidraw').then((mod) => mod.Excalidraw),
+//   { ssr: false }
+// );
 
 export function BoardsLayout() {
   const t = useTranslations('Boards');
@@ -157,7 +157,7 @@ export function BoardsLayout() {
       <Box className="flex-1 relative border border-white/10 rounded-xl overflow-hidden bg-[#121212]">
         <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
         
-        {!loading && colorScheme && (
+        {/* {!loading && colorScheme && (
           <Excalidraw 
             excalidrawAPI={(api) => setExcalidrawAPI(api)}
             initialData={{
@@ -172,7 +172,7 @@ export function BoardsLayout() {
             theme={colorScheme === 'dark' ? 'dark' : 'light'}
             langCode={langCode}
           />
-        )}
+        )} */}
       </Box>
 
       <MaterialsPickerModal 
