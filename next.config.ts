@@ -7,6 +7,14 @@ const withNextIntl = createNextIntlPlugin(
 
 const nextConfig: NextConfig = {
   /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: '/api-proxy/:path*',
+        destination: 'https://test-lirnexa-435a6bda28a0.herokuapp.com/:path*'
+      },
+    ]
+  },
   experimental: {
       authInterrupts: true,
   }
