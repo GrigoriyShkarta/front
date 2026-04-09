@@ -4,17 +4,17 @@ import { routing } from './i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
-export default function proxy(request: NextRequest) {
+/**
+ * Middleware for handling internationalization and authentication.
+ * Next.js automatically executes this file on every request.
+ */
+export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // Check if the path should be excluded from auth checks (e.g. valid static files)
-  // The matcher in config already handles most of this, but be safe.
   
   const publicPages = ['/login', '/register'];
   const protectedPages = ['/main'];
 
   // Helper to remove locale from path to check against pages
-  // e.g. /en/login -> /login
   const pathnameWithoutLocale = pathname.replace(/^\/(uk|en|es|pt|fr|de|it|ko|ja|zh|tr|ar|hi|th|zh-CN|zh-TW)/, '') || '/';
 
   const accessToken = request.cookies.get('access_token')?.value;
@@ -31,9 +31,6 @@ export default function proxy(request: NextRequest) {
   // 2. If user is NOT authenticated and tries to access protected pages
   if (!accessToken && isProtectedPage) {
     const locale = request.cookies.get('NEXT_LOCALE')?.value || routing.defaultLocale;
-    // We redirect to login. next-intl middleware will likely handle the locale redirect if we just go to /login? 
-    // But better to be explicit: /[locale]/login
-    // However, extracting the intended locale from the URL might be safer if the user typed /en/main
     
     // Attempt to extract locale from the current path request if possible
     const pathLocaleMatch = pathname.match(/^\/(uk|en|es|pt|fr|de|it|ko|ja|zh|tr|ar|hi|th|zh-CN|zh-TW)/);
