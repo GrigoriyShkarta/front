@@ -2,6 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { 
   Stack, 
   TextInput, 
@@ -18,18 +19,15 @@ import {
   Tooltip,
   Textarea,
   Grid,
-  Title,
-  Tabs,
   Switch
 } from '@mantine/core';
-import { IoCloudUploadOutline, IoRefreshOutline, IoAddOutline, IoPersonOutline, IoSettingsOutline } from 'react-icons/io5';
+import { IoCloudUploadOutline, IoRefreshOutline, IoAddOutline, IoCloseOutline } from 'react-icons/io5';
 import { user_form_schema, UserFormData, UserListItem } from '@/schemas/users';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { useState, useEffect, useMemo } from 'react';
 import { generate_password } from '../utils/password';
 import { AvatarCropper } from './avatar-cropper';
-import { UserRole } from '@/types/auth.types';
 import { useCategories } from '../../categories/hooks/use-categories';
 import { CategoryDrawer } from '../../categories/components/category-drawer';
 import { CreateCategoryForm } from '../../categories/schemas/category-schema';
@@ -57,8 +55,14 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
   const current_user_role = current_user?.role;
   const is_teacher = current_user_role === 'teacher';
   const is_super_admin = current_user_role === 'super_admin';
-  const is_admin = current_user_role === 'admin';
   const show_admin_fields = current_user_role !== 'student';
+
+  const form_schema = useMemo(() => {
+    if (initial_data) return user_form_schema;
+    return user_form_schema.extend({
+      password: z.string().min(6, 'errors.password_too_short'),
+    });
+  }, [initial_data]);
 
   const {
     register,
@@ -67,9 +71,9 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
     setError,
     watch,
     reset,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
   } = useForm<UserFormData>({
-    resolver: zodResolver(user_form_schema),
+    resolver: zodResolver(form_schema),
     defaultValues: {
       name: initial_data?.name || '',
       email: initial_data?.email || '',
@@ -112,7 +116,7 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
     }
     
     const currentCategories = watch('categories') || [];
-    setValue('categories', [...currentCategories, ...newIds]);
+    setValue('categories', [...currentCategories, ...newIds], { shouldValidate: true, shouldDirty: true });
     setCategoryDrawerOpened(false);
   };
 
@@ -129,7 +133,14 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
         // data.teacher_id = is_super_admin ? current_user?.id : current_user?.super_admin_id;
       }
 
-      await on_submit(data);
+      // 3. Convert empty strings to null for date fields
+      const processed_data = {
+        ...data,
+        birthday: data.birthday || null,
+        deactivation_date: data.deactivation_date || null,
+      };
+
+      await on_submit(processed_data);
     } catch (error: any) {
       const server_errors = error.response?.data?.message;
       if (Array.isArray(server_errors)) {
@@ -185,7 +196,7 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
 
   const handle_crop_complete = (file: File) => {
     set_avatar_preview(URL.createObjectURL(file));
-    setValue('avatar', file);
+    setValue('avatar', file, { shouldValidate: true, shouldDirty: true });
   };
 
   return (
@@ -232,6 +243,7 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
             <TextInput
               label={t('form.name')}
               placeholder={t('form.name_placeholder')}
+              maxLength={100}
               required
               withAsterisk
               {...register('name')}
@@ -244,40 +256,10 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
               placeholder={t('form.email_placeholder')}
               required
               withAsterisk
+              maxLength={254}
               {...register('email')}
               error={errors.email?.message && common_t(errors.email.message)}
             />
-
-            <Grid gutter="md">
-              <Grid.Col span={6}>
-                <TextInput
-                  label={tProfile('fields.city')}
-                  placeholder={tProfile('placeholders.city')}
-                  {...register('city')}
-                />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput
-                  type="date"
-                  label={tProfile('fields.birthday')}
-                  {...register('birthday')}
-                />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput
-                  label={tProfile('fields.telegram')}
-                  placeholder={tProfile('placeholders.telegram')}
-                  {...register('telegram')}
-                />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput
-                  label={tProfile('fields.instagram')}
-                  placeholder={tProfile('placeholders.instagram')}
-                  {...register('instagram')}
-                />
-              </Grid.Col>
-            </Grid>
 
             {show_admin_fields && (
               <PasswordInput
@@ -295,6 +277,48 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
                 leftSectionPointerEvents="all"
               />
             )}
+
+            <Grid gutter="md">
+              <Grid.Col span={6}>
+                <TextInput
+                  label={tProfile('fields.city')}
+                  placeholder={tProfile('placeholders.city')}
+                  {...register('city')}
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <TextInput
+                  type="date"
+                  label={tProfile('fields.birthday')}
+                  {...register('birthday')}
+                  rightSection={
+                    watch('birthday') && (
+                      <ActionIcon 
+                        variant="subtle" 
+                        color="gray" 
+                        onClick={() => setValue('birthday', null, { shouldValidate: true, shouldDirty: true })}
+                      >
+                        <IoCloseOutline size={16} />
+                      </ActionIcon>
+                    )
+                  }
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <TextInput
+                  label={tProfile('fields.telegram')}
+                  placeholder={tProfile('placeholders.telegram')}
+                  {...register('telegram')}
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <TextInput
+                  label={tProfile('fields.instagram')}
+                  placeholder={tProfile('placeholders.instagram')}
+                  {...register('instagram')}
+                />
+              </Grid.Col>
+            </Grid>
 
             <Textarea
               label={t('form.learning_goals')}
@@ -316,7 +340,7 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
                 { value: 'inactive', label: t('form.status_inactive') },
               ]}
               value={watch('status')}
-              onChange={(val) => setValue('status', val as 'active' | 'inactive')}
+              onChange={(val) => setValue('status', val as 'active' | 'inactive', { shouldValidate: true, shouldDirty: true })}
             />
 
             <Stack gap="xs">
@@ -325,12 +349,12 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
                 <Switch
                   label={t('form.is_name_locked')}
                   checked={watch('is_name_locked')}
-                  onChange={(event) => setValue('is_name_locked', event.currentTarget.checked)}
+                  onChange={(event) => setValue('is_name_locked', event.currentTarget.checked, { shouldValidate: true, shouldDirty: true })}
                 />
                 <Switch
                   label={t('form.is_avatar_locked')}
                   checked={watch('is_avatar_locked')}
-                  onChange={(event) => setValue('is_avatar_locked', event.currentTarget.checked)}
+                  onChange={(event) => setValue('is_avatar_locked', event.currentTarget.checked, { shouldValidate: true, shouldDirty: true })}
                 />
               </Group>
             </Stack>
@@ -339,6 +363,17 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
               type="date"
               label={t('form.deactivation_date')}
               {...register('deactivation_date')}
+              rightSection={
+                watch('deactivation_date') && (
+                  <ActionIcon 
+                    variant="subtle" 
+                    color="gray" 
+                    onClick={() => setValue('deactivation_date', null, { shouldValidate: true, shouldDirty: true })}
+                  >
+                    <IoCloseOutline size={16} />
+                  </ActionIcon>
+                )
+              }
             />
 
             {show_admin_fields && (
@@ -355,7 +390,7 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
                   placeholder={t('form.categories_placeholder')}
                   data={categoryList.map(c => ({ value: c.id, label: c.name }))}
                   value={watched_categories}
-                  onChange={(val) => setValue('categories', val)}
+                  onChange={(val) => setValue('categories', val, { shouldValidate: true, shouldDirty: true })}
                   searchable
                   clearable
                 />
@@ -368,10 +403,10 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
           type="submit" 
           fullWidth 
           loading={is_loading} 
-          disabled={!isValid || is_loading}
+          disabled={!isValid || is_loading || (initial_data ? !isDirty : false)}
           mt="md"
           color="primary"
-          className="bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-md shadow-primary/20"
+          className="bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
         >
           {common_t('save')}
         </Button>
