@@ -86,7 +86,8 @@ export function DesktopSidebar() {
             borderColor: 'rgba(255,255,255,0.1)'
           }}
         >
-          {collapsed ? <IoMenuOutline size={20} /> : <IoArrowBackOutline size={20} />}
+          {collapsed ? <IoMenuOutline size={20} color={space?.personalization?.is_white_sidebar_color !== false ? 'white' : 'black'}/> :
+           <IoArrowBackOutline size={20} color={space?.personalization?.is_white_sidebar_color !== false ? 'white' : 'black'}/>}
         </ActionIcon>
       </Box>
 

@@ -92,7 +92,7 @@ export function UserDropdown({ collapsed, hide_email, className, style }: Props)
       <Menu.Dropdown>
         <Menu.Label>{t('profile')}</Menu.Label>
         <Menu.Item 
-          component={Link} 
+          component={Link}
           href="/main/profile"
           leftSection={<IoPersonOutline style={{ width: rem(14), height: rem(14) }} />}
         >

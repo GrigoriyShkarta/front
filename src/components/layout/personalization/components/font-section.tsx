@@ -34,7 +34,7 @@ export function PersonalizationFontSection({ form, is_premium }: Props) {
     >
       <Stack gap="lg">
         <Box>
-          <Title order={4} mb={4} className="text-gradient-primary">
+          <Title order={4} mb={4} className="text-secondary">
             {t('font_title')}
           </Title>
           <Text size="sm" color="dimmed" mb="md">

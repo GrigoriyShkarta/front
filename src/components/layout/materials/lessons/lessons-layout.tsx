@@ -106,8 +106,20 @@ export default function LessonsLayout() {
                     {breadcrumb_items}
                 </Breadcrumbs>
 
-                <Group justify="space-between" align="flex-end">
-                    <Title order={2}>{t('title')}</Title>
+                <Group justify="space-between" align="center" wrap="nowrap">
+                    <Group align="center" gap="md">
+                        <Box className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm border border-primary/20 shrink-0">
+                            <IoBookOutline size={28} />
+                        </Box>
+                        <Stack gap={0}>
+                            <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+                                {t('title')}
+                            </Title>
+                            <Text c="dimmed" size="sm" className="hidden sm:block">
+                                {t('subtitle')}
+                            </Text>
+                        </Stack>
+                    </Group>
                     
                     <Group>
                          {!is_student && selected_ids.length > 0 && (

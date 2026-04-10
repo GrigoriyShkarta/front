@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Title, Group, Button, Paper, Stack, Box, LoadingOverlay } from '@mantine/core';
-import { IoAddOutline, IoTrashOutline, IoFilterOutline } from 'react-icons/io5';
+import { IoAddOutline, IoTrashOutline, IoFilterOutline, IoPeopleOutline } from 'react-icons/io5';
 import { UserTable } from './components/user-table';
 import { UserDrawer } from './components/user-drawer';
 import { UserDeleteModal } from './components/user-delete-modal';
@@ -12,7 +12,7 @@ import { useUsersQuery } from './hooks/use-users-query';
 import { UserListItem, UserFormData } from '@/schemas/users';
 import { useTranslations } from 'next-intl';
 import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
-import { Breadcrumbs, Anchor } from '@mantine/core';
+import { Breadcrumbs, Anchor, Text } from '@mantine/core';
 import { Link } from '@/i18n/routing';
 import { cn } from "@/lib/utils";
 
@@ -144,10 +144,25 @@ export function UsersLayout() {
 
   return (
     <Stack gap="lg">
-      <Stack gap="xs">
-        <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
-        <Group justify="space-between" align="center">
-          <Title order={2}>{t('title')}</Title>
+      <Stack gap="lg">
+        <Breadcrumbs separator="→" mb="-xs">
+          {breadcrumb_items}
+        </Breadcrumbs>
+
+        <Group justify="space-between" align="center" wrap="nowrap">
+          <Group align="center" gap="md">
+            <Box className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm border border-primary/20 shrink-0">
+              <IoPeopleOutline size={28} />
+            </Box>
+            <Stack gap={0}>
+              <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+                {t('title')}
+              </Title>
+              <Text c="dimmed" size="sm" className="hidden sm:block">
+                {t('subtitle')}
+              </Text>
+            </Stack>
+          </Group>
         </Group>
       </Stack>
 

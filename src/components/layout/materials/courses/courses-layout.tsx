@@ -16,7 +16,7 @@ import {
   Breadcrumbs,
   Anchor
 } from "@mantine/core";
-import { IoLibraryOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoFilterOutline, IoGridOutline, IoListOutline } from "react-icons/io5";
+import { IoSchoolOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoFilterOutline, IoGridOutline, IoListOutline } from "react-icons/io5";
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useCourses } from "./hooks/use-courses";
@@ -129,8 +129,20 @@ export default function CoursesLayout() {
                     {breadcrumb_items}
                 </Breadcrumbs>
 
-                <Group justify="space-between" align="flex-end">
-                    <Title order={2}>{t('title')}</Title>
+                <Group justify="space-between" align="center" wrap="nowrap">
+                    <Group align="center" gap="md">
+                        <Box className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm border border-primary/20 shrink-0">
+                            <IoSchoolOutline size={28} />
+                        </Box>
+                        <Stack gap={0}>
+                            <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+                                {t('title')}
+                            </Title>
+                            <Text c="dimmed" size="sm" className="hidden sm:block">
+                                {t('subtitle')}
+                            </Text>
+                        </Stack>
+                    </Group>
                     
                     <Group>
                          {!is_student && selected_ids.length > 0 && (
@@ -280,7 +292,7 @@ export default function CoursesLayout() {
                                         boxShadow: '0 0 20px rgba(var(--mantine-primary-color-filled-rgb), 0.15)'
                                     }}
                                 >
-                                    <IoLibraryOutline size={40} />
+                                    <IoSchoolOutline size={40} />
                                 </Box>
                                 <Text fw={500} size="lg">{t('empty_title')}</Text>
                                 <Text c="dimmed" size="sm" ta="center" maw={400}>

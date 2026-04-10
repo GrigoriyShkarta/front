@@ -10,6 +10,7 @@
   --color-primary-bg: var(--space-primary-bg);
   --color-secondary: var(--space-secondary);
   --color-secondary-hover: var(--space-secondary-hover);
+  --color-accent: var(--space-secondary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -186,6 +187,95 @@ hr {
   border-color: rgba(var(--space-secondary-rgb), 0.3) !important;
 }
 
+/* ── Table Row Hover Effect (Secondary Color) ── */
+tr[data-hover]:hover,
+.mantine-Table-tr[data-hover]:hover {
+  background-color: rgba(var(--space-secondary-rgb), 0.05) !important;
+  transition: background-color 0.2s ease;
+}
+
+/* ============================================ */
+/* Secondary Color — Links, Icons, Subtle Buttons */
+/* Mantine v8 uses HASHED class names (m_xxx), so we target               */
+/* data-variant attributes and Mantine root CSS variables instead          */
+/* ============================================ */
+
+/* ── Headings ── */
+
+/* ── Reset headings, icons and subtle buttons in sidebar ── */
+aside h1, aside h2, aside h3, aside h4, aside h5, aside h6,
+aside [class*="mantine-Title-root"],
+aside [data-variant="subtle"],
+aside .mantine-Anchor-root,
+aside .icon-secondary,
+aside .text-secondary {
+  color: inherit !important;
+  --button-color: inherit !important;
+  --ai-color: inherit !important;
+  --anchor-color: inherit !important;
+  --nav-link-color: inherit !important;
+}
+
+/* ── Mantine Anchor: override --mantine-color-anchor ── */
+/* Mantine v8 Anchor reads: color: var(--mantine-color-anchor) */
+:root,
+[data-mantine-color-scheme="light"],
+[data-mantine-color-scheme="dark"] {
+  --mantine-color-anchor: var(--space-secondary);
+}
+
+/* ── Links (Next.js <Link> renders as <a>) ── */
+/* a:not([class]):not([class*="bg-"]),
+a[href]:not([class*="bg-"]):not([class*="text-primary"]) {
+  color: var(--space-secondary) !important;
+} */
+
+a:not([class]):not([class*="bg-"]):hover,
+a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
+  opacity: 0.75;
+}
+
+/* ── Subtle variant Buttons ── */
+/* Mantine v8: data-variant is on the real element, class is hashed.      */
+/* --button-color is the CSS var Mantine reads for subtle text color.     */
+[data-variant="subtle"]:not([data-color]) {
+  --button-color: var(--space-secondary) !important;
+  --button-hover: rgba(var(--space-secondary-rgb), 0.08) !important;
+  --button-hover-color: var(--space-secondary) !important;
+  color: var(--space-secondary) !important;
+}
+
+[data-variant="subtle"]:not([data-color]):hover {
+  background-color: rgba(var(--space-secondary-rgb), 0.08) !important;
+  color: var(--space-secondary) !important;
+}
+
+/* ── Subtle variant ActionIcons ── */
+/* Mantine v8 ActionIcon reads --ai-color for icon/text color */
+[data-variant="subtle"]:not([data-color]) {
+  --ai-color: var(--space-secondary) !important;
+  --ai-hover: rgba(var(--space-secondary-rgb), 0.08) !important;
+  --ai-hover-color: var(--space-secondary) !important;
+}
+
+/* SVG icons inside any subtle variant element */
+[data-variant="subtle"]:not([data-color]) svg {
+  color: var(--space-secondary);
+}
+
+/* ── Utility classes ── */
+.icon-secondary,
+.text-secondary {
+  color: var(--space-secondary) !important;
+}
+
+/* ── NavLink active ── */
+[data-active][data-variant="subtle"],
+[data-active]:not([data-variant]) {
+  color: var(--space-secondary) !important;
+  background-color: rgba(var(--space-secondary-rgb), 0.08) !important;
+}
+
 /* Custom scrollbar for premium look */
 ::-webkit-scrollbar {
   width: 8px;
@@ -235,7 +325,7 @@ hr {
 
 .mantine-Breadcrumbs-root a, 
 .mantine-Breadcrumbs-root .mantine-Anchor-root {
-  color: var(--space-primary) !important;
+  color: var(--space-secondary) !important;
   opacity: 0.8;
   transition: all 0.2s ease;
 }
@@ -247,7 +337,7 @@ hr {
 }
 
 .mantine-Breadcrumbs-separator {
-  color: var(--space-primary) !important;
+  color: var(--space-secondary) !important;
   opacity: 0.4;
   margin-inline: 8px;
 }
@@ -274,6 +364,10 @@ hr {
 /* SegmentedControl Active Label Color */
 .mantine-SegmentedControl-label[data-active] {
   color: var(--space-primary-text) !important;
+}
+
+.mantine-Breadcrumbs-separator {
+  color: var(--space-secondary) !important;
 }
 
 .mantine-SegmentedControl-indicator {

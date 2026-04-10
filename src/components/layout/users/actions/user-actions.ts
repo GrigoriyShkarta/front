@@ -22,11 +22,17 @@ export const userActions = {
 
   create_user: async (data: UserFormData) => {
     // If avatar is a file, we might need FormData
+    console.log('data', data)
     if (data.avatar instanceof File) {
       const form_data = new FormData();
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          form_data.append(key, value);
+          if (Array.isArray(value)) {
+            // Это добавит categories=id1, categories=id2 и т.д.
+            value.forEach(item => form_data.append(key, item));
+          } else {
+            form_data.append(key, value);
+          }
         }
       });
       const response = await api.post('/users', form_data, {

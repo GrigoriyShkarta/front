@@ -152,7 +152,6 @@ export function ColorSelect({
                 size="compact-xs" 
                 leftSection={<IoColorPaletteOutline />}
                 rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-primary)' }} />}
-                className="!text-primary hover:!bg-primary/5"
               >
                 {t('custom_color')}
               </Button>
@@ -236,7 +235,6 @@ export function ColorSelect({
                     size="compact-xs" 
                     leftSection={<IoSparklesOutline />}
                     rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-primary)' }} />}
-                    className="!text-primary hover:!bg-primary/5"
                 >
                   {t('build_gradient')}
                 </Button>

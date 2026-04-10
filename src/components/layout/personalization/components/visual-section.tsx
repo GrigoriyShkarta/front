@@ -65,7 +65,7 @@ export function PersonalizationVisualSection({ form, is_premium }: Props) {
       <Stack gap="lg">
         <Group justify="space-between">
           <Box>
-            <Title order={4} mb={4} className="text-gradient-primary">
+            <Title order={4} mb={4} className="text-secondary">
               {t('visual_style_title')}
             </Title>
             <Text size="sm" color="dimmed">

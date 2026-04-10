@@ -97,6 +97,8 @@ export function applyTheme(config: ThemeConfig) {
   root.style.setProperty('--space-secondary', secondary_val);
   root.style.setProperty('--space-secondary-rgb', hexToRgb(secondary_val));
   root.style.setProperty('--space-secondary-hover', secondary_val);
+  // Override Mantine v8 anchor color variable so <Anchor> uses secondary color
+  root.style.setProperty('--mantine-color-anchor', secondary_val);
 
   // --- Apply Background Color/Gradient ---
   let bg_val = '#ffffff';

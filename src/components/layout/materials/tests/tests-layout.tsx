@@ -21,7 +21,7 @@ import {
     IoAddOutline, 
     IoFilterOutline, 
     IoTrashOutline,
-    IoCheckmarkDoneOutline
+    IoClipboardOutline
 } from 'react-icons/io5';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -71,29 +71,27 @@ export default function TestsLayout() {
     };
 
     return (
-        <Stack gap="xl" className="animate-in fade-in duration-500">
-            <Breadcrumbs separator="→">
+        <Stack gap="lg" className="animate-in fade-in duration-500">
+            <Breadcrumbs mb="-xs" separator="→">
                 {breadcrumb_items}
             </Breadcrumbs>
 
-            <Group justify="space-between" align="flex-start">
-                <Stack gap={4}>
-                    <Group gap="md">
-                        <Box 
-                            className="p-3 rounded-2xl bg-primary/10 text-primary dark:bg-primary/20"
-                        >
-                            <IoCheckmarkDoneOutline size={28} />
-                        </Box>
-                        <div>
-                            <Title order={2} fw={700} className="tracking-tight">
-                                {t('title')}
-                            </Title>
-                            <Text c="dimmed" size="sm">
-                                {t('subtitle')}
-                            </Text>
-                        </div>
-                    </Group>
-                </Stack>
+            <Group justify="space-between" align="center" wrap="nowrap">
+                <Group align="center" gap="md">
+                    <Box 
+                        className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm border border-primary/20 shrink-0"
+                    >
+                        <IoClipboardOutline size={28} />
+                    </Box>
+                    <Stack gap={0}>
+                        <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+                            {t('title')}
+                        </Title>
+                        <Text c="dimmed" size="sm" className="hidden sm:block">
+                            {t('subtitle')}
+                        </Text>
+                    </Stack>
+                </Group>
 
                 {!is_student && (
                     <Button 
@@ -191,7 +189,7 @@ export default function TestsLayout() {
                     <Box py={80} className="text-center">
                         <Stack align="center" gap="sm">
                             <Box className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-2">
-                                <IoCheckmarkDoneOutline size={32} className="text-zinc-500" />
+                                <IoClipboardOutline size={32} className="text-zinc-500" />
                             </Box>
                             <Title order={4} fw={600}>{t('empty_title')}</Title>
                             <Text c="dimmed" size="sm" maw={300} mx="auto">

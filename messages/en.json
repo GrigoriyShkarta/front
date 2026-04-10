@@ -63,6 +63,7 @@
     "no_data": "No data found",
     "upgrade_plan": "Upgrade Plan",
     "pricing_title": "Pricing Plans",
+    "no_results_found": "No results found",
     "upgrade_modal": {
       "title": "Premium Feature",
       "description": "This look is incredible! Upgrade your plan so your users can see this design too.",
@@ -554,6 +555,7 @@
   },
   "Users": {
     "title": "Student Base",
+    "subtitle": "Manage the database of students and their access to the platform.",
     "add_button": "Add Student",
     "table": {
       "user": "Student",

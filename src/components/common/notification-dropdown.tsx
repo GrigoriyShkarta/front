@@ -121,7 +121,7 @@ export function NotificationDropdown() {
   };
 
   const space = user?.space?.personalization;
-  const primary_color = space?.primary_color || theme.primaryColor;
+  const secondary_color = space?.secondary_color || theme.primaryColor;
 
   return (
     <Menu 
@@ -137,7 +137,7 @@ export function NotificationDropdown() {
         <ActionIcon 
           variant="transparent" 
           size="lg" 
-          style={{ color: primary_color }}
+          style={{ color: secondary_color }}
           className={cn(
             "transition-all duration-300 hover:scale-110", 
             has_unread ? "opacity-100 animate-pulse" : "opacity-70 hover:opacity-100"
@@ -146,7 +146,7 @@ export function NotificationDropdown() {
         >
           <Indicator 
             disabled={!has_unread} 
-            color={primary_color} 
+            color={secondary_color} 
             size={10} 
             offset={4}
             processing
