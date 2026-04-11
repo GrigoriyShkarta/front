@@ -1,7 +1,8 @@
 'use client';
 
-import { Tabs, Stack, Title, Paper, Text, Breadcrumbs, Anchor, Box, LoadingOverlay, Group, Avatar, Badge, Button } from '@mantine/core';
-import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoSchoolOutline, IoListOutline, IoVideocamOutline } from 'react-icons/io5';
+import { Tabs, Stack, Title, Paper, Text, Breadcrumbs, Anchor, Box, LoadingOverlay, Group, Avatar, Badge, Button, ActionIcon, Tooltip } from '@mantine/core';
+import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoSchoolOutline, IoListOutline, IoVideocamOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
+import { FaChalkboard } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { useUserQuery } from '../hooks/use-user-query';
@@ -43,6 +44,7 @@ export function StudentProfileShell({
   const t = useTranslations('Users');
   const common_t = useTranslations('Common');
   const tNav = useTranslations('Navigation');
+  const tProfile = useTranslations('Profile');
   
   const { user: profile_user, is_loading, is_error, error, refresh } = useUserQuery(id as string);
   const { update_user, teachers, current_user, is_mutating } = useUsersQuery();
@@ -59,7 +61,9 @@ export function StudentProfileShell({
         ? 'tracker'
         : pathname.endsWith('/recordings')
           ? 'recordings'
-          : 'general';
+          : pathname.endsWith('/security')
+            ? 'security'
+            : 'general';
 
   const breadcrumb_items = useMemo(() => {
     const items = custom_breadcrumbs || [
@@ -123,21 +127,23 @@ export function StudentProfileShell({
 
   return (
     <Stack gap="lg">
-      <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
+      <Box className="overflow-x-auto whitespace-nowrap hide-scrollbar pb-1">
+        <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
+      </Box>
 
       {!hide_user_info && (
         <Stack gap="xs">
-          <Group justify="space-between" align="center" wrap="nowrap" className="flex-col sm:flex-row items-start sm:items-center">
-            <Group gap="md" wrap="nowrap">
-              <Avatar src={profile_user.avatar} size="xl" radius="md" className="hidden xs:block">
+          <Group justify="space-between" align="flex-start" className="flex-col sm:flex-row sm:items-center gap-y-4">
+            <Group gap="md" wrap="nowrap" align="flex-start">
+              <Avatar src={profile_user.avatar} size="xl" radius="md" className="hidden xs:block shrink-0">
                 {profile_user.name.charAt(0)}
               </Avatar>
               <Stack gap={0}>
-                <Group gap="md">
-                  <Title order={2} size="h3" className="sm:text-3xl">{profile_user.name}</Title>
+                <Group gap="md" wrap="wrap">
+                  <Title order={2} size="h3" className="sm:text-3xl break-words">{profile_user.name}</Title>
                 </Group>
-                <Group gap="xs">
-                  <Text c="dimmed" size="sm" className="hidden sm:block">{profile_user.email}</Text>
+                <Group gap="xs" wrap="wrap">
+                  <Text c="dimmed" size="sm" className="hidden sm:block break-all">{profile_user.email}</Text>
                   {profile_user.role === 'student' && current_user?.role !== 'student' && (
                     <Badge 
                       color={profile_user.status === 'active' ? 'green' : 'red'} 
@@ -165,6 +171,23 @@ export function StudentProfileShell({
                 )}
               </Stack>
             </Group>
+            
+            {current_user?.role !== 'student' && (
+              <Group gap="sm" wrap="nowrap" className="w-full sm:w-auto justify-end sm:justify-start">
+                <Button
+                  component={Link}
+                  href={`/main/boards/${profile_user.id}`}
+                  variant="light"
+                  color="indigo"
+                  size="sm"
+                  radius="xl"
+                  leftSection={<FaChalkboard size={16} />}
+                  className="shadow-sm hover:shadow-md transition-all hidden sm:flex"
+                >
+                  {tNav('boards')}
+                </Button>
+              </Group>
+            )}
           </Group>
         </Stack>
       )}
@@ -181,28 +204,35 @@ export function StudentProfileShell({
           className="bg-transparent"
         >
           {!hide_tabs && (
-            <Tabs.List className="px-4 py-3 border-b border-secondary/10 sticky top-0 z-10 overflow-x-auto flex-nowrap hide-scrollbar">
-              <Tabs.Tab value="general" leftSection={<IoPersonOutline size={16} />}>
+            <Tabs.List className="!flex !flex-nowrap px-4 py-3 border-b border-secondary/10 sticky top-0 z-10 overflow-x-auto hide-scrollbar bg-secondary/2 gap-1 sm:gap-2">
+              <Tabs.Tab value="general" leftSection={<IoPersonOutline size={16} />} className="whitespace-nowrap shrink-0">
                 {t('tabs.general') || 'General'}
               </Tabs.Tab>
               {profile_user.role === 'student' && (
                 <>
-                  <Tabs.Tab value="subscriptions" leftSection={<IoCardOutline size={16} />}>
+                  <Tabs.Tab value="subscriptions" leftSection={<IoCardOutline size={16} />} className="whitespace-nowrap shrink-0">
                     {t('tabs.lesson_history')}
                   </Tabs.Tab>
                   {current_user?.role !== 'student' && (
-                    <Tabs.Tab value="materials" leftSection={<IoBookOutline size={16} />}>
+                    <Tabs.Tab value="materials" leftSection={<IoBookOutline size={16} />} className="whitespace-nowrap shrink-0">
                       {tNav('materials') || 'Materials'}
                     </Tabs.Tab>
                   )}
                   {current_user?.role !== 'student' && (
-                    <Tabs.Tab value="tracker" leftSection={<IoListOutline size={16} />}>
+                    <Tabs.Tab value="tracker" leftSection={<IoListOutline size={16} />} className="whitespace-nowrap shrink-0">
                       {tNav('tracker') || 'Tracker'}
                     </Tabs.Tab>
                   )}
-                  <Tabs.Tab value="recordings" leftSection={<IoVideocamOutline size={16} />}>
-                    {t('tabs.recordings') || 'Recordings'}
-                  </Tabs.Tab>
+                  {current_user?.role !== 'student' && (
+                    <Tabs.Tab value="recordings" leftSection={<IoVideocamOutline size={16} />} className="whitespace-nowrap shrink-0">
+                      {t('tabs.recordings') || 'Recordings'}
+                    </Tabs.Tab>
+                  )}
+                  {is_own_profile && (
+                    <Tabs.Tab value="security" leftSection={<IoShieldCheckmarkOutline size={16} />} className="whitespace-nowrap shrink-0">
+                      {tProfile('tabs.security') || 'Security'}
+                    </Tabs.Tab>
+                  )}
                 </>
               )}
             </Tabs.List>
