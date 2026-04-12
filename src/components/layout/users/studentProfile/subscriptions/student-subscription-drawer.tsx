@@ -7,21 +7,23 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useSubscriptions } from '@/components/layout/finance/subscriptions/hooks/use-subscriptions';
 import { useStudentSubscriptions } from '../hooks/use-student-subscriptions';
 import { useEffect, useState, useMemo } from 'react';
+import { useAuth } from '@/hooks/use-auth';
 import dayjs from 'dayjs';
 import 'dayjs/locale/uk';
 import 'dayjs/locale/en';
 import { IoTimeOutline, IoTrashOutline } from 'react-icons/io5';
 import '@mantine/dates/styles.css';
+import { cn } from '@/lib/utils';
 
 import { SubscriptionPaymentStatus } from './types';
 import { StudentSubscription } from '../schemas/student-subscription-schema';
 
 interface Props {
   opened: boolean;
-  onClose: () => void;
   studentId: string;
   subscription?: StudentSubscription; // Optional for edit mode
   initialDate?: Date; // Pre-select start date when opening from calendar
+  onClose: () => void;
 }
 
 const DAYS = [
@@ -46,6 +48,8 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
   const { subscriptions: templates } = useSubscriptions();
   const finance_t = useTranslations('Finance.subscriptions.validation');
   const { create_subscription, update_subscription, is_creating, is_updating } = useStudentSubscriptions(studentId);
+  const { user } = useAuth();
+  const is_white_sidebar_color = user?.space?.personalization?.is_white_sidebar_color ?? false;
 
   const [lessons, setLessons] = useState<LessonItem[]>([]);
   const [lastGenerated, setLastGenerated] = useState<string>('');
@@ -75,7 +79,6 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
       name: (value, values) => (values.subscription_type === 'custom' && !value ? finance_t('name_required') : null),
       price: (value, values) => (values.subscription_type === 'custom' && (value === undefined || value < 0) ? finance_t('price_non_negative') : null),
       lessons_count: (value, values) => (values.subscription_type === 'custom' && (!value || value <= 0) ? finance_t('lessons_count_required') : null),
-      selected_days: (value) => (value.length === 0 ? finance_t('at_least_one_day') : null),
       paid_amount: (value, values) => (values.payment_status === 'partially_paid' && (value === undefined || value < 0) ? finance_t('paid_amount_required') : null),
     }
   });
@@ -251,8 +254,6 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
   }, [lessons, subscription, is_manual_next_payment_date]);
 
   const handleSubmit = async (values: typeof form.values) => {
-    if (lessons.length !== currentData.lessons_count) return;
-
     // Combine date and time for each lesson to build lesson_dates
     const lesson_dates = lessons.map(lesson => {
       const [hours, minutes] = lesson.time.split(':').map(Number);
@@ -314,7 +315,6 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
 
   const handleCalendarChange = (dates: any) => {
     const datesArray: Date[] = Array.isArray(dates) ? dates : dates ? [dates] : [];
-    if (datesArray.length > currentData.lessons_count) return;
 
     const newLessons = datesArray.map(date => {
       const existing = lessons.find(l => dayjs(l.date).isSame(date, 'day'));
@@ -343,9 +343,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
   };
 
   const is_form_valid = 
-    (form.values.subscription_type === 'template' ? !!form.values.subscription_id : (!!form.values.name && form.values.price > 0 && form.values.lessons_count > 0)) && 
-    form.values.selected_days.length > 0 && 
-    lessons.length === currentData.lessons_count;
+    (form.values.subscription_type === 'template' ? !!form.values.subscription_id : (!!form.values.name && form.values.price > 0 && form.values.lessons_count > 0));
 
   return (
     <Drawer
@@ -395,6 +393,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                   label={t('form.subscription_price') || 'Price'}
                   placeholder={t('form.subscription_price_placeholder')}
                   min={0}
+                  allowLeadingZeros={false}
                   required
                   withAsterisk
                   {...form.getInputProps('price')}
@@ -403,6 +402,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                   label={t('form.lessons_count') || 'Lessons count'}
                   placeholder={t('form.lessons_count_placeholder')}
                   min={1}
+                  allowLeadingZeros={false}
                   required
                   withAsterisk
                   {...form.getInputProps('lessons_count')}
@@ -540,7 +540,12 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                       const isSelected = lessons.some(l => dayjs(l.date).isSame(dateObj, 'day'));
                       return (
                         <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Text size="sm" c={isSelected ? 'primary' : 'inherit'}>{dateObj.getDate()}</Text>
+                          <Text 
+                            size="sm" 
+                            c={isSelected ? (is_white_sidebar_color ? 'white' : 'black') : 'inherit'}
+                          >
+                            {dateObj.getDate()}
+                          </Text>
                           {isSelected && (
                             <div style={{
                               position: 'absolute',
@@ -559,12 +564,16 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                   />
                 </Group>
 
-                {lessons.length > 0 && (
-                  <Stack gap={4} mb="md">
-                    <Text size="xs" fw={700} c="dimmed" tt="uppercase">{common_t('preview')}</Text>
-                    {lessons.map((lesson, index) => (
+                <Stack gap={4} mb="md">
+                  <Text size="xs" fw={700} c="dimmed" tt="uppercase">{common_t('preview')}</Text>
+                  {lessons.length > 0 ? (
+                    lessons.map((lesson, index) => (
                       <Group key={index} justify="space-between" p="xs" className="bg-white/5 rounded-sm">
-                        <Text size="sm">{dayjs(lesson.date).locale(locale).format('DD MMM (ddd)')}</Text>
+                        <Text size="sm">
+                          {lesson.date && dayjs(lesson.date).isValid()
+                            ? dayjs(lesson.date).locale(locale).format('DD MMM (ddd)')
+                            : t('form.not_assigned')}
+                        </Text>
                         <Group gap="xs">
                           <TextInput
                             type="time"
@@ -578,9 +587,15 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                           </ActionIcon>
                         </Group>
                       </Group>
-                    ))}
-                  </Stack>
-                )}
+                    ))
+                  ) : (
+                    <Box py="xl" className="border border-dashed border-white/10 rounded-sm">
+                      <Text size="sm" c="dimmed" ta="center">
+                        {t('form.lesson_date_not_assigned') || 'Дата уроку поки ще не призначена'}
+                      </Text>
+                    </Box>
+                  )}
+                </Stack>
 
                 <Text size="sm" fw={500} mt="md" ta="center" c={lessons.length === currentData.lessons_count ? 'green' : 'orange'}>
                   {lessons.length} {common_t('lessons')} {t('selected')} 
@@ -599,10 +614,13 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
                 <Button 
                   type="submit" 
                   loading={is_creating || is_updating} 
-                  disabled={!is_form_valid}
+                  disabled={!is_form_valid || is_creating || is_updating || (subscription ? !form.isDirty() : false)}
                   fullWidth
                   color="primary"
-                  className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
+                  className={cn(
+                    "bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-md shadow-primary/20",
+                    "disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
+                  )}
                 >
                   {common_t('save')}
                 </Button>

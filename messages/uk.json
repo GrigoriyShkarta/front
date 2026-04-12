@@ -589,6 +589,8 @@
       "edit_subscription_title": "Редагувати послугу"
     },
     "form": {
+      "not_assigned": "Дата не призначена",
+      "lesson_date_not_assigned": "Дата уроку не призначена",
       "avatar": "Аватар",
       "upload": "Завантажити",
       "name": "Ім'я",

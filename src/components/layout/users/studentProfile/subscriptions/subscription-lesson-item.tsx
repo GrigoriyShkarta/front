@@ -18,15 +18,16 @@ interface Props {
 
 export function SubscriptionLessonItem({ lesson, isTeacher, statusColors, onUpdate }: Props) {
   const common_t = useTranslations('Common');
+  const user_t = useTranslations('Users');
   const locale = useLocale();
   
   const [rescheduleData, setRescheduleData] = useState<{ status: string; date: Date } | null>(null);
 
-  const handleStatusChange = (val: string) => {
-    if (val === 'rescheduled') {
+  const handleStatusChange = (val: string, is_manual_edit = false) => {
+    if (val === 'rescheduled' || is_manual_edit) {
       setRescheduleData({
-        status: 'rescheduled',
-        date: new Date(lesson.date)
+        status: is_manual_edit ? lesson.status : 'rescheduled',
+        date: lesson.date && dayjs(lesson.date).isValid() ? new Date(lesson.date) : new Date()
       });
     } else {
       setRescheduleData(null);
@@ -39,7 +40,7 @@ export function SubscriptionLessonItem({ lesson, isTeacher, statusColors, onUpda
     await onUpdate({
       lessonId: lesson.id,
       data: {
-        status: 'rescheduled',
+        status: rescheduleData.status,
         date: dayjs(rescheduleData.date).toISOString()
       }
     });
@@ -60,12 +61,22 @@ export function SubscriptionLessonItem({ lesson, isTeacher, statusColors, onUpda
       <Stack gap={6}>
         <Group justify="space-between" align="flex-start">
           <Stack gap={0}>
-            <Text size="xs" fw={700}>{dayjs(lesson.date).locale(locale).format('DD MMM')}</Text>
+            <Text size="xs" fw={700}>
+              {lesson.date && dayjs(lesson.date).isValid() 
+                ? dayjs(lesson.date).locale(locale).format('DD MMM') 
+                : user_t('form.not_assigned')}
+            </Text>
             <Text size="10px" c="dimmed" style={{ textTransform: 'capitalize' }}>
-              {dayjs(lesson.date).locale(locale).format('dddd')}
+              {lesson.date && dayjs(lesson.date).isValid() 
+                ? dayjs(lesson.date).locale(locale).format('dddd') 
+                : ''}
             </Text>
           </Stack>
-          <Text size="xs" fw={500} c="dimmed">{dayjs(lesson.date).format('HH:mm')}</Text>
+          <Text size="xs" fw={500} c="dimmed">
+            {lesson.date && dayjs(lesson.date).isValid() 
+              ? dayjs(lesson.date).format('HH:mm') 
+              : ''}
+          </Text>
         </Group>
 
         {isTeacher ? (
@@ -86,13 +97,13 @@ export function SubscriptionLessonItem({ lesson, isTeacher, statusColors, onUpda
               value={rescheduleData?.status || lesson.status}
               onChange={(val) => handleStatusChange(val || '')}
             />
-            {lesson.status === 'rescheduled' && !rescheduleData && (
+            {(lesson.status === 'rescheduled' || !lesson.date || !dayjs(lesson.date).isValid()) && !rescheduleData && (
               <Tooltip label={common_t('edit')}>
                 <ActionIcon 
                   variant="light" 
                   size="xs" 
                   color="primary" 
-                  onClick={() => handleStatusChange('rescheduled')}
+                  onClick={() => handleStatusChange(lesson.status, true)}
                 >
                   <IoPencilOutline size={12} />
                 </ActionIcon>
@@ -145,6 +156,7 @@ export function SubscriptionLessonItem({ lesson, isTeacher, statusColors, onUpda
               variant="filled" 
               color="primary"
               onClick={handleSaveReschedule}
+              disabled={!rescheduleData.date || !dayjs(rescheduleData.date).isValid()}
             >
               {common_t('save')}
             </Button>

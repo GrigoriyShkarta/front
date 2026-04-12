@@ -557,6 +557,7 @@
     "title": "Student Base",
     "subtitle": "Manage the database of students and their access to the platform.",
     "add_button": "Add Student",
+    "not_assigned": "Not assigned",
     "table": {
       "user": "Student",
       "role": "Role",
@@ -585,6 +586,8 @@
     },
     "form": {
       "avatar": "Avatar",
+      "not_assigned": "Not assigned",
+      "lesson_date_not_assigned": "Lesson date not assigned",
       "upload": "Upload",
       "name": "Name",
       "name_placeholder": "Enter full name",
