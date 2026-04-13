@@ -1,10 +1,8 @@
 'use client';
 
-import { memo } from 'react';
 import { useTranslations } from 'next-intl';
 import { 
   Stack, 
-  Checkbox, 
   Paper, 
   Title, 
   Text,
@@ -21,12 +19,10 @@ import {
   BACKGROUND_LIGHT, 
   BACKGROUND_DARK, 
   SECONDARY_COLORS,
-  BASIC_PRIMARY_COLORS,
-  BASIC_SECONDARY_COLORS,
-  BASIC_BACKGROUND_LIGHT,
-  BASIC_BACKGROUND_DARK,
   BACKGROUND_LIGHT_GRADIENTS,
-  BACKGROUND_DARK_GRADIENTS
+  BACKGROUND_DARK_GRADIENTS,
+  ACCENT_COLORS,
+  ACCENT_GRADIENTS
 } from '@/lib/constants';
 import { Controller, UseFormReturn, useWatch } from 'react-hook-form';
 import { PersonalizationFormData } from '@/schemas/personalization';
@@ -50,6 +46,7 @@ export function PersonalizationVisualSection({ form, is_premium }: Props) {
   const secondary_options = SECONDARY_COLORS;
   const bg_light_options = [...BACKGROUND_LIGHT, ...BACKGROUND_LIGHT_GRADIENTS];
   const bg_dark_options = [...BACKGROUND_DARK, ...BACKGROUND_DARK_GRADIENTS];
+  const accent_options = [...ACCENT_COLORS, ...ACCENT_GRADIENTS];
 
   return (
     <Paper 
@@ -75,7 +72,7 @@ export function PersonalizationVisualSection({ form, is_premium }: Props) {
           {is_premium && (
             <Badge 
               variant="gradient" 
-              gradient={{ from: 'var(--space-primary)', to: 'var(--space-primary-hover)' }} 
+              gradient={{ from: 'var(--space-accent)', to: 'var(--space-accent-hover)' }} 
               leftSection={<IoDiamondOutline />}
               size="lg"
               className="shadow-sm"
@@ -96,6 +93,25 @@ export function PersonalizationVisualSection({ form, is_premium }: Props) {
               onChange={field.onChange}
               solid_label={t('solid_colors')}
               gradients_label={t('gradients')}
+              is_premium={is_premium}
+              type="primary"
+            />
+          )}
+        />
+
+        <Controller
+          name="accent_color"
+          control={control}
+          render={({ field }) => (
+            <ColorSelect
+              label={t('accent_color_label')}
+              description={t('accent_color_description')}
+              options={accent_options}
+              value={field.value}
+              onChange={field.onChange}
+              solid_label={t('solid_colors')}
+              gradients_label={t('gradients')}
+              show_gradients={true}
               is_premium={is_premium}
               type="primary"
             />

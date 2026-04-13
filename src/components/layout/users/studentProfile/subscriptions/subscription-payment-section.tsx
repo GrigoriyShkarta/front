@@ -126,7 +126,7 @@ export function SubscriptionPaymentSection({ sub, isTeacher, onUpdate }: Props) 
                       <Group gap="xl">
                         <Stack gap={2}>
                           <Text size="xs" fw={700} c="dimmed" tt="uppercase">{common_t('paid_amount')}</Text>
-                          <Text size="sm" fw={600} color="orange.4">{sub.paid_amount} / {sub.price} {currencySymbol}</Text>
+                          <Text size="sm" fw={600} color="var(--space-accent)">{sub.paid_amount} / {sub.price} {currencySymbol}</Text>
                         </Stack>
                         <Stack gap={2}>
                           <Text size="xs" fw={700} c="dimmed" tt="uppercase">{t('form.partial_payment_date')}</Text>
@@ -145,9 +145,9 @@ export function SubscriptionPaymentSection({ sub, isTeacher, onUpdate }: Props) 
 
                 {sub.next_payment_date && (
                   <Group gap={6}>
-                    <IoCalendarOutline size={14} color="var(--space-primary)" />
+                    <IoCalendarOutline size={14} color="var(--space-accent)" />
                     <Text size="xs" fw={600}>{t('form.next_payment_date')}:</Text>
-                    <Text size="xs" fw={700} color="var(--space-primary)">
+                    <Text size="xs" fw={700} color="var(--space-accent)">
                       {dayjs(sub.next_payment_date).locale(locale).format('DD MMM YYYY')}
                     </Text>
                   </Group>

@@ -28,7 +28,7 @@ export function UpgradePlanButton({ collapsed, className, ...props }: Props) {
           className
         )}
         style={{
-          background: 'var(--space-primary-bg)',
+          background: 'var(--space-accent)',
         }}
         onClick={() => router.push('/main/billing')}
         title={t('upgrade_plan')}
@@ -48,7 +48,7 @@ export function UpgradePlanButton({ collapsed, className, ...props }: Props) {
         className
       )}
       style={{
-        background: 'var(--space-primary-bg)',
+        background: 'var(--space-accent)',
         color: 'var(--space-sidebar-text)'
       }}
       onClick={() => router.push('/main/billing')}

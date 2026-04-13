@@ -7,6 +7,8 @@ import {
   PRIMARY_GRADIENTS as PALETTE_PRIMARY_GRADIENTS,
   BACKGROUND_LIGHT_GRADIENTS as PALETTE_LIGHT_GRADIENTS,
   BACKGROUND_DARK_GRADIENTS as PALETTE_DARK_GRADIENTS,
+  ACCENT_COLORS as PALETTE_ACCENT,
+  ACCENT_GRADIENTS as PALETTE_ACCENT_GRADIENTS,
 } from './theme/colors';
 
 // Type definitions for color options
@@ -99,6 +101,25 @@ export const BASIC_PRIMARY_COLORS: SolidColorOption[] = PRIMARY_COLORS_CATEGORIZ
 export const BASIC_SECONDARY_COLORS: SolidColorOption[] = SECONDARY_COLORS.slice(0, 4);
 export const BASIC_BACKGROUND_LIGHT: SolidColorOption[] = BACKGROUND_LIGHT.slice(0, 1);
 export const BASIC_BACKGROUND_DARK: SolidColorOption[] = BACKGROUND_DARK.slice(0, 1);
+
+// Accent colors
+export const ACCENT_COLORS: SolidColorOption[] = Object.keys(PALETTE_ACCENT).map((id, index) => ({
+  id: PALETTE_ACCENT[id as keyof typeof PALETTE_ACCENT],
+  hex: PALETTE_ACCENT[id as keyof typeof PALETTE_ACCENT],
+  type: 'solid' as const,
+  is_premium: index >= 5 // First 5 are free
+}));
+
+export const ACCENT_GRADIENTS: GradientOption[] = Object.keys(PALETTE_ACCENT_GRADIENTS).map(id => ({
+  id: PALETTE_ACCENT_GRADIENTS[id as keyof typeof PALETTE_ACCENT_GRADIENTS].gradient,
+  gradient: PALETTE_ACCENT_GRADIENTS[id as keyof typeof PALETTE_ACCENT_GRADIENTS].gradient,
+  from: PALETTE_ACCENT_GRADIENTS[id as keyof typeof PALETTE_ACCENT_GRADIENTS].from,
+  to: PALETTE_ACCENT_GRADIENTS[id as keyof typeof PALETTE_ACCENT_GRADIENTS].to,
+  type: 'gradient' as const,
+  is_premium: true
+}));
+
+export const BASIC_ACCENT_COLORS: SolidColorOption[] = ACCENT_COLORS.filter(c => !c.is_premium);
 
 // ============================================
 // LANGUAGES

@@ -95,8 +95,8 @@ export function PersonalizationForm() {
             leftSection={<IoSaveOutline size={20} />}
             className="shadow-lg h-14 rounded-xl transition-all duration-300 hover:scale-[1.02]"
             style={{
-              background: 'var(--space-primary-bg)',
-              color: 'var(--space-sidebar-text)'
+              background: 'var(--space-accent-bg)',
+              color: 'var(--space-accent-text, #ffffff)'
             }}
           >
             {t('save_button')}

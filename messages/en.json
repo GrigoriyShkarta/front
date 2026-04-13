@@ -502,6 +502,8 @@
     "primary_color_label": "Primary Color",
     "secondary_color_label": "Secondary Color",
     "bg_color_label": "Background Color",
+    "accent_color_label": "Accent Color",
+    "accent_color_description": "This color will be used for buttons and key interaction elements.",
     "dark_theme_label": "Enable dark theme",
     "dark_theme_description": "Allow users to switch to dark mode.",
     "bg_color_dark_label": "Dark Mode Background",

@@ -80,7 +80,13 @@ export function UserTable({
   };
 
   const rows = users.map((user) => {
-    const last_sub = (user as any).purchased_subscriptions?.[0];
+    const subs = (user as any).purchased_subscriptions || [];
+    const latest_sub = [...subs].sort((a, b) => {
+      const date_a = a.next_payment_date || a.created_at;
+      const date_b = b.next_payment_date || b.created_at;
+      return new Date(date_b).getTime() - new Date(date_a).getTime();
+    })[0];
+    const last_sub = latest_sub;
     const is_partially_paid = last_sub?.payment_status === 'partially_paid';
     
     // If partially paid, we prioritize partial_payment_date for this column

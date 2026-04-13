@@ -10,7 +10,9 @@
   --color-primary-bg: var(--space-primary-bg);
   --color-secondary: var(--space-secondary);
   --color-secondary-hover: var(--space-secondary-hover);
-  --color-accent: var(--space-secondary);
+  --color-accent: var(--space-accent);
+  --color-accent-bg: var(--space-accent-bg);
+  --color-accent-hover: var(--space-accent-hover);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -93,8 +95,8 @@ body {
 .bg-primary\/5[data-active],
 .bg-primary\/10[data-active],
 [style*="var(--mantine-primary-color-filled)"] {
-  background: var(--space-primary-bg) !important;
-  color: var(--space-primary-text) !important;
+  background: var(--space-accent-bg, var(--space-primary-bg)) !important;
+  color: var(--space-accent-text, #ffffff) !important;
   border: none !important;
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease !important;
 }
@@ -107,7 +109,7 @@ body {
 .mantine-Button-root[data-variant="filled"][data-color="primary"] .text-white,
 .mantine-Button-root[data-variant="filled"]:not([data-color]) .text-white,
 .mantine-Pagination-control[data-active] {
-  color: var(--space-primary-text) !important;
+  color: var(--space-accent-text, #ffffff) !important;
 }
 
 .text-primary-foreground {
@@ -119,7 +121,7 @@ body {
 .bg-primary:hover,
 .bg-primary-hover:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(var(--space-primary-rgb), 0.15);
+  box-shadow: 0 6px 20px rgba(var(--space-accent-rgb, var(--space-primary-rgb)), 0.15);
   filter: brightness(1.1);
 }
 
@@ -130,8 +132,8 @@ body {
 .bg-primary-light,
 .bg-primary\/5,
 .bg-primary\/10 {
-  background-color: rgba(var(--space-primary-rgb), 0.1) !important;
-  color: var(--space-primary) !important;
+  background-color: rgba(var(--space-accent-rgb, var(--space-primary-rgb)), 0.1) !important;
+  color: var(--space-accent, var(--space-primary)) !important;
   border: none !important;
 }
 
@@ -140,7 +142,7 @@ body {
 .bg-primary-light:hover,
 .bg-primary\/5:hover,
 .bg-primary\/10:hover {
-  background-color: rgba(var(--space-primary-rgb), 0.15) !important;
+  background-color: rgba(var(--space-accent-rgb, var(--space-primary-rgb)), 0.15) !important;
 }
 
 .text-gradient-primary {
@@ -150,16 +152,27 @@ body {
   background-clip: text;
 }
 
-/* Brand Checkbox/Radio Styling */
+/* Brand Checkbox/Radio/Switch Styling */
 .mantine-Checkbox-input:checked,
-.mantine-Radio-input:checked {
-  background-color: var(--space-primary) !important;
-  border-color: var(--space-primary) !important;
+.mantine-Radio-input:checked,
+.mantine-Switch-track {
+  /* Default border override for switch */
 }
 
+/* Checked state backgrounds */
+.mantine-Checkbox-input:checked,
+.mantine-Radio-input:checked,
+.mantine-Switch-track[data-checked],
+.mantine-Switch-input:checked + .mantine-Switch-track {
+  background: var(--space-accent-bg, var(--space-primary-bg)) !important;
+  border-color: var(--space-accent, var(--space-primary)) !important;
+}
+
+/* Focus and active states */
 .mantine-Checkbox-input:focus,
-.mantine-Radio-input:focus {
-  border-color: var(--space-primary) !important;
+.mantine-Radio-input:focus,
+.mantine-Switch-input:focus + .mantine-Switch-track {
+  border-color: var(--space-accent, var(--space-primary)) !important;
 }
 
 .space-bg-dynamic {

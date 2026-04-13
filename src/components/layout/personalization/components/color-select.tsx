@@ -25,6 +25,7 @@ import { IoColorPaletteOutline, IoSparklesOutline, IoAddOutline, IoTrashOutline,
 
 interface Props {
   label: string;
+  description?: string;
   options: ColorOption[];
   value: string;
   onChange: (value: string) => void;
@@ -59,7 +60,7 @@ function ColorCircle({ option, selected, onClick, is_premium_user }: {
             className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-md z-10 border border-gray-100 dark:border-zinc-800"
             style={{ backgroundColor: 'white' }}
           >
-             <IoDiamondOutline size={10} style={{ color: 'var(--space-primary)' }} />
+             <IoDiamondOutline size={10} style={{ color: 'var(--space-accent)' }} />
           </Box>
         )}
       </UnstyledButton>
@@ -69,6 +70,7 @@ function ColorCircle({ option, selected, onClick, is_premium_user }: {
 
 export function ColorSelect({ 
   label, 
+  description,
   options, 
   value, 
   onChange, 
@@ -135,9 +137,14 @@ export function ColorSelect({
 
   return (
     <Box>
-      <Text size="sm" fw={500} mb={12}>
+      <Text size="sm" fw={500} mb={description ? 4 : 12}>
         {label}
       </Text>
+      {description && (
+        <Text size="xs" c="dimmed" mb={12}>
+          {description}
+        </Text>
+      )}
       
       {/* Solid Colors */}
       <Box mb={show_gradients && (gradients.length > 0 || is_premium) ? 'md' : 0}>
@@ -151,7 +158,8 @@ export function ColorSelect({
                 variant="subtle" 
                 size="compact-xs" 
                 leftSection={<IoColorPaletteOutline />}
-                rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-primary)' }} />}
+                rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-accent)' }} />}
+                style={{ color: 'var(--space-accent)' }}
               >
                 {t('custom_color')}
               </Button>
@@ -234,7 +242,8 @@ export function ColorSelect({
                     variant="subtle" 
                     size="compact-xs" 
                     leftSection={<IoSparklesOutline />}
-                    rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-primary)' }} />}
+                    rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-accent)' }} />}
+                    style={{ color: 'var(--space-accent)' }}
                 >
                   {t('build_gradient')}
                 </Button>
@@ -269,7 +278,10 @@ export function ColorSelect({
                             size="compact-xs" 
                             leftSection={<IoAddOutline />} 
                             onClick={add_color}
-                            className="!text-primary !bg-primary/10 hover:!bg-primary/20"
+                            style={{ 
+                              color: 'var(--space-accent)', 
+                              backgroundColor: 'rgba(var(--space-accent-rgb), 0.1)' 
+                            }}
                           >
                             {t('add_color_stop')}
                           </Button>
@@ -299,7 +311,11 @@ export function ColorSelect({
                     <Button 
                       size="xs" 
                       fullWidth 
-                      className="!bg-primary hover:opacity-90 transition-all shadow-md"
+                      className="hover:opacity-90 transition-all shadow-md"
+                      style={{
+                        background: 'var(--space-accent-bg)',
+                        color: 'var(--space-accent-text, #ffffff)'
+                      }}
                       onClick={() => {
                         handle_apply_gradient();
                       }}
@@ -329,7 +345,7 @@ export function ColorSelect({
                       className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-md z-10 border border-gray-100 dark:border-zinc-800"
                       style={{ backgroundColor: 'white' }}
                     >
-                       <IoDiamondOutline size={10} style={{ color: 'var(--space-primary)' }} />
+                       <IoDiamondOutline size={10} style={{ color: 'var(--space-accent)' }} />
                     </Box>
                   )}
                 </UnstyledButton>

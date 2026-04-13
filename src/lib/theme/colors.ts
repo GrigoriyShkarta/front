@@ -233,3 +233,41 @@ export const SECONDARY_COLORS = {
 
 export type SecondaryColorId = keyof typeof SECONDARY_COLORS;
 
+// ============================================
+// ACCENT COLORS (For buttons and highlights)
+// ============================================
+export const ACCENT_COLORS = {
+  blue: "#2563eb",
+  indigo: "#4f46e5",
+  violet: "#8b5cf6",
+  purple: "#7c3aed",
+  fuchsia: "#d946ef",
+  pink: "#ec4899",
+  rose: "#e11d48",
+  red: "#dc2626",
+  orange: "#f97316",
+  amber: "#f59e0b",
+  yellow: "#eab308",
+  lime: "#84cc16",
+  green: "#16a34a",
+  emerald: "#059669",
+  teal: "#0d9488",
+  cyan: "#06b6d4",
+  sky: "#0284c7",
+  azure: "#007fff",
+} as const;
+
+export type AccentColorId = keyof typeof ACCENT_COLORS;
+
+// ============================================
+// ACCENT GRADIENTS (Premium Features)
+// ============================================
+export const ACCENT_GRADIENTS = {
+  'sunset-accent': { gradient: "linear-gradient(135deg, #f97316 0%, #ec4899 100%)", from: "#f97316", to: "#ec4899" },
+  'ocean-accent': { gradient: "linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)", from: "#0284c7", to: "#06b6d4" },
+  'purple-accent': { gradient: "linear-gradient(135deg, #7c3aed 0%, #d946ef 100%)", from: "#7c3aed", to: "#d946ef" },
+  'emerald-accent': { gradient: "linear-gradient(135deg, #059669 0%, #16a34a 100%)", from: "#059669", to: "#16a34a" },
+  'fire-accent': { gradient: "linear-gradient(135deg, #dc2626 0%, #f97316 100%)", from: "#dc2626", to: "#f97316" },
+  'cosmic-accent': { gradient: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)", from: "#4f46e5", to: "#7c3aed" },
+} as const;
+

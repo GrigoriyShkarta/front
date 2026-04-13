@@ -13,6 +13,7 @@ export const personalization_schema = z.object({
   languages: z.array(z.string()).min(1, 'errors.required'),
   font_family: z.string(),
   currency: z.string(),
+  accent_color: z.string(),
 });
 
 export type PersonalizationFormData = z.infer<typeof personalization_schema>;

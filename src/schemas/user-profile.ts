@@ -14,6 +14,7 @@ export const personalization_schema = z.object({
   is_show_sidebar_icon: z.boolean().optional().default(true),
   font_family: z.string().optional().default('inter'),
   currency: z.string().optional().default('UAH'),
+  accent_color: z.string().optional().nullable().default('#2563eb'),
 });
 
 export const dashboard_personalization_schema = z.object({

@@ -10,11 +10,12 @@ import {
   SECONDARY_COLORS, 
   BACKGROUND_LIGHT, 
   BACKGROUND_DARK, 
-  BASIC_PRIMARY_COLORS,
   BASIC_SECONDARY_COLORS,
   BASIC_BACKGROUND_LIGHT,
   BASIC_BACKGROUND_DARK,
-  BASIC_FONTS
+  BASIC_FONTS,
+  ACCENT_COLORS,
+  BASIC_ACCENT_COLORS,
 } from '@/lib/constants';
 
 export function usePersonalizationForm() {
@@ -46,6 +47,7 @@ export function usePersonalizationForm() {
       icon: space?.icon || null,
       is_show_sidebar_icon: space?.is_show_sidebar_icon ?? true,
       currency: space?.currency || 'UAH',
+      accent_color: space?.accent_color || '#2563eb',
     }
   });
 
@@ -65,6 +67,7 @@ export function usePersonalizationForm() {
       icon: space?.icon || null,
       is_show_sidebar_icon: space?.is_show_sidebar_icon ?? true,
       currency: space?.currency || 'UAH',
+      accent_color: space?.accent_color || '#2563eb',
     });
   }, [space, form]);
 
@@ -105,7 +108,12 @@ export function usePersonalizationForm() {
     // Check sidebar icon setting (showing is premium)
     const is_sidebar_icon_premium = watched_values.is_show_sidebar_icon === true;
 
-    return !!(is_primary_premium || is_secondary_premium || is_bg_premium || is_bg_dark_premium || is_font_premium || is_icon_premium || is_sidebar_icon_premium);
+    // Check accent color
+    const is_accent_premium = watched_values.accent_color.includes('gradient') || 
+      (!BASIC_ACCENT_COLORS.some(c => c.id === watched_values.accent_color) && 
+       ACCENT_COLORS.find(c => c.id === watched_values.accent_color)?.is_premium);
+
+    return !!(is_primary_premium || is_secondary_premium || is_bg_premium || is_bg_dark_premium || is_font_premium || is_icon_premium || is_sidebar_icon_premium || is_accent_premium);
   }, [watched_string]);
 
   // Instant preview by updating user context (debounced to keep UI fluid)

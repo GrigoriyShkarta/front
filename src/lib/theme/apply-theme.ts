@@ -22,6 +22,7 @@ export interface ThemeConfig {
   select_mode?: boolean;
   is_white_sidebar_color?: boolean;
   font_family?: string;
+  accent_color?: string;
 }
 
 /**
@@ -99,6 +100,30 @@ export function applyTheme(config: ThemeConfig) {
   root.style.setProperty('--space-secondary-hover', secondary_val);
   // Override Mantine v8 anchor color variable so <Anchor> uses secondary color
   root.style.setProperty('--mantine-color-anchor', secondary_val);
+  
+  // --- Apply Accent Color (For buttons) ---
+  const accent_val = config.accent_color || '#2563eb';
+  const is_accent_gradient = accent_val.includes('gradient');
+  
+  root.style.setProperty('--space-accent-is-gradient', is_accent_gradient ? '1' : '0');
+
+  if (is_accent_gradient) {
+    const colors = accent_val.match(/#[a-fA-F0-9]{3,6}/g);
+    const from_color = colors?.[0] || '#2563eb';
+    const to_color = colors?.[1] || from_color;
+
+    root.style.setProperty('--space-accent', from_color);
+    root.style.setProperty('--space-accent-rgb', hexToRgb(from_color));
+    root.style.setProperty('--space-accent-hover', to_color);
+    root.style.setProperty('--space-accent-bg', accent_val);
+    root.style.setProperty('--space-accent-text', '#ffffff');
+  } else {
+    root.style.setProperty('--space-accent', accent_val);
+    root.style.setProperty('--space-accent-rgb', hexToRgb(accent_val));
+    root.style.setProperty('--space-accent-hover', accent_val);
+    root.style.setProperty('--space-accent-bg', accent_val);
+    root.style.setProperty('--space-accent-text', '#ffffff');
+  }
 
   // --- Apply Background Color/Gradient ---
   let bg_val = '#ffffff';

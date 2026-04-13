@@ -38,6 +38,7 @@ export function DynamicThemeProvider({ children }: Props) {
       select_mode: space?.select_mode,
       is_white_sidebar_color: space?.is_white_sidebar_color ?? false,
       font_family: space?.font_family || 'inter',
+      accent_color: space?.accent_color || '#2563eb',
     });
   }, [space, mode, is_mounted]);
 

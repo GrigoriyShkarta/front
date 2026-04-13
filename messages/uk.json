@@ -507,6 +507,8 @@
     "primary_color_label": "Головний колір",
     "secondary_color_label": "Другорядний колір",
     "bg_color_label": "Фон у світлому режимі",
+    "accent_color_label": "Акцентний колір",
+    "accent_color_description": "Цей колір буде використаний для кнопок та ключових елементів взаємодії.",
     "dark_theme_label": "Увімкнути темну тему",
     "dark_theme_description": "Дозволити користувачам перемикатися на темний режим.",
     "bg_color_dark_label": "Фон у темному режимі",

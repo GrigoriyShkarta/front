@@ -100,7 +100,11 @@ export const useReports = (dateRange: [Date | null, Date | null]) => {
     allStudents.forEach(student => {
         const subs = (student.purchased_subscriptions || []);
         if (subs.length > 0) {
-            const latest = [...subs].sort((a,b) => dayjs(b.created_at).valueOf() - dayjs(a.created_at).valueOf())[0];
+            const latest = [...subs].sort((a,b) => {
+                const dateA = a.next_payment_date || a.created_at;
+                const dateB = b.next_payment_date || b.created_at;
+                return dayjs(dateB).valueOf() - dayjs(dateA).valueOf();
+            })[0];
             studentLatestSubMap[student.id] = latest.id;
         }
     });

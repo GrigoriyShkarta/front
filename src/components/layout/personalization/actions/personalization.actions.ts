@@ -19,6 +19,7 @@ export const updatePersonalization = async (data: PersonalizationFormData) => {
   form_data.append('font_family', data.font_family);
   form_data.append('is_show_sidebar_icon', String(data.is_show_sidebar_icon));
   form_data.append('currency', data.currency);
+  form_data.append('accent_color', data.accent_color);
   
   // Append languages array
   data.languages.forEach((lang) => {

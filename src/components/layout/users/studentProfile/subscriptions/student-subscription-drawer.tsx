@@ -359,6 +359,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
           {!subscription && (
             <SegmentedControl
               fullWidth
+              color="accent"
               value={form.values.subscription_type}
               onChange={(val) => form.setFieldValue('subscription_type', val as 'template' | 'custom')}
               data={[

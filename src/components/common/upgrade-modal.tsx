@@ -38,8 +38,8 @@ export function UpgradeModal({ opened, onClose }: Props) {
           size={80} 
           radius="xl" 
           style={{
-            background: 'var(--space-primary-bg)',
-            color: 'var(--space-sidebar-text)'
+            background: 'var(--space-accent-bg)',
+            color: 'var(--space-accent-text, #ffffff)'
           }}
         >
           <IoDiamondOutline size={40} />
@@ -61,8 +61,8 @@ export function UpgradeModal({ opened, onClose }: Props) {
                 flex={2} 
                 radius="md" 
                 style={{
-                    background: 'var(--space-primary-bg)',
-                    color: 'var(--space-sidebar-text)'
+                    background: 'var(--space-accent-bg)',
+                    color: 'var(--space-accent-text, #ffffff)'
                 }}
                 className="shadow-lg hover:brightness-110 transition-all"
                 leftSection={<IoRocketOutline size={18} />}
