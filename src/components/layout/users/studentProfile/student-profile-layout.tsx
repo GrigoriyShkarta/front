@@ -63,7 +63,9 @@ export function StudentProfileShell({
           ? 'recordings'
           : pathname.endsWith('/security')
             ? 'security'
-            : 'general';
+            : pathname.endsWith('/boards')
+              ? 'boards'
+              : 'general';
 
   const breadcrumb_items = useMemo(() => {
     const items = custom_breadcrumbs || [
@@ -172,22 +174,6 @@ export function StudentProfileShell({
               </Stack>
             </Group>
             
-            {current_user?.role !== 'student' && (
-              <Group gap="sm" wrap="nowrap" className="w-full sm:w-auto justify-end sm:justify-start">
-                <Button
-                  component={Link}
-                  href={`/main/boards/${profile_user.id}`}
-                  variant="light"
-                  color="indigo"
-                  size="sm"
-                  radius="xl"
-                  leftSection={<FaChalkboard size={16} />}
-                  className="shadow-sm hover:shadow-md transition-all hidden sm:flex"
-                >
-                  {tNav('boards')}
-                </Button>
-              </Group>
-            )}
           </Group>
         </Stack>
       )}
@@ -213,6 +199,11 @@ export function StudentProfileShell({
                   <Tabs.Tab value="subscriptions" leftSection={<IoCardOutline size={16} />} className="whitespace-nowrap shrink-0">
                     {t('tabs.lesson_history')}
                   </Tabs.Tab>
+                  {current_user?.role !== 'student' && (
+                    <Tabs.Tab value="boards" leftSection={<FaChalkboard size={16} />} className="whitespace-nowrap shrink-0">
+                      {tNav('boards') || 'Boards'}
+                    </Tabs.Tab>
+                  )}
                   {current_user?.role !== 'student' && (
                     <Tabs.Tab value="materials" leftSection={<IoBookOutline size={16} />} className="whitespace-nowrap shrink-0">
                       {tNav('materials') || 'Materials'}

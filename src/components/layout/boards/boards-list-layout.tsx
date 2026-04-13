@@ -31,11 +31,11 @@ import dayjs from 'dayjs';
 /**
  * Layout for listing individual boards for a specific student.
  */
-export function BoardsListLayout() {
+export function BoardsListLayout({ hide_header }: { hide_header?: boolean }) {
   const t = useTranslations('Boards');
   const tNav = useTranslations('Navigation');
   const params = useParams();
-  const userId = params?.userId as string;
+  const userId = (params?.userId || params?.id) as string;
   const { user: currentUser } = useAuth();
   const { loading, student_name, boards, createBoard, deleteBoard, updateBoard } = useBoardData(userId);
   const [opened, { open, close }] = useDisclosure(false);
@@ -68,18 +68,20 @@ export function BoardsListLayout() {
   };
 
   return (
-    <Stack gap="xl" className="py-4 min-h-[500px]">
-      <Stack gap="xs">
-        <Breadcrumbs separator="→" className="text-xs sm:text-sm">{breadcrumb_items}</Breadcrumbs>
-        <Group justify="space-between" align="flex-end">
-          <Stack gap={4}>
-            <Title order={1} className="text-2xl sm:text-3xl font-bold tracking-tight">
-               {student_name ? t('list_title', { name: student_name }) : t('title')}
-            </Title>
-            <Text c="dimmed" size="sm">{t('list_subtitle')}</Text>
-          </Stack>
-        </Group>
-      </Stack>
+    <Stack gap="xl" className={cn("py-4", !hide_header && "min-h-[500px]")}>
+      {!hide_header && (
+        <Stack gap="xs">
+          <Breadcrumbs separator="→" className="text-xs sm:text-sm">{breadcrumb_items}</Breadcrumbs>
+          <Group justify="space-between" align="flex-end">
+            <Stack gap={4}>
+              <Title order={1} className="text-2xl sm:text-3xl font-bold tracking-tight">
+                 {student_name ? t('list_title', { name: student_name }) : t('title')}
+              </Title>
+              <Text c="dimmed" size="sm">{t('list_subtitle')}</Text>
+            </Stack>
+          </Group>
+        </Stack>
+      )}
 
       <Box className="relative">
         <LoadingOverlay visible={loading} overlayProps={{ blur: 1, radius: 'lg' }} loaderProps={{ color: 'primary' }} />
