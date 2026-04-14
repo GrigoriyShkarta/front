@@ -38,7 +38,15 @@ export function StudentGeneralInfo({ user, is_own_profile }: Props) {
               <Divider my="xs" label={t('form.categories')} labelPosition="left" />
               <Group gap="xs">
                 {user.categories?.map(c => (
-                  <Badge key={c.id} variant="outline" color={c.color}>
+                  <Badge 
+                    key={c.id} 
+                    variant="outline" 
+                    color={c.color || 'gray'}
+                    style={!c.color ? { 
+                      borderColor: 'color-mix(in srgb, var(--mantine-color-text), transparent 60%)', 
+                      color: 'var(--mantine-color-text)' 
+                    } : {}}
+                  >
                     {c.name}
                   </Badge>
                 ))}

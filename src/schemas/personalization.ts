@@ -10,6 +10,7 @@ export const personalization_schema = z.object({
   bg_color_dark: z.string(),
   is_white_sidebar_color: z.boolean(),
   is_show_sidebar_icon: z.boolean(),
+  sidebar_width: z.number().min(200).max(300),
   languages: z.array(z.string()).min(1, 'errors.required'),
   font_family: z.string(),
   currency: z.string(),

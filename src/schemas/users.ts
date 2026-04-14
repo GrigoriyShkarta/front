@@ -4,7 +4,9 @@ export const user_role_schema = z.enum(['super_admin', 'admin', 'teacher', 'stud
 export type UserRole = z.infer<typeof user_role_schema>;
 
 export const user_form_schema = z.object({
-  name: z.string().min(1, 'errors.required'),
+  name: z.string()
+    .min(1, 'errors.required')
+    .regex(/^[^0-9]*$/, 'errors.name_no_digits'),
   email: z.string().min(1, 'errors.required').email('errors.invalid_email'),
   password: z.string().min(6, 'errors.password_too_short').optional().or(z.literal('')),
   role: user_role_schema,
@@ -12,7 +14,14 @@ export const user_form_schema = z.object({
   teacher_id: z.string().optional().nullable(),
   categories: z.array(z.string()).optional(),
   learning_goals: z.string().optional(),
-  birthday: z.string().nullable().optional(),
+  birthday: z.string().nullable().optional().refine((val) => {
+    if (!val) return true;
+    const date = new Date(val);
+    const now = new Date();
+    const hundred_years_ago = new Date();
+    hundred_years_ago.setFullYear(now.getFullYear() - 100);
+    return date <= now && date >= hundred_years_ago;
+  }, 'errors.invalid_birthday'),
   city: z.string().nullable().optional(),
   telegram: z.string().nullable().optional(),
   instagram: z.string().nullable().optional(),

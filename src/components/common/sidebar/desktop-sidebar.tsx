@@ -29,9 +29,10 @@ export function DesktopSidebar() {
       component="aside"
       className={cn(
         'hidden md:flex flex-col h-screen transition-all duration-300 relative z-20',
-        collapsed ? 'w-[50px]' : 'w-[250px]'
+        collapsed ? 'w-[50px]' : ''
       )}
       style={{ 
+        width: !collapsed ? `${space?.personalization?.sidebar_width ?? 250}px` : '50px',
         background: 'var(--space-primary-bg)',
         color: 'var(--space-sidebar-text)'
       }}

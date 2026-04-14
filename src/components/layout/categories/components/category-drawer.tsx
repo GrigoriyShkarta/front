@@ -1,6 +1,19 @@
 'use client';
 
-import { TextInput, ColorInput, Button, Stack, Group, Drawer, ActionIcon, Box, Text } from '@mantine/core';
+import { 
+  TextInput, 
+  Button, 
+  Stack, 
+  Group, 
+  Drawer, 
+  ActionIcon, 
+  Box, 
+  Text,
+  Popover,
+  ColorSwatch,
+  ColorPicker,
+  Tooltip
+} from '@mantine/core';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
@@ -10,10 +23,10 @@ import { IoAddOutline, IoTrashOutline } from 'react-icons/io5';
 
 interface Props {
   opened: boolean;
-  onClose: () => void;
-  onSubmit: (data: CreateCategoryForm | CreateCategoryForm[]) => Promise<void>;
   editing_category?: CategoryMaterial | null;
   loading?: boolean;
+  onClose: () => void;
+  onSubmit: (data: CreateCategoryForm | CreateCategoryForm[]) => Promise<void>;
 }
 
 export function CategoryDrawer({ opened, onClose, onSubmit, editing_category, loading }: Props) {
@@ -21,8 +34,8 @@ export function CategoryDrawer({ opened, onClose, onSubmit, editing_category, lo
   const common_t = useTranslations('Common');
 
   const {
-    register,
     control,
+    register,
     handleSubmit,
     reset,
     setValue,
@@ -32,7 +45,7 @@ export function CategoryDrawer({ opened, onClose, onSubmit, editing_category, lo
     resolver: zodResolver(bulk_create_category_schema),
     mode: 'onChange',
     defaultValues: {
-      categories: [{ name: '', color: '' }],
+      categories: [{ name: '', color: '#2563eb' }],
     },
   });
 
@@ -51,7 +64,7 @@ export function CategoryDrawer({ opened, onClose, onSubmit, editing_category, lo
       });
     } else {
       reset({
-        categories: [{ name: '', color: '' }],
+        categories: [{ name: '', color: '#2563eb' }],
       });
     }
   }, [editing_category, opened, reset]);
@@ -103,14 +116,33 @@ export function CategoryDrawer({ opened, onClose, onSubmit, editing_category, lo
                    required
                    error={errors.categories?.[index]?.name?.message ? common_t(`errors.${errors.categories[index]?.name?.message as any}`) : null}
                    {...register(`categories.${index}.name`)}
-                 />
-                 <ColorInput
-                   label={t('table.color')}
-                   placeholder="#2563eb"
-                   disallowInput={false}
-                   value={currentColor}
-                   onChange={(val) => setValue(`categories.${index}.color`, val, { shouldValidate: true })}
-                   error={errors.categories?.[index]?.color?.message ? common_t(`errors.${errors.categories[index]?.color?.message as any}`) : null}
+                   rightSection={
+                     <Popover position="bottom-end" shadow="md" withArrow>
+                       <Popover.Target>
+                         <Tooltip label={t('table.color')}>
+                           <ColorSwatch 
+                             color={currentColor || '#2563eb'} 
+                             size={20} 
+                             className="cursor-pointer hover:scale-110 transition-transform" 
+                           />
+                         </Tooltip>
+                       </Popover.Target>
+                       <Popover.Dropdown p="xs">
+                         <Stack gap="xs">
+                           <ColorPicker
+                             value={currentColor || '#2563eb'}
+                             onChange={(val) => setValue(`categories.${index}.color`, val, { shouldValidate: true, shouldDirty: true })}
+                             format="hex"
+                           />
+                           <TextInput 
+                             size="xs"
+                             value={currentColor}
+                             onChange={(e) => setValue(`categories.${index}.color`, e.currentTarget.value, { shouldValidate: true, shouldDirty: true })}
+                           />
+                         </Stack>
+                       </Popover.Dropdown>
+                     </Popover>
+                   }
                  />
                </Stack>
              );
@@ -122,7 +154,7 @@ export function CategoryDrawer({ opened, onClose, onSubmit, editing_category, lo
               leftSection={<IoAddOutline />} 
               onClick={() => append({ name: '', color: '' })}
               color="primary"
-              className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors"
+              className="!bg-accent/10 !text-accent hover:!bg-accent/20 transition-colors"
             >
               {t('add_another')}
             </Button>

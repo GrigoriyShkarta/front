@@ -21,18 +21,18 @@ export function StudentCourses({ student_id }: Props) {
   const { 
     courses, 
     is_loading, 
-    grant_access, 
     is_granting, 
-    revoke_access, 
     is_revoking, 
     total_pages,
     page,
-    setPage,
     search,
-    setSearch,
     category_ids,
-    setCategoryIds,
     limit,
+    grant_access, 
+    revoke_access, 
+    setPage,
+    setSearch,
+    setCategoryIds,
     setLimit
   } = useStudentMaterials(student_id);
   

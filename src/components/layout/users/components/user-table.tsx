@@ -21,6 +21,8 @@ interface Props {
   selected_users: string[];
   sort_by?: string;
   sort_order?: 'asc' | 'desc';
+  user_link_prefix?: string;
+  show_actions?: boolean;
   on_page_change: (page: number) => void;
   on_limit_change: (limit: number) => void;
   on_select: (id: string) => void;
@@ -28,8 +30,6 @@ interface Props {
   on_edit: (user: UserListItem) => void;
   on_delete: (id: string) => void;
   on_sort: (field: string) => void;
-  user_link_prefix?: string;
-  show_actions?: boolean;
 }
 
 export function UserTable({ 
@@ -39,17 +39,17 @@ export function UserTable({
   limit,
   current_user,
   selected_users, 
+  sort_by,
+  sort_order,
+  user_link_prefix = '/main/users',
+  show_actions = true,
   on_page_change,
   on_limit_change,
   on_select, 
   on_select_all,
   on_edit, 
   on_delete,
-  sort_by,
-  sort_order,
   on_sort,
-  user_link_prefix = '/main/users',
-  show_actions = true
 }: Props) {
   const t = useTranslations('Users');
   const common_t = useTranslations('Common');
@@ -137,7 +137,7 @@ export function UserTable({
             <Avatar 
               src={user.avatar} 
               radius="xl" 
-              size="sm"
+              size="md"
               className="cursor-pointer hover:opacity-80 transition-opacity"
             >
               {user.name.charAt(0)}

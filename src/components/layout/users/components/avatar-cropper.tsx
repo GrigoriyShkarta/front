@@ -84,7 +84,11 @@ export function AvatarCropper({ image, opened, onClose, onCropComplete }: Props)
           <Button variant="subtle" color="gray" onClick={onClose}>
             {common_t('cancel')}
           </Button>
-          <Button onClick={handleSave}>
+          <Button 
+            onClick={handleSave} 
+            color="primary"
+            className="bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
+          >
             {common_t('save')}
           </Button>
         </Group>

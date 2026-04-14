@@ -98,6 +98,7 @@
     "users_deleted_error": "Не вдалося видалити вибраних користувачів.",
     "errors": {
       "required": "Це поле є обов'язковим",
+      "invalid_birthday": "Невірна дата народження",
       "invalid_email": "Невірна адреса електронної пошти",
       "password_too_short": "Пароль повинен містити щонайменше 6 символів",
       "current_password_invalid": "Поточний пароль введено неправильно",
@@ -106,7 +107,9 @@
       "subscription_name_required": "Назва послуги обов'язкова",
       "subscription_price_required": "Ціна обов'язкова",
       "subscription_lessons_count_required": "Кількість занять повинна бути не менше 1",
-      "at_least_one_day": "Оберіть хоча б один день"
+      "at_least_one_day": "Оберіть хоча б один день",
+      "name_no_digits": "Ім'я не може містити цифри",
+      "name_must_start_with_uppercase": "Ім'я повинно починатися з великої літери"
     },
     "roles": {
       "super_admin": "Головний адмін",
@@ -526,6 +529,7 @@
     "sidebar_text_color_description": "Виберіть колір тексту для навігації сайдбару.",
     "sidebar_color_white": "Білий",
     "sidebar_color_black": "Чорний",
+    "sidebar_width_label": "Ширина сайдбару",
     "premium": "Преміум",
     "enter_space_name": "Введіть назву простору",
     "select_languages_placeholder": "Виберіть мови",

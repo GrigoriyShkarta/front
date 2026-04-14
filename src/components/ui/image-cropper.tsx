@@ -49,7 +49,12 @@ export function ImageCropper({
 
   const handleSave = async () => {
     try {
-      const croppedImage = await getCroppedImg(image, croppedAreaPixels, 'logo.jpg');
+      // Determine extension based on data URL to preserve transparency if it's a PNG
+      const extension = image.startsWith('data:image/png') ? 'png' : 
+                        image.startsWith('data:image/webp') ? 'webp' : 'jpg';
+      const fileName = `logo.${extension}`;
+      
+      const croppedImage = await getCroppedImg(image, croppedAreaPixels, fileName);
       if (croppedImage) {
         onCropComplete(croppedImage);
         onClose();

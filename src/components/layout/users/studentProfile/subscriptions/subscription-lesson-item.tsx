@@ -52,10 +52,10 @@ export function SubscriptionLessonItem({ lesson, isTeacher, statusColors, onUpda
       p="xs" 
       radius="md" 
       withBorder 
-      w={{ base: '100%', sm: 138 }}
+      w={{ base: '100%', sm: 'fit-content' }}
       style={{ 
         backgroundColor: statusColors[lesson.status] || 'transparent',
-        borderColor: 'rgba(255,255,255,0.05)'
+        borderColor: 'rgba(255,255,255,0.05)',
       }}
     >
       <Stack gap={6}>

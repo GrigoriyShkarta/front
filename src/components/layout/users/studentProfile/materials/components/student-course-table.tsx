@@ -82,7 +82,7 @@ export function StudentCourseTable({ data, is_loading, on_course_click }: Props)
             <Text size="xs" c="dimmed">{t('table.progress') || 'Progress'}</Text>
             <Text size="xs" fw={500}>{item.progress_percentage}%</Text>
           </Group>
-          <Progress value={item.progress_percentage} size="xs" radius="xl" color="primary" />
+          <Progress value={item.progress_percentage} size="xs" radius="xl" />
         </Stack>
       </Table.Td>
     </Table.Tr>

@@ -69,7 +69,7 @@ export function SidebarItem({ item, collapsed, onClick, onExpand }: Props) {
         'flex items-center w-full rounded-lg transition-all duration-200 h-10 group relative',
         collapsed ? 'justify-center px-0' : 'px-3',
         is_active && !has_items
-          ? 'bg-primary-hover shadow-md' 
+          ? 'bg-white/10' 
           : 'hover:bg-white/10 active:scale-98',
         !collapsed && !is_active && 'hover:translate-x-1',
         collapsed && !is_active && 'hover:scale-110'

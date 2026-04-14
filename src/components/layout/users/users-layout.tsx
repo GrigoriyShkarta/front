@@ -14,7 +14,6 @@ import { useTranslations } from 'next-intl';
 import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
 import { Breadcrumbs, Anchor, Text } from '@mantine/core';
 import { Link } from '@/i18n/routing';
-import { cn } from "@/lib/utils";
 
 export function UsersLayout() {
   const t = useTranslations('Users');
@@ -151,7 +150,7 @@ export function UsersLayout() {
 
         <Group justify="space-between" align="center" wrap="nowrap">
           <Group align="center" gap="md">
-            <Box className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm border border-primary/20 shrink-0">
+            <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
               <IoPeopleOutline size={28} />
             </Box>
             <Stack gap={0}>

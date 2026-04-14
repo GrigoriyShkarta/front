@@ -99,6 +99,7 @@
     "users_deleted_error": "Failed to delete selected users.",
     "errors": {
       "required": "This field is required",
+      "invalid_birthday": "Invalid birthday",
       "invalid_email": "Invalid email address",
       "password_too_short": "Password must be at least 6 characters",
       "current_password_invalid": "The current password you entered is incorrect",
@@ -107,7 +108,9 @@
       "subscription_name_required": "Servant name is required",
       "subscription_price_required": "Servant price is required",
       "subscription_lessons_count_required": "Lessons count must be at least 1",
-      "at_least_one_day": "Select at least one day"
+      "at_least_one_day": "Select at least one day",
+      "name_no_digits": "Name cannot contain digits",
+      "name_must_start_with_uppercase": "Name must start with an uppercase letter"
     },
     "roles": {
       "super_admin": "Super Admin",
@@ -521,6 +524,7 @@
     "sidebar_text_color_description": "Choose text color for sidebar navigation.",
     "sidebar_color_white": "White",
     "sidebar_color_black": "Black",
+    "sidebar_width_label": "Sidebar Width",
     "premium": "Premium",
     "enter_space_name": "Enter space name",
     "select_languages_placeholder": "Select languages",

@@ -10,7 +10,8 @@ import {
   Badge,
   Group,
   Switch,
-  Collapse
+  Collapse,
+  Slider
 } from '@mantine/core';
 import { ColorSelect } from './color-select';
 import { 
@@ -137,6 +138,38 @@ export function PersonalizationVisualSection({ form, is_premium }: Props) {
             />
           )}
         />
+
+        <Box>
+          <Text size="sm" fw={500} mb={8}>
+            {t('sidebar_width_label') || 'Sidebar Width'} ({watch('sidebar_width')}px)
+          </Text>
+          <Controller
+            name="sidebar_width"
+            control={control}
+            render={({ field }) => (
+              <Slider
+                {...field}
+                min={200}
+                max={300}
+                step={10}
+                label={(val) => `${val}px`}
+                marks={[
+                  { value: 200, label: '200px' },
+                  { value: 250, label: '250px' },
+                  { value: 300, label: '300px' },
+                ]}
+                styles={{
+                  markLabel: { fontSize: '10px' },
+                  bar: { backgroundColor: watch('accent_color') },
+                  thumb: { 
+                    borderColor: watch('accent_color'),
+                    backgroundColor: 'var(--mantine-color-white)' 
+                  }
+                }}
+              />
+            )}
+          />
+        </Box>
 
         <Controller
           name="secondary_color"

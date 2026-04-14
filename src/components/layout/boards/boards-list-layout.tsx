@@ -101,7 +101,7 @@ export function BoardsListLayout({ hide_header }: { hide_header?: boolean }) {
                   className="w-12 h-12 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform mb-4"
                   style={{ backgroundColor: 'rgba(var(--space-primary-rgb), 0.1)' }}
                 >
-                   <IoAddOutline size={28} style={{ color: 'var(--space-primary)' }} />
+                   <IoAddOutline size={28} style={{ color: 'var(--space-secondary)' }} />
                 </Box>
                 <Text fw={600} size="lg">{t('create_board')}</Text>
              </UnstyledButton>
@@ -144,7 +144,7 @@ export function BoardsListLayout({ hide_header }: { hide_header?: boolean }) {
              onClick={handleCreate} 
              loading={creating} 
              radius="md" 
-             color="primary"
+             style={{ background: 'var(--space-accent)' }}
           >
              {useTranslations('Common')('add')}
           </Button>
@@ -260,7 +260,7 @@ function BoardCard({ board, userId, onDelete, onUpdate, can_delete }: {
                 radius="md" 
                 autoFocus 
               />
-              <Button fullWidth onClick={handleUpdate} loading={saving} radius="md" color="primary">
+              <Button fullWidth onClick={handleUpdate} loading={saving} radius="md" style={{ background: 'var(--space-accent)' }}>
                  {common_t('save')}
               </Button>
            </Stack>

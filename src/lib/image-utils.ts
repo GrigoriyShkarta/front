@@ -49,14 +49,22 @@ export default async function getCroppedImg(
   // paste generated rotate image with correct offsets for x,y crop
   ctx.putImageData(data, 0, 0);
 
+  // Determine output type based on file extension or data URL to preserve transparency if needed
+  let outputType = 'image/jpeg';
+  if (fileName.toLowerCase().endsWith('.png') || imageSrc.startsWith('data:image/png')) {
+    outputType = 'image/png';
+  } else if (fileName.toLowerCase().endsWith('.webp') || imageSrc.startsWith('data:image/webp')) {
+    outputType = 'image/webp';
+  }
+
   // As a blob
   return new Promise((resolve) => {
     canvas.toBlob((file) => {
       if (file) {
-        resolve(new File([file], fileName, { type: 'image/jpeg' }));
+        resolve(new File([file], fileName, { type: outputType }));
       } else {
         resolve(null);
       }
-    }, 'image/jpeg');
+    }, outputType, outputType === 'image/jpeg' ? 0.9 : undefined);
   });
 }

@@ -34,6 +34,7 @@ import { CreateCategoryForm } from '../../categories/schemas/category-schema';
 
 interface Props {
   activeTab: 'personal' | 'settings';
+  setActiveTab: (tab: 'personal' | 'settings') => void;
   initial_data?: UserListItem | null;
   teachers: { id: string; name: string; role: string }[];
   current_user: any;
@@ -41,7 +42,7 @@ interface Props {
   is_loading: boolean;
 }
 
-export function UserForm({ activeTab, initial_data, teachers, current_user, on_submit, is_loading }: Props) {
+export function UserForm({ activeTab, setActiveTab, initial_data, teachers, current_user, on_submit, is_loading }: Props) {
   const t = useTranslations('Users');
   const common_t = useTranslations('Common');
   const tProfile = useTranslations('Profile');
@@ -142,6 +143,7 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
 
       await on_submit(processed_data);
     } catch (error: any) {
+      setActiveTab('personal');
       const server_errors = error.response?.data?.message;
       if (Array.isArray(server_errors)) {
         server_errors.forEach((err_obj: any) => {
@@ -200,223 +202,240 @@ export function UserForm({ activeTab, initial_data, teachers, current_user, on_s
   };
 
   return (
-    <form onSubmit={handleSubmit(handle_form_submit)} className='overflow-x-hidden'>
-      <Stack gap="md">
-        <AvatarCropper
-          image={raw_image || ''}
-          opened={cropper_opened}
-          onClose={() => set_cropper_opened(false)}
-          onCropComplete={handle_crop_complete}
-        />
-        
-        {activeTab === 'personal' && (
-          <Stack gap="md">
-            <Box>
-              <Text size="sm" fw={500} mb={4}>{t('form.avatar')}</Text>
-              <Group>
-                <Avatar src={avatar_preview} size="lg" radius="md" />
-                {!(is_avatar_locked && current_user_role === 'student') && (
-                  <FileButton 
-                    onChange={(file) => {
-                      if (file) {
-                        set_raw_image(URL.createObjectURL(file));
-                        set_cropper_opened(true);
-                      }
-                    }} 
-                    accept="image/png,image/jpeg"
-                  >
-                    {(props) => (
-                      <Button 
-                        {...props} 
-                        variant="filled" 
-                        leftSection={<IoCloudUploadOutline size={16} />}
-                        className="bg-primary text-primary-foreground shadow-sm hover:shadow-md transition-all"
-                      >
-                        {t('form.upload')}
-                      </Button>
-                    )}
-                  </FileButton>
-                )}
-              </Group>
-            </Box>
+    <>
+      <AvatarCropper
+        image={raw_image || ''}
+        opened={cropper_opened}
+        onClose={() => set_cropper_opened(false)}
+        onCropComplete={handle_crop_complete}
+      />
 
-            <TextInput
-              label={t('form.name')}
-              placeholder={t('form.name_placeholder')}
-              maxLength={100}
-              required
-              withAsterisk
-              {...register('name')}
-              disabled={is_name_locked && current_user_role === 'student'}
-              error={errors.name?.message && common_t(errors.name.message)}
-            />
-
-            <TextInput
-              label={t('form.email')}
-              placeholder={t('form.email_placeholder')}
-              required
-              withAsterisk
-              maxLength={254}
-              {...register('email')}
-              error={errors.email?.message && common_t(errors.email.message)}
-            />
-
-            {show_admin_fields && (
-              <PasswordInput
-                label={t('form.password')}
-                placeholder={t('form.password_placeholder')}
-                required={!initial_data}
-                withAsterisk={!initial_data}
-                {...register('password')}
-                error={errors.password?.message && common_t(errors.password.message)}
-                leftSection={
-                  <ActionIcon onClick={on_generate_password} variant="subtle" color="primary" type="button">
-                    <IoRefreshOutline size={16} />
-                  </ActionIcon>
-                }
-                leftSectionPointerEvents="all"
-              />
-            )}
-
-            <Grid gutter="md">
-              <Grid.Col span={6}>
-                <TextInput
-                  label={tProfile('fields.city')}
-                  placeholder={tProfile('placeholders.city')}
-                  {...register('city')}
-                />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput
-                  type="date"
-                  label={tProfile('fields.birthday')}
-                  {...register('birthday')}
-                  rightSection={
-                    watch('birthday') && (
-                      <ActionIcon 
-                        variant="subtle" 
-                        color="gray" 
-                        onClick={() => setValue('birthday', null, { shouldValidate: true, shouldDirty: true })}
-                      >
-                        <IoCloseOutline size={16} />
-                      </ActionIcon>
-                    )
-                  }
-                />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput
-                  label={tProfile('fields.telegram')}
-                  placeholder={tProfile('placeholders.telegram')}
-                  {...register('telegram')}
-                />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput
-                  label={tProfile('fields.instagram')}
-                  placeholder={tProfile('placeholders.instagram')}
-                  {...register('instagram')}
-                />
-              </Grid.Col>
-            </Grid>
-
-            <Textarea
-              label={t('form.learning_goals')}
-              placeholder={t('form.learning_goals_placeholder')}
-              minRows={3}
-              autosize
-              {...register('learning_goals')}
-              error={errors.learning_goals?.message && common_t(errors.learning_goals.message)}
-            />
-          </Stack>
-        )}
-
-        {activeTab === 'settings' && (
-          <Stack gap="md">
-            <Select
-              label={t('form.status')}
-              data={[
-                { value: 'active', label: t('form.status_active') },
-                { value: 'inactive', label: t('form.status_inactive') },
-              ]}
-              value={watch('status')}
-              onChange={(val) => setValue('status', val as 'active' | 'inactive', { shouldValidate: true, shouldDirty: true })}
-            />
-
-            <Stack gap="xs">
-              <Text size="sm" fw={500}>{t('form.permissions') || 'Permissions'}</Text>
-              <Group style={{flexDirection: 'column', alignItems: 'self-start' }}>
-                <Switch
-                  label={t('form.is_name_locked')}
-                  checked={watch('is_name_locked')}
-                  onChange={(event) => setValue('is_name_locked', event.currentTarget.checked, { shouldValidate: true, shouldDirty: true })}
-                />
-                <Switch
-                  label={t('form.is_avatar_locked')}
-                  checked={watch('is_avatar_locked')}
-                  onChange={(event) => setValue('is_avatar_locked', event.currentTarget.checked, { shouldValidate: true, shouldDirty: true })}
-                />
-              </Group>
-            </Stack>
-
-            <TextInput
-              type="date"
-              label={t('form.deactivation_date')}
-              {...register('deactivation_date')}
-              rightSection={
-                watch('deactivation_date') && (
-                  <ActionIcon 
-                    variant="subtle" 
-                    color="gray" 
-                    onClick={() => setValue('deactivation_date', null, { shouldValidate: true, shouldDirty: true })}
-                  >
-                    <IoCloseOutline size={16} />
-                  </ActionIcon>
-                )
-              }
-            />
-
-            {show_admin_fields && (
+      <form onSubmit={handleSubmit(handle_form_submit)} className='overflow-x-hidden'>
+        <Stack gap="md">
+          {activeTab === 'personal' && (
+            <Stack gap="md">
               <Box>
-                <Group justify="space-between" mb={4}>
-                  <Text size="sm" fw={500}>{t('form.categories')}</Text>
-                  <Tooltip label={t('form.create_category')}>
-                    <ActionIcon variant="subtle" size="xs" onClick={() => setCategoryDrawerOpened(true)}>
-                      <IoAddOutline />
-                    </ActionIcon>
-                  </Tooltip>
+                <Text size="sm" fw={500} mb={4}>{t('form.avatar')}</Text>
+                <Group>
+                  <Avatar src={avatar_preview} size="lg" radius="md" />
+                  {!(is_avatar_locked && current_user_role === 'student') && (
+                    <FileButton 
+                      onChange={(file) => {
+                        if (file) {
+                          set_raw_image(URL.createObjectURL(file));
+                          set_cropper_opened(true);
+                        }
+                      }} 
+                      accept="image/png,image/jpeg,image/webp,image/avifS"
+                    >
+                      {(props) => (
+                        <Button 
+                          {...props} 
+                          type="button"
+                          variant="filled" 
+                          leftSection={<IoCloudUploadOutline size={16} />}
+                          className="bg-primary text-primary-foreground shadow-sm hover:shadow-md transition-all"
+                        >
+                          {t('form.upload')}
+                        </Button>
+                      )}
+                    </FileButton>
+                  )}
                 </Group>
-                <MultiSelect
-                  placeholder={t('form.categories_placeholder')}
-                  data={categoryList.map(c => ({ value: c.id, label: c.name }))}
-                  value={watched_categories}
-                  onChange={(val) => setValue('categories', val, { shouldValidate: true, shouldDirty: true })}
-                  searchable
-                  clearable
-                />
               </Box>
-            )}
-          </Stack>
-        )}
 
-        <Button 
-          type="submit" 
-          fullWidth 
-          loading={is_loading} 
-          disabled={!isValid || is_loading || (initial_data ? !isDirty : false)}
-          mt="md"
-          color="primary"
-          className="bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
-        >
-          {common_t('save')}
-        </Button>
+              <TextInput
+                label={t('form.name')}
+                placeholder={t('form.name_placeholder')}
+                maxLength={100}
+                required
+                withAsterisk
+                {...register('name', {
+                  onChange: (e) => {
+                    const value = e.target.value.replace(/\d/g, '');
+                    const formatted = value
+                      .split(' ')
+                      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                      .join(' ');
+                    setValue('name', formatted, { shouldValidate: true });
+                  }
+                })}
+                disabled={is_name_locked && current_user_role === 'student'}
+                error={errors.name?.message && common_t(errors.name.message)}
+              />
 
-        <CategoryDrawer
-          opened={categoryDrawerOpened}
-          onClose={() => setCategoryDrawerOpened(false)}
-          onSubmit={handleCategoryCreate}
-        />
-      </Stack>
-    </form>
+              <TextInput
+                label={t('form.email')}
+                placeholder={t('form.email_placeholder')}
+                required
+                withAsterisk
+                maxLength={254}
+                {...register('email')}
+                error={errors.email?.message && common_t(errors.email.message)}
+              />
+
+              {show_admin_fields && (
+                <PasswordInput
+                  label={t('form.password')}
+                  placeholder={t('form.password_placeholder')}
+                  required={!initial_data}
+                  withAsterisk={!initial_data}
+                  {...register('password')}
+                  error={errors.password?.message && common_t(errors.password.message)}
+                  leftSection={
+                    <ActionIcon onClick={on_generate_password} variant="subtle" color="primary" type="button">
+                      <IoRefreshOutline size={16} />
+                    </ActionIcon>
+                  }
+                  leftSectionPointerEvents="all"
+                />
+              )}
+
+              <Grid gutter="md">
+                <Grid.Col span={6}>
+                  <TextInput
+                    label={tProfile('fields.city')}
+                    placeholder={tProfile('placeholders.city')}
+                    {...register('city')}
+                  />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput
+                    type="date"
+                    label={tProfile('fields.birthday')}
+                    max={dayjs().format('YYYY-MM-DD')}
+                    min={dayjs().subtract(100, 'year').format('YYYY-MM-DD')}
+                    {...register('birthday')}
+                    error={errors.birthday?.message && common_t(errors.birthday.message)}
+                    rightSection={
+                      watch('birthday') && (
+                        <ActionIcon 
+                          variant="subtle" 
+                          color="gray" 
+                          onClick={() => setValue('birthday', null, { shouldValidate: true, shouldDirty: true })}
+                        >
+                          <IoCloseOutline size={16} />
+                        </ActionIcon>
+                      )
+                    }
+                  />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput
+                    label={tProfile('fields.telegram')}
+                    placeholder={tProfile('placeholders.telegram')}
+                    maxLength={50}
+                    {...register('telegram')}
+                  />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput
+                    label={tProfile('fields.instagram')}
+                    placeholder={tProfile('placeholders.instagram')}
+                    maxLength={50}
+                    {...register('instagram')}
+                  />
+                </Grid.Col>
+              </Grid>
+
+              <Textarea
+                label={t('form.learning_goals')}
+                placeholder={t('form.learning_goals_placeholder')}
+                minRows={3}
+                autosize
+                {...register('learning_goals')}
+                error={errors.learning_goals?.message && common_t(errors.learning_goals.message)}
+              />
+            </Stack>
+          )}
+
+          {activeTab === 'settings' && (
+            <Stack gap="md">
+              <Select
+                label={t('form.status')}
+                data={[
+                  { value: 'active', label: t('form.status_active') },
+                  { value: 'inactive', label: t('form.status_inactive') },
+                ]}
+                value={watch('status')}
+                onChange={(val) => setValue('status', val as 'active' | 'inactive', { shouldValidate: true, shouldDirty: true })}
+              />
+
+              <Stack gap="xs">
+                <Text size="sm" fw={500}>{t('form.permissions') || 'Permissions'}</Text>
+                <Group style={{flexDirection: 'column', alignItems: 'self-start' }}>
+                  <Switch
+                    label={t('form.is_name_locked')}
+                    checked={watch('is_name_locked')}
+                    onChange={(event) => setValue('is_name_locked', event.currentTarget.checked, { shouldValidate: true, shouldDirty: true })}
+                  />
+                  <Switch
+                    label={t('form.is_avatar_locked')}
+                    checked={watch('is_avatar_locked')}
+                    onChange={(event) => setValue('is_avatar_locked', event.currentTarget.checked, { shouldValidate: true, shouldDirty: true })}
+                  />
+                </Group>
+              </Stack>
+
+              <TextInput
+                type="date"
+                label={t('form.deactivation_date')}
+                {...register('deactivation_date')}
+                rightSection={
+                  watch('deactivation_date') && (
+                    <ActionIcon 
+                      variant="subtle" 
+                      color="gray" 
+                      onClick={() => setValue('deactivation_date', null, { shouldValidate: true, shouldDirty: true })}
+                    >
+                      <IoCloseOutline size={16} />
+                    </ActionIcon>
+                  )
+                }
+              />
+
+              {show_admin_fields && (
+                <Box>
+                  <Group justify="space-between" mb={4}>
+                    <Text size="sm" fw={500}>{t('form.categories')}</Text>
+                    <Tooltip label={t('form.create_category')}>
+                      <ActionIcon type="button" variant="subtle" size="xs" onClick={() => setCategoryDrawerOpened(true)}>
+                        <IoAddOutline />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
+                  <MultiSelect
+                    placeholder={t('form.categories_placeholder')}
+                    data={categoryList.map(c => ({ value: c.id, label: c.name }))}
+                    value={watched_categories}
+                    onChange={(val) => setValue('categories', val, { shouldValidate: true, shouldDirty: true })}
+                    searchable
+                    clearable
+                  />
+                </Box>
+              )}
+            </Stack>
+          )}
+
+          <Button 
+            type="submit" 
+            fullWidth 
+            loading={is_loading} 
+            disabled={!isValid || is_loading || (initial_data ? !isDirty : false)}
+            mt="md"
+            color="primary"
+            className="bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
+          >
+            {common_t('save')}
+          </Button>
+        </Stack>
+      </form>
+
+      <CategoryDrawer
+        opened={categoryDrawerOpened}
+        onClose={() => setCategoryDrawerOpened(false)}
+        onSubmit={handleCategoryCreate}
+      />
+    </>
   );
 }

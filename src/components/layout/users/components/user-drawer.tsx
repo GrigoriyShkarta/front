@@ -34,13 +34,13 @@ export function UserDrawer({
       id: 'personal' as const, 
       label: t('tabs_drawer.personal'), 
       icon: <IoPersonOutline size={20} />,
-      color: 'var(--space-primary)'
+      color: 'var(--space-accent)'
     },
     { 
       id: 'settings' as const, 
       label: t('tabs_drawer.settings'), 
       icon: <IoSettingsOutline size={20} />,
-      color: 'var(--space-primary)'
+      color: 'var(--space-accent)'
     }
   ];
 
@@ -184,6 +184,7 @@ export function UserDrawer({
       <ScrollArea h="100%" p="xl">
         <UserForm 
           activeTab={activeTab}
+          setActiveTab={setActiveTab}
           initial_data={initial_data}
           teachers={teachers}
           current_user={current_user}

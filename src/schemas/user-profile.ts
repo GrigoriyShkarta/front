@@ -12,6 +12,7 @@ export const personalization_schema = z.object({
   bg_color_dark: z.string().optional().nullable().default('#0f0f0f'),
   is_white_sidebar_color: z.boolean().optional().default(false),
   is_show_sidebar_icon: z.boolean().optional().default(true),
+  sidebar_width: z.number().min(200).max(300).optional().default(250),
   font_family: z.string().optional().default('inter'),
   currency: z.string().optional().default('UAH'),
   accent_color: z.string().optional().nullable().default('#2563eb'),

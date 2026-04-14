@@ -129,8 +129,8 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
         })));
         
         // Prevent immediate auto-generation by setting lastGenerated
-        const selectedTemplateId = subscription.subscription_id;
-        const stateKey = `${selectedTemplateId}-${subscription.selected_days.join(',')}-${dayjs(firstLesson?.date).toISOString()}`;
+        const selectedTemplateId = subscription.subscription_id || 'custom';
+        const stateKey = `${selectedTemplateId}-${subscription.lessons?.length || 1}-${subscription.selected_days.join(',')}-${dayjs(firstLesson?.date).toISOString()}`;
         setLastGenerated(stateKey);
       }
     } else if (!opened) {
@@ -276,6 +276,7 @@ export function StudentSubscriptionDrawer({ opened, onClose, studentId, subscrip
           next_payment_date: values.next_payment_date ? dayjs(values.next_payment_date).toISOString() : null,
           payment_reminder: values.payment_reminder,
           selected_days: values.selected_days,
+          lesson_dates,
           comment: values.comment,
         }
       });
