@@ -40,7 +40,6 @@ interface Props {
 
 export function CourseAccessModal({ opened, on_close, course, student_id, on_submit, is_loading }: Props) {
   const t = useTranslations('Materials.access');
-  const t_course = useTranslations('Materials.courses');
   const common_t = useTranslations('Common');
   
   const [selected_lesson_ids, set_selected_lesson_ids] = useState<string[]>([]);
@@ -215,7 +214,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
                   <Group gap="xs">
                     <IoPlayCircleOutline size={16} />
                     <UnstyledButton onClick={() => handle_navigate(item.lesson_id, 'lesson')}>
-                      <Text size="sm" color="primary" className="hover:underline">{item.title || item.name || item.lesson_id}</Text>
+                      <Text size="sm" fw={500} className="hover:underline">{item.title || item.name || item.lesson_id}</Text>
                     </UnstyledButton>
                     {item.access_type && item.access_type !== 'none' && (
                       <Badge size="xs" variant="outline" color={item.access_type === 'full' ? 'green' : 'orange'}>
@@ -249,7 +248,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
                   <Group gap="xs">
                     <IoCheckmarkDoneCircleOutline size={16} />
                     <UnstyledButton onClick={() => handle_navigate(item.test_id, 'test')}>
-                        <Text size="sm" color="primary" className="hover:underline">{item.title || item.name || item.test_id}</Text>
+                        <Text size="sm" fw={500} className="hover:underline">{item.title || item.name || item.test_id}</Text>
                     </UnstyledButton>
 
                   </Group>
@@ -297,7 +296,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
                               <Group gap="xs">
                                 <IoPlayCircleOutline size={14} />
                                 <UnstyledButton onClick={() => handle_navigate(c.lesson_id, 'lesson')}>
-                                  <Text size="sm" color="primary" className="hover:underline">{c.title || c.name || c.lesson_id}</Text>
+                                  <Text size="sm" fw={500} className="hover:underline">{c.title || c.name || c.lesson_id}</Text>
                                 </UnstyledButton>
                                 {c.access_type && c.access_type !== 'none' && (
                                   <Badge size="xs" variant="outline" color={c.access_type === 'full' ? 'green' : 'orange'}>
@@ -330,7 +329,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
                               <Group gap="xs">
                                 <IoCheckmarkDoneCircleOutline size={14} color="var(--mantine-primary-color-filled)" />
                                 <UnstyledButton onClick={() => handle_navigate(c.test_id, 'test')}>
-                                    <Text size="sm" color="primary" className="hover:underline">{c.title || c.name || c.test_id}</Text>
+                                    <Text size="sm" fw={500} className="hover:underline">{c.title || c.name || c.test_id}</Text>
                                 </UnstyledButton>
                               </Group>
                               <Checkbox 
@@ -383,7 +382,8 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
           </Text>
           <Group justify="flex-end" gap="sm">
             <Button 
-              variant="outline" 
+              variant="subtle" 
+              color="gray" 
               leftSection={<IoArrowBackOutline size={16} />} 
               onClick={() => set_confirm_opened(false)}
             >

@@ -41,6 +41,8 @@ export function useTrackerBoard(userId: string) {
     can_student_edit_tracker: false
   });
   const [settings_drawer_opened, setSettingsDrawerOpened] = useState(false);
+  const [is_submitting_task, setIsSubmittingTask] = useState(false);
+  const [is_submitting_column, setIsSubmittingColumn] = useState(false);
 
   const form = useForm<TrackerTask>({
     resolver: zodResolver(tracker_task_schema),
@@ -199,20 +201,25 @@ export function useTrackerBoard(userId: string) {
   };
 
   const onSubmitTask = async (data: TrackerTask) => {
-    if (editing_task) {
-      await updateTrackerTask(editing_task.id, data);
-      setTasks(prev => prev.map(t => t.id === editing_task.id ? { ...t, ...data } as TrackerTask : t));
-    } else {
-      // Ensure order is correct even if state changed since drawer opened
-      const task_data = {
-        ...data,
-        order: tasks.filter(t => t.column_id === data.column_id).length
-      };
-      const response = await createTrackerTask(userId, task_data);
-      const newTask = response.data;
-      setTasks(prev => [...prev, newTask]);
+    setIsSubmittingTask(true);
+    try {
+      if (editing_task) {
+        await updateTrackerTask(editing_task.id, data);
+        setTasks(prev => prev.map(t => t.id === editing_task.id ? { ...t, ...data } as TrackerTask : t));
+      } else {
+        // Ensure order is correct even if state changed since drawer opened
+        const task_data = {
+          ...data,
+          order: tasks.filter(t => t.column_id === data.column_id).length
+        };
+        const response = await createTrackerTask(userId, task_data);
+        const newTask = response.data;
+        setTasks(prev => [...prev, newTask]);
+      }
+      setTaskDrawerOpened(false);
+    } finally {
+      setIsSubmittingTask(false);
     }
-    setTaskDrawerOpened(false);
   };
 
   const handleDeleteTask = async (taskId: string) => {
@@ -238,15 +245,20 @@ export function useTrackerBoard(userId: string) {
 
   const onSubmitColumn = async ({ name, color }: { name: string; color?: string }) => {
     if (!name) return;
-    if (editing_column) {
-      await updateTrackerColumn(editing_column.id, name, color);
-      setColumns(prev => prev.map(c => c.id === editing_column.id ? { ...c, title: name, color } : c));
-    } else {
-      const response = await createTrackerColumn(userId, name, columns.length, color);
-      const newCol = response.data;
-      setColumns(prev => [...prev, newCol]);
+    setIsSubmittingColumn(true);
+    try {
+      if (editing_column) {
+        await updateTrackerColumn(editing_column.id, name, color);
+        setColumns(prev => prev.map(c => c.id === editing_column.id ? { ...c, title: name, color } : c));
+      } else {
+        const response = await createTrackerColumn(userId, name, columns.length, color);
+        const newCol = response.data;
+        setColumns(prev => [...prev, newCol]);
+      }
+      setColumnDrawerOpened(false);
+    } finally {
+      setIsSubmittingColumn(false);
     }
-    setColumnDrawerOpened(false);
   };
 
   const handleDeleteColumn = async (columnId: string) => {
@@ -261,6 +273,7 @@ export function useTrackerBoard(userId: string) {
       task: {
         opened: task_drawer_opened,
         editing: editing_task,
+        loading: is_submitting_task,
         form,
         subtaskFields: { fields, append, remove },
         setOpened: setTaskDrawerOpened,
@@ -269,6 +282,7 @@ export function useTrackerBoard(userId: string) {
       column: {
         opened: column_drawer_opened,
         editing: editing_column,
+        loading: is_submitting_column,
         setOpened: setColumnDrawerOpened,
         onSubmit: onSubmitColumn
       },

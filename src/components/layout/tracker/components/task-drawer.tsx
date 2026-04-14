@@ -26,7 +26,6 @@ import { Controller, UseFormReturn } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { TrackerTask, TrackerColumn } from '../schemas/tracker-schema';
 import { useTrackerTranslator } from '../hooks/use-tracker-translator';
-import { cn } from '@/lib/utils';
 
 interface Props {
   opened: boolean;
@@ -40,6 +39,7 @@ interface Props {
     remove: (index: number) => void;
   };
   onSubmit: (data: TrackerTask) => void;
+  loading: boolean;
 }
 
 export function TaskDrawer({ 
@@ -49,7 +49,8 @@ export function TaskDrawer({
   columns, 
   subtaskFields: { fields, append, remove },
   onClose, 
-  onSubmit 
+  onSubmit,
+  loading
 }: Props) {
   const { t, getColumnLabel } = useTrackerTranslator();
   const common_t = useTranslations('Common');
@@ -169,7 +170,6 @@ export function TaskDrawer({
                   onClick={() => append({ id: crypto.randomUUID(), title: '', completed: false })}
                   maw={160}
                   radius="md"
-                  className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors"
                 >
                   {t('card.add_subtask')}
                 </Button>
@@ -179,8 +179,9 @@ export function TaskDrawer({
                 type="submit" 
                 fullWidth
                 disabled={!form.formState.isValid}
+                loading={loading}
                 mt="md"
-                className="bg-primary text-primary-foreground hover:bg-primary-hover transition-colors"
+                className="bg-primary text-primary-foreground hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
                 radius="md"
               >
                 {common_t('save')}

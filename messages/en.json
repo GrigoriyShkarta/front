@@ -368,7 +368,8 @@
         "delete_confirm": "Are you sure you want to delete this recording?",
         "recording_deleted": "Recording successfully deleted",
         "insert_link": "Insert link",
-        "no_recording_yet": "No recording yet"
+        "no_recording_yet": "No recording yet",
+        "invalid_youtube_url": "Invalid YouTube URL"
       }
     }
   },
@@ -451,6 +452,8 @@
     "title": "Tracker",
     "users_title": "Choose Student for Tracker",
     "board_title": "Tracker: {name}",
+    "column_delete_confirm_title": "Are you sure you want to delete this column?",
+    "column_delete_confirm_description": "All cards in this column will also be deleted. This action cannot be undone.",
     "columns": {
       "planned": "Planned",
       "in_progress": "In Progress",
@@ -466,7 +469,13 @@
       "add_card": "Add Card",
       "edit_card": "Edit Card",
       "add_subtask": "Add",
-      "subtask_placeholder": "Subtask title"
+      "subtask_placeholder": "Subtask title",
+      "delete_confirm_title": "Are you sure you want to delete this card?",
+      "delete_confirm_description": "This action cannot be undone.",
+      "delete_success": "Card deleted successfully",
+      "delete_error": "Failed to delete card",
+      "column_delete_confirm_title": "Are you sure you want to delete this column?",
+      "column_delete_confirm_description": "All cards in this column will also be deleted. This action cannot be undone."
     },
     "validation": {
       "required": "Required"

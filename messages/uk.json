@@ -371,7 +371,8 @@
         "delete_confirm": "Ви впевнені, що хочете видалити цей запис?",
         "recording_deleted": "Запис успішно видалено",
         "insert_link": "Вставити посилання",
-        "no_recording_yet": "Запису ще немає"
+        "no_recording_yet": "Запису ще немає",
+        "invalid_youtube_url": "Невірне посилання на YouTube"
       }
     }
   },
@@ -456,6 +457,8 @@
     "users_subtitle": "Оберіть учня, щоб переглянути або оновити його прогрес",
     "open_board": "Відкрити дошку",
     "board_title": "Трекер: {name}",
+    "column_delete_confirm_title": "Ви впевнені, що хочете видалити цю колонку?",
+    "column_delete_confirm_description": "Всі картки в цій колонці також будуть видалені. Ця дія не може бути скасована.",
     "columns": {
       "planned": "Заплановано",
       "in_progress": "В процесі",
@@ -471,7 +474,13 @@
       "add_card": "Додати картку",
       "edit_card": "Редагувати картку",
       "add_subtask": "Додати",
-      "subtask_placeholder": "Назва підзадачі"
+      "subtask_placeholder": "Назва підзадачі",
+      "delete_confirm_title": "Ви впевнені, що хочете видалити цю картку?",
+      "delete_confirm_description": "Ця дія не може бути скасована.",
+      "delete_success": "Картку успішно видалено",
+      "delete_error": "Не вдалось видалити картку",
+      "column_delete_confirm_title": "Ви впевнені, что хочете видалити цю колонку?",
+      "column_delete_confirm_description": "Всі картки в цій колонці також будуть видалені. Ця дія не може бути скасована."
     },
     "validation": {
       "required": "Обов'язкове поле"

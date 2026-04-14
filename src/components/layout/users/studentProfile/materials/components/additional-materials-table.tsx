@@ -37,7 +37,7 @@ export function AdditionalMaterialsTable({ lessons, on_toggle_access, is_mutatin
                 <Group gap="sm" wrap="nowrap">
                   <IoBookOutline 
                     size={20} 
-                    style={{ color: 'var(--space-primary)' }} 
+                    style={{ color: 'var(--space-secondary)' }} 
                   />
                   <Link 
                     href={`/main/materials/lessons/${lesson.id}`}

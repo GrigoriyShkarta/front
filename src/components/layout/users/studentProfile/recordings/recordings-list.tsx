@@ -28,17 +28,13 @@ export function StudentRecordingsList() {
   const locale = useLocale();
   
   const { 
-    subscriptions, is_loading, update_lesson_recording, delete_lesson_recording
+    subscriptions, is_loading, update_lesson_recording, delete_lesson_recording, update_lesson
   } = useStudentSubscriptions(student_id);
 
-  const [editing_lesson, set_editing_lesson] = useState<{ id: string, url: string } | null>(null);
+  const [editing_lesson, set_editing_lesson] = useState<{ id: string, url: string, date: any } | null>(null);
   const [deleting_id, set_deleting_id] = useState<string | null>(null);
 
   const is_teacher = ['super_admin', 'admin', 'teacher'].includes(current_user?.role || '');
-
-  const get_recordings_for_sub = (sub: any) => {
-    return (sub.lessons || []).filter((l: any) => !!l.recording_url);
-  };
 
   const handle_delete = async () => {
     if (deleting_id) {
@@ -68,9 +64,27 @@ export function StudentRecordingsList() {
     return result;
   };
 
+  const is_valid_youtube = (url: string) => {
+    if (!url) return true; // Allow empty to clear
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return !!(match && match[2].length === 11);
+  };
+
   const handle_save_edit = async () => {
     if (editing_lesson) {
-      await update_lesson_recording({ lessonId: editing_lesson.id, data: { recording_url: editing_lesson.url } });
+      if (editing_lesson.url && !is_valid_youtube(editing_lesson.url)) {
+        return;
+      }
+      
+      const update_data: any = { recording_url: editing_lesson.url };
+      
+      // If lesson doesn't have a date, set it to today (day of uploading the video)
+      if (!editing_lesson.date) {
+        update_data.date = dayjs().toISOString();
+      }
+      
+      await update_lesson({ lessonId: editing_lesson.id, data: update_data });
       set_editing_lesson(null);
     }
   };
@@ -98,19 +112,27 @@ export function StudentRecordingsList() {
       {active_subscriptions.map(sub => {
         const lessons = sub.lessons || [];
         const slots = get_all_slots_for_sub(sub);
-        const startDate = dayjs(sub.created_at).format('DD.MM.YYYY');
-        const endDate = lessons.length > 0 
-          ? dayjs(lessons[lessons.length - 1].date).format('DD.MM.YYYY')
-          : dayjs(sub.created_at).add(1, 'month').format('DD.MM.YYYY');
+        
+        const known_lessons = lessons.filter((l: any) => !!l.date);
+        const has_period = known_lessons.length > 0;
+        
+        const startDate = has_period 
+          ? dayjs(Math.min(...known_lessons.map((l: any) => dayjs(l.date).valueOf()))).format('DD.MM.YYYY')
+          : null;
+        const endDate = has_period 
+          ? dayjs(Math.max(...known_lessons.map((l: any) => dayjs(l.date).valueOf()))).format('DD.MM.YYYY')
+          : null;
 
         return (
           <Stack key={sub.id} gap="md" className="p-4 border border-secondary/10 rounded-xl">
             <Group justify="space-between" align="center" px="xs">
               <Stack gap={0}>
                 <Text fw={700} size="md" className="text-secondary-dark">{sub.subscription?.name || sub.name || common_t('no_data')}</Text>
-                <Text size="xs" c="dimmed" fw={500}>
-                  {startDate} - {endDate}
-                </Text>
+                {has_period && (
+                  <Text size="xs" c="dimmed" fw={500}>
+                    {startDate} - {endDate}
+                  </Text>
+                )}
               </Stack>
             </Group>
 
@@ -122,7 +144,7 @@ export function StudentRecordingsList() {
                     lesson={lesson} 
                     is_teacher={is_teacher}
                     locale={locale}
-                    onEdit={() => set_editing_lesson({ id: lesson.id, url: lesson.recording_url })}
+                    onEdit={() => set_editing_lesson({ id: lesson.id, url: lesson.recording_url, date: lesson.date })}
                     onDelete={() => set_deleting_id(lesson.id)}
                   />
                 ) : (
@@ -131,7 +153,7 @@ export function StudentRecordingsList() {
                     lesson={lesson}
                     locale={locale}
                     is_teacher={is_teacher}
-                    onEdit={is_teacher && !lesson.is_placeholder ? () => set_editing_lesson({ id: lesson.id, url: '' }) : undefined}
+                    onEdit={is_teacher && !lesson.is_placeholder ? () => set_editing_lesson({ id: lesson.id, url: '', date: lesson.date }) : undefined}
                   />
                 )
               ))}
@@ -144,15 +166,25 @@ export function StudentRecordingsList() {
       <Modal opened={!!editing_lesson} onClose={() => set_editing_lesson(null)} title={t('edit')} centered radius="md">
         <Stack gap="md">
           <TextInput 
-            label="URL" 
+            label="URL (YouTube)" 
             value={editing_lesson?.url || ''} 
             onChange={(e) => set_editing_lesson(prev => prev ? { ...prev, url: e.target.value } : null)}
-            placeholder="https://..."
+            placeholder="https://www.youtube.com/watch?v=..."
             radius="md"
+            withAsterisk
+            error={editing_lesson?.url && !is_valid_youtube(editing_lesson.url) ? t('invalid_youtube_url') || 'Invalid YouTube URL' : null}
           />
           <Group justify="flex-end">
             <Button variant="subtle" color="gray" onClick={() => set_editing_lesson(null)}>{common_t('cancel')}</Button>
-            <Button onClick={handle_save_edit} radius="md">{common_t('save')}</Button>
+            <Button 
+              onClick={handle_save_edit} 
+              radius="md" 
+              color="primary"
+              disabled={!editing_lesson?.url || !is_valid_youtube(editing_lesson.url)}
+              className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20 disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
+            >
+              {common_t('save')}
+            </Button>
           </Group>
         </Stack>
       </Modal>
@@ -230,10 +262,10 @@ function RecordingCard({ lesson, is_teacher, locale, onEdit, onDelete }: {
         <Group justify="space-between" wrap="nowrap" align="center">
           <Stack gap={0}>
             <Text fw={700} size="sm" className="line-clamp-1">
-              {dayjs(lesson.date).locale(locale).format('DD MMM YYYY')}
+              {dayjs(lesson.date || new Date()).locale(locale).format('DD MMM YYYY')}
             </Text>
             <Text size="xs" c="dimmed" fw={500}>
-                {dayjs(lesson.date).locale(locale).format('HH:mm')}
+                {dayjs(lesson.date || new Date()).locale(locale).format('HH:mm')}
             </Text>
           </Stack>
 

@@ -338,8 +338,7 @@ a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
 
 .mantine-Breadcrumbs-root a, 
 .mantine-Breadcrumbs-root .mantine-Anchor-root {
-  color: var(--space-secondary) !important;
-  opacity: 0.8;
+  color: var(--space-accent) !important;
   transition: all 0.2s ease;
 }
 
@@ -350,8 +349,7 @@ a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
 }
 
 .mantine-Breadcrumbs-separator {
-  color: var(--space-secondary) !important;
-  opacity: 0.4;
+  color: var(--space-accent) !important;
   margin-inline: 8px;
 }
 

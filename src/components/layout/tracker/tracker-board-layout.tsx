@@ -11,7 +11,6 @@ import {
   Box,
   LoadingOverlay,
   Center,
-  useMantineTheme
 } from '@mantine/core';
 import { 
   IoAddOutline,
@@ -42,7 +41,6 @@ interface Props {
 }
 
 export function TrackerBoardLayout({ student_id, hide_header }: Props) {
-  const theme = useMantineTheme();
   const t = useTranslations('Tracker');
   const tNav = useTranslations('Navigation');
   const params = useParams();
@@ -71,18 +69,17 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
   ));
 
   return (
-    <Stack gap="lg" h="100%" className="tracker-board-container">
+    <Stack gap="lg" className="tracker-board-container min-h-full">
       {hide_header ? (
         is_admin && (
           <Group justify="flex-end" mb="xs">
             <Button 
-                variant="light"
-                color="primary"
+                variant="default"
+                color="gray"
                 size="sm"
                 leftSection={<IoSettingsOutline size={18} />} 
                 onClick={() => drawers.settings.setOpened(true)}
                 radius="md"
-                className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors"
             >
                 {t('settings.button')}
             </Button>
@@ -145,7 +142,7 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
                     ref={provided.innerRef}
                     align="stretch" 
                     gap="lg" 
-                    className="h-full overflow-x-auto pb-3 pt-2 px-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:bg-secondary/30 hover:[&::-webkit-scrollbar-thumb]:bg-primary [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
+                    className="overflow-x-auto pb-3 pt-2 px-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:bg-secondary/30 hover:[&::-webkit-scrollbar-thumb]:bg-primary [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent" 
                     wrap="nowrap"
                   >
                     {columns.map((column, index) => (
@@ -198,6 +195,7 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
         opened={drawers.task.opened}
         onClose={() => drawers.task.setOpened(false)}
         editingTask={drawers.task.editing}
+        loading={drawers.task.loading}
         form={drawers.task.form}
         columns={columns}
         subtaskFields={drawers.task.subtaskFields}
@@ -207,6 +205,7 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
       <ColumnDrawer 
         opened={drawers.column.opened}
         onClose={() => drawers.column.setOpened(false)}
+        loading={drawers.column.loading}
         onSubmit={drawers.column.onSubmit}
         initialName={drawers.column.editing?.title}
         initialColor={drawers.column.editing?.color}

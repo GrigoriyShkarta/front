@@ -2,56 +2,55 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  Group, 
   Stack, 
   Drawer,
   TextInput,
   Button,
-  rem,
   Title,
   ScrollArea,
-  ColorInput,
-  useMantineTheme
+  Popover,
+  ColorSwatch,
+  ColorPicker,
+  Tooltip,
 } from '@mantine/core';
 import { useTranslations } from 'next-intl';
-import { cn } from '@/lib/utils';
 
 interface Props {
   opened: boolean;
-  onClose: () => void;
-  onSubmit: (data: { name: string; color?: string }) => void;
   initialName?: string;
   initialColor?: string;
+  onClose: () => void;
+  onSubmit: (data: { name: string; color?: string }) => void;
+  loading?: boolean;
 }
 
-export function ColumnDrawer({ opened, onClose, onSubmit, initialName, initialColor }: Props) {
+export function ColumnDrawer({ opened, onClose, onSubmit, initialName, initialColor, loading }: Props) {
   const t = useTranslations('Tracker');
   const common_t = useTranslations('Common');
-  const theme = useMantineTheme();
   const [name, setName] = useState(initialName || '');
-  const [color, setColor] = useState(initialColor || '');
+  const [color, setColor] = useState(initialColor || '#2563eb');
   const [touched, setTouched] = useState(false);
 
   useEffect(() => {
     if (opened) {
       setName(initialName || '');
-      setColor(initialColor || '');
+      setColor(initialColor || '#2563eb');
     }
   }, [opened, initialName, initialColor]);
 
   const handleClose = () => {
-    setName('');
-    setColor('');
-    setTouched(false);
     onClose();
+    setTimeout(() => {
+        setName('');
+        setColor('#2563eb');
+        setTouched(false);
+    }, 200);
   };
 
   const handleSubmit = () => {
     if (name.trim()) {
       onSubmit({ name: name.trim(), color: color || undefined });
-      setName('');
-      setColor('');
-      setTouched(false);
+      handleClose();
     }
   };
 
@@ -101,18 +100,39 @@ export function ColumnDrawer({ opened, onClose, onSubmit, initialName, initialCo
             required
             withAsterisk
             autoFocus
-          />
-          <ColorInput 
-             label={t('column_color')}
-             placeholder="#FFFFFF"
-             value={color}
-             onChange={setColor}
-             disallowInput={false}
+            rightSection={
+              <Popover position="bottom-end" shadow="md" withArrow>
+                <Popover.Target>
+                  <Tooltip label={t('column_color')}>
+                    <ColorSwatch 
+                      color={color || '#2563eb'} 
+                      size={20} 
+                      className="cursor-pointer hover:scale-110 transition-transform" 
+                    />
+                  </Tooltip>
+                </Popover.Target>
+                <Popover.Dropdown p="xs">
+                  <Stack gap="xs">
+                    <ColorPicker
+                      value={color || '#2563eb'}
+                      onChange={setColor}
+                      format="hex"
+                    />
+                    <TextInput 
+                      size="xs"
+                      value={color}
+                      onChange={(e) => setColor(e.currentTarget.value)}
+                    />
+                  </Stack>
+                </Popover.Dropdown>
+              </Popover>
+            }
           />
           <Button 
             fullWidth
             onClick={handleSubmit}
             disabled={!name.trim()}
+            loading={loading}
             mt="md"
             radius="md"
             className="bg-primary text-white hover:bg-primary-hover transition-colors"

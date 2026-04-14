@@ -124,14 +124,14 @@ export function AudioPlayer({ src, class_name }: Props) {
               backgroundColor: 'rgba(255, 255, 255, 0.1)',
             },
             bar: {
-              backgroundColor: 'var(--space-primary)',
+              backgroundColor: 'var(--space-accent)',
             },
             thumb: {
               display: current_time > 0 ? 'block' : 'none',
               borderWidth: 0,
               width: 8,
               height: 8,
-              backgroundColor: 'var(--space-primary)',
+              backgroundColor: 'var(--space-accent)',
               boxShadow: theme.shadows.xs,
             }
           })}

@@ -7,8 +7,11 @@ import {
   Paper, 
   Text, 
   Box,
-  Button
+  Button,
+  Modal
 } from '@mantine/core';
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { 
   IoAddOutline,
   IoTrashOutline,
@@ -59,32 +62,39 @@ export function TrackerColumn({
   const can_edit = is_admin || settings.can_student_edit_tracker;
   
   const isDefault = ['planned', 'in_progress', 'completed'].includes(column.id.toLowerCase());
+  const [confirm_delete_opened, set_confirm_delete_opened] = useState(false);
+  const common_t = useTranslations('Common');
+
+  const handle_delete = () => {
+    onDeleteColumn(column.id);
+    set_confirm_delete_opened(false);
+  };
 
 
   return (
     <Draggable key={column.id} draggableId={column.id} index={index} isDragDisabled={!is_admin}>
       {(provided, snapshot) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          className={cn(
-            "flex flex-col h-full shrink-0 transition-shadow duration-300",
-            snapshot.isDragging && "z-50"
-          )}
-          style={{
-            ...provided.draggableProps.style,
-            width: 340, // Match the Paper width exactly to avoid jumping
-          }}
-        >
-          <Paper 
-            w={340} 
+          <div
+            ref={provided.innerRef}
+            {...provided.draggableProps}
             className={cn(
-                "flex flex-col h-full bg-white/40 dark:bg-black/20 backdrop-blur-xl border-white/20 dark:border-white/5",
-                "shadow-sm rounded-2xl overflow-hidden",
-                snapshot.isDragging && "shadow-2xl scale-[1.02] border-primary/30"
+              "flex flex-col shrink-0 transition-shadow duration-300",
+              snapshot.isDragging && "z-50"
             )}
-            withBorder
+            style={{
+              ...provided.draggableProps.style,
+              width: 340,
+            }}
           >
+            <Paper 
+              w={340} 
+              className={cn(
+                  "flex flex-col flex-1 min-h-full bg-white/40 dark:bg-black/20 backdrop-blur-xl border-white/20 dark:border-white/5",
+                  "shadow-sm rounded-2xl overflow-hidden",
+                  snapshot.isDragging && "shadow-2xl scale-[1.02] border-primary/30"
+              )}
+              withBorder
+            >
             <Box 
                 p="md" 
                 className="bg-white/30 dark:bg-white/5 border-b border-white/20 dark:border-white/5 relative" 
@@ -105,7 +115,7 @@ export function TrackerColumn({
                       <ActionIcon variant="subtle" size="sm" color="gray" onClick={() => onEditColumn(column)}>
                           <IoPencilOutline size={18} />
                       </ActionIcon>
-                      <ActionIcon variant="subtle" size="sm" color="red" onClick={() => onDeleteColumn(column.id)}>
+                      <ActionIcon variant="subtle" size="sm" color="red" onClick={() => set_confirm_delete_opened(true)}>
                           <IoTrashOutline size={18} />
                       </ActionIcon>
                     </Group>
@@ -120,11 +130,11 @@ export function TrackerColumn({
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                   className={cn(
-                    "flex-1 flex flex-col p-4 overflow-y-auto transition-colors scrollbar-thin",
+                    "flex-1 flex flex-col p-4 overflow-y-auto transition-colors scrollbar-thin min-h-full",
                     snapshot.isDraggingOver && "bg-primary/5"
                   )}
                 >
-                  <Stack gap="md" className="flex-1">
+                  <Stack gap="md">
                     {tasks
                       .filter(t => t.column_id === column.id)
                       .sort((a, b) => a.order - b.order)
@@ -141,7 +151,6 @@ export function TrackerColumn({
                            onDeleteTask={onDeleteTask}
                         />
                       ))}
-                    {provided.placeholder}
                   </Stack>
                   
                   {can_create && (
@@ -152,16 +161,39 @@ export function TrackerColumn({
                       color="primary" 
                       leftSection={<IoAddOutline />}
                       onClick={() => onAddTask(column.id)}
-                      className="border-dashed border-2 !bg-primary/5 !text-primary border-primary/20 opacity-80 hover:opacity-100 hover:!bg-primary/10 transition-all rounded-xl mt-4 shrink-0"
+                      className="border-dashed border-2 !bg-accent/5 !text-accent border-accent/20 opacity-80 hover:opacity-100 hover:!bg-accent/10 transition-all rounded-xl mt-4 shrink-0"
                     >
                       {t('card.add_card')}
                     </Button>
                   )}
+                  {provided.placeholder}
                 </Box>
               )}
             </Droppable>
           </Paper>
-        </div>
+            <Modal
+              opened={confirm_delete_opened}
+              onClose={() => set_confirm_delete_opened(false)}
+              title={t('column_delete_confirm_title') || common_t('delete')}
+              centered
+              size="sm"
+              overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
+            >
+              <Stack gap="md">
+                <Text size="sm">
+                  {t('column_delete_confirm_description') || common_t('delete_confirmation_desc')}
+                </Text>
+                <Group justify="flex-end" gap="sm">
+                  <Button variant="subtle" color="gray" onClick={() => set_confirm_delete_opened(false)}>
+                    {common_t('cancel')}
+                  </Button>
+                  <Button color="red" onClick={handle_delete}>
+                    {common_t('delete')}
+                  </Button>
+                </Group>
+              </Stack>
+            </Modal>
+          </div>
       )}
     </Draggable>
   );

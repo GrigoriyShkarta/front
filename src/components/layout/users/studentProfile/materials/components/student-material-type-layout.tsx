@@ -86,7 +86,8 @@ export function StudentMaterialTypeLayout({ student_id, type }: Props) {
         set_preview_item(item);
         set_preview_opened(true);
     } else {
-        if (item.url) window.open(item.url, '_blank');
+        const urlValue = item.file_url || item.url;
+        if (urlValue) window.open(urlValue, '_blank');
     }
   };
 
@@ -151,6 +152,7 @@ export function StudentMaterialTypeLayout({ student_id, type }: Props) {
             items={items} 
             type={type}
             on_toggle_access={handle_toggle_access}
+            on_item_click={handle_item_click}
             is_mutating={is_granting || is_revoking}
         />
       )}
