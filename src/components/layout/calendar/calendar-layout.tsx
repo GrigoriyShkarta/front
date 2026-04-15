@@ -1,9 +1,11 @@
 'use client';
 
-import { Box, Container, Stack, Transition, LoadingOverlay } from '@mantine/core';
+import { Box, Container, Stack, Transition, LoadingOverlay, Breadcrumbs, Anchor, Group, Title, Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
+import { IoCalendarOutline } from 'react-icons/io5';
+import { Link } from '@/i18n/routing';
 import { CalendarSidebar } from './components/calendar-sidebar';
 import { CalendarHeader } from './components/calendar-header';
 import { MonthView } from './components/month-view';
@@ -33,12 +35,17 @@ export function CalendarLayout({ student_id }: Props = {}) {
     isFetching,
     disconnectGoogleCalendar,
     googleCalendarStatus,
+    subscription_drawer_opened,
     isLoadingGoogleStatus,
+    subscription_student_id,
+    is_student,
+    is_mutating,
+    lesson_drawer_opened,
+    selected_lesson,
     set_current_view,
     handle_prev,
     handle_next,
     handle_today,
-    set_current_date,
     set_modal_opened,
     handle_navigate,
     handle_date_click,
@@ -46,22 +53,26 @@ export function CalendarLayout({ student_id }: Props = {}) {
     handle_modal_submit,
     handle_modal_delete,
     connectGoogleCalendar,
-    subscription_drawer_opened,
     set_subscription_drawer_opened,
-    subscription_student_id,
     set_subscription_student_id,
-    is_student,
-    is_mutating,
     handle_event_drop,
-    lesson_drawer_opened,
     set_lesson_drawer_opened,
-    selected_lesson,
     update_lesson_status,
-    is_navigating,
   } = useCalendar({ student_id });
 
   const locale = useLocale();
+  const tCal = useTranslations('Calendar');
+  const tNav = useTranslations('Navigation');
   const [locale_loaded, set_locale_loaded] = useState(false);
+
+  const breadcrumb_items = [
+    { title: tNav('dashboard'), href: '/main' },
+    { title: tNav('calendar'), href: '/main/calendar' },
+  ].map((item, index) => (
+    <Anchor component={Link} href={item.href} key={index} size="sm">
+      {item.title}
+    </Anchor>
+  ));
 
   useEffect(() => {
     let internal_locale = locale;
@@ -133,24 +144,47 @@ export function CalendarLayout({ student_id }: Props = {}) {
   };
 
   return (
-    <Container size="xl" className="h-[calc(100vh-100px)] flex max-w-full relative">
+    <Container size="xl" className="h-[calc(100vh-100px)] flex flex-col max-w-full relative gap-lg">
       <LoadingOverlay visible={isFetching || !locale_loaded} overlayProps={{ blur: 2 }} />
       {locale_loaded && (
         <>
-          <CalendarSidebar 
-            date={current_date}
-            on_date_change={(d) => handle_navigate(d)}
-            events={events}
-            on_create_click={() => handle_date_click(new Date())}
-            on_event_click={handle_event_click}
-            googleCalendarStatus={googleCalendarStatus}
-            isLoadingGoogleStatus={isLoadingGoogleStatus}
-            on_connect_google={connectGoogleCalendar}
-            on_disconnect_google={() => disconnectGoogleCalendar.mutate()}
-            is_student={is_student}
-          />
+          <Stack gap="lg" mb="lg">
+            <Breadcrumbs separator="→" mb="-xs">
+              {breadcrumb_items}
+            </Breadcrumbs>
 
-          <Stack gap="lg" className="flex-1 pl-0 lg:pl-6 overflow-hidden">
+            <Group justify="space-between" align="center" wrap="nowrap">
+              <Group align="center" gap="md">
+                <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+                  <IoCalendarOutline size={28} />
+                </Box>
+                <Stack gap={0}>
+                  <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+                    {tCal('title')}
+                  </Title>
+                  <Text c="dimmed" size="sm" className="hidden sm:block">
+                    {tCal('subtitle')}
+                  </Text>
+                </Stack>
+              </Group>
+            </Group>
+          </Stack>
+
+          <Box className="flex-1 flex overflow-hidden min-h-0">
+            <CalendarSidebar 
+              date={current_date}
+              on_date_change={(d) => handle_navigate(d)}
+              events={events}
+              on_create_click={() => handle_date_click(new Date())}
+              on_event_click={handle_event_click}
+              googleCalendarStatus={googleCalendarStatus}
+              isLoadingGoogleStatus={isLoadingGoogleStatus}
+              on_connect_google={connectGoogleCalendar}
+              on_disconnect_google={() => disconnectGoogleCalendar.mutate()}
+              is_student={is_student}
+            />
+
+            <Stack gap="lg" className="flex-1 pl-0 lg:pl-6 overflow-hidden">
             <CalendarHeader
               current_date={current_date}
               current_view={current_view}
@@ -175,8 +209,9 @@ export function CalendarLayout({ student_id }: Props = {}) {
               </Transition>
             </Box>
           </Stack>
+        </Box>
 
-          <EventModal
+        <EventModal
             opened={modal_opened}
             event={selected_event}
             is_loading={is_mutating}

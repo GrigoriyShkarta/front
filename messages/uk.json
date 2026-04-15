@@ -256,6 +256,7 @@
       "join_button": "Приєднатися до уроку"
     },
     "title": "Календар",
+    "subtitle": "Плануйте заняття, керуйте подіями та синхронізуйте свій робочий графік.",
     "today": "Сьогодні",
     "views": {
       "day": "День",
@@ -297,7 +298,7 @@
     "no_events": "Подій не знайдено",
     "google_calendar_connected": "Google Календар ✓",
     "google_calendar_disconnect": "Відключити",
-    "google_calendar_connect": "Підключити Google Календар",
+    "google_calendar_connect": "Підключити Google",
     "google_disconnected_title": "Google Календар відключено",
     "google_disconnected_message": "Синхронізація з Google Календарем була успішно припинена",
     "google_connected_title": "Успішно підключено",

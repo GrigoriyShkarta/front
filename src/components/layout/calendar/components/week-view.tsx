@@ -13,11 +13,11 @@ import { useTranslations } from 'next-intl';
 interface Props {
   current_date: Date;
   events: CalendarEvent[];
+  is_student?: boolean;
   on_event_click?: (event: CalendarEvent) => void;
   on_navigate?: (date: Date) => void;
   on_date_click?: (date: Date) => void;
   on_event_drop?: (event_id: string, new_date: Date) => void;
-  is_student?: boolean;
 }
 
 /**

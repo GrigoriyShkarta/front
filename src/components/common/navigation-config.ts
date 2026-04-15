@@ -1,5 +1,5 @@
 import { IconType } from 'react-icons';
-import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoCheckmarkDoneOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoShieldCheckmarkOutline, IoDocumentTextOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoListOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoShieldCheckmarkOutline, IoDocumentTextOutline } from 'react-icons/io5';
 import { FaChalkboard } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
 import { IoMdCheckboxOutline } from "react-icons/io";
@@ -47,7 +47,7 @@ export const MAIN_NAVIGATION: NavItem[] = [
   {
     label: 'tracker',
     href: '/main/tracker',
-    icon: IoCheckmarkDoneOutline,
+    icon: IoListOutline,
     roles: ['super_admin', 'admin', 'teacher', 'student'],
   },
   {

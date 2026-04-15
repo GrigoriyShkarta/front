@@ -24,6 +24,7 @@ import {
   IoShieldHalfOutline,
   IoArrowBackOutline,
   IoBookOutline,
+  IoClipboardOutline,
   IoCheckmarkDoneCircleOutline
 } from 'react-icons/io5';
 import { useRouter } from '@/i18n/routing';
@@ -327,7 +328,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
                           return (
                             <Group key={c.test_id} justify="space-between" py={4} pr="md">
                               <Group gap="xs">
-                                <IoCheckmarkDoneCircleOutline size={14} />
+                                <IoClipboardOutline size={14} />
                                 <UnstyledButton onClick={() => handle_navigate(c.test_id, 'test')}>
                                     <Text size="sm" fw={500} className="hover:underline">{c.title || c.name || c.test_id}</Text>
                                 </UnstyledButton>

@@ -56,6 +56,8 @@ export function CalendarSidebar({
             fullWidth 
             size="md" 
             radius="md" 
+            variant="filled"
+            color="primary"
             leftSection={<IoAddOutline size={20} />}
             onClick={on_create_click}
             className="shadow-md shadow-primary/20"

@@ -253,6 +253,7 @@
       "join_button": "Join Lesson"
     },
     "title": "Calendar",
+    "subtitle": "Schedule lessons, manage events, and synchronize your work schedule.",
     "today": "Today",
     "views": {
       "day": "Day",

@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useState, useCallback, useMemo, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import { useBoardHistory } from './hooks/use-board-history';
 import { useBoardZoomPan } from './hooks/use-board-zoom-pan';
 import { useRouter } from '@/i18n/routing';
@@ -42,7 +41,6 @@ interface Props {
 }
 
 export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
-  const t = useTranslations('Boards');
   const { colorScheme } = useMantineColorScheme();
   const el_ref = useRef<BoardElement[]>(initial_data?.elements || []);
   const [elements, set_elements_state] = useState<BoardElement[]>(el_ref.current);
@@ -82,7 +80,7 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
     });
   }, [is_dark]);
   const effective_bg_color = bg_color === 'auto' ? (is_dark ? '#12121e' : '#f8f9fa') : bg_color;
-  const grid_color = is_dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+  const grid_color = is_dark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.12)';
 
   // Collaborative Socket
   const { 

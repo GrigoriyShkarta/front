@@ -116,13 +116,13 @@ export function applyTheme(config: ThemeConfig) {
     root.style.setProperty('--space-accent-rgb', hexToRgb(from_color));
     root.style.setProperty('--space-accent-hover', to_color);
     root.style.setProperty('--space-accent-bg', accent_val);
-    root.style.setProperty('--space-accent-text', '#ffffff');
+    root.style.setProperty('--space-accent-text', config.is_white_sidebar_color ? '#ffffff' : '#000000');
   } else {
     root.style.setProperty('--space-accent', accent_val);
     root.style.setProperty('--space-accent-rgb', hexToRgb(accent_val));
     root.style.setProperty('--space-accent-hover', accent_val);
     root.style.setProperty('--space-accent-bg', accent_val);
-    root.style.setProperty('--space-accent-text', '#ffffff');
+    root.style.setProperty('--space-accent-text', config.is_white_sidebar_color ? '#ffffff' : '#000000');
   }
 
   // --- Apply Background Color/Gradient ---

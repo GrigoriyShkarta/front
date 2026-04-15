@@ -83,7 +83,7 @@ export function get_event_style(color?: string): string {
     case 'pink':
       return 'bg-pink-500/20 text-pink-400 border-pink-500 hover:bg-pink-500/30';
     default:
-      return 'bg-primary/20 text-primary border-primary hover:bg-primary/30';
+      return 'bg-primary text-primary-foreground border-primary hover:brightness-105';
   }
 }
 

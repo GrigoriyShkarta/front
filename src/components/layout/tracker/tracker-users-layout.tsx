@@ -76,12 +76,13 @@ export function TrackerUsersLayout() {
         </Group>
       </Stack>
 
-      <Box className="relative min-h-[400px]">
+      <Box className="relative">
         <LoadingOverlay 
           visible={is_loading} 
           overlayProps={{ blur: 1, radius: 'lg', backgroundOpacity: 0.1 }} 
           loaderProps={{ size: 'lg', color: 'blue' }}
           zIndex={10} 
+          className='h-screen'
         />
         
         {!is_loading && filtered_users.length === 0 ? (
