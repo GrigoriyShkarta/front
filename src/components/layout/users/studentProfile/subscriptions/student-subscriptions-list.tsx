@@ -168,6 +168,9 @@ export function StudentSubscriptionsList() {
       >
         <Stack gap="md">
           <Text size="sm">{finance_t('delete_confirm.description')}</Text>
+          <Text size="sm" c="red" fw={500}>
+            {finance_t('delete_confirm.warning_lessons_will_be_deleted') || 'Увага: Разом з абонементом будуть видалені всі записи уроків, прив\'язані до нього.'}
+          </Text>
           <Group justify="flex-end">
             <Button variant="subtle" onClick={() => set_deleting_id(null)}>{common_t('cancel')}</Button>
             <Button color="red" onClick={handle_delete}>{common_t('delete')}</Button>

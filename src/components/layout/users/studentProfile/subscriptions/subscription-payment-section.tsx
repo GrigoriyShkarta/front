@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { getCurrencySymbol } from '@/lib/constants';
 
 import { UpdateSubscriptionData } from './types';
+import { cn } from '@/lib/utils';
 
 interface Props {
   sub: StudentSubscription;
@@ -116,7 +117,11 @@ export function SubscriptionPaymentSection({ sub, isTeacher, onUpdate }: Props) 
                         style={{ width: 150 }}
                       />
                     </Stack>
-                    <Button size="xs" mt="lg" onClick={handleSave}>
+                    <Button size="xs" mt="lg" onClick={handleSave} color="primary"
+                        className={cn(
+                          "bg-primary text-primary-foreground hover:opacity-90 transition-all shadow-md shadow-primary/20",
+                          "disabled:opacity-50 disabled:shadow-none disabled:cursor-not-allowed"
+                        )}>
                       {common_t('save')}
                     </Button>
                   </Group>
@@ -126,7 +131,7 @@ export function SubscriptionPaymentSection({ sub, isTeacher, onUpdate }: Props) 
                       <Group gap="xl">
                         <Stack gap={2}>
                           <Text size="xs" fw={700} c="dimmed" tt="uppercase">{common_t('paid_amount')}</Text>
-                          <Text size="sm" fw={600} color="var(--space-accent)">{sub.paid_amount} / {sub.price} {currencySymbol}</Text>
+                          <Text size="sm" fw={600} >{sub.paid_amount} / {sub.price} {currencySymbol}</Text>
                         </Stack>
                         <Stack gap={2}>
                           <Text size="xs" fw={700} c="dimmed" tt="uppercase">{t('form.partial_payment_date')}</Text>
@@ -143,11 +148,21 @@ export function SubscriptionPaymentSection({ sub, isTeacher, onUpdate }: Props) 
                   </>
                 )}
 
+                {sub.payment_date && (
+                  <Group gap={6}>
+                    <IoCalendarOutline size={14} />
+                    <Text size="xs" fw={600}>{common_t('payment_date')}:</Text>
+                    <Text size="xs" fw={700}>
+                      {dayjs(sub.payment_date).locale(locale).format('DD MMM YYYY')}
+                    </Text>
+                  </Group>
+                )}
+
                 {sub.next_payment_date && (
                   <Group gap={6}>
-                    <IoCalendarOutline size={14} color="var(--space-accent)" />
+                    <IoCalendarOutline size={14} />
                     <Text size="xs" fw={600}>{t('form.next_payment_date')}:</Text>
-                    <Text size="xs" fw={700} color="var(--space-accent)">
+                    <Text size="xs" fw={700}>
                       {dayjs(sub.next_payment_date).locale(locale).format('DD MMM YYYY')}
                     </Text>
                   </Group>

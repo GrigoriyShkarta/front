@@ -23,7 +23,7 @@ import {
   IoFolderOutline,
   IoShieldHalfOutline,
   IoArrowBackOutline,
-  IoPlayCircleOutline,
+  IoBookOutline,
   IoCheckmarkDoneCircleOutline
 } from 'react-icons/io5';
 import { useRouter } from '@/i18n/routing';
@@ -212,7 +212,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
               return (
                 <Group key={item.id} justify="space-between" px="md">
                   <Group gap="xs">
-                    <IoPlayCircleOutline size={16} />
+                    <IoBookOutline size={16} />
                     <UnstyledButton onClick={() => handle_navigate(item.lesson_id, 'lesson')}>
                       <Text size="sm" fw={500} className="hover:underline">{item.title || item.name || item.lesson_id}</Text>
                     </UnstyledButton>
@@ -294,7 +294,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
                           return (
                             <Group key={c.lesson_id} justify="space-between" py={4} pr="md">
                               <Group gap="xs">
-                                <IoPlayCircleOutline size={14} />
+                                <IoBookOutline size={14} />
                                 <UnstyledButton onClick={() => handle_navigate(c.lesson_id, 'lesson')}>
                                   <Text size="sm" fw={500} className="hover:underline">{c.title || c.name || c.lesson_id}</Text>
                                 </UnstyledButton>
@@ -327,7 +327,7 @@ export function CourseAccessModal({ opened, on_close, course, student_id, on_sub
                           return (
                             <Group key={c.test_id} justify="space-between" py={4} pr="md">
                               <Group gap="xs">
-                                <IoCheckmarkDoneCircleOutline size={14} color="var(--mantine-primary-color-filled)" />
+                                <IoCheckmarkDoneCircleOutline size={14} />
                                 <UnstyledButton onClick={() => handle_navigate(c.test_id, 'test')}>
                                     <Text size="sm" fw={500} className="hover:underline">{c.title || c.name || c.test_id}</Text>
                                 </UnstyledButton>

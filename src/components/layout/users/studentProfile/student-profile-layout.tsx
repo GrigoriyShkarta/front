@@ -200,11 +200,6 @@ export function StudentProfileShell({
                     {t('tabs.lesson_history')}
                   </Tabs.Tab>
                   {current_user?.role !== 'student' && (
-                    <Tabs.Tab value="boards" leftSection={<FaChalkboard size={16} />} className="whitespace-nowrap shrink-0">
-                      {tNav('boards') || 'Boards'}
-                    </Tabs.Tab>
-                  )}
-                  {current_user?.role !== 'student' && (
                     <Tabs.Tab value="materials" leftSection={<IoBookOutline size={16} />} className="whitespace-nowrap shrink-0">
                       {tNav('materials') || 'Materials'}
                     </Tabs.Tab>
@@ -212,6 +207,11 @@ export function StudentProfileShell({
                   {current_user?.role !== 'student' && (
                     <Tabs.Tab value="tracker" leftSection={<IoListOutline size={16} />} className="whitespace-nowrap shrink-0">
                       {tNav('tracker') || 'Tracker'}
+                    </Tabs.Tab>
+                  )}
+                  {current_user?.role !== 'student' && (
+                    <Tabs.Tab value="boards" leftSection={<FaChalkboard size={16} />} className="whitespace-nowrap shrink-0">
+                      {tNav('boards') || 'Boards'}
                     </Tabs.Tab>
                   )}
                   {current_user?.role !== 'student' && (

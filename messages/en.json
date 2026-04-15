@@ -1518,6 +1518,7 @@
       "delete_confirm": {
         "title": "Confirm Deletion",
         "description": "Are you sure you want to delete this servant? This action cannot be undone.",
+        "warning_lessons_will_be_deleted": "Attention: All lesson records associated with the subscription will be deleted along with it.",
         "bulk_description": "Are you sure you want to delete {count} selected servants? This action cannot be undone."
       }
     },

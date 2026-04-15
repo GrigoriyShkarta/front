@@ -48,7 +48,6 @@ export async function get_additional_lessons(student_id: string, params: any = {
   const response = await api.get('/materials/lessons', {
     params: {
       ...params,
-      unassigned: true,
       student_id,
     },
     paramsSerializer: (params) => {

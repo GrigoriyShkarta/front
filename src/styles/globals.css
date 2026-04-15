@@ -338,7 +338,7 @@ a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
 
 .mantine-Breadcrumbs-root a, 
 .mantine-Breadcrumbs-root .mantine-Anchor-root {
-  color: var(--space-accent) !important;
+  color: var(--space-secondary) !important;
   transition: all 0.2s ease;
 }
 
@@ -349,7 +349,7 @@ a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
 }
 
 .mantine-Breadcrumbs-separator {
-  color: var(--space-accent) !important;
+  color: var(--space-secondary) !important;
   margin-inline: 8px;
 }
 
@@ -360,16 +360,16 @@ a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
 
 /* Default/Outline variant underline and text color */
 .mantine-Tabs-tab[data-active] {
-  color: var(--space-primary) !important;
-  border-color: var(--space-primary) !important;
+  color: var(--space-accent) !important;
+  border-color: var(--space-accent) !important;
 }
 
 /* Pills variant background and text color */
 .mantine-Tabs-root[data-variant="pills"] .mantine-Tabs-tab[data-active],
 .mantine-Tabs-tab[data-active][data-variant="pills"] {
-  background-color: var(--space-primary) !important;
-  color: var(--space-primary-text) !important;
-  box-shadow: 0 4px 12px rgba(var(--space-primary-rgb), 0.2);
+  background-color: var(--space-accent) !important;
+  color: var(--space-accent-text) !important;
+  box-shadow: 0 4px 12px rgba(var(--space-accent-rgb), 0.2);
 }
 
 /* SegmentedControl Active Label Color */

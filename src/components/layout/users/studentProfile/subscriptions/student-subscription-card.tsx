@@ -83,7 +83,7 @@ export function StudentSubscriptionCard({
             flex={1}
           >
             <Text fw={700} size="lg" className="text-white">{sub?.name ?? sub.subscription?.name ?? t('subscription')}</Text>
-            <Text fw={700} size="xl" color="var(--space-accent)">
+            <Text fw={700} size="xl">
               {sub.price} {currencySymbol}
             </Text>
             {periodString && (
@@ -102,7 +102,7 @@ export function StudentSubscriptionCard({
               <Group gap={4} ml="md">
                 {showExtend && (
                   <Tooltip label={t('form.extend_subscription') || 'Extend subscription'}>
-                    <ActionIcon variant="subtle" style={{ color: 'var(--space-accent)' }} onClick={handleExtendClick}>
+                    <ActionIcon variant="subtle" onClick={handleExtendClick}>
                       <IoRepeatOutline size={18} />
                     </ActionIcon>
                   </Tooltip>
