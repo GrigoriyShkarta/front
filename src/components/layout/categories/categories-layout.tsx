@@ -94,15 +94,26 @@ export default function CategoriesLayout() {
   const has_data = categories.length > 0;
 
   return (
-    <Stack gap="xl">
-      <Breadcrumbs mb="xs" separator="→">
+    <Stack gap="lg">
+      <Breadcrumbs separator="→" mb="-xs">
         {breadcrumb_items}
       </Breadcrumbs>
       
-      <Group justify="space-between" align="center">
-        <Stack gap={0}>
-          <Title order={2}>{t('title')}</Title>
-        </Stack>
+      <Group justify="space-between" align="center" wrap="nowrap">
+        <Group align="center" gap="md">
+          <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+            <IoPricetagOutline size={28} />
+          </Box>
+          <Stack gap={0}>
+            <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+              {t('title')}
+            </Title>
+            <Text c="dimmed" size="sm" className="hidden sm:block">
+              {t('subtitle')}
+            </Text>
+          </Stack>
+        </Group>
+
         <Group gap="sm">
           {selected_ids.length > 0 && (
             <Button 
@@ -120,7 +131,7 @@ export default function CategoriesLayout() {
             onClick={handle_add}
             radius="md"
             color="primary"
-            className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
+            className="bg-primary hover:opacity-90 transition-all shadow-md mt-0"
           >
             {t('add_category')}
           </Button>

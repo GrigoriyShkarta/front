@@ -14,7 +14,8 @@ import {
 } from '@mantine/core';
 import { 
   IoAddOutline,
-  IoSettingsOutline
+  IoSettingsOutline,
+  IoListOutline
 } from 'react-icons/io5';
 import { 
   DragDropContext, 
@@ -96,36 +97,48 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
           </Group>
         )
       ) : (
-        <Stack gap="xs">
+        <Stack gap="lg">
+          <Breadcrumbs separator="→" mb="-xs">
+            {breadcrumb_items}
+          </Breadcrumbs>
+
           <Group justify="space-between" align="center" wrap="nowrap">
-              <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
-              {is_admin && (
-                  <Group gap="sm">
-                      <Button 
-                          variant="light"
-                          color="primary"
-                          leftSection={<IoSettingsOutline size={20} />} 
-                          onClick={() => drawers.settings.setOpened(true)}
-                          radius="md"
-                          className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors"
-                      >
-                          {t('settings.button')}
-                      </Button>
-                      <Button 
-                          leftSection={<IoAddOutline size={20} />} 
-                          onClick={() => handlers.handleCreateColumn()}
-                          radius="md"
-                          color="primary"
-                          className="bg-primary shadow-md text-primary-foreground hover:opacity-90 transition-all"
-                      >
-                      {t('add_column')}
-                      </Button>
-                  </Group>
-              )}
+            <Group align="center" gap="md">
+              <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+                <IoListOutline size={28} />
+              </Box>
+              <Stack gap={0}>
+                <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+                  {t('title')}
+                </Title>
+                <Text c="dimmed" size="sm" className="hidden sm:block">
+                  {t('subtitle')}
+                </Text>
+              </Stack>
+            </Group>
+
+            {is_admin && (
+              <Group gap="sm">
+                <Button
+                  color="gray"
+                  leftSection={<IoSettingsOutline size={20} />} 
+                  onClick={() => drawers.settings.setOpened(true)}
+                  radius="md"
+                >
+                  {t('settings.button')}
+                </Button>
+                <Button 
+                  leftSection={<IoAddOutline size={20} />} 
+                  onClick={() => handlers.handleCreateColumn()}
+                  radius="md"
+                  color="primary"
+                  className="bg-primary shadow-md text-primary-foreground hover:opacity-90 transition-all"
+                >
+                  {t('add_column')}
+                </Button>
+              </Group>
+            )}
           </Group>
-          <Title order={2} className="font-bold">
-              {t('title')}
-          </Title>
         </Stack>
       )}
 
