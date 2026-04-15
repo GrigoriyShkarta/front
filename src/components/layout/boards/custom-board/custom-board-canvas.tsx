@@ -22,7 +22,7 @@ import { MaterialsPickerModal } from '../components/materials-picker-modal';
 import { LinkCreateModal as BoardLinkModal } from './components/link-create-modal';
 import { EditableText } from '@/components/layout/boards/custom-board/components/editable-text';
 import { UserProfile } from '@/schemas/user-profile';
-import { upload_board_file } from './actions/board-api';
+import { upload_board_file, update_board } from './actions/board-api';
 import { Box, useMantineColorScheme } from '@mantine/core';
 
 const backend_url = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
@@ -56,7 +56,11 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
 
   // Settings & Theme
   const [bg_color, set_bg_color] = useState(initial_data?.bg_color || 'auto');
-  const [grid_type, set_grid_type] = useState<GridType>(initial_data?.grid_type || 'cells');
+  const [grid_type, set_grid_type] = useState<GridType>(
+    (initial_data?.grid_type === 'dots' || initial_data?.grid_type === 'none') 
+      ? initial_data.grid_type 
+      : 'cells'
+  );
   const [board_theme, set_board_theme] = useState<'light' | 'dark' | 'auto'>(initial_data?.board_theme || 'auto');
 
   const is_dark = board_theme === 'auto' ? (colorScheme === 'dark') : (board_theme === 'dark');
@@ -80,7 +84,7 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
     });
   }, [is_dark]);
   const effective_bg_color = bg_color === 'auto' ? (is_dark ? '#12121e' : '#f8f9fa') : bg_color;
-  const grid_color = is_dark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.12)';
+  const grid_color = is_dark ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.25)';
 
   // Collaborative Socket
   const { 
@@ -108,6 +112,18 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
     };
     const handleSync = (data: { elements: BoardElement[], settings?: any }) => {
       if (data.elements) set_elements(data.elements);
+      if (data.settings) {
+        if (data.settings.bg_color) set_bg_color(data.settings.bg_color);
+        if (data.settings.grid_type) set_grid_type(data.settings.grid_type);
+        if (data.settings.board_theme) set_board_theme(data.settings.board_theme);
+      }
+    };
+    
+    const handleSettingsUpdated = (data: { settings: any }) => {
+      if (!data.settings) return;
+      if (data.settings.bg_color) set_bg_color(data.settings.bg_color);
+      if (data.settings.grid_type) set_grid_type(data.settings.grid_type);
+      if (data.settings.board_theme) set_board_theme(data.settings.board_theme);
     };
 
     socket.on('element:update', handleRemoteUpdate);
@@ -121,6 +137,8 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
     socket.on('elements:deleted', handleRemoteDelete);
 
     socket.on('elements:sync', handleSync);
+    socket.on('board:settings_updated', handleSettingsUpdated);
+    socket.on('settings:updated', handleSettingsUpdated);
 
     return () => {
       socket.off('element:update', handleRemoteUpdate);
@@ -132,6 +150,8 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
       socket.off('element:deleted', handleRemoteDelete);
       socket.off('elements:deleted', handleRemoteDelete);
       socket.off('elements:sync', handleSync);
+      socket.off('board:settings_updated', handleSettingsUpdated);
+      socket.off('settings:updated', handleSettingsUpdated);
     };
   }, [socket, set_elements]);
 
@@ -155,6 +175,22 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
     if (key === 'bg_color') set_bg_color(value);
     if (key === 'grid_type') set_grid_type(value);
     if (key === 'board_theme') set_board_theme(value);
+
+    // Persist to server
+    update_board(board_id, { 
+      settings: { 
+        bg_color: key === 'bg_color' ? value : bg_color,
+        grid_type: key === 'grid_type' ? value : grid_type,
+        board_theme: key === 'board_theme' ? value : board_theme
+      } 
+    });
+
+    // Broadcast to other participants
+    emit_board_settings({
+      bg_color: key === 'bg_color' ? value : bg_color,
+      grid_type: key === 'grid_type' ? value : grid_type,
+      board_theme: key === 'board_theme' ? value : board_theme
+    });
   };
 
   const router = useRouter();
@@ -560,7 +596,11 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
             />
         )}
 
-        <InlineTextToolbar textRef={text_edit_ref} onLinkModalOpen={set_is_inline_link_open} />
+        <InlineTextToolbar 
+          textRef={text_edit_ref} 
+          onLinkModalOpen={set_is_inline_link_open} 
+          is_dark={is_dark}
+        />
 
         <MaterialsPickerModal 
             opened={is_materials_opened} 

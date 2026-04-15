@@ -209,6 +209,7 @@ export function CanvasRenderer({
                       <img 
                         src={get_media_url(img.src)} 
                         alt={img.name} 
+                        crossOrigin="anonymous"
                         style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: tool === 'select' ? 'all' : 'none', cursor: tool === 'select' ? 'grab' : 'default' }} 
                         onMouseDown={(e) => handlers.onMouseDown(e)} 
                         onDoubleClick={(e) => handlers.onDoubleClick(e)} 

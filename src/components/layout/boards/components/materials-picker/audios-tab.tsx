@@ -109,8 +109,8 @@ export function AudiosTab({ categories, onSelect }: AudiosTabProps) {
                   <Table.Td align="right">
                     <Button 
                         size="xs" 
-                        variant="gradient" 
-                        gradient={{ from: 'var(--space-primary)', to: 'var(--space-secondary)', deg: 45 }}
+                        variant="filled" 
+                        color='var(--space-accent)'  
                         radius="md"
                         onClick={() => onSelect(item)}
                     >

@@ -104,7 +104,7 @@ export function FilesTab({ categories, onSelect }: FilesTabProps) {
         loading={loading}
       />
 
-      <ScrollArea mah={400} offsetScrollbars>
+      <ScrollArea offsetScrollbars>
         {items.length > 0 ? (
           <Table verticalSpacing="sm" className="bg-white/5 rounded-xl overflow-hidden border border-white/10">
             <Table.Tbody>
@@ -120,8 +120,6 @@ export function FilesTab({ categories, onSelect }: FilesTabProps) {
                             size="sm" 
                             fw={600} 
                             lineClamp={1}
-                            variant="gradient"
-                            gradient={{ from: 'white', to: 'white', deg: 0 }}
                            >
                             {item.name}
                           </Text>

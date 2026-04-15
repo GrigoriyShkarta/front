@@ -73,7 +73,7 @@ export function LinkCreateModal({ opened, onClose, onAdd }: LinkCreateModalProps
           <Button 
             onClick={handle_submit} 
             radius="md" 
-            style={{ backgroundColor: 'var(--space-primary)', color: 'var(--space-primary-text)' }}
+            style={{ backgroundColor: 'var(--space-accent)', color: 'var(--space-accent-text)' }}
           >
             {common_t('add')}
           </Button>

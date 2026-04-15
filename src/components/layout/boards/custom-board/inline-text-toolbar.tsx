@@ -1,6 +1,6 @@
 'use client';
 
-import { ActionIcon, Group, Tooltip, Box, Popover, ColorSwatch, ColorPicker, Stack, Divider } from '@mantine/core';
+import { ActionIcon, Group, Tooltip, Box, Popover, ColorSwatch, ColorPicker, Stack, Divider, useMantineColorScheme } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { MdFormatBold, MdFormatItalic, MdFormatUnderlined, MdStrikethroughS, MdHighlight, MdLink, MdLinkOff, MdFormatColorText } from 'react-icons/md';
 import { useState, useEffect, useRef } from 'react';
@@ -20,13 +20,16 @@ const COLORS = ['#ef4444', '#f97316', '#f59e0b', '#10b981', '#3b82f6', '#6366f1'
 interface Props {
   textRef: React.RefObject<HTMLDivElement | null>;
   onLinkModalOpen?: (opened: boolean) => void;
+  is_dark?: boolean;
 }
 
 /**
  * Inline formatting toolbar that appears above the text selection inside EditableText.
  */
-export function InlineTextToolbar({ textRef, onLinkModalOpen }: Props) {
+export function InlineTextToolbar({ textRef, onLinkModalOpen, is_dark: is_dark_prop }: Props) {
   const t = useTranslations('Boards');
+  const { colorScheme } = useMantineColorScheme();
+  const is_dark = is_dark_prop ?? (colorScheme === 'dark');
 
   const [toolbarPos, setToolbarPos] = useState<{ x: number; y: number } | null>(null);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -191,7 +194,15 @@ export function InlineTextToolbar({ textRef, onLinkModalOpen }: Props) {
           }}
           data-inline-toolbar="true"
         >
-          <Group gap={4} p={6} className="rounded-xl border border-white/10 bg-[#1e1e2e] shadow-2xl backdrop-blur-md" wrap="nowrap">
+          <Group 
+            gap={4} p={6} 
+            className="rounded-xl shadow-2xl backdrop-blur-md" 
+            wrap="nowrap"
+            style={{ 
+              backgroundColor: is_dark ? 'rgba(30, 30, 46, 0.85)' : 'rgba(255, 255, 255, 0.95)',
+              border: is_dark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e5e7eb',
+            }}
+          >
 
             <Tooltip label={t('bold') || 'Bold'}>
               <ActionIcon variant={activeFormats.bold ? 'filled' : 'subtle'} color="var(--space-primary)"
@@ -232,17 +243,31 @@ export function InlineTextToolbar({ textRef, onLinkModalOpen }: Props) {
             }}>
               <Popover.Target>
                 <Tooltip label={t('text_color') || 'Text Color'}>
-                  <ActionIcon variant="subtle" color="var(--space-primary)" onPointerDown={(e) => e.preventDefault()}>
-                    <MdFormatColorText size={20} color={textColor} />
+                  <ActionIcon 
+                    variant="subtle" 
+                    color="var(--space-primary)" 
+                    onPointerDown={(e) => e.preventDefault()}
+                    style={{ border: `1px solid ${is_dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'}` }}
+                  >
+                    <MdFormatColorText size={20} color={textColor === '#ffffff' && !is_dark ? '#000000' : textColor} />
                   </ActionIcon>
                 </Tooltip>
               </Popover.Target>
-              <Popover.Dropdown bg="#1e1e2e" bd="1px solid rgba(255,255,255,0.1)" p="xs">
+              <Popover.Dropdown 
+                bg={is_dark ? '#1e1e2e' : '#ffffff'} 
+                bd={is_dark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e5e7eb'} 
+                p="xs"
+              >
                 <Stack gap="xs">
                   <Group gap={6} w={130} onPointerDown={(e) => e.preventDefault()}>
                     {COLORS.map(c => (
-                      <ColorSwatch key={c} color={c} size={18} style={{ cursor: 'pointer' }}
-                        onClick={() => { setTextColor(c); applySavedColor('foreColor', c); }} />
+                      <ColorSwatch key={c} color={c} size={18} 
+                        style={{ 
+                          cursor: 'pointer', 
+                          border: `1px solid ${is_dark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}` 
+                        }}
+                        onClick={() => { setTextColor(c); applySavedColor('foreColor', c); }} 
+                      />
                     ))}
                   </Group>
                   <Divider opacity={0.1} />
@@ -266,19 +291,33 @@ export function InlineTextToolbar({ textRef, onLinkModalOpen }: Props) {
             }}>
               <Popover.Target>
                 <Tooltip label={t('highlight') || 'Highlight'}>
-                  <ActionIcon variant="subtle" color="var(--space-primary)" onPointerDown={(e) => e.preventDefault()}>
-                    <MdHighlight size={20} color={highlightColor === 'transparent' ? '#a1a1aa' : highlightColor} />
+                  <ActionIcon 
+                    variant="subtle" 
+                    color="var(--space-primary)" 
+                    onPointerDown={(e) => e.preventDefault()}
+                    style={{ border: `1px solid ${is_dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'}` }}
+                  >
+                    <MdHighlight size={20} color={highlightColor === 'transparent' ? (is_dark ? '#a1a1aa' : '#71717a') : highlightColor} />
                   </ActionIcon>
                 </Tooltip>
               </Popover.Target>
-              <Popover.Dropdown bg="#1e1e2e" bd="1px solid rgba(255,255,255,0.1)" p="xs">
+              <Popover.Dropdown 
+                bg={is_dark ? '#1e1e2e' : '#ffffff'} 
+                bd={is_dark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e5e7eb'} 
+                p="xs"
+              >
                 <Stack gap="xs">
                   <Group gap={6} w={130} onPointerDown={(e) => e.preventDefault()}>
                     <ColorSwatch color="transparent" size={18} style={{ cursor: 'pointer', border: '1px solid #444' }}
                       onClick={() => { setHighlightColor('transparent'); applySavedColor('backColor', 'transparent'); }} />
                     {COLORS.map(c => (
-                      <ColorSwatch key={c} color={c} size={18} style={{ cursor: 'pointer' }}
-                        onClick={() => { setHighlightColor(c); applySavedColor('backColor', c); }} />
+                      <ColorSwatch key={c} color={c} size={18} 
+                        style={{ 
+                          cursor: 'pointer', 
+                          border: `1px solid ${is_dark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}` 
+                        }}
+                        onClick={() => { setHighlightColor(c); applySavedColor('backColor', c); }} 
+                      />
                     ))}
                   </Group>
                   <Divider opacity={0.1} />
