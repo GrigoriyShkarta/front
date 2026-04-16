@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useForm, Controller } from 'react-hook-form';
 import dayjs from 'dayjs';
 import { Link } from '@/i18n/routing';
-import { Modal, TextInput, Textarea, Button, Group, Stack, Tabs, Select, Text, MultiSelect, LoadingOverlay, Box } from '@mantine/core';
+import { Modal, TextInput, Textarea, Button, Group, Stack, Tabs, Select, Text, MultiSelect, Box } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarEvent, ManualEvent, manual_event_schema } from '../schemas/event-schema';
@@ -21,11 +21,11 @@ interface Props {
   opened: boolean;
   event?: CalendarEvent | null;
   is_loading?: boolean;
+  is_student?: boolean;
   onClose: () => void;
   onSubmit: (event: CalendarEvent) => void;
   onDelete?: (id: string) => void;
   onCreateSubscription?: (studentId: string) => void;
-  is_student?: boolean;
 }
 
 /**
@@ -362,7 +362,7 @@ export function EventModal({ opened, event, onClose, onSubmit, onDelete, onCreat
                 />
               </Stack>
               
-              <Controller
+              {/* <Controller
                 control={control}
                 name="attendees"
                 render={({ field }) => (
@@ -376,7 +376,7 @@ export function EventModal({ opened, event, onClose, onSubmit, onDelete, onCreat
                     error={errors.attendees?.message}
                   />
                 )}
-              />
+              /> */}
 
               <Textarea
                 label={t('description')}

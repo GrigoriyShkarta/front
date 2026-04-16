@@ -1,7 +1,7 @@
 'use client';
 
 import { Paper, Stack, Text, Radio, Checkbox, TextInput, Textarea, Group, Box, Button, rem } from '@mantine/core';
-import { IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5';
+import { IoChevronBackOutline, IoChevronForwardOutline, IoCheckmarkOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
@@ -18,6 +18,7 @@ interface Props {
   on_text_change: (text: string) => void;
   on_next: () => void;
   on_prev: () => void;
+  on_submit: () => void;
   can_next: boolean;
   can_prev: boolean;
 }
@@ -36,6 +37,7 @@ export function TestQuestionCard({
   on_text_change,
   on_next,
   on_prev,
+  on_submit,
   can_next,
   can_prev,
 }: Props) {
@@ -69,6 +71,12 @@ export function TestQuestionCard({
       <Text size="xl" fw={600} style={{ fontSize: rem(22) }}>
         {question.question}
       </Text>
+
+      {(question.type === QUESTION_TYPES.SINGLE_CHOICE || question.type === QUESTION_TYPES.MULTIPLE_CHOICE) && (
+        <Text size="sm" c="dimmed" fs="italic" mt={-10}>
+          {question.type === QUESTION_TYPES.SINGLE_CHOICE ? t('hint_single') : t('hint_multiple')}
+        </Text>
+      )}
 
       {/* Question media */}
       {question.media && <QuestionMedia media={question.media} />}
@@ -155,12 +163,12 @@ export function TestQuestionCard({
         <Button
           variant="light"
           color="primary"
-          rightSection={<IoChevronForwardOutline size={16} />}
-          onClick={on_next}
-          disabled={!can_next}
+          leftSection={!can_next ? <IoCheckmarkOutline size={16} /> : undefined}
+          rightSection={can_next ? <IoChevronForwardOutline size={16} /> : undefined}
+          onClick={can_next ? on_next : on_submit}
           radius="md"
         >
-          {t('next')}
+          {can_next ? t('next') : t('submit')}
         </Button>
       </Group>
     </Stack>

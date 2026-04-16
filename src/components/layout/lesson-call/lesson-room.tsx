@@ -103,27 +103,34 @@ function MyCallUI() {
   }, [callingState, setActiveCall, router]);
 
   const handleLeave = async () => {
-    const callToEnd = activeCall;
+    // 1. Store reference and immediately clear context to remove UI elements
+    const callToEnd = activeCall || call;
     setActiveCall(null);
     
+    // 2. Perform cleanup
     if (callToEnd) {
       try {
         if (user && user.role !== 'student') {
+          // If teacher is leaving, stop recording and end call for everyone
           if (isRecordingInProgress) {
             try {
               await callToEnd.stopRecording();
             } catch (error) {
-              console.error('Failed to stop recording before ending call:', error);
+              console.error('Failed to stop recording:', error);
             }
           }
           await callToEnd.endCall();
         } else {
+          // Student just leaves
           await callToEnd.leave();
         }
       } catch (e) {
-        await callToEnd.leave();
+        console.error('Error during call termination:', e);
+        try { await callToEnd.leave(); } catch (inner_e) {}
       }
     }
+
+    // 3. Finally redirect
     router.push('/main');
   };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { 
   Paper, 
   Stack, 
@@ -9,19 +9,19 @@ import {
   Text, 
   TextInput, 
   Select, 
-  ThemeIcon, 
   Pagination, 
-  Center,
   LoadingOverlay,
-  Box
+  Box,
+  Anchor,
+  Breadcrumbs,
+  Title
 } from '@mantine/core';
-import { IoSearchOutline, IoFilterOutline, IoSchoolOutline, IoReaderOutline } from 'react-icons/io5';
+import { IoSearchOutline, IoFilterOutline, IoDocumentTextOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { useDebouncedValue } from '@mantine/hooks';
 
 import { useHomeworksAll } from '../hooks/use-homeworks-all';
 import { HomeworkResultsTable } from './reviews/homework-results-table';
-import { PageContainer } from '@/components/common/page-container';
 
 /**
  * Main dashboard layout for administrative homework review.
@@ -32,6 +32,16 @@ export function HomeworkReviewsLayout() {
   const t = useTranslations('Materials.homework.reviews');
   const common_t = useTranslations('Common');
   const router = useRouter();
+  const tNav = useTranslations('Navigation');
+  
+    const breadcrumb_items = [
+      { title: tNav('dashboard'), href: '/main' },
+      { title: t('title'), href: '/main/materials/homeworks/reviews' },
+    ].map((item, index) => (
+      <Anchor component={Link} href={item.href} key={index} size="sm">
+        {item.title}
+      </Anchor>
+    ));
   const [search, set_search] = useState('');
   const [debounced_search] = useDebouncedValue(search, 400);
   const [status, set_status] = useState<string | null>('pending');
@@ -69,8 +79,27 @@ export function HomeworkReviewsLayout() {
   };
 
   return (
-    <PageContainer>
+    
       <Stack gap="xl">
+        <Breadcrumbs separator="→" mb="-xs">
+          {breadcrumb_items}
+        </Breadcrumbs>
+
+        <Group justify="space-between" align="center" wrap="nowrap">
+          <Group align="center" gap="md">
+            <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+              <IoDocumentTextOutline size={28} />
+            </Box>
+            <Stack gap={0}>
+              <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+                {t('title')}
+              </Title>
+              <Text c="dimmed" size="sm" className="hidden sm:block">
+                {t('description')}
+              </Text>
+            </Stack>
+          </Group>
+        </Group>
         <Box pos="relative">
           <LoadingOverlay 
             visible={is_loading} 
@@ -161,6 +190,5 @@ export function HomeworkReviewsLayout() {
           </Paper>
         </Box>
       </Stack>
-    </PageContainer>
   );
 }

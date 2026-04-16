@@ -313,6 +313,10 @@ a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
   outline: none !important;
 }
 
+.bn-editor {
+  background-color: transparent !important;
+}
+
 .is-read-only {
   .bn-toolbar {
     display: none !important;

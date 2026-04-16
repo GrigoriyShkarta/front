@@ -236,6 +236,7 @@ export function TestTakeLayout({ test_id, course_id }: Props) {
                                 }
                                 on_next={go_next}
                                 on_prev={go_prev}
+                                on_submit={handle_submit_click}
                                 can_next={current_index < total_questions - 1}
                                 can_prev={current_index > 0}
                             />

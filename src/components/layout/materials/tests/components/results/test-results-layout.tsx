@@ -1,17 +1,17 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-import { Stack, Box, LoadingOverlay, Pagination, Group, Text, Select, Paper, TextInput } from '@mantine/core';
+import { Stack, Box, LoadingOverlay, Pagination, Group, Text, Select, Paper, TextInput, Anchor, Breadcrumbs, Title } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { useDebouncedValue } from '@mantine/hooks';
 import { IoSearchOutline } from 'react-icons/io5';
 
-import { useRouter } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { useTestResults } from '../../hooks/use-test-results';
-import { useTestEditor } from '../../hooks/use-test-editor';
 import { TestResultsStats } from './test-results-stats';
 import { TestResultsTable } from './test-results-table';
+import { IoMdCheckboxOutline } from 'react-icons/io';
 
 interface Props {
   test_id?: string;
@@ -24,6 +24,7 @@ interface Props {
 export function TestResultsLayout({ test_id }: Props) {
   const t = useTranslations('Materials.tests.results');
   const common_t = useTranslations('Common');
+  const tNav = useTranslations('Navigation');
   const router = useRouter();
 
   const [page, set_page] = useState(1);
@@ -32,8 +33,14 @@ export function TestResultsLayout({ test_id }: Props) {
   const [search, set_search] = useState('');
   const [debounced_search] = useDebouncedValue(search, 400);
 
-  // If we have a test_id, we fetch stats for that test
-  const { test } = useTestEditor({ id: test_id || '' });
+  const breadcrumb_items = [
+      { title: tNav('dashboard'), href: '/main' },
+      { title: t('title'), href: '/main/materials/tests/reviews' },
+    ].map((item, index) => (
+      <Anchor component={Link} href={item.href} key={index} size="sm">
+        {item.title}
+      </Anchor>
+    ));
 
   const {
     attempts,
@@ -66,6 +73,26 @@ export function TestResultsLayout({ test_id }: Props) {
 
   return (
     <Stack gap="xl">
+      <Breadcrumbs separator="→" mb="-xs">
+        {breadcrumb_items}
+      </Breadcrumbs>
+
+      <Group justify="space-between" align="center" wrap="nowrap">
+        <Group align="center" gap="md">
+          <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+            <IoMdCheckboxOutline size={28} />
+          </Box>
+          <Stack gap={0}>
+            <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+              {t('title')}
+            </Title>
+            <Text c="dimmed" size="sm" className="hidden sm:block">
+              {t('description')}
+            </Text>
+          </Stack>
+        </Group>
+      </Group>
+
       <Box pos="relative">
         <LoadingOverlay visible={is_loading} overlayProps={{ blur: 2 }} zIndex={40} />
 
@@ -76,17 +103,16 @@ export function TestResultsLayout({ test_id }: Props) {
         <Paper withBorder radius="md" mt="lg" className="bg-white/5 border-white/10 overflow-hidden">
           <Box className="p-4 border-b border-white/10 bg-white/2">
             <Group justify="space-between">
-
-                <TextInput
-                  placeholder={common_t('search') + '...'}
-                  size="xs"
-                  w={200}
-                  leftSection={<IoSearchOutline size={14} />}
-                  value={search}
-                  onChange={(e) => set_search(e.currentTarget.value)}
-                  radius="md"
-                  variant="filled"
-                />
+              <TextInput
+                placeholder={common_t('search') + '...'}
+                size="xs"
+                w={200}
+                leftSection={<IoSearchOutline size={14} />}
+                value={search}
+                onChange={(e) => set_search(e.currentTarget.value)}
+                radius="md"
+                variant="filled"
+              />
 
               <Select
                 data={status_options}

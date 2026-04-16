@@ -6,7 +6,6 @@ import {
     Group, 
     Text, 
     Paper, 
-    Box, 
     TextInput, 
     Modal, 
     LoadingOverlay, 
@@ -14,7 +13,6 @@ import {
     Drawer, 
     MultiSelect,
     NumberInput,
-    Switch,
     Divider,
     rem
 } from '@mantine/core';
@@ -346,8 +344,7 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
             )
         ) : (
             <Group gap="sm">
-                <Button 
-                    variant="light" 
+                <Button  
                     color="gray" 
                     leftSection={<IoEyeOutline size={18} />}
                     onClick={startPreview}
@@ -356,7 +353,6 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
                     {t('editor.preview')}
                 </Button>
                 <Button 
-                    variant="light" 
                     color="gray" 
                     leftSection={<IoOptionsOutline size={18} />}
                     onClick={() => setAdditionalOpened(true)}

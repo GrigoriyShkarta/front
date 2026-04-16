@@ -74,6 +74,7 @@ export function CourseEditorDrawer({ opened, on_close, course, on_save, is_savin
         fields,
         used_lesson_ids,
         used_test_ids,
+        is_dragging_group,
         register,
         handleSubmit,
         setValue,
@@ -89,7 +90,6 @@ export function CourseEditorDrawer({ opened, on_close, course, on_save, is_savin
         move_down,
         on_drag_start,
         on_drag_end,
-        is_dragging_group,
     } = useCourseEditorForm({ course, opened });
 
     const on_submit_handler = async (values: CreateCourseForm) => {
@@ -275,6 +275,11 @@ export function CourseEditorDrawer({ opened, on_close, course, on_save, is_savin
                         onClick={handle_create_new_item} 
                         loading={is_creating}
                         disabled={!creation_name.trim()}
+                        className={cn(
+                            "h-12 transition-all duration-200",
+                            !creation_name.trim() ? "opacity-40 grayscale-[0.5] cursor-not-allowed" : "shadow-md hover:shadow-lg active:scale-[0.98]"
+                        )}
+                        color="blue"
                     >
                         {common_t('create')}
                     </Button>
@@ -293,7 +298,12 @@ export function CourseEditorDrawer({ opened, on_close, course, on_save, is_savin
                         <Button variant="light" onClick={() => set_success_modal(null)} color="gray">
                             {common_t('stay')}
                         </Button>
-                        <Button 
+                        <Button
+                            className={cn(
+                                "h-12 transition-all duration-200",
+                                !success_modal ? "opacity-40 grayscale-[0.5] cursor-not-allowed" : "shadow-md hover:shadow-lg active:scale-[0.98]"
+                            )}
+                            color="blue"
                             onClick={() => {
                                 if (success_modal) {
                                     router.push(`/main/materials/${success_modal.type}s/${success_modal.id}/edit`);

@@ -9,10 +9,10 @@ interface LessonSidebarProps {
     course_id?: string;
     context_course: any;
     sidebar_opened: boolean;
-    onToggle: () => void;
     all_lessons: any[];
     all_tests: any[];
     active_lesson_id?: string;
+    onToggle: () => void;
     t: (key: string) => string;
 }
 
@@ -58,7 +58,7 @@ export function LessonSidebar({
                         <Box p="xl" pb="md" className="bg-zinc-50/50 dark:bg-white/5 border-b border-zinc-100 dark:border-white/5">
                             <Group justify="space-between" align="flex-start" mb="xl" wrap="nowrap">
                                 <Stack gap={4}>
-                                    <Text size="xs" fw={800} c="primary" tt="uppercase" lts={2}>{t('editor.course_navigation')}</Text>
+                                    <Text size="xs" fw={800} tt="uppercase" lts={2}>{t('editor.course_navigation')}</Text>
                                     <Title order={3} className="line-clamp-2 leading-tight">{context_course.name}</Title>
                                 </Stack>
                             </Group>
@@ -66,7 +66,7 @@ export function LessonSidebar({
                             <Stack gap={8}>
                                 <Group justify="space-between">
                                     <Text size="xs" fw={700} c="dimmed">{t('editor.your_progress')}</Text>
-                                    <Text size="xs" fw={700} c="primary">
+                                    <Text size="xs" fw={700}>
                                         {(() => {
                                             const all_lessons = context_course.content.flatMap((item: any) => item.type === 'lesson' ? [item] : (item.lessons || []));
                                             const accessible_count = all_lessons.filter((l: any) => l.has_access).length;

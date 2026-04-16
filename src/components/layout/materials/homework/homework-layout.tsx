@@ -89,7 +89,7 @@ export default function HomeworkLayout() {
                 <Stack gap={4}>
                     <Group gap="md">
                         <Box 
-                            className="p-3 rounded-2xl bg-primary/10 text-primary dark:bg-primary/20"
+                            className="p-3 rounded-2xl"
                         >
                             <IoDocumentTextOutline size={28} />
                         </Box>

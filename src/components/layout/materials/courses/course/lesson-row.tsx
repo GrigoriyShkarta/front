@@ -99,8 +99,8 @@ export function LessonRow({ lesson, index, is_standalone, course_id, active_less
                 <Group gap="md" wrap="nowrap">
                     <Box className="relative">
                         <ThemeIcon 
-                            variant={is_active ? "filled" : "light"} 
-                            color={has_access ? "primary" : "gray"} 
+                            // variant={is_active ? "filled" : "light"} 
+                            // color={has_access ? "primary" : "gray"} 
                             size="lg" 
                             radius="md"
                             className={cn(

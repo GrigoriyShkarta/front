@@ -31,7 +31,7 @@ export function CourseCurriculum({ content, all_lessons, all_tests = [], course_
     return (
         <Stack gap="xl">
             <Group gap="sm">
-                <ThemeIcon variant="light" size="xl" radius="md">
+                <ThemeIcon size="xl" radius="md">
                     <IoListOutline size={24} />
                 </ThemeIcon>
                 <Title order={2}>{t('course_structure')}</Title>

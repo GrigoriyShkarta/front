@@ -46,7 +46,7 @@ export default function LessonEditor({
       <style jsx global>{`
         .lesson-editor-root {
           min-height: 100vh;
-          background-color: transparent;
+          background-color: transparent !important;
         }
         /* Custom scrollbar for better look */
         .lesson-editor-root ::-webkit-scrollbar {

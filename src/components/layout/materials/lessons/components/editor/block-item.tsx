@@ -83,8 +83,9 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
       className={`block-item ${isDragging ? 'dragging' : ''} ${read_only ? 'read-only' : ''}`}
       styles={{
         root: {
+          position: 'relative',
           transition: 'all 0.2s ease',
-          backgroundColor: read_only ? 'transparent' : 'var(--mantine-color-body)',
+          backgroundColor: 'transparent',
           opacity: isDragging ? 0.4 : 1,
           border: isDragging 
             ? '2px dashed var(--mantine-primary-color-filled)' 

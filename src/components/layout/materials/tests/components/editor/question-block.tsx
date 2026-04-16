@@ -181,9 +181,16 @@ export function QuestionBlock({
 
         <Stack gap="xs">
             {is_preview ? (
-                <Text size="xl" fw={610} style={{ fontSize: rem(22) }} px="md" py="xs">
-                    {data.question}
-                </Text>
+                <Stack gap={0} px="md" py="xs">
+                    <Text size="xl" fw={610} style={{ fontSize: rem(22) }}>
+                        {data.question}
+                    </Text>
+                    {(data.type === QUESTION_TYPES.SINGLE_CHOICE || data.type === QUESTION_TYPES.MULTIPLE_CHOICE) && (
+                        <Text size="sm" c="dimmed" fs="italic" mt={4}>
+                            {data.type === QUESTION_TYPES.SINGLE_CHOICE ? t('hint_single') : t('hint_multiple')}
+                        </Text>
+                    )}
+                </Stack>
             ) : (
                 <Textarea
                     placeholder={t('question_placeholder')}

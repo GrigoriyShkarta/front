@@ -1,7 +1,7 @@
 'use client';
 
-import { Table, Checkbox, ActionIcon, Group, Text, Menu, rem, useMantineTheme, Badge } from '@mantine/core';
-import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoCheckmarkDoneOutline } from 'react-icons/io5';
+import { Table, Checkbox, ActionIcon, Group, Text, Menu, rem, Badge } from '@mantine/core';
+import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoClipboardOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { useAuth } from '@/hooks/use-auth';
@@ -12,16 +12,15 @@ import { Link } from '@/i18n/routing';
 interface Props {
   data: Omit<TestMaterial, 'content'>[];
   selected_ids: string[];
+  is_loading?: boolean;
   on_selection_change: (ids: string[]) => void;
   on_delete: (id: string) => void;
-  is_loading?: boolean;
 }
 
 export function TestTable({ data, selected_ids, on_selection_change, on_delete, is_loading }: Props) {
   const t = useTranslations('Materials.tests.table');
   const common_t = useTranslations('Common');
   const tCat = useTranslations('Categories');
-  const theme = useMantineTheme();
   const { user } = useAuth();
   const is_student = user?.role === 'student';
 
@@ -108,9 +107,9 @@ export function TestTable({ data, selected_ids, on_selection_change, on_delete, 
                 )}
                 <Table.Td>
                   <Group gap="sm" wrap="nowrap">
-                    <IoCheckmarkDoneOutline 
+                    <IoClipboardOutline 
                       size={20} 
-                      className="text-primary"
+                      className="text-secondary"
                     />
                     <Link 
                       href={`/main/materials/tests/${item.id}`}

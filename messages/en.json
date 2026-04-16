@@ -1128,6 +1128,7 @@
       },
       "results": {
         "title": "Test Results",
+        "description": "Student attempts that require your attention or manual review.",
         "title_global": "Test Reviews",
         "review_description": "Review student answers and grade open-ended questions.",
         "back_to_list": "Back to list",

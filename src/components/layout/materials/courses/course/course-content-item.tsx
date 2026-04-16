@@ -70,7 +70,7 @@ export function CourseContentItemRenderer({ item: _item, all_lessons, all_tests 
                             </Stack>
                         </Group>
                         <ThemeIcon 
-                            variant="subtle" 
+                            // variant="subtle" 
                             color="gray" 
                             style={{ 
                                 transition: 'transform 200ms ease',
@@ -125,7 +125,7 @@ export function CourseContentItemRenderer({ item: _item, all_lessons, all_tests 
                     <Group gap="md" wrap="nowrap">
                         <Box className="relative">
                             <ThemeIcon 
-                                variant={is_active ? "filled" : "light"}
+                                // variant={is_active ? "filled" : "light"}
                                 color={!has_access ? "gray" : (is_passed ? "green" : "primary")} 
                                 size="lg" 
                                 radius="md"

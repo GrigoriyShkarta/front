@@ -33,6 +33,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
     roles: ['student'],
   },
   {
+    label: 'courses',
+    href: '/main/materials/courses',
+    icon: IoSchoolOutline,
+    roles: ['student'],
+  },
+  {
     label: 'calendar',
     href: '/main/calendar',
     icon: IoCalendarOutline,
@@ -108,7 +114,7 @@ export const MAIN_NAVIGATION: NavItem[] = [
         label: 'courses',
         href: '/main/materials/courses',
         icon: IoSchoolOutline,
-        roles: ['super_admin', 'admin', 'teacher', 'student'],
+        roles: ['super_admin', 'admin', 'teacher',],
       },
       // {
       //   label: 'homework',

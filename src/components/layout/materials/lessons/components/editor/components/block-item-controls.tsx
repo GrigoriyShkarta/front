@@ -56,32 +56,28 @@ export function BlockItemControls({
       )}
 
       {!read_only && (
-        <Group 
-          justify="flex-end" 
-          p="xs" 
+        <Box 
           style={{ 
             position: 'absolute', 
-            top: 0, 
-            right: 0, 
+            top: 6, 
+            right: 6, 
             zIndex: 10,
-            pointerEvents: 'none' 
           }}
         >
-          <Group gap="xs" style={{ pointerEvents: 'all' }}>
-            {show_remove && (
-              <Tooltip label={t('delete_block')}>
-                <ActionIcon 
-                  variant="subtle" 
-                  color="red" 
-                  onClick={on_remove}
-                  radius="md"
-                >
-                  <IoTrashOutline size={16} />
-                </ActionIcon>
-              </Tooltip>
-            )}
-          </Group>
-        </Group>
+          {show_remove && (
+            <Tooltip label={t('delete_block')}>
+              <ActionIcon 
+                variant="subtle" 
+                color="red" 
+                onClick={on_remove}
+                radius="md"
+                size="md"
+              >
+                <IoTrashOutline size={16} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        </Box>
       )}
     </>
   );

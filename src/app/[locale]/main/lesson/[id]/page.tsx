@@ -18,6 +18,11 @@ export default function LessonPage() {
   
   // Ref to prevent double-joining in Strict Mode
   const joiningTracker = useRef<Record<string, boolean>>({});
+  const activeCallRef = useRef<Call | null>(activeCall);
+  
+  useEffect(() => {
+    activeCallRef.current = activeCall;
+  }, [activeCall]);
 
   useEffect(() => {
     if (!id) return;
@@ -26,14 +31,14 @@ export default function LessonPage() {
       return;
     }
 
-    if (activeCall && activeCall.id === id) {
+    if (activeCallRef.current && activeCallRef.current.id === id) {
       // Already in this call
       return;
     }
     
     // Check if we already have a call with a different ID, we should leave it
-    if (activeCall && activeCall.id !== id) {
-      activeCall.leave();
+    if (activeCallRef.current && activeCallRef.current.id !== id) {
+      activeCallRef.current.leave();
       setActiveCall(null);
     }
     
@@ -58,7 +63,7 @@ export default function LessonPage() {
       });
 
     // We never call leave() here; handled by onLeave or route changes
-  }, [client, id, activeCall, setActiveCall, t]);
+  }, [client, id, setActiveCall, t]);
 
 
   if (error) {

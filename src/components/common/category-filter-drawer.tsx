@@ -50,7 +50,7 @@ export function CategoryFilterDrawer({ opened, onClose, categoryIds, onCategoryI
           <Button variant="subtle" color="gray" onClick={handle_clear}>
             {common_t('clear')}
           </Button>
-          <Button onClick={handle_apply}>
+          <Button onClick={handle_apply} className="bg-primary hover:opacity-90 shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5">
             {common_t('apply')}
           </Button>
         </Group>

@@ -91,18 +91,41 @@ export default function TestsLayout() {
                     </Stack>
                 </Group>
 
-                {!is_student && (
+                <Group gap="sm">
                     <Button 
-                        component={Link}
-                        href="/main/materials/tests/create"
-                        size="md" 
+                        variant={categoryFilters.length > 0 ? "light" : "default"}
+                        color={categoryFilters.length > 0 ? "primary" : "gray"}
+                        leftSection={<IoFilterOutline size={18} />}
+                        onClick={() => setCategoryDrawerOpened(true)}
+                        className={cn(categoryFilters.length > 0 && "border-primary-500/50")}
+                        size="md"
                         radius="md"
-                        leftSection={<IoAddOutline size={20} />}
-                        className="bg-primary hover:opacity-90 shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5"
                     >
-                        {t('add_test')}
+                        {common_t('filters')}
+                        {categoryFilters.length > 0 && (
+                            <Box
+                                ml={8}
+                                className="w-5 h-5 rounded-full text-white flex items-center justify-center text-[10px] font-bold"
+                                style={{ backgroundColor: 'var(--mantine-primary-color-filled)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
+                            >
+                                {categoryFilters.length}
+                            </Box>
+                        )}
                     </Button>
-                )}
+
+                    {!is_student && (
+                        <Button 
+                            component={Link}
+                            href="/main/materials/tests/create"
+                            size="md" 
+                            radius="md"
+                            leftSection={<IoAddOutline size={20} />}
+                            className="bg-primary hover:opacity-90 shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5"
+                        >
+                            {t('add_test')}
+                        </Button>
+                    )}
+                </Group>
             </Group>
 
             <Paper withBorder radius="md" className="bg-white/5 border-white/10 overflow-hidden relative">
@@ -128,24 +151,6 @@ export default function TestsLayout() {
                                     }
                                 }}
                             />
-                            <Button 
-                                variant={categoryFilters.length > 0 ? "light" : "default"}
-                                color={categoryFilters.length > 0 ? "primary" : "gray"}
-                                leftSection={<IoFilterOutline size={18} />}
-                                onClick={() => setCategoryDrawerOpened(true)}
-                                className={cn(categoryFilters.length > 0 && "border-primary-500/50")}
-                            >
-                                {common_t('filters')}
-                                {categoryFilters.length > 0 && (
-                                    <Box
-                                        ml={8}
-                                        className="w-5 h-5 rounded-full text-white flex items-center justify-center text-[10px] font-bold"
-                                        style={{ backgroundColor: 'var(--mantine-primary-color-filled)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
-                                    >
-                                        {categoryFilters.length}
-                                    </Box>
-                                )}
-                            </Button>
                         </Group>
 
                         {!is_student && (
