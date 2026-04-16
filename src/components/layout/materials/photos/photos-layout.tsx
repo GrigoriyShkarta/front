@@ -308,7 +308,7 @@ export default function PhotosLayout() {
 
                 <Group justify="space-between" align="center" wrap="nowrap">
                     <Group align="center" gap="md">
-                        <Box className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm border border-primary/20 shrink-0">
+                        <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
                             <IoImageOutline size={28} />
                         </Box>
                         <Stack gap={0}>

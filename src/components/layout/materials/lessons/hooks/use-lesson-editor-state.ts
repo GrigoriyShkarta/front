@@ -17,6 +17,7 @@ import { useCourse } from '@/components/layout/materials/courses/hooks/use-cours
 import { useLessons } from '@/components/layout/materials/lessons/hooks/use-lessons';
 import { BlockNoteEditorRef } from '../components/editor/block-note';
 import { CreateCategoryForm } from '@/components/layout/categories/schemas/category-schema';
+import { useBlockDragging } from './use-block-dragging';
 
 export interface LessonBlock {
   id: string;
@@ -42,6 +43,8 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
   const queryClient = useQueryClient();
 
   const { lesson, is_loading_lesson, is_saving, create_lesson, update_lesson } = useLessonEditor({ id, student_id });
+  
+  const { is_dragging_block, set_is_dragging_block } = useBlockDragging();
   
   const [readOnly, setReadOnly] = useState(is_read_only || is_access_mode);
   const [title, setTitle] = useState('');
@@ -374,6 +377,7 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
     handle_delete_homework, handleSave, is_saving_access, handleSaveAccess, startRepositioning,
     handleMouseDown, handleMouseMove, handleMouseUp, addBlock, removeBlock, updateBlockContent,
     handleToggleBlockAccess, handleToggleFullAccess, openBank, handleMediaSelect, moveBlock,
-    handle_category_create_submit, router, deleteHwModalOpened, setDeleteHwModalOpened
+    handle_category_create_submit, router, deleteHwModalOpened, setDeleteHwModalOpened,
+    is_dragging_block, set_is_dragging_block
   };
 }

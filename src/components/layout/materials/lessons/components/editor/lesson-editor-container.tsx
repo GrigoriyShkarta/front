@@ -25,6 +25,7 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
     <Box 
         maw={course_id ? (state.sidebar_opened ? 1600 : 1200) : 1000} 
         mx="auto" py="xl" px="md" onMouseUp={state.handleMouseUp} onMouseLeave={state.handleMouseUp} 
+        onDragOver={(e) => e.preventDefault()}
         pos="relative" className="transition-all duration-500 ease-in-out"
     >
       <LoadingOverlay visible={state.is_loading_lesson || state.is_saving || (!!course_id && state.is_loading_context_course)} overlayProps={{ blur: 2 }} zIndex={100} />
@@ -62,7 +63,8 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
                 <LessonBlocksList 
                     blocks={state.blocks} readOnly={state.readOnly} is_access_mode={is_access_mode} accessible_block_ids={state.accessible_block_ids}
                     onBlockChange={state.updateBlockContent} onBlockRemove={state.removeBlock} onOpenBank={state.openBank} onMove={state.moveBlock}
-                    onCheckedChange={state.handleToggleBlockAccess} onAddBlock={state.addBlock} editorRefs={state.editorRefs} t={state.t}
+                    onCheckedChange={state.handleToggleBlockAccess} onAddBlock={state.addBlock} editorRefs={state.editorRefs} 
+                    set_is_dragging_block={state.set_is_dragging_block} t={state.t}
                 />
 
                 <LessonHomeworkSection 

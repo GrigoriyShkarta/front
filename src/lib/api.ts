@@ -1,9 +1,9 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
-import { setAuthCookies, clearAuthCookies } from './auth';
+import { clearAuthCookies } from './auth';
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8000/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -11,15 +11,20 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  // We no longer manually add the Authorization header because we use HttpOnly cookies
-  // browser sends them automatically with 'withCredentials: true'
+  // We no longer manually add the Authorization header because we use HttpOnly cookies.
+  // The browser sends them automatically with 'withCredentials: true'.
   return config;
 });
 
 let is_refreshing = false;
-let failed_requests: { resolve: (token: string | null) => void; reject: (error: any) => void }[] = [];
+let failed_requests: { resolve: (token: string | null) => void; reject: (error: unknown) => void }[] = [];
 
-const process_queue = (error: any, token: string | null = null) => {
+/**
+ * Resolves or rejects all queued requests that were waiting for a token refresh.
+ * @param error Error to reject with, or null on success.
+ * @param token Token string on success, or null on failure.
+ */
+const process_queue = (error: unknown, token: string | null = null): void => {
   failed_requests.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -31,27 +36,30 @@ const process_queue = (error: any, token: string | null = null) => {
   failed_requests = [];
 };
 
-const redirectToLogin = () => {
-  if (typeof window !== 'undefined') {
-    const pathname = window.location.pathname;
-
-    // Prevent redirection loop if already on login page
-    if (pathname.includes('/login')) {
-      return;
-    }
-
-    const segments = pathname.split('/');
-    const current_locale = segments[1];
-    
-    // Check if the first segment is a valid locale (e.g., 'uk', 'en')
-    const is_valid_locale = (current_locale && current_locale.length === 2) || ["zh-CN", "zh-TW"].includes(current_locale);
-    
-    if (is_valid_locale) {
-      window.location.href = `/${current_locale}/login`;
-    } else {
-      window.location.href = '/login';
-    }
+/**
+ * Redirects the user to the login page, preserving the current locale prefix.
+ */
+const redirectToLogin = (): void => {
+  if (typeof window === 'undefined') {
+    return;
   }
+
+  const pathname = window.location.pathname;
+
+  // Prevent redirection loop if already on login page
+  if (pathname.includes('/login')) {
+    return;
+  }
+
+  const segments = pathname.split('/');
+  const current_locale = segments[1];
+
+  // Check if the first segment is a valid locale (e.g., 'uk', 'en', 'zh-CN')
+  const is_valid_locale =
+    (current_locale && current_locale.length === 2) ||
+    ['zh-CN', 'zh-TW'].includes(current_locale);
+
+  window.location.href = is_valid_locale ? `/${current_locale}/login` : '/login';
 };
 
 api.interceptors.response.use(
@@ -59,24 +67,29 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const original_request = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // Skip if it's already a retry or not a 401 error
-    if (error.response?.status !== 401 || original_request?._retry) {
-      return Promise.reject(error);
-    }
-
-    // Skip if the error is on the refresh endpoint itself
-    if (original_request.url?.includes('/auth/refresh')) {
+    // If the failing request IS the refresh endpoint — abort immediately and redirect.
+    // This must be checked BEFORE the status code check to handle any error status
+    // (401, 404, network error, etc.) coming from the refresh call itself.
+    if (original_request?.url?.includes('/auth/refresh')) {
+      is_refreshing = false;
+      process_queue(error, null);
       clearAuthCookies();
       redirectToLogin();
       return Promise.reject(error);
     }
 
+    // For non-401 errors or already-retried requests — pass through without refresh attempt
+    if (error.response?.status !== 401 || original_request?._retry) {
+      return Promise.reject(error);
+    }
+
+    // Queue this request if a refresh is already in progress
     if (is_refreshing) {
       return new Promise((resolve, reject) => {
         failed_requests.push({ resolve, reject });
       })
         .then(() => {
-          // No need to set new token in header, browser handles it
+          // Browser automatically sends the new HttpOnly cookie on retry
           return api(original_request);
         })
         .catch((err) => Promise.reject(err));
@@ -86,24 +99,28 @@ api.interceptors.response.use(
     is_refreshing = true;
 
     try {
-      // Check for the non-HttpOnly flag before attempting a refresh
-      const hasToken = Cookies.get('has_token');
+      // Check for the non-HttpOnly flag cookie before attempting a refresh.
+      // If it's missing, the session has fully expired — no point calling refresh.
+      const has_token = Cookies.get('has_token');
 
-      if (!hasToken) {
+      if (!has_token) {
         is_refreshing = false;
+        process_queue(null, null);
         clearAuthCookies();
         redirectToLogin();
         return Promise.reject(error);
       }
 
-      // We don't read refresh_token from JS cookies anymore as it's HttpOnly
-      // We just call the refresh endpoint and let the browser send the cookie
-      await axios.post(`${api.defaults.baseURL}/auth/refresh`, {}, {
-        withCredentials: true
-      });
+      // The refresh_token is HttpOnly — we don't read it directly.
+      // The browser sends it automatically with withCredentials: true.
+      await axios.post(
+        `${api.defaults.baseURL}/auth/refresh`,
+        {},
+        { withCredentials: true },
+      );
 
-      // After successful refresh, backend has set new cookies via Set-Cookie header
-      process_queue(null, "success");
+      // Backend has set fresh cookies via Set-Cookie headers
+      process_queue(null, 'success');
       is_refreshing = false;
 
       return api(original_request);
@@ -114,5 +131,5 @@ api.interceptors.response.use(
       redirectToLogin();
       return Promise.reject(refresh_error);
     }
-  }
+  },
 );

@@ -2,35 +2,10 @@
 
 import { BlockNoteView } from "@blocknote/mantine";
 import * as locales from '@blocknote/core/locales';
-import { 
-  useCreateBlockNote, 
-  getDefaultReactSlashMenuItems, 
-  SuggestionMenuController,
-  createReactBlockSpec,
-  FormattingToolbarController,
-  FormattingToolbar,
-  TextAlignButton,
-  BasicTextStyleButton,
-  ColorStyleButton,
-  BlockTypeSelect,
-  CreateLinkButton,
-  NestBlockButton,
-  UnnestBlockButton
-} from "@blocknote/react";
-import { BlockNoteSchema, defaultBlockSpecs } from "@blocknote/core";
+import { useCreateBlockNote, getDefaultReactSlashMenuItems, SuggestionMenuController, FormattingToolbarController, FormattingToolbar, TextAlignButton, BasicTextStyleButton, ColorStyleButton, BlockTypeSelect, CreateLinkButton, NestBlockButton, UnnestBlockButton } from "@blocknote/react";
 import "@blocknote/mantine/style.css";
-import { 
-  IoVideocamOutline, 
-  IoImageOutline, 
-  IoMusicalNotesOutline, 
-  IoDocumentOutline, 
-  IoMenuOutline,
-  IoResizeOutline,
-  IoDownloadOutline,
-  IoFileTrayOutline
-} from 'react-icons/io5';
+import { IoVideocamOutline, IoImageOutline, IoMusicalNotesOutline, IoDocumentOutline } from 'react-icons/io5';
 import { useMemo, forwardRef, useImperativeHandle, useState, useEffect } from 'react';
-import { ActionIcon, Group, Menu, Box, Paper, Text, Stack, Card } from '@mantine/core';
 import { useMantineColorScheme } from '@mantine/core';
 import { useTranslations, useLocale } from 'next-intl';
 import { MediaPickerModal } from '../media-picker-modal';
@@ -38,392 +13,22 @@ import { photoActions } from '../../../photos/actions/photo-actions';
 import { videoActions } from '../../../videos/actions/video-actions';
 import { audioActions } from '../../../audios/actions/audio-actions';
 import { fileActions } from '../../../files/actions/file-actions';
-import { AudioPlayer } from '@/components/ui/audio-player';
-import { cn } from '@/lib/utils';
 import { PhotoPreviewModal, PhotoMaterialPreview } from '@/components/common/photo-preview-modal';
-
-/**
- * Custom YouTube block specification
- */
-const YoutubeBlock = createReactBlockSpec(
-  {
-    type: "youtube",
-    propSchema: {
-      url: { default: "" },
-      videoId: { default: "" },
-      alignment: { default: "center", values: ["left", "center", "right"] },
-      width: { default: "85%", values: ["50%", "70%", "85%", "100%"] },
-    },
-    content: "none",
-  },
-  {
-    render: ({ block, editor }) => {
-      const videoId = block.props.videoId || "";
-      const url = videoId ? `https://www.youtube.com/embed/${videoId}?rel=0` : block.props.url;
-      const { alignment, width } = block.props;
-      const is_read_only = !editor.isEditable;
-      const justify = alignment === 'left' ? 'flex-start' : (alignment === 'right' ? 'flex-end' : 'center');
-
-      return (
-        <Box className="w-full relative group py-4" style={{ display: 'flex', justifyContent: justify }}>
-          <Box 
-            className="aspect-video relative overflow-hidden rounded-xl shadow-lg border border-white/10"
-            style={{ width: width }}
-          >
-            <iframe
-              src={url}
-              className="absolute inset-0 w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-            
-            {!is_read_only && (
-              <Box className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                <Paper 
-                  withBorder 
-                  shadow="sm" 
-                  radius="md" 
-                  p={4} 
-                  className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md"
-                >
-                  <Group gap={4}>
-                    <Menu shadow="md">
-                      <Menu.Target>
-                        <ActionIcon variant="subtle" size="sm" color="gray">
-                          <IoMenuOutline size={14} />
-                        </ActionIcon>
-                      </Menu.Target>
-                      <Menu.Dropdown>
-                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'left' } })}>Left</Menu.Item>
-                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'center' } })}>Center</Menu.Item>
-                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'right' } })}>Right</Menu.Item>
-                      </Menu.Dropdown>
-                    </Menu>
-
-                    <Menu shadow="md">
-                      <Menu.Target>
-                        <ActionIcon variant="subtle" size="sm" color="gray">
-                          <IoResizeOutline size={14} />
-                        </ActionIcon>
-                      </Menu.Target>
-                      <Menu.Dropdown>
-                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '50%' } })}>50%</Menu.Item>
-                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '70%' } })}>70%</Menu.Item>
-                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '85%' } })}>85%</Menu.Item>
-                        <Menu.Item onClick={() => editor.updateBlock(block, { props: { width: '100%' } })}>Full Width</Menu.Item>
-                      </Menu.Dropdown>
-                    </Menu>
-                  </Group>
-                </Paper>
-              </Box>
-            )}
-          </Box>
-        </Box>
-      );
-    },
-  }
-);
+import { generateId, ensureBlockId, parseContent, handleUrlConversion } from './utils/block-note-utils';
+import { editor_schema as schema } from './utils/editor-schema';
 
 
-/**
- * Custom Audio block specification
- */
-const AudioBlock = createReactBlockSpec(
-  {
-    type: "audio",
-    propSchema: {
-      url: { default: "" },
-      name: { default: "Audio File" },
-      alignment: { default: "center", values: ["left", "center", "right"] },
-    },
-    content: "none",
-  },
-  {
-    render: ({ block, editor }) => {
-      const { alignment, url } = block.props;
-      const is_read_only = !editor.isEditable;
-      const justify = alignment === 'left' ? 'flex-start' : (alignment === 'right' ? 'flex-end' : 'center');
-
-      return (
-        <Box className="py-4 relative group w-full" style={{ display: 'flex', justifyContent: justify }}>
-          <AudioPlayer src={url} class_name="" />
-          
-          {!is_read_only && (
-            <Box className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              <Paper withBorder shadow="sm" radius="md" p={4} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
-                <Menu shadow="md">
-                  <Menu.Target>
-                    <ActionIcon variant="subtle" size="sm" color="gray">
-                      <IoMenuOutline size={14} />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'left' } })}>Left</Menu.Item>
-                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'center' } })}>Center</Menu.Item>
-                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'right' } })}>Right</Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              </Paper>
-            </Box>
-          )}
-        </Box>
-      );
-    }
-  }
-);
-
-/**
- * Custom File block specification
- */
-const FileBlock = createReactBlockSpec(
-  {
-    type: "file",
-    propSchema: {
-      url: { default: "" },
-      name: { default: "Document" },
-      extension: { default: "" },
-      alignment: { default: "center", values: ["left", "center", "right"] },
-    },
-    content: "none",
-  },
-  {
-    render: ({ block, editor }) => {
-      const { url, name, alignment } = block.props;
-      const extension = block.props.extension || url.split('.').pop()?.toUpperCase() || 'FILE';
-      const justify = alignment === 'left' ? 'flex-start' : (alignment === 'right' ? 'flex-end' : 'center');
-      const is_read_only = !editor.isEditable;
-
-      return (
-        <Box className="py-2 relative group w-full" style={{ display: 'flex', justifyContent: justify }}>
-          <Card 
-            component="a"
-            href={url}
-            target="_blank"
-            download
-            withBorder={!is_read_only} 
-            radius="lg" 
-            p="sm" 
-            className={cn(
-                "w-full max-w-md transition-all no-underline text-inherit",
-                is_read_only 
-                    ? "bg-transparent hover:bg-zinc-50 dark:hover:bg-white/5" 
-                    : "bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 border-zinc-200 dark:border-zinc-800"
-            )}
-          >
-            <Group wrap="nowrap" gap="md">
-              <Box className="relative">
-                <Box 
-                  className="w-12 h-14 rounded-lg border flex items-center justify-center relative overflow-hidden text-white border-transparent"
-                  bg="brand"
-                >
-                  <IoFileTrayOutline size={24} />
-                </Box>
-              </Box>
-              
-              <Stack gap={2} className="flex-1 min-w-0">
-                <Text fw={600} size="sm" className="truncate">{name}</Text>
-                <Text size="xs" c="dimmed">{extension} Document</Text>
-              </Stack>
-
-              {!is_read_only && (
-                <ActionIcon 
-                  variant="subtle" 
-                  color="brand"
-                  radius="md"
-                >
-                  <IoDownloadOutline size={20} />
-                </ActionIcon>
-              )}
-            </Group>
-          </Card>
-
-          {!is_read_only && (
-            <Box className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              <Paper withBorder shadow="sm" radius="md" p={4} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
-                <Menu shadow="md">
-                  <Menu.Target>
-                    <ActionIcon variant="subtle" size="sm" color="gray">
-                      <IoMenuOutline size={14} />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'left' } })}>Left</Menu.Item>
-                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'center' } })}>Center</Menu.Item>
-                    <Menu.Item onClick={() => editor.updateBlock(block, { props: { alignment: 'right' } })}>Right</Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
-              </Paper>
-            </Box>
-          )}
-        </Box>
-      )
-    }
-  }
-);
-
-// Create schema with the custom blocks
-
-// Create schema with the custom blocks
-const schema = BlockNoteSchema.create({
-  blockSpecs: {
-    ...defaultBlockSpecs,
-    youtube: YoutubeBlock(),
-    audio: AudioBlock(),
-    file: FileBlock(),
-  },
-});
 
 export interface BlockNoteEditorRef {
   insert_media: (id: string, url: string, type: 'image' | 'video' | 'audio' | 'file') => void;
 }
 
-/**
- * Props for the BlockNoteEditor component
- * @param {string} initial_content - Initial editor content in JSON string format
- * @param {function} on_change - Callback fired when content changes
- * @param {function} on_open_bank - Callback to open the media bank modal
- */
 interface Props {
   initial_content?: string;
   on_change: (content: string) => void;
   on_open_bank: (type: 'image' | 'video' | 'audio' | 'file') => void;
   read_only?: boolean;
 }
-
-const generateId = () => {
-  try {
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-      return crypto.randomUUID();
-    }
-  } catch (e) {}
-  return Math.random().toString(36).substring(2, 11) + Date.now().toString(36).substring(2, 11);
-};
-
-const ensureBlockId = (block: any) => ({
-  ...block,
-  id: block.id || generateId(),
-});
-
-/**
- * Recursively ensures all blocks and their children have valid IDs and types.
- * Also unwraps "material-style" blocks where content is a JSON string of other blocks.
- */
-const normalizeBlocks = (blocks: any[]): any[] => {
-  if (!Array.isArray(blocks)) return [];
-  
-  const result: any[] = [];
-  const generateId = () => {
-    try {
-      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-        return crypto.randomUUID();
-      }
-    } catch (e) {}
-    return Math.random().toString(36).substring(2, 11) + Date.now().toString(36).substring(2, 11);
-  };
-
-  for (const block of blocks) {
-    if (typeof block !== 'object' || block === null || Array.isArray(block)) {
-      result.push({
-        id: generateId(),
-        type: 'paragraph',
-        content: [{ type: 'text', text: String(block || ''), styles: {} }],
-        children: []
-      });
-      continue;
-    }
-
-    // Handle "wrapper" blocks (material-style or generic wrappers)
-    // If it has no type but has content as a JSON string that looks like an array, try to unwrap it
-    if (!block.type && typeof block.content === 'string' && block.content.trim().startsWith('[')) {
-      try {
-        const inner = JSON.parse(block.content);
-        if (Array.isArray(inner)) {
-          result.push(...normalizeBlocks(inner));
-          continue;
-        }
-      } catch (e) {
-        // Not a valid JSON array, treat as regular paragraph
-      }
-    }
-
-    const normalized: any = {
-      id: block.id || generateId(),
-      type: block.type || 'paragraph',
-      props: block.props || {},
-      content: block.content,
-      children: Array.isArray(block.children) ? normalizeBlocks(block.children) : [],
-    };
-
-    if (!normalized.id) {
-      normalized.id = generateId();
-    }
-
-    // Paragraph blocks must have content array
-    if (normalized.type === 'paragraph' && !Array.isArray(normalized.content)) {
-      if (typeof normalized.content === 'string') {
-          normalized.content = [{ type: 'text', text: normalized.content, styles: {} }];
-      } else {
-          normalized.content = [];
-      }
-    }
-
-    result.push(normalized);
-  }
-
-  return result;
-};
-
-/**
- * Robustly parses initial content, handling various data wrappers and structures.
- */
-const parseContent = (initial_content: any) => {
-    if (!initial_content) return undefined;
-
-    try {
-        const parsed = typeof initial_content === 'string'
-            ? JSON.parse(initial_content)
-            : initial_content;
-
-        // Unwrap "main" block wrapper if it exists ([{ id: "main", content: "..." }])
-        // This is a common pattern in the backend where an array of blocks is wrapped in a JSON string
-        if (
-            Array.isArray(parsed) &&
-            parsed.length === 1 &&
-            !parsed[0]?.type &&
-            parsed[0]?.content &&
-            typeof parsed[0].content === 'string' &&
-            parsed[0].content.trim().startsWith('[')
-        ) {
-            try {
-                const inner = JSON.parse(parsed[0].content);
-                if (Array.isArray(inner)) {
-                    return normalizeBlocks(inner);
-                }
-            } catch (e) {
-                // Not a valid JSON array, proceed normally
-            }
-        }
-
-        // Standard case - it's already an array of blocks or a single block
-        const blocksArray = Array.isArray(parsed) ? parsed : [parsed];
-        const normalized = normalizeBlocks(blocksArray);
-        
-        console.log("INITIAL CONTENT (NORMALIZED):", normalized);
-        return normalized.length > 0 ? normalized : undefined;
-    } catch (e) {
-        console.error('Failed to parse BlockNote content:', e, initial_content);
-        // If parsing fails but we have a string, try to wrap it in a paragraph
-        if (typeof initial_content === 'string' && initial_content.trim() !== '') {
-            return [{
-                id: generateId(),
-                type: 'paragraph',
-                content: [{ type: 'text', text: initial_content, styles: {} }],
-                children: []
-            }];
-        }
-        return undefined;
-    }
-};
 
 const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content, on_change, on_open_bank, read_only = false }, ref) => {
   const { colorScheme } = useMantineColorScheme();
@@ -432,203 +37,71 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
 
   const [pickerOpened, setPickerOpened] = useState(false);
   const [pickerType, setPickerType] = useState<'image' | 'video' | 'audio' | 'file' | 'all'>('all');
-
   const [previewOpened, setPreviewOpened] = useState(false);
   const [previewPhoto, setPreviewPhoto] = useState<PhotoMaterialPreview | null>(null);
   const [previewPhotosList, setPreviewPhotosList] = useState<PhotoMaterialPreview[]>([]);
 
   const editor = useCreateBlockNote({
     schema,
-    initialContent: useMemo(() => {
-        return parseContent(initial_content);
-    }, [initial_content]),
+    initialContent: useMemo(() => parseContent(initial_content), [initial_content]),
     dictionary: (locales as any)[locale] || locales.en,
     editable: !read_only,
     uploadFile: async (file: File) => {
       let result;
-      if (file.type.startsWith('image/')) {
-        result = await photoActions.create_photo({ name: file.name, file });
-      } else if (file.type.startsWith('video/')) {
-        result = await videoActions.create_video({ name: file.name, file });
-      } else if (file.type.startsWith('audio/')) {
-        result = await audioActions.create_audio({ name: file.name, file });
-      } else {
-        result = await fileActions.create_file({ name: file.name, file });
-      }
+      if (file.type.startsWith('image/')) result = await photoActions.create_photo({ name: file.name, file });
+      else if (file.type.startsWith('video/')) result = await videoActions.create_video({ name: file.name, file });
+      else if (file.type.startsWith('audio/')) result = await audioActions.create_audio({ name: file.name, file });
+      else result = await fileActions.create_file({ name: file.name, file });
       return (result as any)?.data?.file_url || (result as any)?.file_url || '';
     }
   });
 
-  // Sync editor editability with read_only prop
-  useEffect(() => {
-    editor.isEditable = !read_only;
-  }, [read_only, editor]);
+  useEffect(() => { editor.isEditable = !read_only; }, [read_only, editor]);
 
-  // Handle image clicks in read-only mode
   const handleWrapperClick = (e: React.MouseEvent) => {
     if (!read_only) return;
-
     const target = e.target as HTMLElement;
     const img = target.closest('img');
-    
     if (img && img.closest('.bn-editor')) {
       const url = img.src;
-      
-      // Find all images for gallery in THIS editor
       const allImages: PhotoMaterialPreview[] = [];
       editor.forEachBlock((block) => {
         if (block.type === 'image' && block.props.url) {
-          allImages.push({
-            id: block.id,
-            name: (block.props as any).name || 'Image',
-            file_url: block.props.url
-          });
+          allImages.push({ id: block.id, name: (block.props as any).name || 'Image', file_url: block.props.url });
         }
         return true;
       });
-
-      const currentPhoto = allImages.find(p => p.file_url === url) || {
-        id: Math.random().toString(),
-        name: 'Image',
-        file_url: url
-      };
-
+      const currentPhoto = allImages.find(p => p.file_url === url) || { id: Math.random().toString(), name: 'Image', file_url: url };
       setPreviewPhoto(currentPhoto);
       setPreviewPhotosList(allImages);
       setPreviewOpened(true);
     }
   };
 
-  const open_picker = (type: 'image' | 'video' | 'audio' | 'file') => {
-    setPickerType(type);
-    setPickerOpened(true);
-  };
-
   const handle_selection = (item: { id: string; url: string; name: string; type: 'image' | 'video' | 'audio' | 'file' }) => {
     const selection = editor.getTextCursorPosition();
     const current_block = selection?.block;
-
-    // Determine block type and props
     let block_type: any = item.type;
     let props: any = { id: item.id, url: item.url, name: item.name };
 
     if (item.type === 'video') {
-      const youtube_regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
-      const match = item.url.match(youtube_regex);
-      if (match && match[1]) {
-        block_type = "youtube";
-        props = {
-          url: `https://www.youtube.com/embed/${match[1]}`,
-          videoId: match[1]
-        };
-      }
+      const youtube_match = item.url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+      if (youtube_match) { block_type = "youtube"; props = { url: `https://www.youtube.com/embed/${youtube_match[1]}`, videoId: youtube_match[1] }; }
     }
+    if (item.type === 'file') props.extension = item.url.split('.').pop() || '';
 
-    if (item.type === 'file') {
-        const ext = item.url.split('.').pop() || '';
-        props.extension = ext.toUpperCase();
-    }
-
-    // If current block is an empty paragraph, replace it
     if (current_block && current_block.type === 'paragraph' && (!current_block.content || (Array.isArray(current_block.content) && current_block.content.length === 0))) {
       editor.replaceBlocks([current_block.id], [ensureBlockId({ type: block_type, props: props })]);
     } else {
-      editor.insertBlocks(
-        [ensureBlockId({ type: block_type, props: props })],
-        current_block?.id || editor.document[editor.document.length - 1]?.id,
-        "after"
-      );
+      editor.insertBlocks([ensureBlockId({ type: block_type, props: props })], current_block?.id || editor.document[editor.document.length - 1]?.id, "after");
     }
-    
     setPickerOpened(false);
   };
 
   const handle_editor_change = () => {
     on_change(JSON.stringify(editor.document, null, 2));
-
     if (read_only) return;
-
-    // Automatic conversion of links to media blocks
-    editor.document.forEach(block => {
-      if (block.type === 'paragraph' && block.content && Array.isArray(block.content) && block.content.length === 1) {
-        let text = '';
-        const node = block.content[0];
-        if (node.type === 'text') {
-          text = node.text.trim();
-        } else if (node.type === 'link') {
-          text = node.href.trim();
-        }
-
-        const is_url = /^https?:\/\/\S+$/.test(text);
-
-        if (is_url) {
-          const clean_url = text.split('?')[0].split('#')[0];
-          const is_image = /\.(jpeg|jpg|gif|png|webp|avif|svg)$/i.test(clean_url);
-          const is_video = /\.(mp4|webm|ogg|mov)$/i.test(clean_url);
-          const is_audio = /\.(mp3|wav|ogg|aac|m4a)$/i.test(clean_url);
-          
-          const youtube_match = text.match(
-            /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i
-          );
-
-          let new_block: any = null;
-
-          if (youtube_match) {
-            new_block = {
-              id: generateId(),
-              type: 'youtube',
-              props: { url: text, videoId: youtube_match[1] },
-            };
-          } else if (is_image) {
-            new_block = {
-              id: generateId(),
-              type: 'image',
-              props: { url: text },
-            };
-          } else if (is_video) {
-            new_block = {
-              id: generateId(),
-              type: 'video',
-              props: { url: text },
-            };
-          } else if (is_audio) {
-            new_block = {
-              id: generateId(),
-              type: 'audio',
-              props: { url: text, name: text.split('/').pop() || 'Audio' },
-            };
-          } else {
-            // Check for other common file types
-            const is_file = /\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|7z|txt|json|csv)$/i.test(clean_url);
-            if (is_file) {
-              new_block = {
-                id: generateId(),
-                type: 'file',
-                props: { 
-                  url: text, 
-                  name: text.split('/').pop() || 'Document',
-                  extension: clean_url.split('.').pop()?.toUpperCase() || 'FILE'
-                },
-              };
-            }
-          }
-
-          if (new_block) {
-            const safe_block_id = block.id;
-            const safe_new_block = ensureBlockId(new_block);
-
-            if (safe_block_id) {
-                setTimeout(() => {
-                    const current_block = editor.getBlock(safe_block_id);
-                    if (current_block && current_block.type === 'paragraph') {
-                        editor.replaceBlocks([safe_block_id], [safe_new_block]);
-                    }
-                }, 0);
-            }
-          }
-        }
-      }
-    });
+    handleUrlConversion(editor);
   };
 
   useImperativeHandle(ref, () => ({
@@ -638,131 +111,32 @@ const BlockNoteEditor = forwardRef<BlockNoteEditorRef, Props>(({ initial_content
   }));
 
   const custom_slash_items = useMemo(() => {
-    // List of titles to filter out (native media items)
-    const native_media_titles = [
-      editor.dictionary.slash_menu.image.title,
-      editor.dictionary.slash_menu.video.title,
-      editor.dictionary.slash_menu.audio.title,
-      editor.dictionary.slash_menu.file.title,
-      "Image", "Video", "Audio", "File", "Media"
-    ];
-
-    const base_items = getDefaultReactSlashMenuItems(editor).filter(item => 
-      !native_media_titles.includes(item.title)
-    );
-    
+    const native_media_titles = [editor.dictionary.slash_menu.image.title, editor.dictionary.slash_menu.video.title, editor.dictionary.slash_menu.audio.title, editor.dictionary.slash_menu.file.title, "Image", "Video", "Audio", "File", "Media"];
+    const base_items = getDefaultReactSlashMenuItems(editor).filter(item => !native_media_titles.includes(item.title));
     const bank_items = [
-      {
-        title: t('photo_from_bank'),
-        subtext: t('photo_from_bank_subtext'),
-        onItemClick: () => open_picker('image'),
-        group: t('library'),
-        icon: <IoImageOutline size={18} />,
-      },
-      {
-        title: t('video_from_bank'),
-        subtext: t('video_from_bank_subtext'),
-        onItemClick: () => open_picker('video'),
-        group: t('library'),
-        icon: <IoVideocamOutline size={18} />,
-      },
-      {
-        title: t('audio_from_bank'),
-        subtext: t('audio_from_bank_subtext'),
-        onItemClick: () => open_picker('audio'),
-        group: t('library'),
-        icon: <IoMusicalNotesOutline size={18} />,
-      },
-      {
-        title: t('file_from_bank'),
-        subtext: t('file_from_bank_subtext'),
-        onItemClick: () => open_picker('file'),
-        group: t('library'),
-        icon: <IoDocumentOutline size={18} />,
-      },
+      { title: t('photo_from_bank'), subtext: t('photo_from_bank_subtext'), onItemClick: () => { setPickerType('image'); setPickerOpened(true); }, group: t('library'), icon: <IoImageOutline size={18} /> },
+      { title: t('video_from_bank'), subtext: t('video_from_bank_subtext'), onItemClick: () => { setPickerType('video'); setPickerOpened(true); }, group: t('library'), icon: <IoVideocamOutline size={18} /> },
+      { title: t('audio_from_bank'), subtext: t('audio_from_bank_subtext'), onItemClick: () => { setPickerType('audio'); setPickerOpened(true); }, group: t('library'), icon: <IoMusicalNotesOutline size={18} /> },
+      { title: t('file_from_bank'), subtext: t('file_from_bank_subtext'), onItemClick: () => { setPickerType('file'); setPickerOpened(true); }, group: t('library'), icon: <IoDocumentOutline size={18} /> },
     ];
-
     return [...bank_items, ...base_items];
   }, [editor, t]);
 
   return (
-    <div 
-      className={`block-note-wrapper ${read_only ? 'is-read-only' : ''}`}
-      onClick={handleWrapperClick}
-    >
-      <BlockNoteView
-        editor={editor}
-        theme={colorScheme === 'dark' ? 'dark' : 'light'}
-        onChange={handle_editor_change}
-        slashMenu={false}
-        formattingToolbar={false}
-        data-test="block-note-editor"
-      >
-        <FormattingToolbarController
-          formattingToolbar={() => (
-        <FormattingToolbar>
-          <BlockTypeSelect />
-          
-          <BasicTextStyleButton basicTextStyle="bold" />
-          <BasicTextStyleButton basicTextStyle="italic" />
-          <BasicTextStyleButton basicTextStyle="underline" />
-          <BasicTextStyleButton basicTextStyle="strike" />
-          <BasicTextStyleButton basicTextStyle="code" />
-
-          <TextAlignButton textAlignment="left" />
-          <TextAlignButton textAlignment="center" />
-          <TextAlignButton textAlignment="right" />
-
-          <ColorStyleButton />
-
-          <NestBlockButton />
-          <UnnestBlockButton />
-
-          <CreateLinkButton />
-        </FormattingToolbar>
-          )}
-        />
-        <SuggestionMenuController
-          triggerCharacter={'/'}
-          getItems={async (query) =>
-            custom_slash_items.filter((item: any) =>
-              item.title.toLowerCase().includes(query.toLowerCase())
-            )
-          }
-        />
+    <div className={`block-note-wrapper ${read_only ? 'is-read-only' : ''}`} onClick={handleWrapperClick}>
+      <BlockNoteView editor={editor} theme={colorScheme === 'dark' ? 'dark' : 'light'} onChange={handle_editor_change} slashMenu={false} formattingToolbar={false}>
+        <FormattingToolbarController formattingToolbar={() => (
+          <FormattingToolbar>
+            <BlockTypeSelect /><BasicTextStyleButton basicTextStyle="bold" /><BasicTextStyleButton basicTextStyle="italic" /><BasicTextStyleButton basicTextStyle="underline" /><BasicTextStyleButton basicTextStyle="strike" /><BasicTextStyleButton basicTextStyle="code" /><TextAlignButton textAlignment="left" /><TextAlignButton textAlignment="center" /><TextAlignButton textAlignment="right" /><ColorStyleButton /><NestBlockButton /><UnnestBlockButton /><CreateLinkButton />
+          </FormattingToolbar>
+        )} />
+        <SuggestionMenuController triggerCharacter={'/'} getItems={async (query) => custom_slash_items.filter((item: any) => item.title.toLowerCase().includes(query.toLowerCase()))} />
       </BlockNoteView>
-
-      <MediaPickerModal
-        opened={pickerOpened}
-        onClose={() => setPickerOpened(false)}
-        onSelect={handle_selection}
-        type={pickerType}
-      />
-
-      <PhotoPreviewModal
-        opened={previewOpened}
-        onClose={() => setPreviewOpened(false)}
-        photo={previewPhoto}
-        photos={previewPhotosList}
-        onPhotoChange={setPreviewPhoto}
-      />
-
-      <style jsx global>{`
-        /* Keep only alignment handlers */
-        .block-note-wrapper.is-read-only .bn-visual-editor {
-          cursor: default;
-        }
-        .block-note-wrapper.is-read-only .bn-editor img {
-          cursor: pointer;
-        }
-        .bn-file-block-content-wrapper {
-          outline: none !important;
-        }
-      `}</style>
+      <MediaPickerModal opened={pickerOpened} onClose={() => setPickerOpened(false)} onSelect={handle_selection} type={pickerType} />
+      <PhotoPreviewModal opened={previewOpened} onClose={() => setPreviewOpened(false)} photo={previewPhoto} photos={previewPhotosList} onPhotoChange={setPreviewPhoto} />
     </div>
   );
 });
 
 BlockNoteEditor.displayName = 'BlockNoteEditor';
-
 export default BlockNoteEditor;

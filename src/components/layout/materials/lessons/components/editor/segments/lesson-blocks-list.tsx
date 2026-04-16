@@ -17,12 +17,13 @@ interface LessonBlocksListProps {
     onCheckedChange: (id: string, checked: boolean) => void;
     onAddBlock: () => void;
     editorRefs: React.MutableRefObject<Record<string, any>>;
+    set_is_dragging_block: (dragging: boolean) => void;
     t: (key: string) => string;
 }
 
 export function LessonBlocksList({
     blocks, readOnly, is_access_mode, accessible_block_ids, onBlockChange, 
-    onBlockRemove, onOpenBank, onMove, onCheckedChange, onAddBlock, editorRefs, t
+    onBlockRemove, onOpenBank, onMove, onCheckedChange, onAddBlock, editorRefs, set_is_dragging_block, t
 }: LessonBlocksListProps) {
     return (
         <Stack gap="md">
@@ -42,6 +43,7 @@ export function LessonBlocksList({
                         is_access_mode={is_access_mode}
                         is_checked={accessible_block_ids.includes(block.id)}
                         on_checked_change={(checked) => onCheckedChange(block.id, checked)}
+                        set_is_dragging_block={set_is_dragging_block}
                         ref={(el) => { editorRefs.current[block.id] = el; }}
                     />
                 ))}

@@ -13,10 +13,10 @@ import { useAuth } from '@/hooks/use-auth';
 interface Props {
   data: LessonMaterial[];
   selected_ids: string[];
+  is_loading?: boolean;
   on_selection_change: (ids: string[]) => void;
   on_delete: (id: string) => void;
   on_grant_access: (id: string) => void;
-  is_loading?: boolean;
 }
 
 export function LessonTable({ data, selected_ids, on_selection_change, on_delete, on_grant_access, is_loading }: Props) {
@@ -123,7 +123,7 @@ export function LessonTable({ data, selected_ids, on_selection_change, on_delete
                   <Group gap="sm" wrap="nowrap">
                     <IoBookOutline 
                       size={20} 
-                      className="text-primary"
+                      className="text-secondary"
                     />
                     <Link 
                       href={`/main/materials/lessons/${item.id}`}

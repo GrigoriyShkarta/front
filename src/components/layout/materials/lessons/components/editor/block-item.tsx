@@ -1,10 +1,11 @@
 'use client';
 
 import { forwardRef, useState } from 'react';
-import { Paper, Group, ActionIcon, Box, Tooltip, Text, Checkbox } from '@mantine/core';
-import { IoReorderThree, IoTrashOutline} from 'react-icons/io5';
+import { Paper, Group } from '@mantine/core';
 import { useTranslations } from 'next-intl';
-import BlockNoteEditor, { BlockNoteEditorRef } from './block-note';
+import { BlockNoteEditorRef } from './block-note';
+import { BlockItemControls } from './components/block-item-controls';
+import { BlockItemContent } from './components/block-item-content';
 
 interface Props {
   id: string;
@@ -19,21 +20,17 @@ interface Props {
   is_access_mode?: boolean;
   is_checked?: boolean;
   on_checked_change?: (checked: boolean) => void;
+  set_is_dragging_block: (dragging: boolean) => void;
 }
 
+/**
+ * Main component representing a single lesson block.
+ * Handles drag and drop logic and layout.
+ */
 const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({ 
-  id, 
-  index, 
-  content, 
-  on_change, 
-  on_remove, 
-  on_open_bank, 
-  on_move, 
-  show_remove = true, 
-  read_only = false,
-  is_access_mode = false,
-  is_checked = false,
-  on_checked_change
+  id, index, content, on_change, on_remove, on_open_bank, on_move, 
+  show_remove = true, read_only = false, is_access_mode = false,
+  is_checked = false, on_checked_change, set_is_dragging_block
 }, ref) => {
   const t = useTranslations('Materials.lessons');
   const [isDragging, setIsDragging] = useState(false);
@@ -48,11 +45,13 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
     e.dataTransfer.setData('text/plain', index.toString());
     e.dataTransfer.effectAllowed = 'move';
     setIsDragging(true);
+    set_is_dragging_block(true);
   };
 
   const handleDragEnd = () => {
     setIsDragging(false);
     setCanDrag(false);
+    set_is_dragging_block(false);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -69,13 +68,13 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
       on_move(fromIndex, index);
     }
     setCanDrag(false);
+    set_is_dragging_block(false);
   };
 
   return (
     <Paper 
       withBorder={!read_only}
       radius="md" 
-      p={0} 
       draggable={canDrag && !read_only}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
@@ -94,68 +93,16 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
       }}
     >
       <Group gap={0} align="stretch" mih="auto">
-        {is_access_mode && (
-          <Box p="md">
-            <Checkbox 
-              checked={is_checked} 
-              onChange={(e) => on_checked_change?.(e.currentTarget.checked)}
-              size="md"
-            />
-          </Box>
-        )}
-
-        {!read_only && !is_access_mode && (
-          <Box
-            p="4px"
-            className="drag-handle cursor-grab" 
-            onMouseDown={() => setCanDrag(true)}
-            onMouseUp={() => setCanDrag(false)}
-            onMouseLeave={() => !isDragging && setCanDrag(false)}
-          >
-            <IoReorderThree size={18} color="var(--mantine-color-gray-6)" />
-          </Box>
-        )}
-
-        <Box style={{ flex: 1, position: 'relative' }}>
-          {!read_only && (
-            <Group 
-              justify="flex-end" 
-              p="xs" 
-              style={{ 
-                position: 'absolute', 
-                top: 0, 
-                right: 0, 
-                zIndex: 10,
-                pointerEvents: 'none' 
-              }}
-            >
-              <Group gap="xs" style={{ pointerEvents: 'all' }}>
-                {show_remove && (
-                  <Tooltip label={t('delete_block')}>
-                    <ActionIcon 
-                      variant="subtle" 
-                      color="red" 
-                      onClick={on_remove}
-                      radius="md"
-                    >
-                      <IoTrashOutline size={16} />
-                    </ActionIcon>
-                  </Tooltip>
-                )}
-              </Group>
-            </Group>
-          )}
-
-          <div onDragStart={(e) => e.stopPropagation()}>
-            <BlockNoteEditor 
-              ref={ref}
-              initial_content={content}
-              on_change={on_change}
-              on_open_bank={on_open_bank}
-              read_only={read_only}
-            />
-          </div>
-        </Box>
+        <BlockItemControls 
+          id={id} read_only={read_only} is_access_mode={is_access_mode} 
+          is_checked={is_checked} show_remove={show_remove} 
+          on_remove={on_remove} on_checked_change={on_checked_change || (() => {})} 
+          setCanDrag={setCanDrag} isDragging={isDragging} t={t}
+        />
+        <BlockItemContent 
+          ref={ref} content={content} on_change={on_change} 
+          on_open_bank={on_open_bank} read_only={read_only} 
+        />
       </Group>
 
       <style jsx global>{`

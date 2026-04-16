@@ -23,13 +23,12 @@ interface Props {
 export function FileTable({ 
     data, 
     selected_ids, 
+    is_picker = false,
     on_selection_change, 
     on_edit, 
     on_delete, 
     on_grant_access,
     on_select, 
-    is_loading,
-    is_picker = false
 }: Props) {
   const t = useTranslations('Materials.file.table');
   const tAccess = useTranslations('Materials.access');
@@ -164,7 +163,7 @@ export function FileTable({
                 <Group gap="sm" wrap="nowrap">
                    <IoDocumentOutline 
                     size={20} 
-                    className="text-primary"
+                    className="text-secondary"
                    />
                    <Anchor 
                     href={item.file_url} 

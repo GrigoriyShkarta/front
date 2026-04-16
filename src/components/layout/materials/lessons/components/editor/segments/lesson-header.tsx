@@ -62,7 +62,7 @@ export function LessonHeader({
             ) : (
                 <Group gap="sm">
                     <Button 
-                        variant="light" color="gray" 
+                        color="gray" 
                         leftSection={<IoOptionsOutline size={18} />}
                         onClick={onToggleAdditional}
                         radius="md"
