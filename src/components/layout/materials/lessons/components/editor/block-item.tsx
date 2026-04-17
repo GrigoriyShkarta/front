@@ -11,14 +11,14 @@ interface Props {
   id: string;
   index: number;
   content: string;
-  on_change: (content: string) => void;
-  on_remove: () => void;
-  on_open_bank: (type: 'image' | 'video' | 'audio' | 'file') => void;
-  on_move: (from: number, to: number) => void;
   show_remove?: boolean;
   read_only?: boolean;
   is_access_mode?: boolean;
   is_checked?: boolean;
+  on_change: (content: string) => void;
+  on_remove: () => void;
+  on_open_bank: (type: 'image' | 'video' | 'audio' | 'file') => void;
+  on_move: (from: number, to: number) => void;
   on_checked_change?: (checked: boolean) => void;
   set_is_dragging_block: (dragging: boolean) => void;
 }

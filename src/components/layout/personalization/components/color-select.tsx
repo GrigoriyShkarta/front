@@ -16,8 +16,6 @@ import {
   Stack, 
   ActionIcon,
   Slider,
-  Select,
-  TextInput
 } from '@mantine/core';
 import { cn } from '@/lib/utils';
 import type { ColorOption, SolidColorOption, GradientOption } from '@/lib/constants';
@@ -156,10 +154,11 @@ export function ColorSelect({
             <Popover.Target>
               <Button 
                 variant="subtle" 
+                color="gray"
                 size="compact-xs" 
                 leftSection={<IoColorPaletteOutline />}
                 rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-accent)' }} />}
-                style={{ color: 'var(--space-accent)' }}
+                c="var(--mantine-color-text)"
               >
                 {t('custom_color')}
               </Button>
@@ -239,14 +238,14 @@ export function ColorSelect({
             <Popover position="bottom" withArrow shadow="md" width={320}>
               <Popover.Target>
                 <Button 
-                    variant="subtle" 
-                    size="compact-xs" 
-                    leftSection={<IoSparklesOutline />}
-                    rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-accent)' }} />}
-                    style={{ color: 'var(--space-accent)' }}
+                  variant="subtle" 
+                  size="compact-xs" 
+                  leftSection={<IoColorPaletteOutline />}
+                  rightSection={!is_premium && <IoDiamondOutline size={10} style={{ color: 'var(--space-accent)' }} />}
+                  style={{ color: 'var(--space-accent)' }}
                 >
-                  {t('build_gradient')}
-                </Button>
+                {t('custom_color')}
+              </Button>
               </Popover.Target>
               <Popover.Dropdown p="md">
                  <Stack gap="sm">

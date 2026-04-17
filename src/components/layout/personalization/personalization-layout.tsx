@@ -21,7 +21,7 @@ export default function PersonalizationLayout() {
   ));
 
   return (
-    <PageContainer size="md">
+    <PageContainer size="lg">
       <Box mb="xl">
         <Breadcrumbs mb="xs" separator="→">{items}</Breadcrumbs>
         <Group justify="space-between" align="flex-start">

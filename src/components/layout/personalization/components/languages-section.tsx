@@ -35,7 +35,7 @@ export function PersonalizationLanguagesSection({ form }: Props) {
     >
       <Stack gap="lg">
         <Box>
-          <Title order={4} mb={4} className="text-secondary">
+          <Title order={4} mb={4}>
             {t('languages_title')}
           </Title>
           <Text size="sm" color="dimmed" mb="md">

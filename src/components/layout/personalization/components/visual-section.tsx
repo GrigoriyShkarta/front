@@ -11,7 +11,7 @@ import {
   Group,
   Switch,
   Collapse,
-  Slider
+  Divider
 } from '@mantine/core';
 import { ColorSelect } from './color-select';
 import { 
@@ -27,7 +27,7 @@ import {
 } from '@/lib/constants';
 import { Controller, UseFormReturn, useWatch } from 'react-hook-form';
 import { PersonalizationFormData } from '@/schemas/personalization';
-import { IoDiamondOutline } from 'react-icons/io5';
+import { IoDiamondOutline, IoColorFilterOutline, IoInvertModeOutline } from 'react-icons/io5';
 
 interface Props {
   form: UseFormReturn<PersonalizationFormData>;
@@ -36,7 +36,7 @@ interface Props {
 
 export function PersonalizationVisualSection({ form, is_premium }: Props) {
   const t = useTranslations('Personalization');
-  const { control, watch, register } = form;
+  const { control } = form;
   const watched_select_mode = useWatch({
     control,
     name: 'select_mode'
@@ -60,12 +60,15 @@ export function PersonalizationVisualSection({ form, is_premium }: Props) {
         backgroundColor: 'var(--space-card-bg)' 
       }}
     >
-      <Stack gap="lg">
+      <Stack gap="xl">
         <Group justify="space-between">
           <Box>
-            <Title order={4} mb={4} className="text-secondary">
-              {t('visual_style_title')}
-            </Title>
+            <Group gap="xs" mb={4}>
+              <Title order={4}>
+                {t('visual_style_title')}
+              </Title>
+              {!is_premium && <IoDiamondOutline size={14} style={{ color: 'var(--space-primary)' }} />}
+            </Group>
             <Text size="sm" color="dimmed">
               {t('visual_style_description')}
             </Text>
@@ -83,173 +86,149 @@ export function PersonalizationVisualSection({ form, is_premium }: Props) {
           )}
         </Group>
 
-        <Controller
-          name="primary_color"
-          control={control}
-          render={({ field }) => (
-            <ColorSelect
-              label={t('primary_color_label')}
-              options={primary_options}
-              value={field.value}
-              onChange={field.onChange}
-              solid_label={t('solid_colors')}
-              gradients_label={t('gradients')}
-              is_premium={is_premium}
-              type="primary"
-            />
-          )}
-        />
-
-        <Controller
-          name="accent_color"
-          control={control}
-          render={({ field }) => (
-            <ColorSelect
-              label={t('accent_color_label')}
-              description={t('accent_color_description')}
-              options={accent_options}
-              value={field.value}
-              onChange={field.onChange}
-              solid_label={t('solid_colors')}
-              gradients_label={t('gradients')}
-              show_gradients={true}
-              is_premium={is_premium}
-              type="primary"
-            />
-          )}
-        />
-
-        <Controller
-          name="is_white_sidebar_color"
-          control={control}
-          render={({ field }) => (
-            <Switch
-              label={<Text size="sm" className="leading-none">{t('sidebar_text_color_label')}</Text>}
-              onLabel={t('sidebar_color_white')}
-              offLabel={t('sidebar_color_black')}
-              styles={{ 
-                body: { alignItems: 'center' },
-                label: { paddingTop: 0 }
-              }}
-              checked={field.value}
-              onChange={field.onChange}
-              size="lg"
-              className="mt-4"
-            />
-          )}
-        />
-
-        <Box>
-          <Text size="sm" fw={500} mb={8}>
-            {t('sidebar_width_label') || 'Sidebar Width'} ({watch('sidebar_width')}px)
-          </Text>
-          <Controller
-            name="sidebar_width"
-            control={control}
-            render={({ field }) => (
-              <Slider
-                {...field}
-                min={200}
-                max={300}
-                step={10}
-                label={(val) => `${val}px`}
-                marks={[
-                  { value: 200, label: '200px' },
-                  { value: 250, label: '250px' },
-                  { value: 300, label: '300px' },
-                ]}
-                styles={{
-                  markLabel: { fontSize: '10px' },
-                  bar: { backgroundColor: watch('accent_color') },
-                  thumb: { 
-                    borderColor: watch('accent_color'),
-                    backgroundColor: 'var(--mantine-color-white)' 
-                  }
-                }}
+        <Stack gap="lg">
+          <Box>
+            <Group gap="xs" mb="xs">
+              <IoColorFilterOutline size={18} className="text-primary" />
+              <Text fw={600} size="sm">{t('branding_colors') || 'Branding Colors'}</Text>
+            </Group>
+            
+            <Stack gap="md" pl={4}>
+              <Controller
+                name="primary_color"
+                control={control}
+                render={({ field }) => (
+                  <ColorSelect
+                    label={t('primary_color_label')}
+                    description={t('primary_color_description') || 'Main color for sidebar and key elements'}
+                    options={primary_options}
+                    value={field.value}
+                    onChange={field.onChange}
+                    solid_label={t('solid_colors')}
+                    gradients_label={t('gradients')}
+                    is_premium={is_premium}
+                    type="primary"
+                  />
+                )}
               />
-            )}
-          />
-        </Box>
 
-        <Controller
-          name="secondary_color"
-          control={control}
-          render={({ field }) => (
-            <ColorSelect
-              label={t('secondary_color_label') || 'Secondary Color'}
-              options={secondary_options}
-              value={field.value}
-              onChange={field.onChange}
-              show_gradients={false}
-              solid_label={t('solid_colors')}
-              is_premium={is_premium}
-              type="secondary"
-            />
-          )}
-        />
+              <Divider variant="dashed" />
 
-        <Controller
-          name="bg_color"
-          control={control}
-          render={({ field }) => (
-            <ColorSelect
-              label={t('bg_color_label') || 'Background Color'}
-              options={bg_light_options}
-              value={field.value}
-              onChange={field.onChange}
-              solid_label={t('solid_colors')}
-              gradients_label={t('gradients')}
-              show_gradients={true}
-              is_premium={is_premium}
-              type="background"
-            />
-          )}
-        />
+              <Controller
+                name="accent_color"
+                control={control}
+                render={({ field }) => (
+                  <ColorSelect
+                    label={t('accent_color_label')}
+                    description={t('accent_color_description')}
+                    options={accent_options}
+                    value={field.value}
+                    onChange={field.onChange}
+                    solid_label={t('solid_colors')}
+                    gradients_label={t('gradients')}
+                    show_gradients={true}
+                    is_premium={is_premium}
+                    type="primary"
+                  />
+                )}
+              />
 
-        <Controller
-          name="select_mode"
-          control={control}
-          render={({ field }) => (
-            <Switch
-              label={
-                <Stack gap={2}>
-                  <Text size="sm" fw={500} className="leading-none">{t('dark_theme_label')}</Text>
-                  <Text size="xs" c="dimmed">{t('dark_theme_description')}</Text>
-                </Stack>
-              }
-              styles={{ 
-                body: { alignItems: 'center' },
-                label: { paddingTop: 0 }
-              }}
-              checked={!!field.value}
-              onChange={(event) => field.onChange(event.currentTarget.checked)}
-              size="lg"
-              className="mt-4"
-            />
-          )}
-        />
+              <Divider variant="dashed" />
 
-        <Collapse in={!!watched_select_mode}>
-          <Box pt="md">
-            <Controller
-              name="bg_color_dark"
-              control={control}
-              render={({ field }) => (
-                <ColorSelect
-                  label={t('bg_color_dark_label')}
-                  options={bg_dark_options}
-                  value={field.value}
-                  onChange={field.onChange}
-                  solid_label={t('solid_colors')}
-                  gradients_label={t('gradients')}
-                  show_gradients={true}
-                  is_premium={is_premium}
-                  type="background"
-                />
-              )}
-            />
+              <Controller
+                name="secondary_color"
+                control={control}
+                render={({ field }) => (
+                  <ColorSelect
+                    label={t('secondary_color_label') || 'Secondary Color'}
+                    description={t('secondary_color_description') || 'Used for borders, card backgrounds and subtle accents'}
+                    options={secondary_options}
+                    value={field.value}
+                    onChange={field.onChange}
+                    show_gradients={false}
+                    solid_label={t('solid_colors')}
+                    is_premium={is_premium}
+                    type="secondary"
+                  />
+                )}
+              />
+            </Stack>
           </Box>
-        </Collapse>
+
+          <Divider />
+
+          <Box>
+            <Group gap="xs" mb="md">
+              <IoInvertModeOutline size={18} className="text-primary" />
+              <Text fw={600} size="sm">{t('background_settings') || 'Background & Theme'}</Text>
+            </Group>
+
+            <Stack gap="md" pl={4}>
+              <Controller
+                name="bg_color"
+                control={control}
+                render={({ field }) => (
+                  <ColorSelect
+                    label={t('bg_color_label') || 'Light Mode Background'}
+                    options={bg_light_options}
+                    value={field.value}
+                    onChange={field.onChange}
+                    solid_label={t('solid_colors')}
+                    gradients_label={t('gradients')}
+                    show_gradients={true}
+                    is_premium={is_premium}
+                    type="background"
+                  />
+                )}
+              />
+
+              <Controller
+                name="select_mode"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    label={
+                      <Stack gap={2}>
+                        <Text size="sm" fw={500} className="leading-none">{t('dark_theme_label')}</Text>
+                        <Text size="xs" c="dimmed">{t('dark_theme_description')}</Text>
+                      </Stack>
+                    }
+                    styles={{ 
+                      body: { alignItems: 'flex-start' },
+                      label: { paddingTop: 0, paddingLeft: 12 }
+                    }}
+                    checked={!!field.value}
+                    onChange={(event) => field.onChange(event.currentTarget.checked)}
+                    size="lg"
+                    className="mt-2"
+                  />
+                )}
+              />
+
+              <Collapse in={!!watched_select_mode}>
+                <Box pt="sm">
+                  <Controller
+                    name="bg_color_dark"
+                    control={control}
+                    render={({ field }) => (
+                      <ColorSelect
+                        label={t('bg_color_dark_label')}
+                        options={bg_dark_options}
+                        value={field.value}
+                        onChange={field.onChange}
+                        solid_label={t('solid_colors')}
+                        gradients_label={t('gradients')}
+                        show_gradients={true}
+                        is_premium={is_premium}
+                        type="background"
+                      />
+                    )}
+                  />
+                </Box>
+              </Collapse>
+            </Stack>
+          </Box>
+        </Stack>
       </Stack>
     </Paper>
   );

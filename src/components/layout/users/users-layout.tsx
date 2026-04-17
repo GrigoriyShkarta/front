@@ -141,6 +141,8 @@ export function UsersLayout() {
     close_bulk_delete();
   };
 
+  const has_data = users.length > 0;
+
   return (
     <Stack gap="lg">
       <Stack gap="lg">
@@ -217,23 +219,46 @@ export function UsersLayout() {
         {is_loading && <Box mih="calc(100vh - 400px)" />}
         
         {!is_loading && (
-          <UserTable 
-            users={users}
-            meta={meta}
-            page={page}
-            limit={limit}
-            current_user={current_user}
-            selected_users={selected_users}
-            on_page_change={set_page}
-            on_limit_change={handle_limit_change}
-            on_select={handle_select}
-            on_select_all={handle_select_all}
-            on_edit={handle_edit_user}
-            on_delete={handle_delete_click}
-            sort_by={sort_by}
-            sort_order={sort_order}
-            on_sort={handle_sort}
-          />
+          has_data ? (
+            <UserTable 
+              users={users}
+              meta={meta}
+              page={page}
+              limit={limit}
+              current_user={current_user}
+              selected_users={selected_users}
+              on_page_change={set_page}
+              on_limit_change={handle_limit_change}
+              on_select={handle_select}
+              on_select_all={handle_select_all}
+              on_edit={handle_edit_user}
+              on_delete={handle_delete_click}
+              sort_by={sort_by}
+              sort_order={sort_order}
+              on_sort={handle_sort}
+            />
+          ) : (
+            <Stack align="center" gap="md" py={60}>
+              <Box 
+                className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
+                style={{ 
+                  backgroundColor: 'var(--mantine-primary-color-light)',
+                  color: 'var(--mantine-primary-color-filled)',
+                  border: '1px solid var(--mantine-primary-color-light-hover)',
+                  boxShadow: '0 0 20px rgba(var(--mantine-primary-color-filled-rgb), 0.15)'
+                }}
+              >
+                <IoPeopleOutline size={40} />
+              </Box>
+              <Text fw={500} size="lg">{t('empty_title') || common_t('no_data')}</Text>
+              <Text c="dimmed" size="sm" ta="center" maw={400}>
+                {t('empty_description') || 'No users found'}
+              </Text>
+              <Button variant="light" mt="sm" onClick={handle_add_user} className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors">
+                {t('add_button')}
+              </Button>
+            </Stack>
+          )
         )}
       </Paper>
 

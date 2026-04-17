@@ -107,7 +107,7 @@ export const ACCENT_COLORS: SolidColorOption[] = Object.keys(PALETTE_ACCENT).map
   id: PALETTE_ACCENT[id as keyof typeof PALETTE_ACCENT],
   hex: PALETTE_ACCENT[id as keyof typeof PALETTE_ACCENT],
   type: 'solid' as const,
-  is_premium: index >= 5 // First 5 are free
+  is_premium: index >= 7 // First 7 are free (matches Classic primary colors)
 }));
 
 export const ACCENT_GRADIENTS: GradientOption[] = Object.keys(PALETTE_ACCENT_GRADIENTS).map(id => ({

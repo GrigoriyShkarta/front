@@ -75,7 +75,7 @@ export function PersonalizationDetailsSection({ form, initial_icon, is_premium }
     >
       <Stack gap="lg">
         <Box>
-          <Title order={4} mb={4} className="text-secondary">
+          <Title order={4} mb={4}>
             {t('space_details_title')}
           </Title>
           <Text size="sm" color="dimmed" mb="md">
