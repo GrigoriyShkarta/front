@@ -220,25 +220,24 @@ export function WeekView({ current_date, events, on_event_click, on_navigate, on
                     );
                   });
                 })()}
+
+                {/* Current time indicator line */}
+                {d.isSame(dayjs(), 'day') && (
+                  <Box
+                    className="absolute left-0 right-0 z-20 pointer-events-none"
+                    style={{
+                      top: `${now.hour() * 60 + now.minute()}px`,
+                    }}
+                  >
+                    <Box className="flex items-center relative">
+                      <Box className="w-2 h-2 rounded-full bg-red-500 absolute -left-1" />
+                      <Box className="h-[2px] bg-red-500 w-full shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                    </Box>
+                  </Box>
+                )}
               </Box>
             ))}
           </SimpleGrid>
-
-          {/* Current time indicator line */}
-          {is_this_week && (
-            <Box
-              className="absolute left-0 right-0 z-20 pointer-events-none"
-              style={{
-                top: `${now.hour() * 60 + now.minute()}px`,
-              }}
-            >
-              <Box className="flex items-center">
-                {/* Time dot indicator (optional, but looks good) */}
-                <Box className="w-2 h-2 rounded-full bg-red-500 absolute -left-1" />
-                <Box className="h-[2px] bg-red-500 w-full shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-              </Box>
-            </Box>
-          )}
         </Box>
       </ScrollArea>
     </Paper>

@@ -355,6 +355,8 @@
       "speaker": "Speaker",
       "settings_saved": "Settings updated",
       "success_title": "Success",
+      "lesson_ends_soon": "Lesson will end in {minutes} minutes",
+      "lesson_ends_timer": "Remaining: {time}",
       "recording_started": "Lesson recording started",
       "recording_stopped": "Lesson recording stopped",
       "recording_failed": "Failed to start recording",
@@ -1458,7 +1460,7 @@
   },
   "Categories": {
     "title": "Categories",
-    "subtitle": "Create and manage categories to organize your educational materials.",
+    "subtitle": "Create and manage categories to organize your data.",
     "add_category": "Add Category",
     "edit_category": "Edit Category",
     "delete_category": "Delete Category",

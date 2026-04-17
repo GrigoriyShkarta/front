@@ -6,8 +6,9 @@ import { Box, Group, Text, Button, Paper, Transition, ActionIcon } from '@mantin
 import { IoVideocamOutline, IoCloseOutline, IoArrowForwardOutline } from 'react-icons/io5';
 import { useUpcomingLesson } from '@/hooks/use-upcoming-lesson';
 import { useAuth } from '@/hooks/use-auth';
-import { Link } from '@/i18n/routing';
+import { Link, usePathname } from '@/i18n/routing';
 import { useState, useEffect } from 'react';
+import { useActiveCall } from '@/context/active-call-context';
 import { cn } from '@/lib/utils';
 import { is_lesson_event } from '../layout/calendar/schemas/event-schema';
 
@@ -17,18 +18,30 @@ import { is_lesson_event } from '../layout/calendar/schemas/event-schema';
  */
 export function LessonReminder() {
   const t = useTranslations('Calendar.reminder');
+  const pathname = usePathname();
   const { user } = useAuth();
   const { lesson } = useUpcomingLesson();
+  const { activeCall } = useActiveCall();
   const [visible, set_visible] = useState(false);
   const [closed_id, set_closed_id] = useState<string | null>(null);
+  const [clicked_id, set_clicked_id] = useState<string | null>(null);
 
   useEffect(() => {
-    if (lesson && lesson.id !== closed_id) {
+    if (!lesson) {
+      set_visible(false);
+      return;
+    }
+
+    const is_on_lesson_page = pathname?.includes(`/main/lesson/${lesson.id}`);
+    const is_already_in_call = activeCall?.id === lesson.id;
+    const is_manually_closed = lesson.id === closed_id;
+
+    if (!is_on_lesson_page && !is_already_in_call && !is_manually_closed) {
       set_visible(true);
     } else {
       set_visible(false);
     }
-  }, [lesson, closed_id]);
+  }, [lesson, closed_id, pathname, activeCall?.id]);
 
   if (!lesson || !is_lesson_event(lesson)) return null;
 
@@ -97,21 +110,24 @@ export function LessonReminder() {
               </Group>
 
               <Group gap="xs">
-                <Button 
-                  component={Link}
-                  href={`/main/lesson/${lesson.id}`}
-                  size="md"
-                  radius="md"
-                  variant="white"
-                  style={{ 
-                    backgroundColor: 'var(--space-primary-text)', 
-                    color: 'var(--space-primary)' 
-                  }}
-                  className="shadow-lg px-6 font-bold transition-all hover:scale-105 active:scale-95"
-                  rightSection={<IoArrowForwardOutline size={18} />}
-                >
-                  {t('join_button')}
-                </Button>
+                {clicked_id !== lesson.id && (
+                  <Button 
+                    component={Link}
+                    href={`/main/lesson/${lesson.id}`}
+                    onClick={() => set_clicked_id(lesson.id)}
+                    size="md"
+                    radius="md"
+                    variant="white"
+                    style={{ 
+                      backgroundColor: 'var(--space-primary-text)', 
+                      color: 'var(--space-primary)' 
+                    }}
+                    className="shadow-lg px-6 font-bold transition-all hover:scale-105 active:scale-95"
+                    rightSection={<IoArrowForwardOutline size={18} />}
+                  >
+                    {t('join_button')}
+                  </Button>
+                )}
                 
                 <ActionIcon 
                   variant="subtle" 

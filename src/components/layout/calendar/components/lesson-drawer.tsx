@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import { IoTimeOutline, IoArrowForwardOutline, IoSchoolOutline, IoPersonOutline, IoReceiptOutline, IoVideocamOutline } from 'react-icons/io5';
 import { LessonEvent } from '../schemas/event-schema';
 import { cn } from '@/lib/utils';
-import { resolve_event_color, get_event_style } from '../utils/calendar-utils';
+import { get_event_style } from '../utils/calendar-utils';
 import '@mantine/dates/styles.css';
 
 interface Props {
@@ -214,18 +214,6 @@ export function LessonDrawer({ opened, lesson, onClose, onSubmit, isLoading, is_
                 input: { backgroundColor: 'transparent', fontWeight: is_student ? 600 : 400 }
               }}
             />
-
-            {!is_student && (
-              <Button 
-                variant="light" 
-                leftSection={<IoArrowForwardOutline size={16} />}
-                onClick={handle_transfer_week}
-                loading={isLoading}
-                className="justify-start h-11"
-              >
-                {t('transfer_week')}
-              </Button>
-            )}
 
             <Button
               component={Link}

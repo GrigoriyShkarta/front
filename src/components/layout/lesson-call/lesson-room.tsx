@@ -28,7 +28,11 @@ import { CallControlsBar } from './components/call-controls-bar';
 import { LessonLayoutView } from './components/lesson-layout-view';
 import { OtherParticipantsPreview } from './components/other-participants-preview';
 
+import { LessonTimer } from './components/lesson-timer';
+
 import '@stream-io/video-react-sdk/dist/css/styles.css';
+
+
 
 /**
  * Main Lesson Room component.
@@ -134,7 +138,7 @@ function MyCallUI() {
     router.push('/main');
   };
 
-  if (callingState !== CallingState.JOINED) {
+  if (callingState !== CallingState.JOINED || !call) {
     return (
       <Center className="flex-1 flex-col gap-4" style={{ backgroundColor: 'var(--call-bg)', color: 'var(--call-text)' }}>
         <Loader size="xl" color="primary" type="dots" />
@@ -163,7 +167,7 @@ function MyCallUI() {
         </div>
 
         {/* Floating PIP Window for focus mode */}
-        {layout === 'pip' && participants.length > 1 && createPortal(
+        {layout === 'pip' && participants.length > 1 && (fullscreenEl || rootRef.current) && createPortal(
           <div className="absolute bottom-6 right-6 w-[240px] h-[160px] z-[9999] rounded-2xl overflow-hidden shadow-2xl border-2 border-[var(--call-border)] bg-[var(--call-surface)]">
             {participants.length === 2 && localParticipant ? (
               <ParticipantView participant={localParticipant} className="w-full h-full" />
@@ -171,6 +175,12 @@ function MyCallUI() {
               <OtherParticipantsPreview />
             )}
           </div>,
+          fullscreenEl || rootRef.current!,
+        )}
+
+        {/* Lesson End Timer (5m warning) - Portaled here for fullscreen visibility */}
+        {(fullscreenEl || rootRef.current) && createPortal(
+          <LessonTimer lesson_id={call.id} />,
           fullscreenEl || rootRef.current!,
         )}
       </div>
