@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { useAuth } from '@/hooks/use-auth';
 import { VideoMaterial } from '../schemas/video-schema';
-import { cn } from '@/lib/utils';
+import { cn, formatBytes } from '@/lib/utils';
 
 interface Props {
   data: VideoMaterial[];
@@ -84,6 +84,7 @@ export function VideoTable({
             <Table.Th>{t('name')}</Table.Th>
             <Table.Th>{tCat('title')}</Table.Th>
             <Table.Th>{t('type')}</Table.Th>
+            <Table.Th>{t('size')}</Table.Th>
             <Table.Th>{t('date')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -234,6 +235,11 @@ export function VideoTable({
                       FILE
                     </Badge>
                   )}
+                </Table.Td>
+                <Table.Td>
+                  <Text size="sm" c="dimmed">
+                    {!is_youtube && item.size ? formatBytes(item.size) : '-'}
+                  </Text>
                 </Table.Td>
                 <Table.Td>
                   <Text size="sm" c="dimmed">

@@ -15,7 +15,7 @@ import { DatePickerInput } from '@mantine/dates';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { IoCalendarOutline } from 'react-icons/io5';
+import { IoCalendarOutline, IoDocumentOutline } from 'react-icons/io5';
 import dayjs from 'dayjs';
 
 import { ReportStats } from './components/report-stats';
@@ -30,7 +30,6 @@ export default function ReportsLayout() {
   const locale = useLocale();
   const t = useTranslations('Finance.reports');
   const tNav = useTranslations('Navigation');
-  const common_t = useTranslations('Common');
 
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
     dayjs().startOf('month').toDate(),
@@ -57,12 +56,18 @@ export default function ReportsLayout() {
       </Breadcrumbs>
 
       <Group justify="space-between" align="flex-end">
-        <Stack gap={0}>
-          <Title order={2}>{t('title')}</Title>
-          <Text color="dimmed" size="sm">
-            {t('subtitle')}
-          </Text>
-        </Stack>
+        <Group align="center" gap="md">
+          <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+            <IoDocumentOutline size={28} />
+          </Box>
+          <Stack gap={0}>
+            <Title order={2}>{t('title')}</Title>
+            <Text color="dimmed" size="sm">
+              {t('subtitle')}
+            </Text>
+          </Stack>
+        </Group>
+        
 
         <DatePickerInput
           type="range"

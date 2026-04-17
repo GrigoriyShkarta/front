@@ -754,6 +754,7 @@
       "table": {
         "name": "Name",
         "file": "File",
+        "size": "Size",
         "date": "Upload Date",
         "actions": "Actions"
       },
@@ -808,6 +809,7 @@
       "table": {
         "name": "Name",
         "preview": "Preview",
+        "size": "Size",
         "date": "Upload Date",
         "actions": "Actions"
       },
@@ -858,6 +860,7 @@
         "type": "Type",
         "date": "Date",
         "actions": "Actions",
+        "size": "Size",
         "file": "File"
       },
       "form": {
@@ -906,6 +909,7 @@
       "table": {
         "name": "Name",
         "extension": "Extension",
+        "size": "Size",
         "date": "Upload Date",
         "actions": "Actions"
       },

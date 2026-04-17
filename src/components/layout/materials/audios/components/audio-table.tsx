@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import { useAuth } from '@/hooks/use-auth';
 import { AudioMaterial } from '../schemas/audio-schema';
 import { AudioPlayer } from '@/components/ui/audio-player';
-import { cn } from '@/lib/utils';
+import { cn, formatBytes } from '@/lib/utils';
 
 interface Props {
   data: AudioMaterial[];
@@ -74,6 +74,7 @@ export function AudioTable({
             <Table.Th>{t('name')}</Table.Th>
             <Table.Th>{tCat('title')}</Table.Th>
             <Table.Th w={350}>{t('file')}</Table.Th>
+            <Table.Th>{t('size')}</Table.Th>
             <Table.Th>{t('date')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -173,6 +174,11 @@ export function AudioTable({
                 </Table.Td>
                 <Table.Td>
                   <AudioPlayer src={item.file_url} />
+                </Table.Td>
+                <Table.Td>
+                  <Text size="sm" c="dimmed">
+                    {item.size ? formatBytes(item.size) : '-'}
+                  </Text>
                 </Table.Td>
                 <Table.Td>
                   <Text size="sm" c="dimmed">

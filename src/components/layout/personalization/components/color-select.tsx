@@ -71,13 +71,13 @@ export function ColorSelect({
   description,
   options, 
   value, 
-  onChange, 
   error, 
   show_gradients = true, 
   solid_label = 'Solid Colors', 
   gradients_label = 'Gradients',
   is_premium = false,
-  type = 'primary'
+  type = 'primary',
+  onChange, 
 }: Props) {
   const t = useTranslations('Personalization');
   const solid_colors = options.filter((opt): opt is SolidColorOption => opt.type === 'solid');

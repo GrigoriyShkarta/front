@@ -122,12 +122,18 @@ export default function SubscriptionsLayout() {
         </Breadcrumbs>
 
         <Group justify="space-between" align="flex-end">
-            <Stack gap={0}>
-                <Title order={2}>{t('title')}</Title>
-                <Text color="dimmed" size="sm">
-                    {t('subtitle')}
-                </Text>
-            </Stack>
+            <Group align="center" gap="md">
+                <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+                    <IoCardOutline size={28} />
+                </Box>
+                <Stack gap={0}>
+                    <Title order={2}>{t('title')}</Title>
+                    <Text color="dimmed" size="sm">
+                        {t('subtitle')}
+                    </Text>
+                </Stack>
+            </Group>
+            
             
             <Group>
                 {selected_ids.length > 0 && (

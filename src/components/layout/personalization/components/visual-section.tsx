@@ -89,7 +89,7 @@ export function PersonalizationVisualSection({ form, is_premium }: Props) {
         <Stack gap="lg">
           <Box>
             <Group gap="xs" mb="xs">
-              <IoColorFilterOutline size={18} className="text-primary" />
+              <IoColorFilterOutline size={18} className="text-secondary" />
               <Text fw={600} size="sm">{t('branding_colors') || 'Branding Colors'}</Text>
             </Group>
             
@@ -98,60 +98,85 @@ export function PersonalizationVisualSection({ form, is_premium }: Props) {
                 name="primary_color"
                 control={control}
                 render={({ field }) => (
-                  <ColorSelect
-                    label={t('primary_color_label')}
-                    description={t('primary_color_description') || 'Main color for sidebar and key elements'}
-                    options={primary_options}
-                    value={field.value}
-                    onChange={field.onChange}
-                    solid_label={t('solid_colors')}
-                    gradients_label={t('gradients')}
-                    is_premium={is_premium}
-                    type="primary"
-                  />
-                )}
+              <ColorSelect
+                label={t('primary_color_label')}
+                description={t('primary_color_description') || 'Main color for sidebar and key elements'}
+                options={primary_options}
+                value={field.value}
+                onChange={field.onChange}
+                solid_label={t('solid_colors')}
+                gradients_label={t('gradients')}
+                is_premium={is_premium}
+                type="primary"
               />
+            )}
+          />
 
-              <Divider variant="dashed" />
-
-              <Controller
-                name="accent_color"
-                control={control}
-                render={({ field }) => (
-                  <ColorSelect
-                    label={t('accent_color_label')}
-                    description={t('accent_color_description')}
-                    options={accent_options}
-                    value={field.value}
-                    onChange={field.onChange}
-                    solid_label={t('solid_colors')}
-                    gradients_label={t('gradients')}
-                    show_gradients={true}
-                    is_premium={is_premium}
-                    type="primary"
-                  />
-                )}
+          <Controller
+            name="is_white_sidebar_color"
+            control={control}
+            render={({ field }) => (
+              <Switch
+                label={
+                  <Box>
+                    <Text size="sm" fw={500}>{t('sidebar_text_color_label')}</Text>
+                    <Text size="xs" c="dimmed">{t('sidebar_text_color_description') || 'Contrast for better visibility on dark backgrounds'}</Text>
+                  </Box>
+                }
+                onLabel={t('sidebar_color_white')}
+                offLabel={t('sidebar_color_black')}
+                styles={{ 
+                  body: { alignItems: 'flex-start' },
+                  label: { paddingTop: 0, paddingLeft: 12 }
+                }}
+                checked={field.value}
+                onChange={field.onChange}
+                size="lg"
+                className="my-1"
               />
+            )}
+          />
 
-              <Divider variant="dashed" />
+          <Divider />
 
-              <Controller
-                name="secondary_color"
-                control={control}
-                render={({ field }) => (
-                  <ColorSelect
-                    label={t('secondary_color_label') || 'Secondary Color'}
-                    description={t('secondary_color_description') || 'Used for borders, card backgrounds and subtle accents'}
-                    options={secondary_options}
-                    value={field.value}
-                    onChange={field.onChange}
-                    show_gradients={false}
-                    solid_label={t('solid_colors')}
-                    is_premium={is_premium}
-                    type="secondary"
-                  />
-                )}
+          <Controller
+            name="accent_color"
+            control={control}
+            render={({ field }) => (
+              <ColorSelect
+                label={t('accent_color_label')}
+                description={t('accent_color_description')}
+                options={accent_options}
+                value={field.value}
+                onChange={field.onChange}
+                solid_label={t('solid_colors')}
+                gradients_label={t('gradients')}
+                show_gradients={true}
+                is_premium={is_premium}
+                type="primary"
               />
+            )}
+          />
+
+          <Divider />
+
+          <Controller
+            name="secondary_color"
+            control={control}
+            render={({ field }) => (
+              <ColorSelect
+                label={t('secondary_color_label') || 'Secondary Color'}
+                description={t('secondary_color_description') || 'Used for borders, card backgrounds and subtle accents'}
+                options={secondary_options}
+                value={field.value}
+                onChange={field.onChange}
+                show_gradients={false}
+                solid_label={t('solid_colors')}
+                is_premium={is_premium}
+                type="secondary"
+              />
+            )}
+          />
             </Stack>
           </Box>
 
@@ -159,7 +184,7 @@ export function PersonalizationVisualSection({ form, is_premium }: Props) {
 
           <Box>
             <Group gap="xs" mb="md">
-              <IoInvertModeOutline size={18} className="text-primary" />
+              <IoInvertModeOutline size={18} className="text-secondary" />
               <Text fw={600} size="sm">{t('background_settings') || 'Background & Theme'}</Text>
             </Group>
 

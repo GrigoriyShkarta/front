@@ -9,6 +9,7 @@ export const file_schema = z.object({
   name: z.string().min(1, 'errors.required'),
   file_url: z.string(),
   file_key: z.string().optional(),
+  size: z.number().optional(),
   categories: z.array(category_schema).optional(),
   accessible_student_ids: z.array(z.string()).optional().default([]),
   created_at: z.string(),

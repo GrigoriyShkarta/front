@@ -87,38 +87,7 @@ export function PersonalizationLayoutSection({ form, is_premium }: Props) {
           />
         </Box>
 
-        <Box>
-           <Group gap="xs" mb={12}>
-            <IoTextOutline size={16} />
-            <Text size="sm" fw={600}>
-              {t('sidebar_appearance_label') || 'Sidebar Appearance'}
-            </Text>
-          </Group>
 
-          <Controller
-            name="is_white_sidebar_color"
-            control={control}
-            render={({ field }) => (
-              <Switch
-                label={
-                  <Box>
-                    <Text size="sm" fw={500}>{t('sidebar_text_color_label')}</Text>
-                    <Text size="xs" c="dimmed">{t('sidebar_text_color_description') || 'Contrast for better visibility on dark backgrounds'}</Text>
-                  </Box>
-                }
-                onLabel={t('sidebar_color_white')}
-                offLabel={t('sidebar_color_black')}
-                styles={{ 
-                  body: { alignItems: 'flex-start' },
-                  label: { paddingTop: 0, paddingLeft: 12 }
-                }}
-                checked={field.value}
-                onChange={field.onChange}
-                size="lg"
-              />
-            )}
-          />
-        </Box>
       </Stack>
     </Paper>
   );

@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { useAuth } from '@/hooks/use-auth';
 import { PhotoMaterial } from '../schemas/photo-schema';
-import { cn } from '@/lib/utils';
+import { cn, formatBytes } from '@/lib/utils';
 
 interface Props {
   data: PhotoMaterial[];
@@ -78,6 +78,7 @@ export function PhotoTable({
             <Table.Th>{t('name')}</Table.Th>
             <Table.Th>{tCat('title')}</Table.Th>
             <Table.Th>{t('date')}</Table.Th>
+            <Table.Th>{t('size')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -187,6 +188,11 @@ export function PhotoTable({
                 <Table.Td>
                   <Text size="sm" c="dimmed">
                     {dayjs(item.created_at).format('DD.MM.YYYY')}
+                  </Text>
+                </Table.Td>
+                <Table.Td>
+                  <Text size="sm" c="dimmed">
+                    {item.size ? formatBytes(item.size) : '-'}
                   </Text>
                 </Table.Td>
               </Table.Tr>

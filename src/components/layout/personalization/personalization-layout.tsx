@@ -6,10 +6,13 @@ import { Box, Title, Text, Breadcrumbs, Anchor, Group, Stack } from '@mantine/co
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { UpgradePlanButton } from '@/components/common/upgrade-plan-button';
+import { usePersonalizationForm } from './hooks/use-personalization-form';
+import { FaPaintbrush } from 'react-icons/fa6';
 
 export default function PersonalizationLayout() {
   const t = useTranslations('Personalization');
   const tNav = useTranslations('Navigation');
+  const { is_premium } = usePersonalizationForm();
 
   const items = [
     { title: tNav('dashboard'), href: '/main' },
@@ -25,15 +28,22 @@ export default function PersonalizationLayout() {
       <Box mb="xl">
         <Breadcrumbs mb="xs" separator="→">{items}</Breadcrumbs>
         <Group justify="space-between" align="flex-start">
-          <Stack gap={0}>
-            <Title order={2}>{t('title')}</Title>
-            <Text color="dimmed" size="sm">
-              {t('description')}
-            </Text>
-          </Stack>
-          <UpgradePlanButton size="md" />
+          <Group align="center" gap="md">
+            <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+              <FaPaintbrush size={28} />
+            </Box>
+            <Stack gap={0}>
+              <Title order={2}>{t('title')}</Title>
+              <Text color="dimmed" size="sm">
+                {t('description')}
+              </Text>
+            </Stack>  
+          </Group>
+          
+          {!is_premium && <UpgradePlanButton size="md" />}
         </Group>
       </Box>
+
 
       <PersonalizationForm />
     </PageContainer>

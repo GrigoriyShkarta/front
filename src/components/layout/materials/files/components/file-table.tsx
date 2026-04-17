@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { useAuth } from '@/hooks/use-auth';
 import { FileMaterial } from '../schemas/file-schema';
-import { cn } from '@/lib/utils';
+import { cn, formatBytes } from '@/lib/utils';
 
 interface Props {
   data: FileMaterial[];
@@ -80,6 +80,7 @@ export function FileTable({
           <Table.Th>{t('name')}</Table.Th>
           <Table.Th>{tCat('title')}</Table.Th>
           <Table.Th>{t('extension')}</Table.Th>
+          <Table.Th>{t('size')}</Table.Th>
           <Table.Th>{t('date')}</Table.Th>
         </Table.Tr>
       </Table.Thead>
@@ -193,6 +194,11 @@ export function FileTable({
                 >
                   {extension}
                 </Badge>
+              </Table.Td>
+              <Table.Td>
+                <Text size="sm" c="dimmed">
+                  {item.size ? formatBytes(item.size) : '-'}
+                </Text>
               </Table.Td>
               <Table.Td>
                 <Text size="sm" c="dimmed">
