@@ -24,6 +24,7 @@ import { AudioMaterial } from '../schemas/audio-schema';
 import { useCategories } from '@/components/layout/categories/hooks/use-categories';
 import { CategoryDrawer as CreateCategoryDrawer } from '@/components/layout/categories/components/category-drawer';
 import { CreateCategoryForm } from '@/components/layout/categories/schemas/category-schema';
+import { useStorageLimitCheck } from '@/components/layout/users/hooks/use-storage-limit-check';
 
 interface FileWithMetadata {
   file: FileWithPath;
@@ -54,6 +55,7 @@ export function AudioDrawer({ opened, onClose, audio, initial_files, on_submit, 
   
   const [files, setFiles] = useState<FileWithMetadata[]>([]);
   const { categories: all_categories, create_category, create_categories, is_pending: is_cat_pending } = useCategories();
+  const { checkFiles } = useStorageLimitCheck();
   
   const [category_drawer_opened, setCategoryDrawerOpened] = useState(false);
   const [active_file_id, setActiveFileId] = useState<string | null>(null);
@@ -80,6 +82,8 @@ export function AudioDrawer({ opened, onClose, audio, initial_files, on_submit, 
   }, [opened, audio, initial_files]);
 
   const handle_drop = (dropped_files: FileWithPath[]) => {
+    if (!checkFiles(dropped_files)) return;
+    
     const new_files = dropped_files.map(f => ({
       file: f,
       id: Math.random().toString(36).substring(7),

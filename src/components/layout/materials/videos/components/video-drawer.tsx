@@ -25,6 +25,7 @@ import { VideoMaterial } from '../schemas/video-schema';
 import { useCategories } from '@/components/layout/categories/hooks/use-categories';
 import { CategoryDrawer as CreateCategoryDrawer } from '@/components/layout/categories/components/category-drawer';
 import { CreateCategoryForm } from '@/components/layout/categories/schemas/category-schema';
+import { useStorageLimitCheck } from '@/components/layout/users/hooks/use-storage-limit-check';
 
 interface FileWithMetadata {
   file?: FileWithPath;
@@ -59,6 +60,7 @@ export function VideoDrawer({ opened, onClose, video, initial_files, on_submit, 
   const [active_tab, setActiveTab] = useState<string | null>('file');
 
   const { categories: all_categories, create_category, create_categories, is_pending: is_cat_pending } = useCategories();
+  const { checkFiles } = useStorageLimitCheck();
   const [category_drawer_opened, setCategoryDrawerOpened] = useState(false);
   const [active_item_id, setActiveItemId] = useState<string | null>(null);
 
@@ -87,6 +89,8 @@ export function VideoDrawer({ opened, onClose, video, initial_files, on_submit, 
   }, [opened, video, initial_files]);
 
   const handle_drop = (dropped_files: FileWithPath[]) => {
+    if (!checkFiles(dropped_files)) return;
+    
     const new_items: FileWithMetadata[] = dropped_files.map(f => ({
       file: f,
       id: Math.random().toString(36).substring(7),

@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
+import { notifications } from '@mantine/notifications';
 import { clearAuthCookies } from './auth';
 
 export const api = axios.create({
@@ -80,6 +81,14 @@ api.interceptors.response.use(
 
     // For non-401 errors or already-retried requests — pass through without refresh attempt
     if (error.response?.status !== 401 || original_request?._retry) {
+      if (error.response?.status === 413) {
+        notifications.show({
+          title: 'Storage limit exceeded',
+          message: 'Not enough space in your storage. Your limit has been reached. Please delete old files to upload new ones.',
+          color: 'red',
+          autoClose: 10000,
+        });
+      }
       return Promise.reject(error);
     }
 

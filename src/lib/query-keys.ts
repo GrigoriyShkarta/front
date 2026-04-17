@@ -57,5 +57,6 @@ export const queryKeys = {
     all: ['users'] as const,
     list: (filters?: any) => [...queryKeys.users.all, 'list', filters] as const,
     detail: (id: string) => [...queryKeys.users.all, 'detail', id] as const,
+    storageUsage: () => [...queryKeys.users.all, 'storage-usage'] as const,
   },
 } as const;

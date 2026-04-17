@@ -30,6 +30,7 @@ import { AudioMaterial } from "./schemas/audio-schema";
 import { Dropzone } from "@mantine/dropzone";
 import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
 import { GrantAccessModal } from '@/components/common/materials/grant-access-modal';
+import { useStorageLimitCheck } from '@/components/layout/users/hooks/use-storage-limit-check';
 import { cn } from "@/lib/utils";
 
 const AUDIO_MIME_TYPES = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/flac'];
@@ -41,6 +42,7 @@ export default function AudiosLayout() {
     const common_t = useTranslations('Common');
     const { user } = useAuth();
     const is_super_admin = user?.role === 'super_admin';
+    const { checkFiles } = useStorageLimitCheck();
 
     const breadcrumb_items = [
         { title: tNav('dashboard'), href: '/main' },
@@ -189,6 +191,8 @@ export default function AudiosLayout() {
             <Dropzone.FullScreen 
                 active={!drawer_opened && !filter_drawer_opened}
                 onDrop={(files) => {
+                    if (!checkFiles(files)) return;
+                    
                     const new_files = files.map(f => ({
                         file: f,
                         id: Math.random().toString(36).substring(7),

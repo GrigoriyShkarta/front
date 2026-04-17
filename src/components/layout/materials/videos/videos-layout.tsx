@@ -33,6 +33,7 @@ import { VideoMaterial } from "./schemas/video-schema";
 import { Dropzone } from "@mantine/dropzone";
 import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
 import { GrantAccessModal } from '@/components/common/materials/grant-access-modal';
+import { useStorageLimitCheck } from '@/components/layout/users/hooks/use-storage-limit-check';
 
 export default function VideosLayout() {
     const t = useTranslations('Materials.video');
@@ -41,6 +42,7 @@ export default function VideosLayout() {
     const common_t = useTranslations('Common');
     const { user } = useAuth();
     const is_super_admin = user?.role === 'super_admin';
+    const { checkFiles } = useStorageLimitCheck();
 
     const breadcrumb_items = [
         { title: tNav('dashboard'), href: '/main' },
@@ -208,6 +210,8 @@ export default function VideosLayout() {
             <Dropzone.FullScreen 
                 active={!drawer_opened && !filter_drawer_opened && !player_opened}
                 onDrop={(files) => {
+                    if (!checkFiles(files)) return;
+                    
                     const new_items = files.map(f => ({
                         file: f,
                         id: Math.random().toString(36).substring(7),

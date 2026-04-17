@@ -116,4 +116,9 @@ export const userActions = {
   delete_notifications: async (ids: string[]) => {
     await api.delete('/notifications/bulk', { data: { ids } });
   },
+
+  get_storage_usage: async () => {
+    const response = await api.get('/users/me/storage-usage');
+    return response.data as { usageInBytes: number; limitInBytes: number };
+  },
 };
