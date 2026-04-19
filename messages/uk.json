@@ -288,6 +288,8 @@
       "attendees": "Учасники",
       "invalid_date_range": "Дата завершення має бути пізніше дати початку",
       "statuses": {
+        "attended": "Відвідано",
+        "missed": "Пропущено",
         "scheduled": "Заплановано",
         "transfered": "Перенесено",
         "burned": "Згорів"
@@ -318,6 +320,8 @@
       "transfer_week": "Перенести на наступний тиждень",
       "to_subscription": "До абонемента",
       "statuses": {
+        "attended": "Відвідано",
+        "missed": "Пропущено",
         "scheduled": "Заплановано",
         "transfered": "Перенесено",
         "burned": "Згорів"

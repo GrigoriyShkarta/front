@@ -285,6 +285,7 @@
       "attendees": "Attendees",
       "invalid_date_range": "End date must be after start date",
       "statuses": {
+        "attended": "Attended",
         "scheduled": "Scheduled",
         "transfered": "Rescheduled",
         "burned": "Missed"
@@ -315,6 +316,8 @@
       "transfer_week": "Move to Next Week",
       "to_subscription": "To Subscription",
       "statuses": {
+        "attended": "Attended",
+        "missed": "Missed",
         "scheduled": "Scheduled",
         "transfered": "Rescheduled",
         "burned": "Missed"

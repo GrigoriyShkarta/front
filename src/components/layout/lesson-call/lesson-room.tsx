@@ -62,7 +62,7 @@ function MyCallUI() {
   const t = useTranslations('Calendar.lesson_room');
   const router = useRouter();
   const { user } = useAuth();
-  const { activeCall, setActiveCall } = useActiveCall();
+  const { activeCall, setActiveCall, call_layout, set_call_layout } = useActiveCall();
   const call = useCall();
   
   const { 
@@ -92,18 +92,18 @@ function MyCallUI() {
   useCallRecording(call);
 
   // Local State
-  const [layout, setLayout] = useState<CallLayoutType>('grid');
   const [showParticipants, setShowParticipants] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
   // Auto-switch layout on screen share
   useEffect(() => {
     if (hasOngoingScreenShare) {
-      setLayout('speaker-right');
-    } else {
-      setLayout('grid');
+      // Only switch if we are in grid (default) to not disrupt manual choices
+      if (call_layout === 'grid') {
+        set_call_layout('speaker-right');
+      }
     }
-  }, [hasOngoingScreenShare]);
+  }, [hasOngoingScreenShare, call_layout, set_call_layout]);
 
   // Handle call end/cleanup
   useEffect(() => {
@@ -166,7 +166,7 @@ function MyCallUI() {
       <div className={`relative flex-1 flex w-full items-center justify-center min-h-0 ${fullscreenEl ? 'p-0' : 'p-4'}`}>
         <div className="flex size-full items-center">
           <LessonLayoutView 
-            layout={layout}
+            layout={call_layout}
             fullscreenEl={fullscreenEl}
             localParticipant={localParticipant}
             participants={participants}
@@ -175,7 +175,7 @@ function MyCallUI() {
         </div>
 
         {/* Floating PIP Window for focus mode */}
-        {layout === 'pip' && participants.length > 1 && (fullscreenEl || rootRef.current) && createPortal(
+        {call_layout === 'pip' && participants.length > 1 && (fullscreenEl || rootRef.current) && createPortal(
           <div className="absolute bottom-6 right-6 w-[240px] h-[160px] z-[9999] rounded-2xl overflow-hidden shadow-2xl border-2 border-[var(--call-border)] bg-[var(--call-surface)]">
             {participants.length === 2 && localParticipant ? (
               <ParticipantView participant={localParticipant} className="w-full h-full" />
@@ -203,9 +203,9 @@ function MyCallUI() {
       {/* Footer Controls */}
       <CallControlsBar 
         userRole={user?.role}
-        layout={layout}
+        layout={call_layout}
         is_fullscreen={!!fullscreenEl}
-        onLayoutChange={setLayout}
+        onLayoutChange={set_call_layout}
         onToggleFullscreen={toggleFullscreen}
         onOpenSettings={() => setShowSettings(true)}
         onToggleParticipants={() => setShowParticipants((prev) => !prev)}

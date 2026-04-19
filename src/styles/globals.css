@@ -398,6 +398,24 @@ a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
   display: none !important;
 } */
 
+.str-video__speech-indicator.str-video__speech-indicator--dominant .str-video__speech-indicator__bar {
+  background-color: var(--space-accent) !important;
+}
+
+/* Target the three-dots icon in participant view */
+.str-video__participant-view .str-video__menu-toggle-button {
+  --str-video__icon-color: var(--space-accent) !important;
+  --str-video__icon-fill: var(--space-accent) !important;
+}
+
+.str-video__participant-view .str-video__menu-toggle-button .str-video__icon {
+  background-color: var(--space-accent) !important;
+}
+
+[data-mantine-color-scheme="light"] .str-video__participant-view .str-video__menu-toggle-button .str-video__icon {
+  filter: none !important; /* Remove any filters that might be applied in light mode */
+}
+
 /* Stream Video Customization */
 .str-video {
   --str-video__primary-color: var(--space-primary) !important;
@@ -416,6 +434,34 @@ a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
   --str-video__call-controls-background-color: var(--call-surface) !important;
   --str-video__call-controls-border-color: var(--call-border) !important;
   --str-video__participant-placeholder-background-color: var(--call-surface) !important;
+}
+
+.str-video__notification {
+  display: none !important;
+}
+
+.str-video__device-settings__device-kind .str-video__option--selected,
+.str-video__device-settings__device-kind .str-video__option--active,
+.str-video__device-settings__device-kind .str-video__device-settings__option--selected,
+.str-video__device-settings__device-kind .str-video__device-settings__option--active {
+  background: none !important;
+}
+
+.str-video__speech-indicator .str-video__speech-indicator__bar {
+  background-color: var(--space-accent) !important;
+}
+
+.str-video__speech-indicator__bar {
+  background-color: var(--space-accent) !important;
+}
+
+.str-video__audio-volume-indicator__bar-value {
+  background-color: var(--space-accent) !important;
+}
+
+.str-video__device-settings__device-kind .str-video__option:not(:first-of-type),
+.str-video__device-settings__device-kind .str-video__device-settings__option:not(:first-of-type) {
+  background: none !important;
 }
 
 .str-video.light {

@@ -6,15 +6,18 @@ import { Call } from '@stream-io/video-react-sdk';
 interface ActiveCallContextType {
   activeCall: Call | null;
   setActiveCall: (call: Call | null) => void;
+  call_layout: 'grid' | 'speaker-left' | 'speaker-right' | 'pip';
+  set_call_layout: (layout: 'grid' | 'speaker-left' | 'speaker-right' | 'pip') => void;
 }
 
 const ActiveCallContext = createContext<ActiveCallContextType | undefined>(undefined);
 
 export function ActiveCallProvider({ children }: { children: ReactNode }) {
   const [activeCall, setActiveCall] = useState<Call | null>(null);
+  const [call_layout, set_call_layout] = useState<'grid' | 'speaker-left' | 'speaker-right' | 'pip'>('grid');
 
   return (
-    <ActiveCallContext.Provider value={{ activeCall, setActiveCall }}>
+    <ActiveCallContext.Provider value={{ activeCall, setActiveCall, call_layout, set_call_layout }}>
       {children}
     </ActiveCallContext.Provider>
   );
