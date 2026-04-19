@@ -9,6 +9,7 @@ import {
   useCall,
   useCallStateHooks,
 } from '@stream-io/video-react-sdk';
+import { SfuModels } from '@stream-io/video-client';
 import { Box, Center, Loader, Text } from '@mantine/core';
 import { useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -69,7 +70,7 @@ function MyCallUI() {
     useHasOngoingScreenShare, 
     useLocalParticipant, 
     useParticipants,
-    useIsCallRecordingInProgress
+    useIsCallRecordingInProgress,
   } = useCallStateHooks();
   
   const callingState = useCallCallingState();
@@ -77,6 +78,12 @@ function MyCallUI() {
   const localParticipant = useLocalParticipant();
   const participants = useParticipants();
   const isRecordingInProgress = useIsCallRecordingInProgress();
+
+  // Use publishedTracks (signaling-based, immediate) to reliably detect screen sharing
+  // screenShareStream is only set after WebRTC track subscription — causes a race on the viewer side
+  const sharingParticipant = participants.find(
+    (p) => p.publishedTracks.includes(SfuModels.TrackType.SCREEN_SHARE)
+  ) ?? null;
 
   // Custom Hooks
   const rootRef = useRef<HTMLElement | null>(null);
@@ -163,6 +170,7 @@ function MyCallUI() {
             fullscreenEl={fullscreenEl}
             localParticipant={localParticipant}
             participants={participants}
+            sharingParticipant={sharingParticipant}
           />
         </div>
 

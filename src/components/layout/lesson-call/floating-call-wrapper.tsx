@@ -3,6 +3,7 @@
 import { useActiveCall } from '@/context/active-call-context';
 import { usePathname, useRouter } from '@/i18n/routing';
 import { StreamCall, StreamTheme, useCallStateHooks, ParticipantView, useCall } from '@stream-io/video-react-sdk';
+import { SfuModels } from '@stream-io/video-client';
 import { Box, ActionIcon, Group } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { IoMicOffOutline, IoMicOutline, IoVideocamOffOutline, IoVideocamOutline, IoLogOutOutline } from 'react-icons/io5';
@@ -57,10 +58,15 @@ function MiniCallUI({ t }: { t: any }) {
   };
   
   const participants = useParticipants();
+  // Use publishedTracks (signaling-based, immediate) to reliably detect screen sharing
+  // screenShareStream is only set after WebRTC track subscription — causes a race on the viewer side
+  const sharingParticipant = participants.find(
+    (p) => p.publishedTracks.includes(SfuModels.TrackType.SCREEN_SHARE)
+  ) ?? null;
   
-  // Find a remote participant (student/teacher) to focus on. If alone, show the local participant.
+  // Fallback to remote participant
   const remoteParticipants = participants.filter(p => !p.isLocalParticipant);
-  const mainParticipant = remoteParticipants.length > 0 ? remoteParticipants[0] : participants[0];
+  const mainParticipant = sharingParticipant || (remoteParticipants.length > 0 ? remoteParticipants[0] : participants[0]);
 
   return (
     <Box className="w-full h-full relative group bg-[var(--call-surface)]">
@@ -69,6 +75,7 @@ function MiniCallUI({ t }: { t: any }) {
           <div key={mainParticipant.sessionId} className="relative w-full h-full">
             <ParticipantView
               participant={mainParticipant}
+              trackType={mainParticipant?.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
               className="w-full h-full"
             />
           </div>

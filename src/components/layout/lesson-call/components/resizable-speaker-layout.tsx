@@ -16,6 +16,7 @@ interface ResizableSpeakerLayoutProps {
   bar_position: 'left' | 'right';
   local_participant: any;
   participants: any[];
+  sharing_participant?: any;
 }
 
 /**
@@ -26,6 +27,7 @@ export function ResizableSpeakerLayout({
   bar_position,
   local_participant,
   participants,
+  sharing_participant,
 }: ResizableSpeakerLayoutProps) {
   const { sidebar_ratio, container_ref, on_drag_start } = useSidebarResize();
 
@@ -34,11 +36,10 @@ export function ResizableSpeakerLayout({
   // 2. Otherwise, the first remote participant takes it
   // 3. Last fallback: local participant
   
-  const screen_share_participants = participants.filter(p => !!p.screenShareStream);
-  const is_sharing = screen_share_participants.length > 0;
+  const is_sharing = !!sharing_participant;
   
-  const spotlight = is_sharing 
-    ? screen_share_participants[0] 
+  const spotlight = sharing_participant 
+    ? sharing_participant 
     : (participants.find(p => p.sessionId !== local_participant?.sessionId) || local_participant);
 
   // Sidebar participants are everyone except what's in the spotlight
@@ -66,7 +67,7 @@ export function ResizableSpeakerLayout({
         {spotlight && (
           <ParticipantView
             participant={spotlight}
-            trackType={is_sharing ? 'screenShareTrack' : 'videoTrack'}
+            trackType={spotlight.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
             className="w-full h-full"
             ParticipantViewUI={NoMenuParticipantViewUI}
           />

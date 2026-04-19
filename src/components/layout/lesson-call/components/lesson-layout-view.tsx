@@ -19,6 +19,7 @@ interface LessonLayoutViewProps {
   fullscreenEl: Element | null;
   localParticipant: any;
   participants: any[];
+  sharingParticipant?: any;
 }
 
 /**
@@ -28,7 +29,8 @@ export function LessonLayoutView({
   layout, 
   fullscreenEl, 
   localParticipant, 
-  participants 
+  participants,
+  sharingParticipant
 }: LessonLayoutViewProps) {
   
   if (fullscreenEl && layout === 'grid' && localParticipant) {
@@ -54,6 +56,7 @@ export function LessonLayoutView({
           >
             <ParticipantView 
               participant={p} 
+              trackType={p.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
               className="w-full h-full"
               ParticipantViewUI={NoMenuParticipantViewUI}
             />
@@ -70,6 +73,7 @@ export function LessonLayoutView({
           <ResizableGridLayout 
             local_participant={localParticipant}
             participants={participants}
+            sharing_participant={sharingParticipant}
           />
         );
       }
@@ -80,6 +84,7 @@ export function LessonLayoutView({
         <div className="relative w-full h-full overflow-hidden rounded-xl">
           <ParticipantView 
             participant={remote} 
+            trackType={remote?.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
             className="w-full h-full"
             ParticipantViewUI={NoMenuParticipantViewUI}
           />
@@ -91,6 +96,7 @@ export function LessonLayoutView({
           bar_position="left"
           local_participant={localParticipant}
           participants={participants}
+          sharing_participant={sharingParticipant}
         />
       );
     default:
@@ -99,6 +105,7 @@ export function LessonLayoutView({
           bar_position="right"
           local_participant={localParticipant}
           participants={participants}
+          sharing_participant={sharingParticipant}
         />
       );
   }

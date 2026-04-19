@@ -11,6 +11,7 @@ const NoMenuParticipantViewUI = () => (
 interface ResizableGridLayoutProps {
   local_participant: any;
   participants: any[];
+  sharing_participant?: any;
 }
 
 const MIN_PCT = 20;
@@ -23,6 +24,7 @@ const MAX_PCT = 80;
 export function ResizableGridLayout({
   local_participant,
   participants,
+  sharing_participant,
 }: ResizableGridLayoutProps) {
   const [left_pct, set_left_pct] = useState(50);
   const container_ref = useRef<HTMLDivElement | null>(null);
@@ -70,6 +72,7 @@ export function ResizableGridLayout({
       >
         <ParticipantView
           participant={left_participant}
+          trackType={left_participant?.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
           className="w-full h-full"
           ParticipantViewUI={NoMenuParticipantViewUI}
         />
@@ -90,6 +93,7 @@ export function ResizableGridLayout({
       >
         <ParticipantView
           participant={right_participant}
+          trackType={right_participant?.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
           className="w-full h-full"
           ParticipantViewUI={NoMenuParticipantViewUI}
         />
