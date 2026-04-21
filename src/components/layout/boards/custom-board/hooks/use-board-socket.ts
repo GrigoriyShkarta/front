@@ -34,7 +34,7 @@ export function useBoardSocket(board_id: string, user: any) {
     const socket = io(`${backend_url}/board`, {
       path: socket_path,
       withCredentials: true,
-      auth: { token: Cookies.get('access_token') },
+      // auth: { token: Cookies.get('access_token') },
       query: { board_id },
       transports: ['websocket', 'polling'],
       reconnection: true,
