@@ -358,15 +358,23 @@ export function useBoardPreview(board_id: string, elements: BoardElement[], is_d
 
             console.log('[Preview] Rendering to canvas and uploading...');
 
-            canvas.toBlob(async (blob) => {
-                if (blob) {
-                    await update_board_preview(board_id, blob);
-                    last_capture_ref.current = Date.now();
-                    console.log('[Preview] Preview uploaded successfully ✓');
-                } else {
-                    console.warn('[Preview] canvas.toBlob returned null');
-                }
-            }, 'image/jpeg', 0.85);
+            // Wait for blob conversion and upload to finish
+            await new Promise<void>((resolve) => {
+                canvas.toBlob(async (blob) => {
+                    if (blob) {
+                        try {
+                            await update_board_preview(board_id, blob);
+                            last_capture_ref.current = Date.now();
+                            console.log('[Preview] Preview uploaded successfully ✓');
+                        } catch (err) {
+                            console.error('[Preview] Upload failed:', err);
+                        }
+                    } else {
+                        console.warn('[Preview] canvas.toBlob returned null');
+                    }
+                    resolve();
+                }, 'image/jpeg', 0.85);
+            });
 
         } catch (error) {
             console.error('[Preview] Capture failed:', error);
