@@ -11,6 +11,7 @@ export interface SubscriptionLesson {
   is_recording_enabled: boolean;
   can_student_download_recording: boolean;
   recording_url: string | null;
+  recording_status: 'none' | 'processing' | 'ready' | 'failed';
   created_at: string;
   updated_at: string;
 }

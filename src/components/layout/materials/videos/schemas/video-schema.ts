@@ -11,12 +11,15 @@ export const video_schema = z.object({
   youtube_url: z.string().nullable().optional(),
   file_key: z.string().optional(),
   thumbnail_url: z.string().optional(),
-  size: z.number().optional(),
+  size: z.number().optional().nullable(),
   categories: z.array(category_schema).optional(),
   accessible_student_ids: z.array(z.string()).optional().default([]),
+  student_name: z.string().optional().nullable(),
+  recording_status: z.string().optional().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
 });
+
 
 export type VideoMaterial = z.infer<typeof video_schema>;
 
@@ -36,10 +39,27 @@ export const video_form_schema = z.object({
 export type VideoFormData = z.infer<typeof video_form_schema>;
 
 /**
+ * Zod schema for lesson recording
+ */
+export const recording_schema = z.object({
+  id: z.string(),
+  name: z.string(),
+  date: z.string().optional().nullable(),
+  size: z.number().optional().nullable(),
+  file_url: z.string(),
+  student_name: z.string().optional().nullable(),
+  recording_status: z.string().optional().nullable(),
+  is_lesson_recording: z.boolean().optional(),
+});
+
+export type Recording = z.infer<typeof recording_schema>;
+
+/**
  * Schema for API Response with pagination
  */
 export const video_list_response_schema = z.object({
   data: z.array(video_schema),
+  recordings: z.array(recording_schema).optional().default([]),
   meta: z.object({
     current_page: z.number(),
     total_pages: z.number(),
@@ -48,3 +68,4 @@ export const video_list_response_schema = z.object({
 });
 
 export type VideoListResponse = z.infer<typeof video_list_response_schema>;
+

@@ -16,12 +16,15 @@ import {
   Center,
   Breadcrumbs,
   Anchor,
-  SegmentedControl
+  SegmentedControl,
+  Tabs,
+  rem,
+  MultiSelect
 } from "@mantine/core";
-import { IoVideocamOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoGridOutline, IoListOutline, IoFilterOutline, IoPeopleOutline } from "react-icons/io5";
+import { IoVideocamOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoGridOutline, IoListOutline, IoFilterOutline, IoPeopleOutline, IoLibraryOutline, IoFileTrayStackedOutline, IoPersonOutline } from "react-icons/io5";
 import { useTranslations } from "next-intl";
 import { useAuth } from "@/hooks/use-auth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { notifications } from "@mantine/notifications";
 import { useVideos } from "./hooks/use-videos";
 import { VideoTable } from "./components/video-table";
@@ -34,6 +37,7 @@ import { Dropzone } from "@mantine/dropzone";
 import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
 import { GrantAccessModal } from '@/components/common/materials/grant-access-modal';
 import { useStorageLimitCheck } from '@/components/layout/users/hooks/use-storage-limit-check';
+import { useUsersQuery } from "@/components/layout/users/hooks/use-users-query";
 
 export default function VideosLayout() {
     const t = useTranslations('Materials.video');
@@ -58,8 +62,10 @@ export default function VideosLayout() {
     const [limit, setLimit] = useState('15');
     const [search, setSearch] = useState('');
     const [category_filters, setCategoryFilters] = useState<string[]>([]);
+    const [recording_student_ids, setRecordingStudentIds] = useState<string[]>([]);
     const [selected_ids, setSelectedIds] = useState<string[]>([]);
     const [view_mode, setViewMode] = useState<'grid' | 'table'>('grid');
+    const [active_tab, setActiveTab] = useState<string | null>('materials');
     
     // Components state
     const [drawer_opened, setDrawerOpened] = useState(false);
@@ -84,9 +90,18 @@ export default function VideosLayout() {
         localStorage.setItem('video_view_mode', mode);
     };
 
+    // Users for filtering recordings
+    const { users: all_users } = useUsersQuery({ role: 'student' });
+    const students_data = useMemo(() => 
+        all_users
+            .filter(u => u.role === 'student')
+            .map(u => ({ value: u.id, label: u.name })), 
+    [all_users]);
+
     // Data fetching
     const { 
         videos, 
+        recordings,
         is_loading, 
         is_uploading, 
         is_updating,
@@ -101,8 +116,30 @@ export default function VideosLayout() {
         page,
         limit: parseInt(limit),
         search,
-        category_ids: category_filters
+        category_ids: category_filters,
+        recording_student_ids: recording_student_ids
     });
+
+
+    const display_data = useMemo(() => {
+        if (active_tab === 'materials') return videos;
+        
+        return recordings.map(r => ({
+            id: r.id,
+            name: r.student_name || r.name,
+            file_url: r.file_url,
+            size: r.size || 0,
+            created_at: r.date || new Date().toISOString(),
+            updated_at: r.date || new Date().toISOString(),
+            categories: [],
+            is_readonly: true,
+            student_name: r.student_name,
+            recording_status: r.recording_status,
+            accessible_student_ids: []
+        } as VideoMaterial));
+
+
+    }, [active_tab, videos, recordings]);
 
     // Handlers
     const handle_add = () => {
@@ -201,14 +238,15 @@ export default function VideosLayout() {
         }
     };
 
-    const has_data = videos.length > 0;
+    const has_data = display_data.length > 0;
     const is_student = user?.role === 'student';
+    const is_readonly_tab = active_tab === 'recordings';
 
     return (
     <>
         {!is_student && (
             <Dropzone.FullScreen 
-                active={!drawer_opened && !filter_drawer_opened && !player_opened}
+                active={!drawer_opened && !filter_drawer_opened && !player_opened && active_tab === 'materials'}
                 onDrop={(files) => {
                     if (!checkFiles(files)) return;
                     
@@ -326,16 +364,18 @@ export default function VideosLayout() {
                     <Group>
                         {!is_student && selected_ids.length > 0 && (
                              <Group gap="xs">
-                                <Button 
-                                   variant="light" 
-                                   leftSection={<IoPeopleOutline size={16} />}
-                                   onClick={() => {
-                                       setIdsToGrant(selected_ids);
-                                       setAccessModalOpened(true);
-                                   }}
-                                >
-                                   {tAccess('grant_access')}
-                                </Button>
+                                {!is_readonly_tab && (
+                                    <Button 
+                                       variant="light" 
+                                       leftSection={<IoPeopleOutline size={16} />}
+                                       onClick={() => {
+                                           setIdsToGrant(selected_ids);
+                                           setAccessModalOpened(true);
+                                       }}
+                                    >
+                                       {tAccess('grant_access')}
+                                    </Button>
+                                )}
                                 <Button 
                                    color="red" 
                                    variant="light" 
@@ -347,13 +387,13 @@ export default function VideosLayout() {
                              </Group>
                         )}
                         <Button 
-                            variant={category_filters.length > 0 ? "light" : "default"}
-                            color={category_filters.length > 0 ? "primary" : "gray"}
+                            variant={(active_tab === 'materials' ? category_filters.length : 0) > 0 ? "light" : "default"}
+                            color={(active_tab === 'materials' ? category_filters.length : 0) > 0 ? "primary" : "gray"}
                             leftSection={<IoFilterOutline size={18} />} 
                             onClick={() => setFilterDrawerOpened(true)}
                         >
                             <Box className="hidden sm:inline">{common_t('filters')}</Box>
-                            {category_filters.length > 0 && (
+                            {active_tab === 'materials' && category_filters.length > 0 && (
                                 <Box 
                                     ml={8} 
                                     className="w-5 h-5 rounded-full text-white flex items-center justify-center text-[10px] font-bold shadow-sm"
@@ -363,7 +403,8 @@ export default function VideosLayout() {
                                 </Box>
                             )}
                         </Button>
-                        {!is_student && (
+
+                        {!is_student && active_tab === 'materials' && (
                             <Button 
                                 leftSection={<IoAddOutline size={18} />} 
                                 onClick={handle_add}
@@ -372,8 +413,49 @@ export default function VideosLayout() {
                                 {t('add_video')}
                             </Button>
                         )}
+
                     </Group>
                 </Group>
+
+                <Tabs 
+                    value={active_tab} 
+                    onChange={(val) => {
+                        setActiveTab(val);
+                        setSelectedIds([]);
+                        setPage(1);
+                    }}
+                    variant="pills"
+                    radius="xl"
+                    styles={{
+                        root: { border: 'none' },
+                        list: { gap: '8px', border: 'none', padding: '4px', backgroundColor: 'rgba(255,255,255,0.03)', width: 'fit-content', borderRadius: '100px' },
+                        tab: { 
+                            padding: '8px 20px', 
+                            fontWeight: 600,
+                            transition: 'all 0.2s ease',
+                            '&[data-active]': {
+                                backgroundColor: 'var(--mantine-primary-color-filled)',
+                                color: 'white',
+                                boxShadow: '0 4px 12px rgba(var(--mantine-primary-color-filled-rgb), 0.2)'
+                            }
+                        }
+                    }}
+                >
+                    <Tabs.List>
+                        <Tabs.Tab 
+                            value="materials" 
+                            leftSection={<IoLibraryOutline size={16} />}
+                        >
+                            {t('tabs_list.materials')}
+                        </Tabs.Tab>
+                        <Tabs.Tab 
+                            value="recordings" 
+                            leftSection={<IoFileTrayStackedOutline size={16} />}
+                        >
+                            {t('tabs_list.recordings')}
+                        </Tabs.Tab>
+                    </Tabs.List>
+                </Tabs>
 
                 <Paper withBorder radius="md" className="bg-white/5 border-white/10 overflow-hidden relative">
                     <LoadingOverlay visible={is_loading} overlayProps={{ blur: 2 }} zIndex={50} />
@@ -383,19 +465,58 @@ export default function VideosLayout() {
                     {/* Filters Toolbar */}
                     <Box className="p-4 border-b border-white/10 bg-white/2">
                         <Group justify="space-between">
-                            <TextInput
-                                placeholder={common_t('search')}
-                                leftSection={<IoSearchOutline size={16} />}
-                                value={search}
-                                onChange={(e) => setSearch(e.currentTarget.value)}
-                                size="sm"
-                                maw={300}
-                                className="flex-1"
-                                variant="filled"
-                            />
+                            <Group gap="sm" className="flex-1" wrap="nowrap">
+                                <TextInput
+                                    placeholder={common_t('search')}
+                                    leftSection={<IoSearchOutline size={16} />}
+                                    value={search}
+                                    onChange={(e) => setSearch(e.currentTarget.value)}
+                                    size="sm"
+                                    maw={300}
+                                    className="flex-1"
+                                    variant="filled"
+                                />
 
-                            <Group gap="xs">
+                                {active_tab === 'recordings' && (
+                                    <MultiSelect
+                                        placeholder={t('students_filter_placeholder')}
+                                        leftSection={<IoPersonOutline size={16} />}
+                                        data={students_data}
+                                        value={recording_student_ids}
+                                        onChange={setRecordingStudentIds}
+                                        size="sm"
+                                        maw={350}
+                                        className="flex-1 hidden md:block"
+                                        clearable
+                                        searchable
+                                        hidePickedOptions
+                                        variant="filled"
+                                        styles={{
+                                            input: { backgroundColor: 'var(--white-5)', border: '1px solid var(--white-10)' },
+                                            pill: { backgroundColor: 'var(--white-10)', color: 'white' }
+                                        }}
+                                    />
+                                )}
+                            </Group>
+
+                            <Group gap="xs" wrap="nowrap">
+                                {active_tab === 'recordings' && (
+                                    <MultiSelect
+                                        placeholder={t('students_filter_placeholder')}
+                                        leftSection={<IoPersonOutline size={16} />}
+                                        data={students_data}
+                                        value={recording_student_ids}
+                                        onChange={setRecordingStudentIds}
+                                        size="sm"
+                                        w={200}
+                                        className="md:hidden"
+                                        clearable
+                                        searchable
+                                        variant="filled"
+                                    />
+                                )}
                                 <Text size="sm" c="dimmed" className="hidden sm:block">{t('view_mode')}:</Text>
+
                                 <SegmentedControl
                                     size="xs"
                                     value={view_mode}
@@ -435,7 +556,7 @@ export default function VideosLayout() {
                             <Box p={view_mode === 'grid' ? "md" : 0}>
                                 {view_mode === 'grid' ? (
                                     <VideoGrid 
-                                        data={videos}
+                                        data={display_data}
                                         selected_ids={selected_ids}
                                         on_selection_change={setSelectedIds}
                                         on_edit={handle_edit}
@@ -446,10 +567,11 @@ export default function VideosLayout() {
                                             setAccessModalOpened(true);
                                         }}
                                         is_loading={is_loading}
+                                        is_readonly={is_readonly_tab}
                                     />
                                 ) : (
                                     <VideoTable 
-                                        data={videos}
+                                        data={display_data}
                                         selected_ids={selected_ids}
                                         on_selection_change={setSelectedIds}
                                         on_edit={handle_edit}
@@ -460,36 +582,39 @@ export default function VideosLayout() {
                                             setAccessModalOpened(true);
                                         }}
                                         is_loading={is_loading}
+                                        is_readonly={is_readonly_tab}
                                     />
                                 )}
                                 
                                 {/* Pagination */}
-                                <Box className="p-4 border-t border-white/10 bg-white/2">
-                                    <Group justify="center">
-                                        <Group gap="xs">
-                                            <Text size="sm" c="dimmed">{common_t('show')}</Text>
-                                            <Select
-                                                data={['15', '30', '50']}
-                                                value={limit}
-                                                onChange={(val) => setLimit(val || '15')}
-                                                size="xs"
-                                                w={70}
+                                {active_tab === 'materials' && (
+                                    <Box className="p-4 border-t border-white/10 bg-white/2">
+                                        <Group justify="center">
+                                            <Group gap="xs">
+                                                <Text size="sm" c="dimmed">{common_t('show')}</Text>
+                                                <Select
+                                                    data={['15', '30', '50']}
+                                                    value={limit}
+                                                    onChange={(val) => setLimit(val || '15')}
+                                                    size="xs"
+                                                    w={70}
+                                                />
+                                                <Text size="sm" c="dimmed">{common_t('per_page')}</Text>
+                                            </Group>
+        
+                                            <Pagination 
+                                                total={total_pages} 
+                                                value={page} 
+                                                onChange={setPage} 
+                                                size="sm"
+                                                withEdges
+                                                boundaries={1}
+                                                siblings={1}
+                                                color="primary"
                                             />
-                                            <Text size="sm" c="dimmed">{common_t('per_page')}</Text>
                                         </Group>
-    
-                                        <Pagination 
-                                            total={total_pages} 
-                                            value={page} 
-                                            onChange={setPage} 
-                                            size="sm"
-                                            withEdges
-                                            boundaries={1}
-                                            siblings={1}
-                                            color="primary"
-                                        />
-                                    </Group>
-                                </Box>
+                                    </Box>
+                                )}
                             </Box>
                         ) : (
                             <Stack align="center" gap="md" py={60}>
@@ -508,7 +633,7 @@ export default function VideosLayout() {
                                 <Text c="dimmed" size="sm" ta="center" maw={400}>
                                     {is_super_admin ? t('empty_description_admin') : t('empty_description')}
                                 </Text>
-                                {!is_student && (
+                                {!is_student && !is_readonly_tab && (
                                     <Group mt="sm">
                                         <Button variant="light" onClick={handle_add} className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors">
                                             {t('add_video')}
@@ -523,3 +648,4 @@ export default function VideosLayout() {
     </>
     );
 }
+

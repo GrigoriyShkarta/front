@@ -43,6 +43,7 @@ export function SubscriptionDrawer({ opened, onClose, subscription, on_submit, i
       name: '',
       lessons_count: undefined,
       price: undefined,
+      lesson_duration: 50,
       student_id: '',
     },
   });
@@ -54,6 +55,7 @@ export function SubscriptionDrawer({ opened, onClose, subscription, on_submit, i
           name: subscription.name,
           lessons_count: subscription.lessons_count,
           price: subscription.price,
+          lesson_duration: subscription.lesson_duration || 50,
           student_id: subscription.student_id || '',
         });
       } else {
@@ -61,6 +63,7 @@ export function SubscriptionDrawer({ opened, onClose, subscription, on_submit, i
           name: '',
           lessons_count: undefined,
           price: undefined,
+          lesson_duration: 50,
           student_id: '',
         });
       }
@@ -141,6 +144,24 @@ export function SubscriptionDrawer({ opened, onClose, subscription, on_submit, i
                 error={errors.price?.message ? t(`validation.${errors.price.message as any}`) : null}
                 variant="filled"
                 rightSection={currencySymbol}
+              />
+            )}
+          />
+
+          <Controller
+            name="lesson_duration"
+            control={control}
+            render={({ field }) => (
+              <NumberInput
+                label={t('form.lesson_duration') || 'Lesson duration (min)'}
+                placeholder={t('form.lesson_duration_placeholder') || '50'}
+                required
+                min={1}
+                allowLeadingZeros={false}
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.lesson_duration?.message ? t(`validation.${errors.lesson_duration.message as any}`) : null}
+                variant="filled"
               />
             )}
           />

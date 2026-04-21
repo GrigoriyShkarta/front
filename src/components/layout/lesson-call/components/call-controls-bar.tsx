@@ -169,19 +169,17 @@ export function CallControlsBar({
         <IoPeopleOutline size={20} />
       </ActionIcon> */}
 
-      {userRole !== 'student' && (
-        <ActionIcon 
-          variant="filled" 
-          size="xl" 
-          radius="xl" 
-          onClick={onOpenSettings}
-          title={t('settings')}
-          style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
-          className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
-        >
-          <IoSettingsOutline size={20} />
-        </ActionIcon>
-      )}
+      <ActionIcon 
+        variant="filled" 
+        size="xl" 
+        radius="xl" 
+        onClick={onOpenSettings}
+        title={t('settings')}
+        style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
+        className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
+      >
+        <IoSettingsOutline size={20} />
+      </ActionIcon>
     </div>
   );
 }

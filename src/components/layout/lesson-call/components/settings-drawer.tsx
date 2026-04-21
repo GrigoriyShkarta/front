@@ -38,6 +38,7 @@ interface SettingsDrawerProps {
   };
   onUpdate: (key: 'is_recording_enabled' | 'can_student_download_recording', value: boolean) => void;
   isLoading: boolean;
+  userRole?: string;
 }
 
 /**
@@ -49,7 +50,8 @@ export function SettingsDrawer({
   fullscreenEl,
   settings, 
   onUpdate, 
-  isLoading 
+  isLoading,
+  userRole
 }: SettingsDrawerProps) {
   const t = useTranslations('Calendar.lesson_room');
   const call = useCall();
@@ -67,6 +69,7 @@ export function SettingsDrawer({
 
   const [speakerDevices, setSpeakerDevices] = useState<MediaDeviceInfo[]>([]);
   const [localVolume, setLocalVolume] = useState(Math.round((speakerState?.volume ?? 1) * 100));
+  const [localMicVolume, setLocalMicVolume] = useState(100);
 
   // Load speaker devices
   useEffect(() => {
@@ -78,6 +81,12 @@ export function SettingsDrawer({
   const handleVolumeChange = (val: number) => {
     setLocalVolume(val);
     call?.speaker.setVolume(val / 100);
+  };
+
+  const handleMicVolumeChange = (val: number) => {
+    setLocalMicVolume(val);
+    // Note: Stream SDK doesn't support direct mic gain yet, 
+    // but we track it for UI and future implementation or Web Audio API wrapper
   };
 
   const deviceToSelectData = useMemo(() => (devices: MediaDeviceInfo[]) => 
@@ -107,7 +116,7 @@ export function SettingsDrawer({
       }}
     >
       <Tabs 
-        defaultValue="lesson" 
+        defaultValue={userRole === 'student' ? 'tech' : 'lesson'} 
         variant="pills" 
         radius="xl"
         styles={{
@@ -127,10 +136,10 @@ export function SettingsDrawer({
           }
         }}
       >
-        {/* <Tabs.List>
-          <Tabs.Tab value="lesson">{t('tab_lesson')}</Tabs.Tab>
+        <Tabs.List>
+          {userRole !== 'student' && <Tabs.Tab value="lesson">{t('tab_lesson')}</Tabs.Tab>}
           <Tabs.Tab value="tech">{t('tab_tech')}</Tabs.Tab>
-        </Tabs.List> */}
+        </Tabs.List>
 
         <Tabs.Panel value="lesson">
           <Stack gap="xl">
@@ -196,22 +205,43 @@ export function SettingsDrawer({
 
             <Divider color="var(--call-border)" />
 
-            {/* Speaker Volume */}
+            {/* Speaker & Mic Volume */}
             <Box>
-              <Group gap="xs" mb="xs">
-                <IoVolumeHighOutline size={18} />
-                <Text fw={600} size="sm">{t('speaker_volume')}</Text>
-              </Group>
-              <Slider 
-                value={localVolume}
-                onChange={handleVolumeChange}
-                color="var(--space-primary)"
-                label={(v) => `${v}%`}
-                size="sm"
-                styles={{
-                  markLabel: { color: 'var(--call-text)' }
-                }}
-              />
+              <Stack gap="md">
+                <Box>
+                  <Group gap="xs" mb="xs">
+                    <IoVolumeHighOutline size={18} />
+                    <Text fw={600} size="sm">{t('output_volume')}</Text>
+                  </Group>
+                  <Slider 
+                    value={localVolume}
+                    onChange={handleVolumeChange}
+                    color="var(--space-primary)"
+                    label={(v) => `${v}%`}
+                    size="sm"
+                    styles={{
+                      markLabel: { color: 'var(--call-text)' }
+                    }}
+                  />
+                </Box>
+
+                <Box>
+                  <Group gap="xs" mb="xs">
+                    <IoMicOutline size={18} />
+                    <Text fw={600} size="sm">{t('mic_volume')}</Text>
+                  </Group>
+                  <Slider 
+                    value={localMicVolume}
+                    onChange={handleMicVolumeChange}
+                    color="var(--space-primary)"
+                    label={(v) => `${v}%`}
+                    size="sm"
+                    styles={{
+                      markLabel: { color: 'var(--call-text)' }
+                    }}
+                  />
+                </Box>
+              </Stack>
             </Box>
 
             <Divider color="var(--call-border)" />

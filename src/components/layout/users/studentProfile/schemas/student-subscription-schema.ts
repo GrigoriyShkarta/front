@@ -8,6 +8,7 @@ export const student_subscription_lesson_schema = z.object({
   is_recording_enabled: z.boolean().default(false),
   can_student_download_recording: z.boolean().default(false),
   recording_url: z.string().nullable().default(null),
+  recording_status: z.enum(['none', 'processing', 'ready', 'failed']).default('none'),
   created_at: z.string(),
   updated_at: z.string(),
 });
@@ -24,6 +25,7 @@ export const student_subscription_schema = z.object({
   payment_reminder: z.boolean().optional(),
   selected_days: z.array(z.string()),
   student_id: z.string(),
+  lesson_duration: z.number().default(50),
   subscription_id: z.string().optional().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -43,6 +45,7 @@ export const create_student_subscription_schema = z.object({
   name: z.string().optional(),
   lessons_count: z.number().optional(),
   price: z.number().optional(),
+  lesson_duration: z.number().min(1, 'errors.required'),
   student_id: z.string().min(1, 'errors.required'),
   paid_amount: z.number().min(0, 'errors.required'),
   payment_status: z.enum(['paid', 'unpaid', 'partially_paid']),

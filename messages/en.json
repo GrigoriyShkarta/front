@@ -353,6 +353,8 @@
       "noise_suppression": "Noise Suppression",
       "noise_suppression_desc": "Removes background noises during the call",
       "speaker_volume": "Speaker Volume",
+      "mic_volume": "Microphone Volume",
+      "output_volume": "Output Signal Volume",
       "camera": "Camera",
       "microphone": "Microphone",
       "speaker": "Speaker",
@@ -375,7 +377,8 @@
         "recording_deleted": "Recording successfully deleted",
         "insert_link": "Insert link",
         "no_recording_yet": "No recording yet",
-        "invalid_youtube_url": "Invalid YouTube URL"
+        "invalid_youtube_url": "Invalid YouTube URL",
+        "recording_processing": "Video is being processed..."
       }
     }
   },
@@ -659,6 +662,7 @@
       "subscription_price_placeholder": "1000",
       "lessons_count": "Lessons Count",
       "lessons_count_placeholder": "8",
+      "lesson_duration": "Duration (min)",
       "comment": "Comment",
       "comment_placeholder": "Your comment..."
     },
@@ -846,6 +850,10 @@
     "video": {
       "title": "Video Materials",
       "subtitle": "A dynamic library of video materials for engaging and effective learning.",
+      "lesson_with": "Lesson with {name}",
+      "students_filter_placeholder": "Filter by students",
+
+
       "empty_title": "No videos found",
       "empty_description": "There are currently no video materials available for your account. Please contact your administrator for access.",
       "empty_description_admin": "Your library is currently empty. Upload a file or add a YouTube link to get started.",
@@ -860,6 +868,11 @@
         "file": "Upload File",
         "url": "YouTube Link"
       },
+      "tabs_list": {
+        "materials": "Materials",
+        "recordings": "Lesson Recordings"
+      },
+
       "table": {
         "name": "Name",
         "type": "Type",
@@ -1521,7 +1534,9 @@
         "lessons_count": "Lessons count",
         "lessons_count_placeholder": "8",
         "price": "Price",
-        "price_placeholder": "99.99"
+        "price_placeholder": "99.99",
+        "lesson_duration": "Lesson duration (min)",
+        "lesson_duration_placeholder": "50"
       },
       "notifications": {
         "create_success": "Servant created successfully",
@@ -1538,6 +1553,7 @@
         "lessons_count_required": "Lessons count must be at least 1",
         "price_required": "Servant price is required",
         "price_non_negative": "Price cannot be negative",
+        "lesson_duration_required": "Lesson duration is required",
         "at_least_one_day": "Select at least one day",
         "paid_amount_required": "Paid amount is required"
       },

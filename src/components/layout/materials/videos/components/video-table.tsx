@@ -19,7 +19,9 @@ interface Props {
   on_select?: (video: VideoMaterial) => void;
   is_loading?: boolean;
   is_picker?: boolean;
+  is_readonly?: boolean;
 }
+
 
 export function VideoTable({ 
     data, 
@@ -31,8 +33,10 @@ export function VideoTable({
     on_grant_access,
     on_select, 
     is_loading,
-    is_picker = false
+    is_picker = false,
+    is_readonly = false
 }: Props) {
+
   const t = useTranslations('Materials.video.table');
   const tAccess = useTranslations('Materials.access');
   const common_t = useTranslations('Common');
@@ -59,10 +63,12 @@ export function VideoTable({
   const show_actions = !is_picker && !is_student;
 
   const get_youtube_id = (url: string) => {
+    if (!url || (!url.includes('youtube.com') && !url.includes('youtu.be'))) return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   };
+
 
   return (
     <Table.ScrollContainer minWidth={800}>
@@ -91,9 +97,9 @@ export function VideoTable({
         <Table.Tbody>
           {data.map((item) => {
             const is_selected = selected_ids.includes(item.id);
-            const is_youtube = !!item.youtube_url || (!item.file_key && !!item.file_url);
-            const youtube_target_url = item.youtube_url || (!item.file_key ? item.file_url : null);
-            const youtube_id = youtube_target_url ? get_youtube_id(youtube_target_url) : null;
+            const youtube_id = item.youtube_url ? get_youtube_id(item.youtube_url) : (item.file_url ? get_youtube_id(item.file_url) : null);
+            const is_youtube = !!youtube_id;
+
 
             return (
               <Table.Tr 
@@ -135,18 +141,22 @@ export function VideoTable({
                             {common_t('confirm')}
                           </Menu.Item>
                         )}
-                        <Menu.Item 
-                          leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
-                          onClick={() => on_edit(item)}
-                        >
-                          {common_t('edit')}
-                        </Menu.Item>
-                        <Menu.Item 
-                          leftSection={<IoPeopleOutline style={{ width: rem(14), height: rem(14) }} />}
-                          onClick={() => on_grant_access(item.id)}
-                        >
-                          {tAccess('grant_access')}
-                        </Menu.Item>
+                        {!is_readonly && (
+                          <>
+                            <Menu.Item 
+                              leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
+                              onClick={() => on_edit(item)}
+                            >
+                              {common_t('edit')}
+                            </Menu.Item>
+                            <Menu.Item 
+                              leftSection={<IoPeopleOutline style={{ width: rem(14), height: rem(14) }} />}
+                              onClick={() => on_grant_access(item.id)}
+                            >
+                              {tAccess('grant_access')}
+                            </Menu.Item>
+                          </>
+                        )}
                         <Menu.Item 
                           color="red"
                           leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
@@ -155,6 +165,7 @@ export function VideoTable({
                           {common_t('delete')}
                         </Menu.Item>
                       </Menu.Dropdown>
+
                     </Menu>
                   </Table.Td>
                 )}

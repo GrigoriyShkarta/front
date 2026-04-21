@@ -14,6 +14,7 @@ export const useVideos = (filters: any = {}) => {
     queryFn: () => videoActions.get_videos(filters),
   });
 
+
   const upload_mutation = useMutation({
     mutationFn: (data: { name: string; file?: File; youtube_url?: string; categories?: string[]; onProgress?: (p: any) => void }) => 
       videoActions.create_video({ 
@@ -94,6 +95,7 @@ export const useVideos = (filters: any = {}) => {
 
   return {
     videos: query.data?.data || [],
+    recordings: query.data?.recordings || [],
     total: query.data?.meta.total_items || 0,
     is_loading: query.isLoading,
     is_fetching: query.isFetching,
@@ -108,4 +110,5 @@ export const useVideos = (filters: any = {}) => {
     bulk_delete: bulk_delete_mutation.mutateAsync,
     refetch: query.refetch,
   };
+
 };

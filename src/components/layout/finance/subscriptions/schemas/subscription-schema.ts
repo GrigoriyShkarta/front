@@ -8,6 +8,7 @@ export const subscription_schema = z.object({
   name: z.string({ message: 'name_required' }).min(1, 'name_required'),
   lessons_count: z.coerce.number({ message: 'lessons_count_required' }).min(1, 'lessons_count_required'),
   price: z.coerce.number({ message: 'price_required' }).min(0, 'price_non_negative'),
+  lesson_duration: z.coerce.number().default(50),
   student_id: z.string().optional(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -22,6 +23,7 @@ export const subscription_form_schema = z.object({
   name: z.string({ message: 'name_required' }).min(1, 'name_required'),
   lessons_count: z.number({ message: 'lessons_count_required' }).min(1, 'lessons_count_required'),
   price: z.number({ message: 'price_required' }).min(0, 'price_non_negative'),
+  lesson_duration: z.number({ message: 'lesson_duration_required' }).min(1, 'lesson_duration_required'),
   student_id: z.string().optional(),
 });
 

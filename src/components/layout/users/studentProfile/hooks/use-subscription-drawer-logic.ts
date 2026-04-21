@@ -45,6 +45,7 @@ export function useSubscriptionDrawerLogic({
       name: '',
       price: 0,
       lessons_count: 1,
+      lesson_duration: 50,
       comment: '',
       selected_days: [] as string[],
       start_date: new Date(),
@@ -63,6 +64,7 @@ export function useSubscriptionDrawerLogic({
       name: (value, values) => (values.subscription_type === 'custom' && !value ? finance_t('name_required') : null),
       price: (value, values) => (values.subscription_type === 'custom' && (value === undefined || value < 0) ? finance_t('price_non_negative') : null),
       lessons_count: (value, values) => (values.subscription_type === 'custom' && (!value || value <= 0) ? finance_t('lessons_count_required') : null),
+      lesson_duration: (value, values) => (values.subscription_type === 'custom' && (!value || value <= 0) ? common_t('errors.required') : null),
       paid_amount: (value, values) => (values.payment_status === 'partially_paid' && (value === undefined || value < 0) ? finance_t('paid_amount_required') : null),
     }
   });
@@ -91,6 +93,7 @@ export function useSubscriptionDrawerLogic({
         name: subscription?.name ?? subscription.subscription?.name ?? '',
         price: subscription.price || 0,
         lessons_count: subscription.lessons?.length || 1,
+        lesson_duration: subscription.lesson_duration || 50,
         comment: subscription.comment || '',
         selected_days: subscription.selected_days,
         start_date: firstLesson ? new Date(firstLesson.date) : new Date(),
@@ -152,12 +155,14 @@ export function useSubscriptionDrawerLogic({
         price: selectedTemplate?.price || 0,
         lessons_count: selectedTemplate?.lessons_count || 1,
         name: selectedTemplate?.name || '',
+        lesson_duration: selectedTemplate?.lesson_duration || 50,
       };
     }
     return {
       price: form.values.price,
       lessons_count: form.values.lessons_count,
       name: form.values.name,
+      lesson_duration: form.values.lesson_duration,
     };
   }, [form.values.subscription_type, selectedTemplate, form.values.price, form.values.lessons_count, form.values.name]);
 
@@ -248,6 +253,7 @@ export function useSubscriptionDrawerLogic({
           partial_payment_date: values.partial_payment_date ? dayjs(values.partial_payment_date).toISOString() : null,
           next_payment_date: values.next_payment_date ? dayjs(values.next_payment_date).toISOString() : null,
           payment_reminder: values.payment_reminder,
+          lesson_duration: values.lesson_duration,
           selected_days: values.selected_days,
           lesson_dates,
           comment: values.comment,
@@ -278,6 +284,7 @@ export function useSubscriptionDrawerLogic({
           name: values.name,
           price: values.price,
           lessons_count: values.lessons_count,
+          lesson_duration: values.lesson_duration,
         });
       }
     }

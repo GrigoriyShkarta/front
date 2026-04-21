@@ -14,13 +14,17 @@ export function VideoPlayerModal({ opened, onClose, video }: Props) {
   const [is_loading, setIsLoading] = useState(true);
 
   const get_youtube_id = (url: string) => {
-    if (!url) return null;
+    if (!url || (!url.includes('youtube.com') && !url.includes('youtu.be'))) return null;
     const regExp = /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]{11})/;
     const match = url.match(regExp);
     return match ? match[1] : null;
   };
 
-  const youtube_id = !video?.file_key && video?.file_url ? get_youtube_id(video.file_url) : null;
+
+  const youtube_id = video?.youtube_url 
+    ? get_youtube_id(video.youtube_url) 
+    : (video?.file_url ? get_youtube_id(video.file_url) : null);
+
 
   useEffect(() => {
     if (opened) {

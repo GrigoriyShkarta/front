@@ -6,7 +6,7 @@ import {
 import { useTranslations, useLocale } from 'next-intl';
 import { 
   IoVideocamOutline, IoDownloadOutline, IoTrashOutline, 
-  IoPencilOutline, IoLinkOutline
+  IoPencilOutline, IoLinkOutline, IoSyncOutline, IoWarningOutline
 } from 'react-icons/io5';
 import { useStudentSubscriptions } from '../hooks/use-student-subscriptions';
 import { useAuth } from '@/hooks/use-auth';
@@ -137,17 +137,43 @@ export function StudentRecordingsList() {
             </Group>
 
             <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 4, lg: 5 }} spacing="md">
-              {slots.map((lesson: any) => (
-                lesson.recording_url ? (
-                  <RecordingCard 
-                    key={lesson.id} 
-                    lesson={lesson} 
-                    is_teacher={is_teacher}
-                    locale={locale}
-                    onEdit={() => set_editing_lesson({ id: lesson.id, url: lesson.recording_url, date: lesson.date })}
-                    onDelete={() => set_deleting_id(lesson.id)}
-                  />
-                ) : (
+              {slots.map((lesson: any) => {
+                if (lesson.recording_status === 'processing') {
+                  return (
+                    <ProcessingRecordingSlot 
+                      key={lesson.id}
+                      lesson={lesson}
+                      locale={locale}
+                    />
+                  );
+                }
+
+                if (lesson.recording_status === 'failed') {
+                  return (
+                    <FailedRecordingSlot 
+                      key={lesson.id}
+                      lesson={lesson}
+                      locale={locale}
+                      is_teacher={is_teacher}
+                      onEdit={() => set_editing_lesson({ id: lesson.id, url: '', date: lesson.date })}
+                    />
+                  );
+                }
+
+                if (lesson.recording_url) {
+                  return (
+                    <RecordingCard 
+                      key={lesson.id} 
+                      lesson={lesson} 
+                      is_teacher={is_teacher}
+                      locale={locale}
+                      onEdit={() => set_editing_lesson({ id: lesson.id, url: lesson.recording_url, date: lesson.date })}
+                      onDelete={() => set_deleting_id(lesson.id)}
+                    />
+                  );
+                }
+
+                return (
                   <EmptyRecordingSlot 
                     key={lesson.id}
                     lesson={lesson}
@@ -155,8 +181,8 @@ export function StudentRecordingsList() {
                     is_teacher={is_teacher}
                     onEdit={is_teacher && !lesson.is_placeholder ? () => set_editing_lesson({ id: lesson.id, url: '', date: lesson.date }) : undefined}
                   />
-                )
-              ))}
+                );
+              })}
             </SimpleGrid>
           </Stack>
         );
@@ -315,6 +341,67 @@ function EmptyRecordingSlot({ lesson, is_teacher, locale, onEdit }: { lesson: an
             <Text size="xs" c="dimmed" mt={4} ta="center">
               {dayjs(lesson.date).locale(locale).format('DD MMM YYYY')}
             </Text>
+          )}
+        </Stack>
+      </Stack>
+    </Paper>
+  );
+}
+
+function ProcessingRecordingSlot({ lesson, locale }: { lesson: any, locale: string }) {
+  const t = useTranslations('Calendar.lesson_room.recordings_ui');
+  
+  return (
+    <Paper 
+      withBorder 
+      radius="md" 
+      className="bg-secondary/5 h-full border-secondary/10 border-dashed flex flex-col items-center justify-center p-6 relative overflow-hidden"
+    >
+      <Stack align="center" gap="sm">
+        <Box className="p-4 bg-blue-50 rounded-full">
+          <IoSyncOutline size={32} className="text-blue-500 animate-spin" />
+        </Box>
+        <Stack gap={2} align="center">
+          <Text size="sm" fw={600} c="dimmed" ta="center">
+            {t('recording_processing')}
+          </Text>
+          {lesson?.date && (
+            <Text size="xs" c="dimmed" ta="center">
+              {dayjs(lesson.date).locale(locale).format('DD MMM YYYY')}
+            </Text>
+          )}
+        </Stack>
+      </Stack>
+    </Paper>
+  );
+}
+
+function FailedRecordingSlot({ lesson, locale, is_teacher, onEdit }: { lesson: any, locale: string, is_teacher: boolean, onEdit?: () => void }) {
+  const common_t = useTranslations('Common');
+  
+  return (
+    <Paper 
+      withBorder 
+      radius="md" 
+      className="bg-red-50/30 h-full border-red-200 border-dashed flex flex-col items-center justify-center p-6 relative"
+    >
+      <Stack align="center" gap="sm">
+        <Box className="p-4 bg-red-100 rounded-full">
+          <IoWarningOutline size={32} className="text-red-500" />
+        </Box>
+        <Stack gap={2} align="center">
+          <Text size="sm" fw={600} c="red.7" ta="center">
+            {common_t('error')}
+          </Text>
+          {lesson?.date && (
+            <Text size="xs" c="dimmed" ta="center">
+              {dayjs(lesson.date).locale(locale).format('DD MMM YYYY')}
+            </Text>
+          )}
+          {is_teacher && onEdit && (
+             <Button variant="subtle" size="xs" color="red" mt="xs" onClick={onEdit}>
+               {common_t('edit')}
+             </Button>
           )}
         </Stack>
       </Stack>

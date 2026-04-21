@@ -220,6 +220,7 @@ function MyCallUI() {
         settings={lessonSettings}
         onUpdate={updateSetting}
         isLoading={isUpdating}
+        userRole={user?.role}
       />
     </section>
   );

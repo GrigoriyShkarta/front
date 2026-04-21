@@ -357,6 +357,8 @@
       "noise_suppression": "Шумозаглушення",
       "noise_suppression_desc": "Видаляє фонові шуми під час дзвінка",
       "speaker_volume": "Гучність динаміка",
+      "mic_volume": "Гучність мікрофона",
+      "output_volume": "Гучність вихідного сигналу",
       "camera": "Камера",
       "microphone": "Мікрофон",
       "speaker": "Динамік",
@@ -379,7 +381,8 @@
         "recording_deleted": "Запис успішно видалено",
         "insert_link": "Вставити посилання",
         "no_recording_yet": "Запису ще немає",
-        "invalid_youtube_url": "Невірне посилання на YouTube"
+        "invalid_youtube_url": "Невірне посилання на YouTube",
+        "recording_processing": "Відео знаходиться в обробці..."
       }
     }
   },
@@ -664,6 +667,7 @@
       "subscription_price_placeholder": "1000",
       "lessons_count": "Кількість уроків",
       "lessons_count_placeholder": "8",
+      "lesson_duration": "Тривалість (хв)",
       "comment": "Коментар",
       "comment_placeholder": "Ваш коментар..."
     },
@@ -851,6 +855,10 @@
     "video": {
       "title": "Відеоматеріали",
       "subtitle": "Каталог навчальних відеоуроків та записів практичних занять.",
+      "lesson_with": "Урок з {name}",
+      "students_filter_placeholder": "Фільтр по студентах",
+
+
       "empty_title": "Відео не знайдено",
       "empty_description": "Наразі у вашому обліковому записі немає доступних відеоматеріалів. Зверніться до куратора для отримання доступу.",
       "empty_description_admin": "У вашій бібліотеці ще немає відео. Завантажте файл або додайте посилання на YouTube, щоб розпочати.",
@@ -865,6 +873,11 @@
         "file": "Завантажити файл",
         "url": "YouTube посилання"
       },
+      "tabs_list": {
+        "materials": "Матеріали",
+        "recordings": "Записи уроків"
+      },
+
       "table": {
         "name": "Назва",
         "type": "Тип",
@@ -1793,7 +1806,9 @@
         "lessons_count": "Кількість занять",
         "lessons_count_placeholder": "8",
         "price": "Ціна",
-        "price_placeholder": "99.99"
+        "price_placeholder": "99.99",
+        "lesson_duration": "Тривалість уроку (хв)",
+        "lesson_duration_placeholder": "50"
       },
       "notifications": {
         "create_success": "Послугу успішно створено",

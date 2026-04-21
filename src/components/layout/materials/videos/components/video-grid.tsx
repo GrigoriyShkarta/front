@@ -17,9 +17,12 @@ interface Props {
   on_play: (video: VideoMaterial) => void;
   on_grant_access: (id: string) => void;
   is_loading?: boolean;
+  is_readonly?: boolean;
 }
 
-export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on_delete, on_play, on_grant_access, is_loading }: Props) {
+
+export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on_delete, on_play, on_grant_access, is_loading, is_readonly }: Props) {
+
   const common_t = useTranslations('Common');
   const tAccess = useTranslations('Materials.access');
   const tAuth = useTranslations('Auth.validation');
@@ -29,10 +32,12 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
   const is_student = user?.role === 'student';
 
   const get_youtube_id = (url: string) => {
+    if (!url || (!url.includes('youtube.com') && !url.includes('youtu.be'))) return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   };
+
 
   const toggle_one = (id: string) => {
     on_selection_change(
@@ -46,9 +51,9 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
     <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 4, lg: 5 }} spacing="lg">
       {data.map((item) => {
         const is_selected = selected_ids.includes(item.id);
-        const is_youtube = !!item.youtube_url || (!item.file_key && !!item.file_url);
-        const youtube_target_url = item.youtube_url || (!item.file_key ? item.file_url : null);
-        const youtube_id = youtube_target_url ? get_youtube_id(youtube_target_url) : null;
+        const youtube_id = item.youtube_url ? get_youtube_id(item.youtube_url) : (item.file_url ? get_youtube_id(item.file_url) : null);
+        const is_youtube = !!youtube_id;
+
 
         return (
           <Card
@@ -79,13 +84,27 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
                     className="transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
-                  <Box 
-                    className="w-full h-full flex items-center justify-center"
-                    style={{ backgroundColor: is_selected ? 'var(--space-primary-10)' : 'rgba(255,255,255,0.02)' }}
-                  >
-                    <IoVideocamOutline size={40} className="text-white/10" />
-                  </Box>
+                  item.file_url ? (
+                    <Box className="w-full h-full relative">
+                       <video 
+                         src={item.file_url + '#t=0.5'} 
+                         className="w-full h-full object-cover"
+                         preload="metadata"
+                         muted
+                         playsInline
+                       />
+                       <Box className="absolute inset-0 bg-black/10" />
+                    </Box>
+                  ) : (
+                    <Box 
+                      className="w-full h-full flex items-center justify-center"
+                      style={{ backgroundColor: is_selected ? 'var(--space-primary-10)' : 'rgba(255,255,255,0.02)' }}
+                    >
+                      <IoVideocamOutline size={40} className="text-white/10" />
+                    </Box>
+                  )
                 )
+
               )}
 
               {/* Badges for video type */}
@@ -139,18 +158,22 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
                     </Menu.Target>
 
                     <Menu.Dropdown className="bg-[var(--space-card-bg)] border-white/10 backdrop-blur-md">
-                      <Menu.Item 
-                        leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
-                        onClick={() => on_edit(item)}
-                      >
-                        {common_t('edit')}
-                      </Menu.Item>
-                      <Menu.Item 
-                        leftSection={<IoPeopleOutline style={{ width: rem(14), height: rem(14) }} />}
-                        onClick={() => on_grant_access(item.id)}
-                      >
-                        {tAccess('grant_access')}
-                      </Menu.Item>
+                      {!is_readonly && (
+                        <>
+                          <Menu.Item 
+                            leftSection={<IoPencilOutline style={{ width: rem(14), height: rem(14) }} />}
+                            onClick={() => on_edit(item)}
+                          >
+                            {common_t('edit')}
+                          </Menu.Item>
+                          <Menu.Item 
+                            leftSection={<IoPeopleOutline style={{ width: rem(14), height: rem(14) }} />}
+                            onClick={() => on_grant_access(item.id)}
+                          >
+                            {tAccess('grant_access')}
+                          </Menu.Item>
+                        </>
+                      )}
                       <Menu.Item 
                         color="red"
                         leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
@@ -159,6 +182,7 @@ export function VideoGrid({ data, selected_ids, on_selection_change, on_edit, on
                         {common_t('delete')}
                       </Menu.Item>
                     </Menu.Dropdown>
+
                   </Menu>
                 </div>
               )}

@@ -72,6 +72,15 @@ export function SubscriptionTypeSection({ form, templates, isEditMode }: Props) 
               withAsterisk
               {...form.getInputProps('lessons_count')}
             />
+            <NumberInput
+              label={t('form.lesson_duration') || 'Duration (min)'}
+              placeholder="50"
+              min={1}
+              allowLeadingZeros={false}
+              required
+              withAsterisk
+              {...form.getInputProps('lesson_duration')}
+            />
           </Group>
         </Stack>
       )}
