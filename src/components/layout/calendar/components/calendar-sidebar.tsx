@@ -7,18 +7,19 @@ import dayjs from 'dayjs';
 import { FaGoogle } from 'react-icons/fa';
 import { IoAddOutline, IoTimeOutline } from 'react-icons/io5';
 import { CalendarEvent, is_google_event, is_lesson_event } from '../schemas/event-schema';
+import { useAuth } from '@/hooks/use-auth';
 
 interface Props {
   date: Date;
-  on_date_change: (date: Date) => void;
   events: CalendarEvent[];
-  on_create_click: () => void;
-  on_event_click: (event: CalendarEvent) => void;
   googleCalendarStatus?: { isConnected: boolean };
   isLoadingGoogleStatus?: boolean;
+  is_student?: boolean;
+  on_date_change: (date: Date) => void;
+  on_create_click: () => void;
+  on_event_click: (event: CalendarEvent) => void;
   on_connect_google?: () => void;
   on_disconnect_google?: () => void;
-  is_student?: boolean;
 }
 
 /**
@@ -27,17 +28,19 @@ interface Props {
  */
 export function CalendarSidebar({ 
   date, 
-  on_date_change, 
   events, 
-  on_create_click, 
-  on_event_click,
   googleCalendarStatus,
   isLoadingGoogleStatus,
+  is_student,
+  on_date_change, 
+  on_create_click, 
+  on_event_click,
   on_connect_google,
   on_disconnect_google,
-  is_student
 }: Props) {
   const t = useTranslations('Calendar');
+  const { user } = useAuth();
+  const space = user?.space;
   const raw_locale = useLocale();
   let locale = raw_locale.toLowerCase();
   if (locale === 'zh-cn') locale = 'zh-cn';
@@ -119,7 +122,16 @@ export function CalendarSidebar({
         <Stack gap="md">
           <Group justify="space-between">
             <Text fw={700} size="sm" tt="uppercase" c="dimmed">{t('upcoming')}</Text>
-            <Badge size="xs" variant="light">{upcoming_events.length}</Badge>
+            <Badge 
+              size="sm"  
+              color="primary"
+              variant="filled"
+              radius="xl" 
+              className="border-none px-2 h-5 min-w-[20px]"
+              style={{ color: space?.personalization?.is_white_sidebar_color !== false ? 'white' : 'black' }}
+            >
+              {upcoming_events.length}
+            </Badge>
           </Group>
           
           <ScrollArea h={300} type="never">

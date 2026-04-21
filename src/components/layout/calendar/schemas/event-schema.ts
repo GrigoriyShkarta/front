@@ -22,6 +22,7 @@ export const lesson_event_schema = z.object({
   title: z.string(),
   subtitle: z.string().optional(),
   color: z.string().optional(),
+  lesson_duration: z.number().optional(),
 });
 
 // ─── Google personal event (from /google-calendar/personal-events) ──────────

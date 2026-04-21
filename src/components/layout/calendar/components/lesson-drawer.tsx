@@ -131,7 +131,7 @@ export function LessonDrawer({ opened, lesson, onClose, onSubmit, isLoading, is_
                   {dayjs(lesson?.date).format('DD MMMM YYYY')}
                 </Text>
                 <Text size="sm" fw={600} className="text-primary mt-0.5">
-                  {dayjs(lesson?.date).format('HH:mm')} — {dayjs(lesson?.date).add(1, 'hour').format('HH:mm')}
+                  {dayjs(lesson?.date).format('HH:mm')} — {dayjs(lesson?.date).add(lesson?.lesson_duration || 50, 'minute').format('HH:mm')}
                 </Text>
               </Stack>
             </Group>

@@ -45,7 +45,7 @@ export const create_student_subscription_schema = z.object({
   name: z.string().optional(),
   lessons_count: z.number().optional(),
   price: z.number().optional(),
-  lesson_duration: z.number().min(1, 'errors.required'),
+  lesson_duration: z.number().optional(),
   student_id: z.string().min(1, 'errors.required'),
   paid_amount: z.number().min(0, 'errors.required'),
   payment_status: z.enum(['paid', 'unpaid', 'partially_paid']),
@@ -56,6 +56,14 @@ export const create_student_subscription_schema = z.object({
   lesson_dates: z.array(z.string()).min(1),
   selected_days: z.array(z.string()).min(1),
   comment: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (!data.subscription_id && (data.lesson_duration === undefined || data.lesson_duration === null)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'errors.required',
+      path: ['lesson_duration']
+    });
+  }
 });
 
 export type CreateStudentSubscriptionData = z.infer<typeof create_student_subscription_schema>;

@@ -52,7 +52,8 @@ export const calendarActions = {
 
       // Handle regular lessons
       const start = new Date(raw.date);
-      const end = new Date(start.getTime() + 60 * 60 * 1000); // +1 hour
+      const duration = raw.duration || 50; // default to 50 minutes if not provided
+      const end = new Date(start.getTime() + duration * 60 * 1000); 
 
       return {
         id: raw.id,
@@ -73,6 +74,7 @@ export const calendarActions = {
         title: raw.subscription?.student?.name ?? 'Student',
         subtitle: raw.subscription?.name ?? undefined,
         color: status_to_color(raw.status),
+        lesson_duration: duration,
       };
     });
   },
