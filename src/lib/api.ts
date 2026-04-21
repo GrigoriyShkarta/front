@@ -64,7 +64,23 @@ const redirectToLogin = (): void => {
 };
 
 api.interceptors.response.use(
-  (response: AxiosResponse) => response,
+  (response: AxiosResponse) => {
+    // If the response contains a token (login or refresh), save it to a client-side cookie
+    // so it can be read by JS for WebSocket authentication across domains.
+    if (
+      response.data?.token &&
+      (response.config.url?.includes('/auth/login') ||
+        response.config.url?.includes('/auth/refresh'))
+    ) {
+      Cookies.set('access_token_client', response.data.token, {
+        expires: 0.5, // 12 hours
+        path: '/',
+        sameSite: 'lax',
+        secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
+      });
+    }
+    return response;
+  },
   async (error: AxiosError) => {
     const original_request = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
