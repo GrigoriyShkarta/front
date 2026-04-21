@@ -397,6 +397,8 @@
     }
   },
   "Boards": {
+    "lock": "Lock",
+    "unlock": "Unlock",
     "enter_link_url": "Enter URL",
     "title": "Boards",
     "users_title": "Select a student for the board",

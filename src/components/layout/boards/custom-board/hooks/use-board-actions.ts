@@ -179,7 +179,7 @@ export function useBoardActions({
         }
 
         set_elements(prev => prev.map(el => {
-            if (selected_ids.includes(el.id)) {
+            if (selected_ids.includes(el.id) && !el.is_locked) {
                 const base = interaction.current.start_elements.find(e => e.id === el.id);
                 if (!base) return el;
                 switch (base.type) {
@@ -220,7 +220,7 @@ export function useBoardActions({
         });
     } else if (interaction.current.is_resizing && interaction.current.resize_id) {
         set_elements(prev => prev.map(el => {
-            if (el.id === interaction.current.resize_id) {
+            if (el.id === interaction.current.resize_id && !el.is_locked) {
                 const base = interaction.current.start_elements.find(e => e.id === el.id);
                 if (!base) return el;
                 
@@ -304,7 +304,7 @@ export function useBoardActions({
                const cy = bbox.y + bbox.h / 2;
                let angle = Math.atan2(coords.y - cy, coords.x - cx) * (180 / Math.PI) + 90;
                if (e.shiftKey) angle = Math.round(angle / 45) * 45;
-               set_elements(prev => prev.map(e => e.id === el.id ? { ...e, angle } : e));
+               set_elements(prev => prev.map(e => (e.id === el.id && !e.is_locked) ? { ...e, angle } : e));
            }
        }
     }
@@ -348,8 +348,8 @@ export function useBoardActions({
     interaction.current.rotate_id = null;
     set_eraser_trail([]);
     
-    // Auto-reset to select tool after drawing
-    if (tool !== 'select' && tool !== 'hand' && tool !== 'eraser') {
+    // Auto-reset to select tool after drawing (except for pen and highlighter)
+    if (tool !== 'select' && tool !== 'hand' && tool !== 'eraser' && tool !== 'pen' && tool !== 'highlighter') {
         set_tool('select');
     }
   };
@@ -373,6 +373,7 @@ export function useBoardActions({
 
   const handle_element_double_click = (e: React.MouseEvent, id: string) => {
       const el = el_ref.current.find(e => e.id === id);
+      if (!el || el.is_locked) return;
       if (el?.type === 'text') {
           set_editing_text_id(id);
       } else if (['video', 'audio', 'youtube', 'embed'].includes(el?.type || '')) {
@@ -382,6 +383,9 @@ export function useBoardActions({
 
   const handle_resize_start = (e: React.MouseEvent, id: string, anchor: string) => {
       e.stopPropagation();
+      const el = el_ref.current.find(e => e.id === id);
+      if (!el || el.is_locked) return;
+
       interaction.current.is_resizing = true;
       interaction.current.resize_id = id;
       interaction.current.resize_anchor = anchor;
@@ -391,6 +395,9 @@ export function useBoardActions({
 
   const handle_rotate_start = (e: React.MouseEvent, id: string) => {
       e.stopPropagation();
+      const el = el_ref.current.find(e => e.id === id);
+      if (!el || el.is_locked) return;
+
       interaction.current.is_rotating = true;
       interaction.current.rotate_id = id;
       interaction.current.start_mouse = get_board_coords(e);
@@ -398,12 +405,20 @@ export function useBoardActions({
   };
 
   const handle_delete = useCallback((payload?: string[] | any) => {
-      const ids: string[] = Array.isArray(payload) ? payload : selected_ids;
+      let ids: string[] = Array.isArray(payload) ? payload : selected_ids;
       if (ids.length === 0) return;
-      set_elements(prev => prev.filter(el => !ids.includes(el.id)));
-      push_state(el_ref.current.filter(el => !ids.includes(el.id)));
-      emit_element_delete(ids);
-      set_selected_ids([]);
+
+      // Only delete non-locked elements
+      const target_ids = el_ref.current
+        .filter(el => ids.includes(el.id) && !el.is_locked)
+        .map(el => el.id);
+
+      if (target_ids.length === 0) return;
+
+      set_elements(prev => prev.filter(el => !target_ids.includes(el.id)));
+      push_state(el_ref.current.filter(el => !target_ids.includes(el.id)));
+      emit_element_delete(target_ids);
+      set_selected_ids(prev => prev.filter(id => !target_ids.includes(id)));
   }, [selected_ids, set_elements, push_state, emit_element_delete]);
 
   const update_selected = (patch: any) => {

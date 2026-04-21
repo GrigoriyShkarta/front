@@ -10,6 +10,7 @@ export interface BaseElement {
   id: string;
   angle?: number;
   loading?: boolean;
+  is_locked?: boolean;
 }
 
 export interface ArrowElement extends BaseElement {

@@ -11,6 +11,7 @@ interface Props {
   on_rotate_start: (e: React.MouseEvent) => void;
   on_pointer_down: (e: React.MouseEvent) => void;
   on_double_click: (e: React.MouseEvent) => void;
+  is_locked?: boolean;
 }
 
 const ANCHORS = [
@@ -33,11 +34,13 @@ const CURSOR_MAP: Record<string, string> = {
  * SVG selection border with 8 resize handles (corners + edges) plus rotation handle.
  * Renders inside the world-coordinate transform group.
  */
-export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_resize_start, on_rotate_start, on_pointer_down, on_double_click }: Props) {
+export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_resize_start, on_rotate_start, on_pointer_down, on_double_click, is_locked }: Props) {
   const { x, y, w, h } = bbox;
   const hs  = 8 / zoom;  // handle size in world units (constant 8px on screen)
   const cx = x + w / 2;
   const cy = y + h / 2;
+
+  const stroke_color = is_locked ? '#adb5bd' : 'var(--space-primary)';
 
   return (
     <g transform={`rotate(${angle}, ${cx}, ${cy})`} style={{ pointerEvents: is_interactive ? 'none' : 'auto' }}>
@@ -47,7 +50,7 @@ export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_res
           x={x - 2 / zoom} y={y - 2 / zoom}
           width={w + 4 / zoom} height={h + 4 / zoom}
           fill="transparent"
-          style={{ cursor: 'grab', pointerEvents: 'all' }}
+          style={{ cursor: is_locked ? 'default' : 'grab', pointerEvents: 'all' }}
           onMouseDown={(e) => { e.stopPropagation(); on_pointer_down(e); }}
           onDoubleClick={(e) => { e.stopPropagation(); on_double_click(e); }}
         />
@@ -58,14 +61,14 @@ export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_res
         x={x - 2 / zoom} y={y - 2 / zoom}
         width={w + 4 / zoom} height={h + 4 / zoom}
         fill="none"
-        stroke="var(--space-primary)"
+        stroke={stroke_color}
         strokeWidth={1.5 / zoom}
-        strokeDasharray={`${5 / zoom} ${3 / zoom}`}
+        strokeDasharray={is_locked ? undefined : `${5 / zoom} ${3 / zoom}`}
         pointerEvents="none"
       />
 
-      {/* Resize handles */}
-      {ANCHORS.map(({ id, x: ax, y: ay }) => {
+      {/* Resize handles - hidden if locked */}
+      {!is_locked && ANCHORS.map(({ id, x: ax, y: ay }) => {
         const hx = x + ax * w - hs / 2;
         const hy = y + ay * h - hs / 2;
         return (
@@ -75,7 +78,7 @@ export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_res
             width={hs} height={hs}
             rx={1.5 / zoom}
             fill="white"
-            stroke="var(--space-primary)"
+            stroke={stroke_color}
             strokeWidth={1.5 / zoom}
             style={{ cursor: CURSOR_MAP[id] }}
             onMouseDown={(e) => { e.stopPropagation(); on_resize_start(e, id); }}
@@ -83,22 +86,35 @@ export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_res
         );
       })}
 
-      {/* Rotation handle */}
-      <line 
-        x1={cx} y1={y} 
-        x2={cx} y2={y - 24 / zoom} 
-        stroke="var(--space-primary)" 
-        strokeWidth={1.5 / zoom} 
-      />
-      <circle 
-        cx={cx} cy={y - 24 / zoom} 
-        r={6 / zoom} 
-        fill="white" 
-        stroke="var(--space-primary)" 
-        strokeWidth={1.5 / zoom}
-        style={{ cursor: 'alias' }}
-        onMouseDown={(e) => { e.stopPropagation(); on_rotate_start(e); }}
-      />
+      {/* Rotation handle - hidden if locked */}
+      {!is_locked && (
+        <>
+          <line 
+            x1={cx} y1={y} 
+            x2={cx} y2={y - 24 / zoom} 
+            stroke={stroke_color} 
+            strokeWidth={1.5 / zoom} 
+          />
+          <circle 
+            cx={cx} cy={y - 24 / zoom} 
+            r={6 / zoom} 
+            fill="white" 
+            stroke={stroke_color} 
+            strokeWidth={1.5 / zoom}
+            style={{ cursor: 'alias' }}
+            onMouseDown={(e) => { e.stopPropagation(); on_rotate_start(e); }}
+          />
+        </>
+      )}
+
+      {/* Lock icon indicator when locked */}
+      {is_locked && (
+        <g transform={`translate(${x + w - 24 / zoom}, ${y - 24 / zoom}) scale(${1 / zoom})`}>
+             <rect width="20" height="20" rx="4" fill="#adb5bd" />
+             <path d="M6 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="white" strokeWidth="2" />
+             <rect x="5" y="10" width="10" height="7" rx="1" fill="white" />
+        </g>
+      )}
     </g>
   );
 }

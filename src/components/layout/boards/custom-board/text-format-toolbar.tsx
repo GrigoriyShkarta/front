@@ -3,7 +3,7 @@
 import { ActionIcon, Group, Select, Tooltip, Box, Divider } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { MdFormatBold, MdFormatItalic, MdFormatUnderlined, MdStrikethroughS } from 'react-icons/md';
-import { IoTrashOutline } from 'react-icons/io5';
+import { IoTrashOutline, IoLockClosedOutline, IoLockOpenOutline } from 'react-icons/io5';
 import { TextElement } from './types';
 import { cn } from '@/lib/utils';
 
@@ -169,6 +169,17 @@ export function TextFormatToolbar({ element, screen_x, screen_y, element_h, on_u
         </Group>
 
         <Divider orientation="vertical" />
+
+        <Tooltip label={element.is_locked ? t('unlock') : t('lock')}>
+          <ActionIcon 
+            variant="subtle" 
+            color={element.is_locked ? "primary" : "gray"} 
+            size="sm" 
+            onClick={() => on_update({ is_locked: !element.is_locked })}
+          >
+            {element.is_locked ? <IoLockClosedOutline size={18} /> : <IoLockOpenOutline size={18} />}
+          </ActionIcon>
+        </Tooltip>
 
         <Tooltip label={t('delete')}>
           <ActionIcon variant="subtle" color="red" size="sm" onClick={on_delete}>

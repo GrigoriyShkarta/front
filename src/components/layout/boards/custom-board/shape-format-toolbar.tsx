@@ -2,7 +2,7 @@
 
 import { ActionIcon, Group, Tooltip, Box, Divider, Slider, Text, Stack, useMantineColorScheme } from '@mantine/core';
 import { useTranslations } from 'next-intl';
-import { IoTrashOutline } from 'react-icons/io5';
+import { IoTrashOutline, IoLockClosedOutline, IoLockOpenOutline } from 'react-icons/io5';
 import { BoardElement, RectElement, EllipseElement, PathElement, LineElement, StrokeStyle, ArrowElement } from './types';
 
 const COLORS = ['#ffffff', '#000000', '#f87171', '#fb923c', '#facc15', '#4ade80', '#60a5fa', '#a78bfa', '#f472b6', '#6b7280'];
@@ -190,6 +190,17 @@ export function ShapeFormatToolbar({ element, screen_x, screen_y, element_h, on_
         </Stack>
 
         <Divider orientation="vertical" />
+
+        <Tooltip label={element.is_locked ? t('unlock') : t('lock')}>
+          <ActionIcon 
+            variant="subtle" 
+            color={element.is_locked ? "primary" : "gray"} 
+            size="sm" 
+            onClick={() => on_update({ is_locked: !element.is_locked })}
+          >
+            {element.is_locked ? <IoLockClosedOutline size={18} /> : <IoLockOpenOutline size={18} />}
+          </ActionIcon>
+        </Tooltip>
 
         <Tooltip label={t('delete')}>
           <ActionIcon variant="subtle" color="red" size="sm" onClick={on_delete}>

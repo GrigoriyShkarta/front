@@ -84,7 +84,7 @@ export function CanvasRenderer({
           const handlers = make_handlers(el.id);
           const is_editing = el.id === editing_text_id;
           const style: React.CSSProperties = {
-            cursor: tool === 'select' ? 'grab' : (tool === 'hand' ? 'grab' : 'default'),
+            cursor: tool === 'select' ? (el.is_locked ? 'default' : 'grab') : (tool === 'hand' ? 'grab' : 'default'),
             pointerEvents: tool === 'select' ? 'all' : 'none',
             ...sel_style(el.id),
             filter: (el as any).stroke_style === 'wavy' ? 'url(#wavy_filter)' : undefined
@@ -512,6 +512,7 @@ export function CanvasRenderer({
               on_rotate_start={(e) => on_rotate_start(e, el.id)}
               on_pointer_down={(e) => on_element_pointer_down(e, el.id)}
               on_double_click={(e) => on_element_double_click(e, el.id)}
+              is_locked={el.is_locked}
             />
           );
         })}
