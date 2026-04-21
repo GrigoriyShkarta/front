@@ -4,19 +4,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ActionIcon, Menu, useComputedColorScheme, Divider } from '@mantine/core';
 import { CallControls, useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
-import { 
-  IoGridOutline, 
+import { BsGrid3X3Gap, BsLayoutSidebar, BsLayoutSidebarReverse, BsPip } from "react-icons/bs";
+import {  
   IoExpandOutline, 
   IoSettingsOutline, 
   IoPersonOutline, 
-  IoAppsOutline, 
-  IoStatsChartOutline, 
-  IoOpenOutline,
-  IoPeopleOutline,
-  IoPinOutline,
   IoMicOffOutline,
   IoVideocamOffOutline,
-  IoDesktopOutline
+  IoDesktopOutline,
+  IoGridOutline
 } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
@@ -157,18 +153,6 @@ export function CallControlsBar({
     >
       <CallControls onLeave={onLeave} />
 
-      {/* <ActionIcon 
-        variant="filled" 
-        size="xl" 
-        radius="xl" 
-        onClick={onToggleParticipants}
-        title={t('participants')}
-        style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
-        className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
-      >
-        <IoPeopleOutline size={20} />
-      </ActionIcon> */}
-
       <ActionIcon
         variant="filled"
         size="xl"
@@ -180,6 +164,56 @@ export function CallControlsBar({
       >
         <IoExpandOutline size={20} />
       </ActionIcon>
+
+      <Menu shadow="md" width={200} position="top" withArrow withinPortal={false}>
+        <Menu.Target>
+          <ActionIcon 
+            variant="filled" 
+            size="xl" 
+            radius="xl" 
+            title={t('layout')}
+            style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
+            className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
+          >
+            <BsGrid3X3Gap size={20} />
+          </ActionIcon>
+        </Menu.Target>
+
+        <Menu.Dropdown style={{ backgroundColor: 'var(--call-surface)', borderColor: 'var(--call-border)' }}>
+          <Menu.Label>{t('layout')}</Menu.Label>
+          {[
+            { key: 'grid', label: t('layout_grid'), icon: <IoGridOutline size={16} /> },
+            { key: 'pip', label: t('layout_pip'), icon: <BsPip size={16} /> },
+            { key: 'speaker-left', label: t('layout_speaker_left'), icon: <BsLayoutSidebar size={16} /> },
+            { key: 'speaker-right', label: t('layout_speaker_right'), icon: <BsLayoutSidebarReverse size={16} /> }
+          ].map((item) => (
+            <Menu.Item
+              key={item.key}
+              onClick={() => onLayoutChange(item.key)}
+              leftSection={item.icon}
+              style={{ 
+                backgroundColor: layout === item.key ? 'var(--space-primary)' : 'transparent',
+                color: layout === item.key ? 'var(--space-primary-text)' : 'var(--call-text)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {item.label}
+            </Menu.Item>
+          ))}
+        </Menu.Dropdown>
+      </Menu>
+
+      {/* <ActionIcon 
+        variant="filled" 
+        size="xl" 
+        radius="xl" 
+        onClick={onToggleParticipants}
+        title={t('participants')}
+        style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
+        className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
+      >
+        <IoPeopleOutline size={20} />
+      </ActionIcon> */}
 
       <ActionIcon 
         variant="filled" 
@@ -193,41 +227,7 @@ export function CallControlsBar({
         <IoSettingsOutline size={20} />
       </ActionIcon>
 
-      <Menu shadow="md" width={200} position="top" withArrow withinPortal={false}>
-        <Menu.Target>
-          <ActionIcon 
-            variant="filled" 
-            size="xl" 
-            radius="xl" 
-            title={t('layout')}
-            style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
-            className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
-          >
-            <IoGridOutline size={20} />
-          </ActionIcon>
-        </Menu.Target>
-
-        <Menu.Dropdown style={{ backgroundColor: 'var(--call-surface)', borderColor: 'var(--call-border)' }}>
-          <Menu.Label>{t('layout')}</Menu.Label>
-          {[
-            { key: 'grid', label: t('layout_grid') },
-            { key: 'pip', label: t('layout_pip') },
-            { key: 'speaker-left', label: t('layout_speaker_left') },
-            { key: 'speaker-right', label: t('layout_speaker_right') }
-          ].map((item) => (
-            <Menu.Item
-              key={item.key}
-              onClick={() => onLayoutChange(item.key)}
-              style={{ 
-                backgroundColor: layout === item.key ? 'var(--space-primary)' : 'transparent',
-                color: layout === item.key ? 'var(--space-primary-text)' : 'var(--call-text)'
-              }}
-            >
-              {item.label}
-            </Menu.Item>
-          ))}
-        </Menu.Dropdown>
-      </Menu>
+      
 
       
 

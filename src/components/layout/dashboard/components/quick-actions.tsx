@@ -15,9 +15,10 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   primary_color?: string;
+  secondary_color?: string;
 }
 
-export function QuickActions({ primary_color }: Props) {
+export function QuickActions({ primary_color, secondary_color }: Props) {
   const t = useTranslations('Dashboard.actions');
   const { user } = useAuth();
   const router = useRouter();
@@ -36,7 +37,6 @@ export function QuickActions({ primary_color }: Props) {
       desc: t('add_student.desc'),
       icon: IoPersonAddOutline,
       route: '/main/users',
-      color: 'indigo'
     },
     {
       id: 'create_course',
@@ -44,7 +44,6 @@ export function QuickActions({ primary_color }: Props) {
       desc: t('create_course.desc'),
       icon: IoLibraryOutline,
       route: '/main/materials/courses',
-      color: 'teal'
     },
     {
       id: 'schedule',
@@ -52,7 +51,6 @@ export function QuickActions({ primary_color }: Props) {
       desc: t('schedule.desc'),
       icon: IoCalendarOutline,
       route: '/main/calendar',
-      color: 'blue'
     },
     {
       id: 'analytics',
@@ -60,7 +58,6 @@ export function QuickActions({ primary_color }: Props) {
       desc: t('analytics.desc'),
       icon: IoPieChartOutline,
       route: '/main/finance/reports',
-      color: 'grape'
     }
   ];
 
@@ -80,7 +77,7 @@ export function QuickActions({ primary_color }: Props) {
             variant="light" 
             size="md" 
             radius="md" 
-            color={action.color}
+            color="secondary"
             className="shrink-0"
           >
             <action.icon size={16} />

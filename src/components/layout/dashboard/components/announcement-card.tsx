@@ -30,6 +30,7 @@ interface Props {
   text?: string | null;
   /** Primary color for accent */
   primary_color?: string;
+  secondary_color?: string;
   /** Called after successful save */
   on_saved?: (text: string) => void;
 }
@@ -39,7 +40,7 @@ interface Props {
  * Admins can inline-edit the announcement text.
  * Students see it read-only.
  */
-export function AnnouncementCard({ text, primary_color, on_saved }: Props) {
+export function AnnouncementCard({ text, primary_color, secondary_color, on_saved }: Props) {
   const t = useTranslations('Dashboard');
   const tc = useTranslations('Common');
   const { user } = useAuth();
@@ -95,7 +96,7 @@ export function AnnouncementCard({ text, primary_color, on_saved }: Props) {
           <Group gap={8} align="center">
             <IoMegaphoneOutline
               size={18}
-              style={{ color: primary_color ?? 'var(--mantine-color-blue-5)' }}
+              style={{ color: secondary_color ?? 'var(--space-secondary)' }}
             />
             <Title order={6} className="tracking-wide uppercase opacity-70">
               {t('announcement_title')}

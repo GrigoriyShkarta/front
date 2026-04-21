@@ -29,8 +29,6 @@ export function useBoardSocket(board_id: string, user: any) {
   useEffect(() => {
     if (!board_id) return;
 
-    console.log('check', Cookies.get('access_token_client'));
-
     const socket = io(`${backend_url}/board`, {
       path: socket_path,
       withCredentials: true,

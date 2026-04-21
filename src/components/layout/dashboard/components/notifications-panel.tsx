@@ -31,12 +31,13 @@ dayjs.extend(relativeTime);
 
 interface Props {
   primary_color?: string;
+  secondary_color?: string;
 }
 
 /**
  * Dashboard notifications panel showing only unread notifications.
  */
-export function NotificationsPanel({ primary_color }: Props) {
+export function NotificationsPanel({ primary_color, secondary_color }: Props) {
   const t = useTranslations('Dashboard');
   const tn = useTranslations('Notifications');
   const { user, refresh_user } = useAuth();
@@ -74,7 +75,7 @@ export function NotificationsPanel({ primary_color }: Props) {
             <Box className="relative">
               <IoNotificationsOutline
                 size={18}
-                style={{ color: primary_color ?? 'var(--mantine-color-blue-5)' }}
+                style={{ color: secondary_color ?? 'var(--space-secondary)' }}
               />
               {has_unread && (
                 <Box

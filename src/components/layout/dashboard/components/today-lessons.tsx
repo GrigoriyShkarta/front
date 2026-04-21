@@ -24,6 +24,7 @@ import type { LessonEvent } from '@/components/layout/calendar/schemas/event-sch
 
 interface Props {
   primary_color?: string;
+  secondary_color?: string;
 }
 
 function LessonStatusBadge({ status }: { status: LessonEvent['status'] }) {
@@ -128,7 +129,7 @@ function LessonRow({ lesson, primary_color, is_admin }: { lesson: LessonEvent; p
 /**
  * Today's lessons list widget.
  */
-export function TodayLessons({ primary_color }: Props) {
+export function TodayLessons({ primary_color, secondary_color }: Props) {
   const t = useTranslations('Dashboard');
   const { user } = useAuth();
   const { today_lessons, isLoading } = useTodayLessons();
@@ -143,7 +144,7 @@ export function TodayLessons({ primary_color }: Props) {
           <Group gap={8} align="center">
             <IoCalendarOutline
               size={18}
-              style={{ color: primary_color ?? 'var(--mantine-color-blue-5)' }}
+              style={{ color: secondary_color ?? 'var(--space-secondary)' }}
             />
             <Title order={6} className="tracking-wide uppercase opacity-70">
               {t('today_lessons_title')}

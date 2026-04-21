@@ -32,6 +32,7 @@ export function DashboardLayout() {
   const space = user?.space?.personalization;
   const dashboard_p = user?.space?.dashboard_personalization;
   const primary_color = space?.primary_color ?? undefined;
+  const secondary_color = space?.secondary_color ?? undefined;
 
   // Determine which fields to use based on role
   const banner_image = is_admin
@@ -85,7 +86,7 @@ export function DashboardLayout() {
               set_local_desc(desc);
             }}
           />
-          <QuickActions primary_color={primary_color} />
+          <QuickActions primary_color={primary_color} secondary_color={secondary_color} />
         </Stack>
         
         {/* Stats Grid */}
@@ -96,6 +97,7 @@ export function DashboardLayout() {
           <AnnouncementCard
             text={resolved_announcement}
             primary_color={primary_color}
+            secondary_color={secondary_color}
             on_saved={text => set_local_announcement(text)}
           />
         )}
@@ -104,14 +106,14 @@ export function DashboardLayout() {
         <Grid gutter="lg">
           {/* Left column: Today's lessons */}
           <Grid.Col span={{ base: 12, md: 5 }}>
-            <TodayLessons primary_color={primary_color} />
+            <TodayLessons primary_color={primary_color} secondary_color={secondary_color} />
           </Grid.Col>
 
           {/* Right column: Notifications + Todo */}
           <Grid.Col span={{ base: 12, md: 7 }}>
             <Stack gap="lg">
-              <NotificationsPanel primary_color={primary_color} />
-              <TodoList primary_color={primary_color} />
+              <NotificationsPanel primary_color={primary_color} secondary_color={secondary_color} />
+              <TodoList primary_color={primary_color} secondary_color={secondary_color} />
             </Stack>
           </Grid.Col>
         </Grid>

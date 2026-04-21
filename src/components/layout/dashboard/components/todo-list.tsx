@@ -27,13 +27,14 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   primary_color?: string;
+  secondary_color?: string;
 }
 
 /**
  * Personal todo list widget for the dashboard.
  * Data is stored in localStorage (per-user isolation is implicit since the app is single-user).
  */
-export function TodoList({ primary_color }: Props) {
+export function TodoList({ primary_color, secondary_color }: Props) {
   const t = useTranslations('Dashboard');
   const tc = useTranslations('Common');
   const { todos, add_todo, toggle_todo, delete_todo, clear_done } = useDashboardTodos();
@@ -62,7 +63,7 @@ export function TodoList({ primary_color }: Props) {
           <Group gap={8} align="center">
             <IoListOutline
               size={18}
-              style={{ color: primary_color ?? 'var(--mantine-color-blue-5)' }}
+              style={{ color: secondary_color ?? 'var(--space-secondary)' }}
             />
             <Title order={6} className="tracking-wide uppercase opacity-70">
               {t('todo_title')}

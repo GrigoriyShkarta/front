@@ -69,23 +69,23 @@ export function LessonReminder() {
             p="md"
             className="pointer-events-auto max-w-4xl mx-auto shadow-2xl relative overflow-hidden group"
             style={{ 
-              backgroundColor: 'var(--space-primary)',
+              backgroundColor: 'var(--space-accent)',
               backgroundImage: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%)',
               backdropFilter: 'blur(10px)',
-              color: 'var(--space-primary-text)'
+              color: 'var(--space-accent-text)'
             }}
           >
             {/* Using a separate div for border to handle opacity without affecting text */}
             <Box 
                className="absolute inset-0 border pointer-events-none opacity-20"
-               style={{ borderColor: 'var(--space-primary-text)' }}
+               style={{ borderColor: 'var(--space-accent-text)' }}
             />
 
             {/* Animated background decoration */}
             <Box 
               className="absolute top-0 right-0 w-64 h-64 opacity-10 pointer-events-none -translate-y-1/2 translate-x-1/2"
               style={{ 
-                background: 'radial-gradient(circle, var(--space-primary-text) 0%, transparent 70%)',
+                background: 'radial-gradient(circle, var(--space-accent-text) 0%, transparent 70%)',
                 filter: 'blur(40px)'
               }}
             />
@@ -94,7 +94,7 @@ export function LessonReminder() {
               <Group gap="md" wrap="nowrap">
                 <Box 
                   className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-inner"
-                  style={{ backgroundColor: 'rgba(var(--space-primary-text-rgb), 0.15)' }}
+                  style={{ backgroundColor: 'rgba(var(--space-accent-text-rgb, 255, 255, 255), 0.15)' }}
                 >
                   <IoVideocamOutline size={26} className="animate-pulse" />
                 </Box>
@@ -119,8 +119,8 @@ export function LessonReminder() {
                     radius="md"
                     variant="white"
                     style={{ 
-                      backgroundColor: 'var(--space-primary-text)', 
-                      color: 'var(--space-primary)' 
+                      backgroundColor: 'var(--space-accent-text)', 
+                      color: 'var(--space-accent)' 
                     }}
                     className="shadow-lg px-6 font-bold transition-all hover:scale-105 active:scale-95"
                     rightSection={<IoArrowForwardOutline size={18} />}
@@ -137,7 +137,7 @@ export function LessonReminder() {
                     set_visible(false);
                     set_closed_id(lesson.id);
                   }}
-                  style={{ color: 'var(--space-primary-text)' }}
+                  style={{ color: 'var(--space-accent-text)' }}
                   className="hover:bg-black/5 dark:hover:bg-white/5"
                 >
                   <IoCloseOutline size={24} />
