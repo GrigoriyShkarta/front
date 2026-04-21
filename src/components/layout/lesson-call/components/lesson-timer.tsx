@@ -56,14 +56,11 @@ export function LessonTimer({ lesson_id }: Props) {
                 <Box className="bg-white/20 p-1.5 rounded-lg text-white">
                   <IoTimeOutline size={18} className="animate-pulse" />
                 </Box>
-                <Box>
-                  <Text fw={700} c="white" size="xs" className="uppercase tracking-tight opacity-90 leading-none">
-                    {t('lesson_ends_soon', { minutes: 5 })}
-                  </Text>
-                  <Text fw={800} c="white" size="md" className="font-mono leading-none mt-1">
-                    {time_str}
-                  </Text>
-                </Box>
+                  <Box>
+                    <Text fw={700} c="white" size="sm" className="tracking-tight opacity-95 leading-none">
+                      {t('lesson_ends_soon', { timer: time_str })}
+                    </Text>
+                  </Box>
               </Group>
             </Group>
             

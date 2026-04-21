@@ -27,9 +27,11 @@ import { SettingsDrawer } from './components/settings-drawer';
 import { ParticipantsPanel } from './components/participants-panel';
 import { CallControlsBar } from './components/call-controls-bar';
 import { LessonLayoutView } from './components/lesson-layout-view';
+import { DraggablePip } from './components/draggable-pip';
 import { OtherParticipantsPreview } from './components/other-participants-preview';
 
 import { LessonTimer } from './components/lesson-timer';
+import { CurrentTime } from './components/current-time';
 
 import '@stream-io/video-react-sdk/dist/css/styles.css';
 
@@ -105,6 +107,13 @@ function MyCallUI() {
     }
   }, [hasOngoingScreenShare, call_layout, set_call_layout]);
 
+  // Default to PIP in fullscreen mode
+  useEffect(() => {
+    if (fullscreenEl) {
+      set_call_layout('pip');
+    }
+  }, [fullscreenEl, set_call_layout]);
+
   // Handle call end/cleanup
   useEffect(() => {
     if (callingState === CallingState.LEFT || callingState === CallingState.IDLE) {
@@ -176,19 +185,22 @@ function MyCallUI() {
 
         {/* Floating PIP Window for focus mode */}
         {call_layout === 'pip' && participants.length > 1 && (fullscreenEl || rootRef.current) && createPortal(
-          <div className="absolute bottom-6 right-6 w-[240px] h-[160px] z-[9999] rounded-2xl overflow-hidden shadow-2xl border-2 border-[var(--call-border)] bg-[var(--call-surface)]">
+          <DraggablePip containerRef={rootRef}>
             {participants.length === 2 && localParticipant ? (
               <ParticipantView participant={localParticipant} className="w-full h-full" />
             ) : (
               <OtherParticipantsPreview />
             )}
-          </div>,
+          </DraggablePip>,
           fullscreenEl || rootRef.current!,
         )}
 
         {/* Lesson End Timer (5m warning) - Portaled here for fullscreen visibility */}
         {(fullscreenEl || rootRef.current) && createPortal(
-          <LessonTimer lesson_id={call.id} />,
+          <>
+            <LessonTimer lesson_id={call.id} />
+            <CurrentTime visible={!!fullscreenEl} />
+          </>,
           fullscreenEl || rootRef.current!,
         )}
       </div>
@@ -210,6 +222,8 @@ function MyCallUI() {
         onOpenSettings={() => setShowSettings(true)}
         onToggleParticipants={() => setShowParticipants((prev) => !prev)}
         onLeave={handleLeave}
+        studentId={participants.find(p => p.userId !== user?.id)?.userId}
+        studentSessionId={participants.find(p => p.userId !== user?.id)?.sessionId}
       />
 
       {/* Settings Drawer */}

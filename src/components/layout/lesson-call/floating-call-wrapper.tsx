@@ -9,6 +9,8 @@ import { useTranslations } from 'next-intl';
 import { IoMicOffOutline, IoMicOutline, IoVideocamOffOutline, IoVideocamOutline, IoLogOutOutline } from 'react-icons/io5';
 import { useAuth } from '@/hooks/use-auth';
 
+import { DraggablePip } from './components/draggable-pip';
+
 export function FloatingCallWrapper() {
   const t = useTranslations('Calendar.lesson_room');
   const { activeCall } = useActiveCall();
@@ -21,15 +23,22 @@ export function FloatingCallWrapper() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] shadow-2xl rounded-2xl overflow-hidden cursor-pointer hover:scale-105 transition-transform"
-         onClick={() => router.push(`/main/lesson/${activeCall.id}`)}
-         style={{ width: 280, height: 210, backgroundColor: 'var(--call-surface)' }}>
-      <StreamCall call={activeCall}>
-        <StreamTheme>
-          <MiniCallUI t={t} />
-        </StreamTheme>
-      </StreamCall>
-    </div>
+    <DraggablePip 
+      fixed 
+      width={280} 
+      height={210} 
+    >
+      <div 
+        className="w-full h-full cursor-pointer"
+        onClick={() => router.push(`/main/lesson/${activeCall.id}`)}
+      >
+        <StreamCall call={activeCall}>
+          <StreamTheme>
+            <MiniCallUI t={t} />
+          </StreamTheme>
+        </StreamCall>
+      </div>
+    </DraggablePip>
   );
 }
 

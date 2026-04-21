@@ -17,6 +17,7 @@ interface ResizableSpeakerLayoutProps {
   local_participant: any;
   participants: any[];
   sharing_participant?: any;
+  is_fullscreen?: boolean;
 }
 
 /**
@@ -28,6 +29,7 @@ export function ResizableSpeakerLayout({
   local_participant,
   participants,
   sharing_participant,
+  is_fullscreen,
 }: ResizableSpeakerLayoutProps) {
   const { sidebar_ratio, container_ref, on_drag_start } = useSidebarResize();
 
@@ -57,7 +59,7 @@ export function ResizableSpeakerLayout({
     >
       {/* Spotlight Panel (Big Video or Screen Share) */}
       <div
-        className="relative overflow-hidden rounded-xl w-full h-full transition-all duration-300"
+        className={`relative overflow-hidden w-full h-full transition-all duration-300 ${is_fullscreen ? 'rounded-none' : 'rounded-xl'}`}
         style={{ 
           flex: `0 0 ${spotlight_pct}%`, 
           minWidth: 0,
@@ -96,7 +98,7 @@ export function ResizableSpeakerLayout({
           }}
         >
           {final_sidebar.map(p => (
-            <div key={p.sessionId} className="relative overflow-hidden rounded-lg aspect-video w-full border border-white/5 shrink-0">
+            <div key={p.sessionId} className={`relative overflow-hidden aspect-video w-full border border-white/5 shrink-0 ${is_fullscreen ? 'rounded-none' : 'rounded-lg'}`}>
               <ParticipantView
                 participant={p}
                 trackType="videoTrack"

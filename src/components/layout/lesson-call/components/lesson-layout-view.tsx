@@ -34,7 +34,14 @@ export function LessonLayoutView({
 }: LessonLayoutViewProps) {
   
   if (fullscreenEl && layout === 'grid' && localParticipant) {
-    const count = participants.length;
+    // Sort participants to ensure consistent order (local participant at the end)
+    const sortedParticipants = [...participants].sort((a, b) => {
+      if (a.sessionId === localParticipant.sessionId) return 1;
+      if (b.sessionId === localParticipant.sessionId) return -1;
+      return 0;
+    });
+
+    const count = sortedParticipants.length;
     const cols = count <= 1 ? 1 : count === 2 ? 2 : 3;
     const rows = Math.ceil(count / cols);
 
@@ -49,10 +56,10 @@ export function LessonLayoutView({
           gap: 8,
         }}
       >
-        {participants.map((p) => (
+        {sortedParticipants.map((p) => (
           <div
             key={p.sessionId}
-            className="relative w-full h-full overflow-hidden rounded-xl border border-white/5"
+            className={`relative w-full h-full overflow-hidden ${fullscreenEl ? 'rounded-none' : 'rounded-xl'} border border-white/5`}
           >
             <ParticipantView 
               participant={p} 
@@ -74,6 +81,7 @@ export function LessonLayoutView({
             local_participant={localParticipant}
             participants={participants}
             sharing_participant={sharingParticipant}
+            is_fullscreen={!!fullscreenEl}
           />
         );
       }
@@ -81,7 +89,7 @@ export function LessonLayoutView({
     case 'pip':
       const remote = participants.find(p => p.sessionId !== localParticipant?.sessionId) || participants[0];
       return (
-        <div className="relative w-full h-full overflow-hidden rounded-xl">
+        <div className={`relative w-full h-full overflow-hidden ${fullscreenEl ? 'rounded-none' : 'rounded-xl'}`}>
           <ParticipantView 
             participant={remote} 
             trackType={remote?.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
@@ -97,6 +105,7 @@ export function LessonLayoutView({
           local_participant={localParticipant}
           participants={participants}
           sharing_participant={sharingParticipant}
+          is_fullscreen={!!fullscreenEl}
         />
       );
     default:
@@ -106,6 +115,7 @@ export function LessonLayoutView({
           local_participant={localParticipant}
           participants={participants}
           sharing_participant={sharingParticipant}
+          is_fullscreen={!!fullscreenEl}
         />
       );
   }

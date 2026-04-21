@@ -55,11 +55,11 @@ export function SettingsDrawer({
 }: SettingsDrawerProps) {
   const t = useTranslations('Calendar.lesson_room');
   const call = useCall();
-  const { useMicrophoneState, useCameraState } = useCallStateHooks();
+  const { useMicrophoneState, useCameraState, useSpeakerState } = useCallStateHooks();
   
   const micState = useMicrophoneState();
   const camState = useCameraState();
-  const speakerState = call?.speaker.state;
+  const speakerState = useSpeakerState();
   
   // Noise cancellation requires @stream-io/audio-filters-web (Krisp)
   // For now we set it to unsupported to avoid crashes
@@ -184,8 +184,8 @@ export function SettingsDrawer({
 
         <Tabs.Panel value="tech">
           <Stack gap="xl">
-            {/* Noise Suppression */}
-            <Box>
+            {/* Noise Suppression - Commented out for now */}
+            {/* <Box>
               <Group justify="space-between" mb="xs">
                 <Group gap="xs">
                   <IoShieldCheckmarkOutline size={18} />
@@ -202,8 +202,7 @@ export function SettingsDrawer({
                 />
               </Group>
             </Box>
-
-            <Divider color="var(--call-border)" />
+            <Divider color="var(--call-border)" /> */}
 
             {/* Speaker & Mic Volume */}
             <Box>
@@ -275,7 +274,7 @@ export function SettingsDrawer({
               <Select
                 label={<Group gap="xs" mb={4}><IoVolumeHighOutline size={16} />{t('speaker')}</Group>}
                 data={deviceToSelectData(speakerDevices)}
-                value={speakerState?.selectedDevice}
+                value={speakerState.selectedDevice}
                 onChange={(v) => call?.speaker.select(v!)}
                 variant="filled"
                 styles={{

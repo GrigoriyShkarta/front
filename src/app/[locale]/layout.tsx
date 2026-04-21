@@ -14,6 +14,8 @@ import { ReactQueryProvider } from '@/context/query-provider';
 import { SpaceMetadataInitializer } from '@/components/common/space-metadata-initializer';
 import { PaymentReminder } from '@/components/common/payment-reminder';
 
+import { StreamVideoProvider } from '@/providers/stream-video-provider';
+
 export default async function LocaleLayout({
   children,
   params
@@ -30,9 +32,11 @@ export default async function LocaleLayout({
         <MantineProvider theme={theme} defaultColorScheme="auto">
           <Notifications position="top-center" />
           <AuthProvider>
-            <SpaceMetadataInitializer />
-            {children}
-            <PaymentReminder />
+            <StreamVideoProvider>
+              <SpaceMetadataInitializer />
+              {children}
+              <PaymentReminder />
+            </StreamVideoProvider>
           </AuthProvider>
         </MantineProvider>
       </ReactQueryProvider>

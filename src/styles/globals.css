@@ -599,6 +599,7 @@ a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
 
 .str-video__participant-view {
   max-width: unset !important;
+  border-radius: 0 !important;
 }
 
 /* Participant name label — always white text with dark backdrop for readability in any theme */

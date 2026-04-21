@@ -2,15 +2,33 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ActionIcon, Menu, useComputedColorScheme } from '@mantine/core';
-import { CallControls } from '@stream-io/video-react-sdk';
-import { IoGridOutline, IoExpandOutline, IoSettingsOutline, IoPeopleOutline } from 'react-icons/io5';
+import { ActionIcon, Menu, useComputedColorScheme, Divider } from '@mantine/core';
+import { CallControls, useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
+import { 
+  IoGridOutline, 
+  IoExpandOutline, 
+  IoSettingsOutline, 
+  IoPersonOutline, 
+  IoAppsOutline, 
+  IoStatsChartOutline, 
+  IoOpenOutline,
+  IoPeopleOutline,
+  IoPinOutline,
+  IoMicOffOutline,
+  IoVideocamOffOutline,
+  IoDesktopOutline
+} from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
+import { FaChalkboard } from 'react-icons/fa';
+import { IoListOutline } from 'react-icons/io5';
 
 interface CallControlsBarProps {
   userRole: string | undefined;
   layout: string;
   is_fullscreen: boolean;
+  studentId?: string;
+  studentSessionId?: string;
   onLayoutChange: (layout: any) => void;
   onToggleFullscreen: () => void;
   onOpenSettings: () => void;
@@ -34,10 +52,18 @@ export function CallControlsBar({
   onOpenSettings,
   onToggleParticipants,
   onLeave,
+  studentId,
+  studentSessionId,
 }: CallControlsBarProps) {
   const t = useTranslations('Calendar.lesson_room');
   const colorScheme = useComputedColorScheme('light');
   const isDark = colorScheme === 'dark';
+  const call = useCall();
+  const { useParticipants } = useCallStateHooks();
+  const participants = useParticipants();
+  
+  const studentParticipant = participants.find(p => p.sessionId === studentSessionId);
+  // const isPinned = studentParticipant?.isPinned;
 
   const [visible, set_visible] = useState(true);
   const hide_timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -53,6 +79,28 @@ export function CallControlsBar({
     clear_timer();
     hide_timer.current = setTimeout(() => set_visible(false), HIDE_DELAY_MS);
   }, [clear_timer]);
+
+  // const handlePin = async () => {
+  //   if (!call || !studentSessionId) return;
+  //   try {
+  //     if (isPinned) {
+  //       // await call.unpinParticipant(studentSessionId);
+  //     } else {
+  //       // await call.pinParticipant(studentSessionId);
+  //     }
+  //   } catch (e) {
+  //     console.error('Failed to pin/unpin:', e);
+  //   }
+  // };
+
+  const handleMute = async (type: 'audio' | 'video' | 'screenshare') => {
+    if (!call || !studentId) return;
+    try {
+      await call.muteUser(studentId, type);
+    } catch (e) {
+      console.error(`Failed to mute ${type}:`, e);
+    }
+  };
 
   // Track mouse position in fullscreen mode
   useEffect(() => {
@@ -109,6 +157,18 @@ export function CallControlsBar({
     >
       <CallControls onLeave={onLeave} />
 
+      {/* <ActionIcon 
+        variant="filled" 
+        size="xl" 
+        radius="xl" 
+        onClick={onToggleParticipants}
+        title={t('participants')}
+        style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
+        className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
+      >
+        <IoPeopleOutline size={20} />
+      </ActionIcon> */}
+
       <ActionIcon
         variant="filled"
         size="xl"
@@ -119,6 +179,18 @@ export function CallControlsBar({
         className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
       >
         <IoExpandOutline size={20} />
+      </ActionIcon>
+
+      <ActionIcon 
+        variant="filled" 
+        size="xl" 
+        radius="xl" 
+        onClick={onOpenSettings}
+        title={t('settings')}
+        style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
+        className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
+      >
+        <IoSettingsOutline size={20} />
       </ActionIcon>
 
       <Menu shadow="md" width={200} position="top" withArrow withinPortal={false}>
@@ -136,7 +208,7 @@ export function CallControlsBar({
         </Menu.Target>
 
         <Menu.Dropdown style={{ backgroundColor: 'var(--call-surface)', borderColor: 'var(--call-border)' }}>
-          <Menu.Label style={{ color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)' }}>{t('layout')}</Menu.Label>
+          <Menu.Label>{t('layout')}</Menu.Label>
           {[
             { key: 'grid', label: t('layout_grid') },
             { key: 'pip', label: t('layout_pip') },
@@ -156,30 +228,97 @@ export function CallControlsBar({
           ))}
         </Menu.Dropdown>
       </Menu>
-{/* 
-      <ActionIcon 
-        variant="filled" 
-        size="xl" 
-        radius="xl" 
-        onClick={onToggleParticipants}
-        title={t('participants')}
-        style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
-        className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
-      >
-        <IoPeopleOutline size={20} />
-      </ActionIcon> */}
 
-      <ActionIcon 
-        variant="filled" 
-        size="xl" 
-        radius="xl" 
-        onClick={onOpenSettings}
-        title={t('settings')}
-        style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
-        className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
-      >
-        <IoSettingsOutline size={20} />
-      </ActionIcon>
+      
+
+      {(userRole !== 'student' ? studentId : true) && (
+        <Menu shadow="md" width={220} position="top" withArrow withinPortal={false}>
+          <Menu.Target>
+            <ActionIcon 
+              variant="filled" 
+              size="xl" 
+              radius="xl" 
+              title={userRole === 'student' ? t('my_links') : t('student_actions')}
+              style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
+              className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
+            >
+              <IoPersonOutline size={20} />
+            </ActionIcon>
+          </Menu.Target>
+
+          <Menu.Dropdown style={{ backgroundColor: 'var(--call-surface)', borderColor: 'var(--call-border)' }}>
+            <Menu.Label>
+              {userRole === 'student' ? t('my_links') : t('student_actions')}
+            </Menu.Label>
+            
+            <Menu.Item
+              leftSection={<IoPersonOutline size={16} />}
+              component={Link}
+              href={userRole === 'student' ? '/main/profile' : `/main/users/${studentId}`}
+              style={{ color: 'var(--call-text)' }}
+            >
+              {userRole === 'student' ? t('my_profile') : t('student_profile')}
+            </Menu.Item>
+
+            <Menu.Item
+              leftSection={<FaChalkboard size={16} />}
+              component={Link}
+              href={userRole === 'student' ? '/main/boards' : `/main/boards/${studentId}`}
+              style={{ color: 'var(--call-text)' }}
+            >
+              {userRole === 'student' ? t('my_boards') : t('student_boards')}
+            </Menu.Item>
+
+            <Menu.Item
+              leftSection={<IoListOutline size={16} />}
+              component={Link}
+              href={userRole === 'student' ? '/main/tracker' : `/main/tracker/${studentId}`}
+              style={{ color: 'var(--call-text)' }}
+            >
+              {userRole === 'student' ? t('my_tracker') : t('student_tracker')}
+            </Menu.Item>
+
+            {userRole !== 'student' && studentSessionId && (
+              <>
+                <Divider my="xs" color="var(--call-border)" />
+                <Menu.Label>{t('moderation')}</Menu.Label>
+                
+                {/* <Menu.Item
+                  leftSection={<IoPinOutline size={16} />}
+                  onClick={handlePin}
+                  style={{ color: isPinned ? 'var(--space-primary)' : 'var(--call-text)' }}
+                >
+                  {isPinned ? t('unpin_student') : t('pin_student')}
+                </Menu.Item> */}
+
+                <Menu.Item
+                  leftSection={<IoMicOffOutline size={16} />}
+                  onClick={() => handleMute('audio')}
+                  style={{ color: 'var(--call-text)' }}
+                >
+                  {t('mute_student')}
+                </Menu.Item>
+
+                <Menu.Item
+                  leftSection={<IoVideocamOffOutline size={16} />}
+                  onClick={() => handleMute('video')}
+                  style={{ color: 'var(--call-text)' }}
+                >
+                  {t('stop_student_video')}
+                </Menu.Item>
+
+                <Menu.Item
+                  leftSection={<IoDesktopOutline size={16} />}
+                  onClick={() => handleMute('screenshare')}
+                  style={{ color: 'var(--call-text)' }}
+                >
+                  {t('stop_student_screen_share')}
+                </Menu.Item>
+              </>
+            )}
+          </Menu.Dropdown>
+        </Menu>
+      )}
     </div>
   );
 }

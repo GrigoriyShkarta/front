@@ -21,11 +21,19 @@ export function useLessonTimer(lesson_id: string | undefined) {
     const fetch_lesson = async () => {
       try {
         const res = await api.get(`/finance/subscriptions/lesson/${lesson_id}`);
-        // Endpoint returns { id, date, end_date, ... }
-        // Fallback: 1. end_date from API, 2. date + 1h, 3. now + 5m (for testing/safety)
-        const lesson_end = res.data.end_date || 
-                          (res.data.date ? dayjs(res.data.date).add(1, 'hour').toISOString() : 
+        // Endpoint returns lesson with optional subscription relation
+        const lesson = res.data;
+        const start_date = dayjs(lesson.date);
+        
+        // Use duration from lesson itself, or from its parent subscription, or default to 50m
+        const duration = lesson.lesson_duration || 
+                        lesson.subscription?.lesson_duration || 
+                        50;
+
+        const lesson_end = lesson.end_date || 
+                          (lesson.date ? start_date.add(duration, 'minute').toISOString() : 
                           dayjs().add(5, 'minute').toISOString());
+        
         set_end_time(lesson_end);
       } catch (err) {
         console.error('[useLessonTimer] Failed to fetch lesson data:', err);

@@ -8,6 +8,7 @@ import { useDebouncedValue } from '@mantine/hooks';
 import { Link } from '@/i18n/routing';
 import { IoSearchOutline, IoArrowForwardOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
 
 /**
  * Modern Grid-based layout for selecting a student for the boards.
@@ -104,6 +105,9 @@ export function BoardsUsersLayout() {
  */
 function StudentBoardCard({ student }: { student: any }) {
   const t = useTranslations('Boards');
+  const { user } = useAuth();
+  const is_white_sidebar_color = user?.space?.personalization?.is_white_sidebar_color ?? false;
+  const text_color = is_white_sidebar_color ? 'text-zinc-900' : 'text-white';
 
   return (
     <UnstyledButton
@@ -142,18 +146,24 @@ function StudentBoardCard({ student }: { student: any }) {
         </div>
 
         <Stack gap={8} className="w-full">
-          <Text fw={700} size="xl" className="text-white transition-colors line-clamp-1 h-8 text-center">
+          <Text fw={700} size="xl" className={cn("transition-colors line-clamp-1 h-8 text-center", text_color)}>
             <span className="group-hover:text-[var(--space-primary)] transition-colors duration-300">
               {student.name}
             </span>
           </Text>
           
           <Group gap={6} justify="center" wrap="nowrap">
-             <Text size="sm" c="dimmed" className="opacity-40 flex items-center gap-1 group-hover:opacity-100 transition-opacity">
+             <Text 
+               size="sm" 
+               className={cn(
+                 "opacity-40 flex items-center gap-1 group-hover:opacity-100 transition-opacity",
+                 text_color
+               )}
+             >
                 {t('open_board')} 
                 <IoArrowForwardOutline 
                   className="group-hover:translate-x-1.5 transition-transform duration-300" 
-                  style={{ color: 'var(--space-primary)' }}
+                  style={{ color: 'var(--space-secondary)' }}
                 />
              </Text>
           </Group>

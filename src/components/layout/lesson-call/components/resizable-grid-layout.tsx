@@ -12,6 +12,7 @@ interface ResizableGridLayoutProps {
   local_participant: any;
   participants: any[];
   sharing_participant?: any;
+  is_fullscreen?: boolean;
 }
 
 const MIN_PCT = 20;
@@ -25,6 +26,7 @@ export function ResizableGridLayout({
   local_participant,
   participants,
   sharing_participant,
+  is_fullscreen,
 }: ResizableGridLayoutProps) {
   const [left_pct, set_left_pct] = useState(50);
   const container_ref = useRef<HTMLDivElement | null>(null);
@@ -67,7 +69,7 @@ export function ResizableGridLayout({
     >
       {/* Left Panel (Teacher/Other) */}
       <div
-        className="relative overflow-hidden rounded-xl w-full h-full"
+        className={`relative overflow-hidden w-full h-full ${is_fullscreen ? 'rounded-none' : 'rounded-xl'}`}
         style={{ flex: `0 0 ${left_pct}%`, minWidth: 0 }}
       >
         <ParticipantView
@@ -88,7 +90,7 @@ export function ResizableGridLayout({
 
       {/* Right Panel (Local) */}
       <div
-        className="relative overflow-hidden rounded-xl w-full h-full"
+        className={`relative overflow-hidden w-full h-full ${is_fullscreen ? 'rounded-none' : 'rounded-xl'}`}
         style={{ flex: `0 0 ${100 - left_pct}%`, minWidth: 0 }}
       >
         <ParticipantView
