@@ -10,15 +10,8 @@ import { useTranslations } from 'next-intl';
  */
 export default function StudentRecordingsPage() {
   const { user } = useAuth();
-  const tNav = useTranslations('Navigation');
-  const t = useTranslations('Users');
 
   if (!user) return null;
-
-  const breadcrumbs = [
-    { title: tNav('dashboard'), href: '/main' },
-    { title: t('tabs.recordings'), href: '/main/recordings' },
-  ];
 
   return (
     <StudentProfileShell 
@@ -26,7 +19,6 @@ export default function StudentRecordingsPage() {
       is_own_profile={true}
       hide_user_info={true}
       hide_tabs={true}
-      custom_breadcrumbs={breadcrumbs}
     >
       <div className="hidden">Own recordings</div>
     </StudentProfileShell>

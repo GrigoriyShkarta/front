@@ -4,13 +4,10 @@ import {
   Stack, 
   Title, 
   Group, 
-  Button, 
-  Breadcrumbs, 
-  Anchor, 
+  Button,  
   Box, 
   LoadingOverlay, 
-  SimpleGrid, 
-  Paper, 
+  SimpleGrid,  
   Text, 
   UnstyledButton,
   Modal,
@@ -20,7 +17,7 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
-import { Link, useRouter } from '@/i18n/routing';
+import { Link } from '@/i18n/routing';
 import { IoAddOutline, IoTrashOutline, IoArrowForwardOutline, IoShapesOutline, IoPencilOutline } from 'react-icons/io5';
 import { useAuth } from '@/hooks/use-auth';
 import { useBoardData, Board } from './hooks/use-board-data';
@@ -45,16 +42,6 @@ export function BoardsListLayout({ hide_header }: { hide_header?: boolean }) {
   const is_admin = currentUser?.role === 'super_admin' || currentUser?.role === 'admin' || currentUser?.role === 'teacher';
   const can_manage = is_admin || currentUser?.id === userId;
 
-  const breadcrumb_items = [
-    { title: tNav('dashboard'), href: '/main' },
-    { title: tNav('boards'), href: '/main/boards' },
-    ...(is_admin && student_name ? [{ title: student_name, href: '#' }] : []),
-  ].map((item, index) => (
-    <Anchor component={Link} href={item.href} key={index} size="sm">
-      {item.title}
-    </Anchor>
-  ));
-
   const handleCreate = async () => {
     if (!newBoardTitle) return;
     setCreating(true);
@@ -71,7 +58,6 @@ export function BoardsListLayout({ hide_header }: { hide_header?: boolean }) {
     <Stack gap="xl" className={cn("py-4", !hide_header && "min-h-[500px]")}>
       {!hide_header && (
         <Stack gap="xs">
-          <Breadcrumbs separator="→" className="text-xs sm:text-sm">{breadcrumb_items}</Breadcrumbs>
           <Group justify="space-between" align="flex-end">
             <Stack gap={4}>
               <Title order={1} className="text-2xl sm:text-3xl font-bold tracking-tight">

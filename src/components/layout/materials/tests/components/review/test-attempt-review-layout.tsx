@@ -4,8 +4,6 @@ import {
     Title, 
     Text, 
     Stack, 
-    Breadcrumbs, 
-    Anchor, 
     Box, 
     LoadingOverlay, 
     Button,
@@ -25,7 +23,7 @@ import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
-import { Link, useRouter } from '@/i18n/routing';
+import { useRouter } from '@/i18n/routing';
 import { PageContainer } from '@/components/common/page-container';
 import { testAttemptActions } from '@/components/layout/materials/tests/actions/test-attempt-actions';
 import { TestQuestion } from '@/components/layout/materials/tests/schemas/test-schema';
@@ -44,7 +42,6 @@ interface Props {
  */
 export function TestAttemptReviewLayout({ id }: Props) {
     const t = useTranslations('Materials.tests.results');
-    const tNav = useTranslations('Navigation');
     const router = useRouter();
     const query_client = useQueryClient();
 
@@ -104,16 +101,6 @@ export function TestAttemptReviewLayout({ id }: Props) {
         return `${m}:${s.toString().padStart(2, '0')}`;
     };
 
-    const breadcrumb_items = [
-        { title: tNav('dashboard'), href: '/main' },
-        { title: t('title_global') || 'Reviews', href: '/main/materials/tests/reviews' },
-        { title: attempt?.student_name || 'Review', href: '#' },
-    ].map((item, index) => (
-        <Anchor component={Link} href={item.href} key={index} size="sm" underline="hover">
-            {item.title}
-        </Anchor>
-    ));
-
     if (is_loading && !attempt) {
         return (
             <PageContainer>
@@ -138,10 +125,6 @@ export function TestAttemptReviewLayout({ id }: Props) {
     return (
         <PageContainer>
             <Stack gap="xl">
-                <Breadcrumbs separator="/" mb="xs">
-                    {breadcrumb_items}
-                </Breadcrumbs>
-
                 <Group justify="space-between" align="flex-start">
                     <Stack gap={4}>
                         <Group 

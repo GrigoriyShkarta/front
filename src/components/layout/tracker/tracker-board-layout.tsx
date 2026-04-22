@@ -6,8 +6,6 @@ import {
   Group, 
   Button, 
   Text, 
-  Breadcrumbs, 
-  Anchor, 
   Box,
   LoadingOverlay,
   Center,
@@ -59,16 +57,6 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
 
   const is_admin = current_user?.role === 'super_admin' || current_user?.role === 'admin' || current_user?.role === 'teacher';
 
-  const breadcrumb_items = [
-    { title: tNav('dashboard'), href: '/main' },
-    { title: tNav('tracker'), href: '/main/tracker' },
-    ...(is_admin && student_name ? [{ title: student_name, href: '#' }] : []),
-  ].map((item, index) => (
-    <Anchor component={Link} href={item.href} key={index} size="sm">
-      {item.title}
-    </Anchor>
-  ));
-
   return (
     <Stack gap="lg" className="tracker-board-container min-h-full">
       {hide_header ? (
@@ -98,10 +86,6 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
         )
       ) : (
         <Stack gap="lg">
-          <Breadcrumbs separator="→" mb="-xs">
-            {breadcrumb_items}
-          </Breadcrumbs>
-
           <Group justify="space-between" align="center" wrap="nowrap">
             <Group align="center" gap="md">
               <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">

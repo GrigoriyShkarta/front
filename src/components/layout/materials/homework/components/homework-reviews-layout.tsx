@@ -12,8 +12,6 @@ import {
   Pagination, 
   LoadingOverlay,
   Box,
-  Anchor,
-  Breadcrumbs,
   Title
 } from '@mantine/core';
 import { IoSearchOutline, IoFilterOutline, IoDocumentTextOutline } from 'react-icons/io5';
@@ -32,16 +30,7 @@ export function HomeworkReviewsLayout() {
   const t = useTranslations('Materials.homework.reviews');
   const common_t = useTranslations('Common');
   const router = useRouter();
-  const tNav = useTranslations('Navigation');
   
-    const breadcrumb_items = [
-      { title: tNav('dashboard'), href: '/main' },
-      { title: t('title'), href: '/main/materials/homeworks/reviews' },
-    ].map((item, index) => (
-      <Anchor component={Link} href={item.href} key={index} size="sm">
-        {item.title}
-      </Anchor>
-    ));
   const [search, set_search] = useState('');
   const [debounced_search] = useDebouncedValue(search, 400);
   const [status, set_status] = useState<string | null>('pending');
@@ -81,10 +70,6 @@ export function HomeworkReviewsLayout() {
   return (
     
       <Stack gap="xl">
-        <Breadcrumbs separator="→" mb="-xs">
-          {breadcrumb_items}
-        </Breadcrumbs>
-
         <Group justify="space-between" align="center" wrap="nowrap">
           <Group align="center" gap="md">
             <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">

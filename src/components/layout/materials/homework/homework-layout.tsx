@@ -13,8 +13,6 @@ import {
     Pagination, 
     Select,
     Transition,
-    Breadcrumbs,
-    Anchor
 } from '@mantine/core';
 import { 
     IoSearchOutline, 
@@ -33,19 +31,9 @@ import { useRouter } from '@/i18n/routing';
 
 export default function HomeworkLayout() {
     const t = useTranslations('Materials.homework');
-    const tNav = useTranslations('Navigation');
     const common_t = useTranslations('Common');
     const { user } = useAuth();
     const is_student = user?.role === 'student';
-
-    const breadcrumb_items = [
-        { title: tNav('dashboard'), href: '/main' },
-        { title: t('title'), href: '/main/materials/homework' },
-    ].map((item, index) => (
-        <Anchor component={Link} href={item.href} key={index} size="sm">
-            {item.title}
-        </Anchor>
-    ));
     
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -81,10 +69,6 @@ export default function HomeworkLayout() {
 
     return (
         <Stack gap="xl" className="animate-in fade-in duration-500">
-            <Breadcrumbs separator="→">
-                {breadcrumb_items}
-            </Breadcrumbs>
-
             <Group justify="space-between" align="flex-start">
                 <Stack gap={4}>
                     <Group gap="md">

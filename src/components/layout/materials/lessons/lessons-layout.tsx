@@ -13,8 +13,6 @@ import {
   Pagination, 
   Select, 
   LoadingOverlay,
-  Breadcrumbs,
-  Anchor
 } from "@mantine/core";
 import { IoBookOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoFilterOutline, IoPeopleOutline } from "react-icons/io5";
 import { useTranslations } from "next-intl";
@@ -30,19 +28,9 @@ import { useAuth } from "@/hooks/use-auth";
 export default function LessonsLayout() {
     const t = useTranslations('Materials.lessons');
     const tAccess = useTranslations('Materials.access');
-    const tNav = useTranslations('Navigation');
     const common_t = useTranslations('Common');
     const { user } = useAuth();
     const is_student = user?.role === 'student';
-
-    const breadcrumb_items = [
-        { title: tNav('dashboard'), href: '/main' },
-        { title: t('title'), href: '/main/materials/lessons' },
-    ].map((item, index) => (
-        <Anchor component={Link} href={item.href} key={index} size="sm">
-            {item.title}
-        </Anchor>
-    ));
 
     // State for filtering and pagination
     const [page, setPage] = useState(1);
@@ -101,10 +89,6 @@ export default function LessonsLayout() {
 
     return (
         <Stack gap="lg">
-                <Breadcrumbs mb="xs" separator="→">
-                    {breadcrumb_items}
-                </Breadcrumbs>
-
                 <Group justify="space-between" align="center" wrap="nowrap">
                     <Group align="center" gap="md">
                         <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">

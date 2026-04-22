@@ -12,13 +12,11 @@ import { useUsersQuery } from './hooks/use-users-query';
 import { UserListItem, UserFormData } from '@/schemas/users';
 import { useTranslations } from 'next-intl';
 import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
-import { Breadcrumbs, Anchor, Text } from '@mantine/core';
-import { Link } from '@/i18n/routing';
+import { Text } from '@mantine/core';
 
 export function UsersLayout() {
   const t = useTranslations('Users');
   const common_t = useTranslations('Common');
-  const tNav = useTranslations('Navigation');
   const [search_query, set_search_query] = useState('');
   const [debounced_search] = useDebouncedValue(search_query, 300);
   const [category_filters, set_category_filters] = useState<string[]>([]);
@@ -63,15 +61,6 @@ export function UsersLayout() {
   useEffect(() => {
     set_page(1);
   }, [debounced_search, category_filters, payment_statuses_filter]);
-
-  const breadcrumb_items = [
-    { title: tNav('dashboard'), href: '/main' },
-    { title: tNav('users'), href: '/main/users' },
-  ].map((item, index) => (
-    <Anchor component={Link} href={item.href} key={index} size="sm">
-      {item.title}
-    </Anchor>
-  ));
 
   const handle_select = (id: string) => {
     set_selected_users(prev => 
@@ -146,10 +135,6 @@ export function UsersLayout() {
   return (
     <Stack gap="lg">
       <Stack gap="lg">
-        <Breadcrumbs separator="→" mb="-xs">
-          {breadcrumb_items}
-        </Breadcrumbs>
-
         <Group justify="space-between" align="center" wrap="nowrap">
           <Group align="center" gap="md">
             <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">

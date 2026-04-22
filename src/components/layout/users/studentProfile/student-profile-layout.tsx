@@ -1,17 +1,17 @@
 'use client';
 
-import { Tabs, Stack, Title, Paper, Text, Breadcrumbs, Anchor, Box, LoadingOverlay, Group, Avatar, Badge, Button, ActionIcon, Tooltip } from '@mantine/core';
-import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoSchoolOutline, IoListOutline, IoVideocamOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
-import { FaChalkboard } from 'react-icons/fa';
+import { Tabs, Stack, Title, Paper, Text, Box, LoadingOverlay, Group, Avatar, Badge, Button, ActionIcon, Tooltip } from '@mantine/core';
+import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoListOutline, IoVideocamOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { useUserQuery } from '../hooks/use-user-query';
 import { useUsersQuery } from '../hooks/use-users-query';
 import { useParams } from 'next/navigation';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { UserDrawer } from '../components/user-drawer';
 import { StudentRecordingsList } from './recordings/recordings-list';
 import { useUpcomingLesson } from '@/hooks/use-upcoming-lesson';
+import { FaChalkboard } from 'react-icons/fa';
 
 interface Props {
   id?: string;
@@ -19,7 +19,6 @@ interface Props {
   is_own_profile?: boolean;
   hide_user_info?: boolean;
   hide_tabs?: boolean;
-  custom_breadcrumbs?: { title: string; href: string }[];
 }
 
 /**
@@ -32,7 +31,6 @@ export function StudentProfileShell({
   is_own_profile,
   hide_user_info,
   hide_tabs,
-  custom_breadcrumbs,
 }: Props) {
   const params = useParams();
   const id = (params?.id as string) || prop_id || '';
@@ -66,28 +64,6 @@ export function StudentProfileShell({
             : pathname.endsWith('/boards')
               ? 'boards'
               : 'general';
-
-  const breadcrumb_items = useMemo(() => {
-    const items = custom_breadcrumbs || [
-      { title: tNav('dashboard'), href: '/main' },
-    ];
-
-    if (!custom_breadcrumbs) {
-      if (!is_own_profile) {
-        items.push({ title: tNav('users'), href: '/main/users' });
-      }
-
-      if (profile_user) {
-        items.push({ title: profile_user.name, href: is_own_profile ? '/main/profile' : `/main/users/${id}` });
-      }
-    }
-
-    return items.map((item, index) => (
-      <Anchor component={Link} href={item.href} key={index} size="sm">
-        {item.title}
-      </Anchor>
-    ));
-  }, [is_own_profile, tNav, profile_user, id, custom_breadcrumbs]);
 
   if (is_loading) {
     return (
@@ -129,10 +105,6 @@ export function StudentProfileShell({
 
   return (
     <Stack gap="lg">
-      <Box className="overflow-x-auto whitespace-nowrap hide-scrollbar pb-1">
-        <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
-      </Box>
-
       {!hide_user_info && (
         <Stack gap="xs">
           <Group justify="space-between" align="flex-start" className="flex-col sm:flex-row sm:items-center gap-y-4">

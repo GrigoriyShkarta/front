@@ -60,16 +60,6 @@ export function CourseView({ id }: Props) {
         );
     }
 
-    const breadcrumb_items = [
-        { title: t_nav('dashboard'), href: '/main' },
-        { title: t('title'), href: '/main/materials/courses' },
-        { title: course.name, href: `/main/materials/courses/${id}` },
-    ].map((item, index) => (
-        <Anchor component={Link} href={item.href} key={index} size="sm">
-            {item.title}
-        </Anchor>
-    ));
-
     const filtered_content = course.content;
 
     const total_duration = filtered_content.reduce((acc: number, item: any) => {
@@ -115,7 +105,6 @@ export function CourseView({ id }: Props) {
                 course_name={course.name}
                 course_description={course.description}
                 image_url={course.image_url}
-                breadcrumb_items={breadcrumb_items}
                 on_edit={() => set_editor_opened(true)}
             />
 

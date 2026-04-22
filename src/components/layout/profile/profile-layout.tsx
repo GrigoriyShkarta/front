@@ -1,10 +1,10 @@
 'use client';
 
-import { Tabs, Stack, Title, Paper, Text, Breadcrumbs, Anchor, Box } from '@mantine/core';
+import { Tabs, Stack, Title, Paper, Text, Box } from '@mantine/core';
 import { IoPersonOutline, IoLockClosedOutline } from 'react-icons/io5';
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslations } from 'next-intl';
-import { Link, usePathname, useRouter } from '@/i18n/routing';
+import { usePathname, useRouter } from '@/i18n/routing';
 import { ProfileInfoForm } from './components/profile-info-form';
 import { SecurityForm } from './components/security-form';
 import { useProfile } from './hooks/use-profile';
@@ -16,7 +16,6 @@ import { useProfile } from './hooks/use-profile';
 export function ProfileLayout({ children }: { children?: React.ReactNode }) {
   const { user } = useAuth();
   const t = useTranslations('Profile');
-  const tNav = useTranslations('Navigation');
   const pathname = usePathname();
   const router = useRouter();
   const { update_profile, is_updating, change_password, is_changing_password } = useProfile();
@@ -25,19 +24,9 @@ export function ProfileLayout({ children }: { children?: React.ReactNode }) {
 
   const active_tab = pathname.endsWith('/security') ? 'security' : 'general';
 
-  const breadcrumb_items = [
-    { title: tNav('dashboard'), href: '/main' },
-    { title: t('title'), href: '/main/profile' },
-  ].map((item, index) => (
-    <Anchor component={Link} href={item.href} key={index} size="sm">
-      {item.title}
-    </Anchor>
-  ));
-
   return (
     <Stack gap="lg">
       <Stack gap="xs">
-        <Breadcrumbs separator="→">{breadcrumb_items}</Breadcrumbs>
         <Title order={2}>{t('title')}</Title>
         <Text c="dimmed" size="sm" mt={-4}>{t('subtitle')}</Text>
       </Stack>

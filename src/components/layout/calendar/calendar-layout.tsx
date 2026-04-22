@@ -1,11 +1,10 @@
 'use client';
 
-import { Box, Container, Stack, Transition, LoadingOverlay, Breadcrumbs, Anchor, Group, Title, Text } from '@mantine/core';
+import { Box, Container, Stack, Transition, LoadingOverlay, Group, Title, Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { IoCalendarOutline } from 'react-icons/io5';
-import { Link } from '@/i18n/routing';
 import { CalendarSidebar } from './components/calendar-sidebar';
 import { CalendarHeader } from './components/calendar-header';
 import { MonthView } from './components/month-view';
@@ -64,15 +63,6 @@ export function CalendarLayout({ student_id }: Props = {}) {
   const tCal = useTranslations('Calendar');
   const tNav = useTranslations('Navigation');
   const [locale_loaded, set_locale_loaded] = useState(false);
-
-  const breadcrumb_items = [
-    { title: tNav('dashboard'), href: '/main' },
-    { title: tNav('calendar'), href: '/main/calendar' },
-  ].map((item, index) => (
-    <Anchor component={Link} href={item.href} key={index} size="sm">
-      {item.title}
-    </Anchor>
-  ));
 
   useEffect(() => {
     let internal_locale = locale;
@@ -149,10 +139,6 @@ export function CalendarLayout({ student_id }: Props = {}) {
       {locale_loaded && (
         <>
           <Stack gap="lg" mb="lg">
-            <Breadcrumbs separator="→" mb="-xs">
-              {breadcrumb_items}
-            </Breadcrumbs>
-
             <Group justify="space-between" align="center" wrap="nowrap">
               <Group align="center" gap="md">
                 <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">

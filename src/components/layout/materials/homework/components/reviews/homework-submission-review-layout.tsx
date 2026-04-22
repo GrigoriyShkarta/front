@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from '@/i18n/routing';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { 
@@ -17,8 +17,7 @@ import {
   Badge, 
   LoadingOverlay,
   Container,
-  Breadcrumbs,
-  Anchor
+  Anchor,
 } from '@mantine/core';
 import { 
   IoArrowBack, 
@@ -33,7 +32,6 @@ import {
 } from 'react-icons/io5';
 import { notifications } from '@mantine/notifications';
 import { useTranslations, useFormatter } from 'next-intl';
-import dayjs from 'dayjs';
 
 import { homeworkActions } from '../../actions/homework-actions';
 import { PageContainer } from '@/components/common/page-container';
@@ -104,14 +102,6 @@ export function HomeworkSubmissionReviewLayout({ id }: Props) {
         {/* Navigation & Toolbar */}
         <Group justify="space-between" align="flex-start">
           <Stack gap={4}>
-            <Breadcrumbs separator="→" className="mb-2">
-              <Anchor onClick={() => router.push('/main/materials/homeworks/reviews')} size="xs" c="dimmed" fw={500}>
-                {t('title') || 'Reviews'}
-              </Anchor>
-              <Text size="xs" c="dimmed" fw={500}>
-                {submission.student?.name || t('unknown_student')}
-              </Text>
-            </Breadcrumbs>
             <Group gap="md">
               <ActionIcon 
                 variant="subtle" 

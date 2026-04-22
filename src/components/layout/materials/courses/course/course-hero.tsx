@@ -7,17 +7,14 @@ import {
     Box, 
     Paper, 
     Image, 
-    Breadcrumbs, 
-    Anchor,
     Container,
     rem,
     Grid,
     Group,
     Button
 } from '@mantine/core';
-import { IoImageOutline, IoPencilOutline } from 'react-icons/io5';
+import { IoPencilOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 import { useAuth } from '@/hooks/use-auth';
 import { ROLES } from '@/types/auth.types';
 
@@ -25,7 +22,6 @@ interface Props {
     course_name: string;
     course_description?: string | null;
     image_url?: string | null;
-    breadcrumb_items: React.ReactNode[];
     on_edit?: () => void;
 }
 
@@ -36,7 +32,6 @@ export function CourseHero({
     course_name, 
     course_description, 
     image_url, 
-    breadcrumb_items,
     on_edit
 }: Props) {
     const t = useTranslations('Materials.courses');
@@ -66,10 +61,6 @@ export function CourseHero({
             <Container size="xl">
                 <Stack gap="xl">
                     <Group justify="space-between" align="center">
-                        <Breadcrumbs separator="→">
-                            {breadcrumb_items}
-                        </Breadcrumbs>
-
                         {can_edit && (
                             <Button 
                                 leftSection={<IoPencilOutline size={16} />}

@@ -13,8 +13,6 @@ import {
   Pagination, 
   Select, 
   LoadingOverlay,
-  Breadcrumbs,
-  Anchor
 } from "@mantine/core";
 import { IoAddOutline, IoTrashOutline, IoSearchOutline, IoCardOutline } from "react-icons/io5";
 import { useTranslations } from "next-intl";
@@ -27,17 +25,7 @@ import { SubscriptionMaterial, SubscriptionFormData } from "./schemas/subscripti
 
 export default function SubscriptionsLayout() {
     const t = useTranslations('Finance.subscriptions');
-    const tNav = useTranslations('Navigation');
     const common_t = useTranslations('Common');
-
-    const breadcrumb_items = [
-        { title: tNav('dashboard'), href: '/main' },
-        { title: tNav('subscriptions'), href: '/main/finance/subscriptions' },
-    ].map((item, index) => (
-        <Anchor component={Link} href={item.href} key={index} size="sm">
-            {item.title}
-        </Anchor>
-    ));
 
     // State for filtering and pagination
     const [page, setPage] = useState(1);
@@ -117,10 +105,6 @@ export default function SubscriptionsLayout() {
 
     return (
     <Stack gap="lg">
-        <Breadcrumbs mb="xs" separator="→">
-            {breadcrumb_items}
-        </Breadcrumbs>
-
         <Group justify="space-between" align="flex-end">
             <Group align="center" gap="md">
                 <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">

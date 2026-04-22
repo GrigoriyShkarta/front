@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Title, Paper, Stack, Box, LoadingOverlay, Breadcrumbs, Anchor, Group, SimpleGrid, TextInput, Text, Avatar, UnstyledButton } from '@mantine/core';
+import { Title, Paper, Stack, Box, LoadingOverlay, Group, SimpleGrid, TextInput, Text, Avatar, UnstyledButton } from '@mantine/core';
 import { useUsersQuery } from '@/components/layout/users/hooks/use-users-query';
 import { useTranslations } from 'next-intl';
 import { useDebouncedValue } from '@mantine/hooks';
@@ -30,22 +30,12 @@ export function TrackerUsersLayout() {
     include_subscriptions: true
   });
 
-  const breadcrumb_items = [
-    { title: tNav('dashboard'), href: '/main' },
-    { title: tNav('tracker'), href: '/main/tracker' },
-  ].map((item, index) => (
-    <Anchor component={Link} href={item.href} key={index} size="sm">
-      {item.title}
-    </Anchor>
-  ));
-
   // Only teachers/admins see this, and they only pick students
   const filtered_users = users.filter(u => u.role === 'student');
 
   return (
     <Stack gap="xl" className="py-4">
       <Stack gap="xs">
-        <Breadcrumbs separator="→" className="text-xs sm:text-sm">{breadcrumb_items}</Breadcrumbs>
         <Group justify="space-between" align="flex-end" className="flex-col sm:flex-row items-start sm:items-end gap-4">
           <Stack gap={4}>
             <Title order={1} className="text-2xl sm:text-3xl font-bold tracking-tight">

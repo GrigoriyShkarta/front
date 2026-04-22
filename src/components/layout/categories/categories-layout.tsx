@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Paper, Stack, Group, Button, Title, LoadingOverlay, Box, Text, Center, Breadcrumbs, Anchor, Pagination, Select } from '@mantine/core';
+import { Paper, Stack, Group, Button, Title, LoadingOverlay, Box, Text, Center, Pagination, Select } from '@mantine/core';
 import { Link } from '@/i18n/routing';
 import { IoAddOutline, IoTrashOutline, IoPricetagOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
@@ -18,15 +18,6 @@ export default function CategoriesLayout() {
   const t = useTranslations('Categories');
   const tNav = useTranslations('Navigation');
   const common_t = useTranslations('Common');
-
-  const breadcrumb_items = [
-    { title: tNav('dashboard'), href: '/main' },
-    { title: tNav('categories'), href: '/main/categories' },
-  ].map((item, index) => (
-    <Anchor component={Link} href={item.href} key={index} size="sm">
-      {item.title}
-    </Anchor>
-  ));
 
   // State
   const [page, setPage] = useState(1);
@@ -94,11 +85,7 @@ export default function CategoriesLayout() {
   const has_data = categories.length > 0;
 
   return (
-    <Stack gap="lg">
-      <Breadcrumbs separator="→" mb="-xs">
-        {breadcrumb_items}
-      </Breadcrumbs>
-      
+    <Stack gap="lg"> 
       <Group justify="space-between" align="center" wrap="nowrap">
         <Group align="center" gap="md">
           <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-import { Stack, Box, LoadingOverlay, Pagination, Group, Text, Select, Paper, TextInput, Anchor, Breadcrumbs, Title } from '@mantine/core';
+import { Stack, Box, LoadingOverlay, Pagination, Group, Text, Select, Paper, TextInput, Title } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { useDebouncedValue } from '@mantine/hooks';
 import { IoSearchOutline } from 'react-icons/io5';
@@ -24,7 +24,6 @@ interface Props {
 export function TestResultsLayout({ test_id }: Props) {
   const t = useTranslations('Materials.tests.results');
   const common_t = useTranslations('Common');
-  const tNav = useTranslations('Navigation');
   const router = useRouter();
 
   const [page, set_page] = useState(1);
@@ -32,15 +31,6 @@ export function TestResultsLayout({ test_id }: Props) {
   const [status_filter, set_status_filter] = useState<string | null>(test_id ? null : 'pending_review');
   const [search, set_search] = useState('');
   const [debounced_search] = useDebouncedValue(search, 400);
-
-  const breadcrumb_items = [
-      { title: tNav('dashboard'), href: '/main' },
-      { title: t('title'), href: '/main/materials/tests/reviews' },
-    ].map((item, index) => (
-      <Anchor component={Link} href={item.href} key={index} size="sm">
-        {item.title}
-      </Anchor>
-    ));
 
   const {
     attempts,
@@ -73,10 +63,6 @@ export function TestResultsLayout({ test_id }: Props) {
 
   return (
     <Stack gap="xl">
-      <Breadcrumbs separator="→" mb="-xs">
-        {breadcrumb_items}
-      </Breadcrumbs>
-
       <Group justify="space-between" align="center" wrap="nowrap">
         <Group align="center" gap="md">
           <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">

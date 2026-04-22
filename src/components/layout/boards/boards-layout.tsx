@@ -8,34 +8,22 @@ import {
   Tooltip,
   Box, 
   LoadingOverlay,
-  useMantineColorScheme
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IoLibraryOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
-import { useAuth } from '@/hooks/use-auth';
 import { useBoardData } from './hooks/use-board-data';
 import { MaterialsPickerModal } from './components/materials-picker-modal';
-import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import "@excalidraw/excalidraw/index.css";
-
-// Excalidraw is client-side only
-// const Excalidraw = dynamic(
-//   () => import('@excalidraw/excalidraw').then((mod) => mod.Excalidraw),
-//   { ssr: false }
-// );
 
 export function BoardsLayout() {
   const t = useTranslations('Boards');
   const params = useParams();
-  const { colorScheme } = useMantineColorScheme();
   
   const studentId = params?.userId as string;
   const boardId = params?.boardId as string;
   const locale = (params?.locale as string) || 'uk';
-  const { user: current_user } = useAuth();
   
   const { loading, current_board } = useBoardData(studentId, boardId);
 

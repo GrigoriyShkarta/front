@@ -3,9 +3,7 @@
 import { 
   Stack, 
   Title, 
-  Group, 
-  Breadcrumbs, 
-  Anchor, 
+  Group,  
   Text, 
   Grid,
   LoadingOverlay,
@@ -29,7 +27,6 @@ import 'dayjs/locale/en';
 export default function ReportsLayout() {
   const locale = useLocale();
   const t = useTranslations('Finance.reports');
-  const tNav = useTranslations('Navigation');
 
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
     dayjs().startOf('month').toDate(),
@@ -38,22 +35,9 @@ export default function ReportsLayout() {
 
   const { stats, is_loading } = useReports(dateRange);
 
-  const breadcrumb_items = [
-    { title: tNav('dashboard'), href: '/main' },
-    { title: t('title'), href: '/main/finance/reports' },
-  ].map((item, index) => (
-    <Anchor component={Link} href={item.href} key={index} size="sm">
-      {item.title}
-    </Anchor>
-  ));
-
   return (
     <Stack gap="lg" pos="relative">
       <LoadingOverlay visible={is_loading} overlayProps={{ blur: 2 }} zIndex={50} />
-
-      <Breadcrumbs mb="xs" separator="→">
-        {breadcrumb_items}
-      </Breadcrumbs>
 
       <Group justify="space-between" align="flex-end">
         <Group align="center" gap="md">

@@ -14,11 +14,8 @@ import {
   Select, 
   LoadingOverlay,
   Center,
-  Breadcrumbs,
-  Anchor,
   SegmentedControl,
   Tabs,
-  rem,
   MultiSelect
 } from "@mantine/core";
 import { IoVideocamOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoGridOutline, IoListOutline, IoFilterOutline, IoPeopleOutline, IoLibraryOutline, IoFileTrayStackedOutline, IoPersonOutline } from "react-icons/io5";
@@ -47,15 +44,6 @@ export default function VideosLayout() {
     const { user } = useAuth();
     const is_super_admin = user?.role === 'super_admin';
     const { checkFiles } = useStorageLimitCheck();
-
-    const breadcrumb_items = [
-        { title: tNav('dashboard'), href: '/main' },
-        { title: t('title'), href: '/main/materials/video' },
-    ].map((item, index) => (
-        <Anchor component={Link} href={item.href} key={index} size="sm">
-            {item.title}
-        </Anchor>
-    ));
 
     // State for filtering and pagination
     const [page, setPage] = useState(1);
@@ -342,10 +330,6 @@ export default function VideosLayout() {
         />
 
         <Stack gap="lg">
-                <Breadcrumbs mb="xs" separator="→">
-                    {breadcrumb_items}
-                </Breadcrumbs>
-
                 <Group justify="space-between" align="center" wrap="nowrap">
                     <Group align="center" gap="md">
                         <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
