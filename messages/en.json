@@ -1265,7 +1265,7 @@
       "gallery": "Gallery",
       "table_view": "Table",
       "subtitle": "Structured learning programs designed for systematic knowledge mastery.",
-      "placeholder_description": "Unlock your potential with this comprehensive course covering all essential aspects of the subject.",
+      "placeholder_description": "Add description",
       "create_course": "Create Course",
       "edit_course": "Edit Course",
       "delete_course": "Delete Course",
@@ -1640,9 +1640,19 @@
     "category_video": "Video",
     "category_file": "Files",
     "category_other": "Other",
-    "files_header": "Your Files",
-    "total": "Total: {total}",
-    "delete_success": "File successfully deleted",
-    "delete_error": "Failed to delete file"
+    "category_other_description": "Includes course covers, user avatars, board snapshots, and other system files.",
+    "page_title": "Cloud Storage",
+    "page_description": "Manage your space storage and see detailed statistics.",
+    "plan_limit": "Plan Limit",
+    "used": "Used",
+    "of_limit": "of {limit} used",
+    "breakdown": "Breakdown",
+    "quick_access": "Quick Access",
+    "storage_health": "Storage Health",
+    "health_good": "Your storage usage is within safe limits. Keep it up!",
+    "health_warning": "You are running out of space. Consider deleting some old files.",
+    "top_files_title": "Largest Files",
+    "view_in_library": "View in library",
+    "no_files_found": "No large files found."
   }
 }

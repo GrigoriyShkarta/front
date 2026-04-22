@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { 
   Box, 
   Text, 
@@ -32,7 +31,8 @@ import {
   IoSettingsOutline,
   IoCloudDoneOutline,
   IoFileTrayOutline,
-  IoLibraryOutline
+  IoLibraryOutline,
+  IoCloudOutline
 } from 'react-icons/io5';
 import { Link } from '@/i18n/routing';
 import { PageContainer } from '@/components/common/page-container';
@@ -77,8 +77,8 @@ export function StoragePage() {
   const used_percent = Math.min(100, (total_used / limit) * 100);
 
   // Donut Chart Calculations
-  const radius = 80;
-  const stroke = 12;
+  const radius = 95;
+  const stroke = 14;
   const normalizedRadius = radius - stroke * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
 
@@ -88,17 +88,22 @@ export function StoragePage() {
     <PageContainer>
       <Stack gap="xl">
         <Group justify="space-between" align="flex-end">
-          <Stack gap={0}>
-            <Title order={2} fw={800} className="tracking-tight">
-              {t('page_title') || 'Cloud Storage'}
-            </Title>
-            <Text c="dimmed" size="sm">
-              {t('page_description') || 'Manage your space storage and see detailed statistics.'}
+          <Group align="center" gap="md">
+            <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+              <IoCloudOutline size={28} />
+            </Box>
+            <Stack gap={0}>
+              <Title order={2} fw={800} className="tracking-tight">
+                {t('page_title') || 'Cloud Storage'}
+              </Title>
+              <Text c="dimmed" size="sm">
+                {t('page_description') || 'Manage your space storage and see detailed statistics.'}
             </Text>
           </Stack>
-          <Badge variant="light" color="blue" size="lg" radius="sm">
+          <Badge variant="light" color="primary" size="lg" radius="sm">
             {t('plan_limit') || 'Plan Limit'}: {format_bytes(limit)}
           </Badge>
+          </Group>
         </Group>
 
         <SimpleGrid cols={{ base: 1, lg: 3 }} spacing="xl">
@@ -121,7 +126,7 @@ export function StoragePage() {
                   style={{ transform: 'rotate(-90deg)' }}
                 >
                   <circle
-                    stroke={is_dark ? '#2a2a3c' : '#f1f5f9'}
+                    stroke={is_dark ? 'rgba(255,255,255,0.05)' : 'var(--mantine-primary-color-light)'}
                     fill="transparent"
                     strokeWidth={stroke}
                     r={normalizedRadius}
@@ -178,13 +183,20 @@ export function StoragePage() {
 
               <Stack w="100%" gap="xs">
                 {data.map(item => (
-                   <Group key={item.key} justify="space-between" wrap="nowrap">
-                     <Group gap="sm" wrap="nowrap">
-                       <Box w={10} h={10} style={{ borderRadius: 2, backgroundColor: item.color }} />
-                       <Text size="xs" fw={600}>{item.label}</Text>
+                   <Stack key={item.key} gap={2}>
+                     <Group justify="space-between" wrap="nowrap">
+                       <Group gap="sm" wrap="nowrap">
+                         <Box w={10} h={10} style={{ borderRadius: 2, backgroundColor: item.color }} />
+                         <Text size="xs" fw={600}>{item.label}</Text>
+                       </Group>
+                       <Text size="xs" c="dimmed" fw={500}>{format_bytes(item.value)}</Text>
                      </Group>
-                     <Text size="xs" c="dimmed" fw={500}>{format_bytes(item.value)}</Text>
-                   </Group>
+                     {item.key === 'other' && (
+                       <Text size="10px" c="dimmed" ml={18} style={{ lineHeight: 1.2 }}>
+                         {t('category_other_description')}
+                       </Text>
+                     )}
+                   </Stack>
                 ))}
               </Stack>
             </Stack>
@@ -210,7 +222,7 @@ export function StoragePage() {
                       >
                         <Group justify="space-between">
                           <Group gap="md">
-                            <ThemeIcon color="gray" variant="light" size="lg" radius="md">
+                            <ThemeIcon color="primary" variant="light" size="lg" radius="xl">
                               <item.icon size={20} />
                             </ThemeIcon>
                             <Stack gap={0}>
@@ -244,7 +256,7 @@ export function StoragePage() {
                     <Title order={4} mb="md" fw={700} display="flex" style={{ alignItems: 'center', gap: 8 }}>
                       <IoInformationCircleOutline size={20} /> {t('tips_title') || 'Optimization Tips'}
                     </Title>
-                    <List spacing="xs" size="xs" icon={<MantineThemeIcon color="blue" size={14} radius="xl"><IoInformationCircleOutline size={8} /></MantineThemeIcon>}>
+                    <List spacing="xs" size="xs" icon={<MantineThemeIcon color="primary" size={14} radius="xl"><IoInformationCircleOutline size={8} /></MantineThemeIcon>}>
                        <List.Item>{t('tip_video') || 'Videos consume the most space. Audit your video materials regularly.'}</List.Item>
                        <List.Item>{t('tip_temp') || 'Temporary files in "Other" can be cleared by contacting support.'}</List.Item>
                        <List.Item>{t('tip_upgrade') || 'Need more space? You can always upgrade your plan in Billing.'}</List.Item>
@@ -271,7 +283,7 @@ export function StoragePage() {
                         >
                           <Group justify="space-between">
                             <Group gap="md">
-                              <ThemeIcon color="gray" variant="light" size="md">
+                              <ThemeIcon color="primary" variant="light" size="md" radius="xl">
                                 {category?.icon && <category.icon size={16} />}
                               </ThemeIcon>
                               <Stack gap={0}>

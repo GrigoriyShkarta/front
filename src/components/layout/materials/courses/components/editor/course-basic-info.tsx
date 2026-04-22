@@ -59,14 +59,6 @@ export function CourseBasicInfo({
                                     <IoImageOutline size={20} color="white" />
                                     <Text c="white" size="xs" fw={500}>{t('form.upload_image')}</Text>
                                 </Box>
-                                {!image_url && (
-                                    <Box className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                        <IoImageOutline size={32} color="white" className="drop-shadow-md" />
-                                        <Text size="xs" c="white" fw={600} className="drop-shadow-sm">
-                                            {t('form.upload_image')}
-                                        </Text>
-                                    </Box>
-                                )}
                             </>
                         ) : (
                             <>
