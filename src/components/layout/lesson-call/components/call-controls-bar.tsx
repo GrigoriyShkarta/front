@@ -4,9 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ActionIcon, Menu, useComputedColorScheme, Divider } from '@mantine/core';
 import { CallControls, useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
-import { BsGrid3X3Gap, BsLayoutSidebar, BsLayoutSidebarReverse, BsPip } from "react-icons/bs";
+import { BsGrid3X3Gap, BsLayoutSidebar, BsLayoutSidebarReverse, BsPip, BsFullscreen } from "react-icons/bs";
 import {  
-  IoExpandOutline, 
   IoSettingsOutline, 
   IoPersonOutline, 
   IoMicOffOutline,
@@ -137,6 +136,13 @@ export function CallControlsBar({
       }`
     : '';
 
+  const layoutIcons: Record<string, React.ReactNode> = {
+    grid: <IoGridOutline size={20} />,
+    pip: <BsPip size={20} />,
+    'speaker-left': <BsLayoutSidebar size={20} />,
+    'speaker-right': <BsLayoutSidebarReverse size={20} />,
+  };
+
   return (
     <div 
       className={`w-full shrink-0 flex items-center justify-center gap-5 flex-wrap px-4 py-3 z-50 ${userRole === 'student' ? 'hide-record-button' : ''} ${bar_classes}`}
@@ -162,7 +168,7 @@ export function CallControlsBar({
         style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
         className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
       >
-        <IoExpandOutline size={20} />
+        <BsFullscreen size={20} />
       </ActionIcon>
 
       <Menu shadow="md" width={200} position="top" withArrow withinPortal={false}>
@@ -175,7 +181,7 @@ export function CallControlsBar({
             style={{ backgroundColor: 'var(--call-surface)', color: 'var(--call-text)' }}
             className="h-[46px] w-[46px] rounded-full flex items-center justify-center cursor-pointer transition-all hover:opacity-80"
           >
-            <BsGrid3X3Gap size={20} />
+            {layoutIcons[layout] || <IoGridOutline size={20} />}
           </ActionIcon>
         </Menu.Target>
 
