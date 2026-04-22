@@ -129,6 +129,8 @@ export function MonthView({
                       const is_google = is_google_event(event);
                       const is_lesson = is_lesson_event(event);
 
+                      const is_past = dayjs(event.end_date || event.start_date).isBefore(dayjs());
+
                       return (
                         <Box
                           key={event.id}
@@ -139,7 +141,8 @@ export function MonthView({
                           className={cn(
                             'px-2 py-0.5 rounded text-[10px] font-semibold truncate transition-all active:scale-95 border-l-2 flex items-center gap-1 hover:z-20',
                             !is_student && is_lesson && 'cursor-move',
-                            get_event_style(color)
+                            get_event_style(color),
+                            is_past && 'opacity-50 grayscale-[0.3] brightness-90'
                           )}
                           draggable={!is_student && is_lesson}
                           onDragStart={(e) => {

@@ -152,6 +152,8 @@ export function WeekView({ current_date, events, on_event_click, on_navigate, on
                     const is_google = is_google_event(event);
                     const is_lesson = is_lesson_event(event);
 
+                    const is_past = end.isBefore(now);
+
                     return (
                       <Tooltip
                         key={event.id}
@@ -169,7 +171,8 @@ export function WeekView({ current_date, events, on_event_click, on_navigate, on
                             'absolute rounded p-1 text-[11px] font-semibold transition-all cursor-pointer overflow-hidden z-10',
                             'border-l-4 shadow-sm active:scale-95 hover:z-20',
                             !is_student && is_lesson && 'cursor-move',
-                            get_event_style(color)
+                            get_event_style(color),
+                            is_past && 'opacity-50 grayscale-[0.3] brightness-90'
                           )}
                           draggable={!is_student && is_lesson}
                           onDragStart={(e) => {
