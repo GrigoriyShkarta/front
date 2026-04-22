@@ -14,7 +14,6 @@ import { PersonalizationDetailsSection } from './details-section';
 import { PersonalizationVisualSection } from './visual-section';
 import { PersonalizationLayoutSection } from './layout-section';
 import { PersonalizationLanguagesSection } from './languages-section';
-import { StorageSection } from './storage-section';
 
 import { updatePersonalization } from '../actions/personalization.actions';
 import { notifications } from '@mantine/notifications';
@@ -92,7 +91,6 @@ export function PersonalizationForm() {
                     is_premium={is_premium} 
                   />
                   <PersonalizationLanguagesSection form={form} />
-                  <StorageSection />
                 </Stack>
               </Tabs.Panel>
 
