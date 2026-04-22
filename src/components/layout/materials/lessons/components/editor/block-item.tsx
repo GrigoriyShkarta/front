@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useState } from 'react';
+import { forwardRef, useState, useRef } from 'react';
 import { Paper, Group } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { BlockNoteEditorRef } from './block-note';
@@ -34,10 +34,12 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
 }, ref) => {
   const t = useTranslations('Materials.lessons');
   const [isDragging, setIsDragging] = useState(false);
-  const [canDrag, setCanDrag] = useState(false);
+  // Use a ref instead of state so the value is available synchronously in dragstart
+  // (React state updates are async and the element might not re-render before the browser fires dragstart)
+  const canDragRef = useRef(false);
 
   const handleDragStart = (e: React.DragEvent) => {
-    if (!canDrag || read_only) {
+    if (!canDragRef.current || read_only) {
       e.preventDefault();
       return;
     }
@@ -50,7 +52,7 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
 
   const handleDragEnd = () => {
     setIsDragging(false);
-    setCanDrag(false);
+    canDragRef.current = false;
     set_is_dragging_block(false);
   };
 
@@ -67,7 +69,7 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
     if (!isNaN(fromIndex) && fromIndex !== index) {
       on_move(fromIndex, index);
     }
-    setCanDrag(false);
+    canDragRef.current = false;
     set_is_dragging_block(false);
   };
 
@@ -75,7 +77,7 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
     <Paper 
       withBorder={!read_only}
       radius="md" 
-      draggable={canDrag && !read_only}
+      draggable={!read_only}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
@@ -98,7 +100,7 @@ const BlockItem = forwardRef<BlockNoteEditorRef, Props>(({
           id={id} read_only={read_only} is_access_mode={is_access_mode} 
           is_checked={is_checked} show_remove={show_remove} 
           on_remove={on_remove} on_checked_change={on_checked_change || (() => {})} 
-          setCanDrag={setCanDrag} isDragging={isDragging} t={t}
+          setCanDrag={(v) => { canDragRef.current = v; }} isDragging={isDragging} t={t}
         />
         <BlockItemContent 
           ref={ref} content={content} on_change={on_change} 

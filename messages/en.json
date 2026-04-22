@@ -1634,7 +1634,7 @@
     "limitExceededMessage": "Not enough space in your storage. Your limit has been reached. Please delete old files to upload new ones.",
     "tips_title": "Optimization Tips",
     "tip_video": "Videos take up the most space. Regularly check your video materials.",
-    "tip_temp": "Temporary files in the 'Other' section can be cleared by contacting support.",
+    "tip_temp": "Periodically review the list of largest files to quickly find and delete bulky materials that are no longer needed.",
     "tip_upgrade": "Need more space? You can always upgrade your plan.",
     "category_audio": "Audio",
     "category_photo": "Photo",

@@ -1,16 +1,51 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+
+const SCROLL_THRESHOLD = 150;
+const MIN_SPEED = 8;
+const MAX_SPEED = 50;
+const INTERVAL_MS = 16;
 
 /**
  * Hook to manage block dragging state and handle smooth auto-scrolling.
- * Uses a dynamic speed based on how close the cursor is to the viewport edges.
+ * Triggers scroll when the cursor is within SCROLL_THRESHOLD px of the viewport edge.
  */
 export function useBlockDragging() {
   const [is_dragging_block, set_is_dragging_block] = useState(false);
-  const scrollInterval = useRef<NodeJS.Timeout | null>(null);
+  const scrollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const scrollDirection = useRef<'up' | 'down' | null>(null);
   const lastClientY = useRef<number>(0);
+
+  const stopScrolling = useCallback(() => {
+    if (scrollInterval.current) {
+      clearInterval(scrollInterval.current);
+      scrollInterval.current = null;
+    }
+    scrollDirection.current = null;
+  }, []);
+
+  const startScrolling = useCallback((direction: 'up' | 'down') => {
+    scrollDirection.current = direction;
+    if (scrollInterval.current) return;
+
+    scrollInterval.current = setInterval(() => {
+      const dir = scrollDirection.current;
+      if (!dir) return;
+
+      let intensity = 0;
+      if (dir === 'up') {
+        intensity = (SCROLL_THRESHOLD - lastClientY.current) / SCROLL_THRESHOLD;
+      } else {
+        intensity = (lastClientY.current - (window.innerHeight - SCROLL_THRESHOLD)) / SCROLL_THRESHOLD;
+      }
+
+      const speed = MIN_SPEED + (MAX_SPEED - MIN_SPEED) * Math.pow(Math.max(0, Math.min(1, intensity)), 1.5);
+      const amount = dir === 'up' ? -speed : speed;
+
+      window.scrollBy({ top: amount, behavior: 'instant' as ScrollBehavior });
+    }, INTERVAL_MS);
+  }, []);
 
   useEffect(() => {
     if (!is_dragging_block) {
@@ -18,79 +53,35 @@ export function useBlockDragging() {
       return;
     }
 
-    const handleGlobalDragOver = (e: DragEvent) => {
-      console.log('hi')
-      // Threshold increased to 200px as requested by USER
-      const threshold = 80;
+    const handleDragOver = (e: DragEvent) => {
       const { clientY } = e;
       lastClientY.current = clientY;
 
-      if (clientY < threshold) {
+      if (clientY < SCROLL_THRESHOLD) {
         startScrolling('up');
-      } else if (window.innerHeight - clientY < threshold) {
+      } else if (window.innerHeight - clientY < SCROLL_THRESHOLD) {
         startScrolling('down');
       } else {
         stopScrolling();
       }
     };
 
-    const handleGlobalDragEnd = () => {
+    const handleDragEnd = () => {
       set_is_dragging_block(false);
       stopScrolling();
     };
 
-    // We add listeners to window to catch dragging even over margins/empty spaces
-    window.addEventListener('dragover', handleGlobalDragOver);
-    window.addEventListener('dragend', handleGlobalDragEnd);
-    window.addEventListener('drop', handleGlobalDragEnd);
+    document.addEventListener('dragover', handleDragOver);
+    document.addEventListener('dragend', handleDragEnd);
+    document.addEventListener('drop', handleDragEnd);
 
     return () => {
-      window.removeEventListener('dragover', handleGlobalDragOver);
-      window.removeEventListener('dragend', handleGlobalDragEnd);
-      window.removeEventListener('drop', handleGlobalDragEnd);
+      document.removeEventListener('dragover', handleDragOver);
+      document.removeEventListener('dragend', handleDragEnd);
+      document.removeEventListener('drop', handleDragEnd);
       stopScrolling();
     };
-  }, [is_dragging_block]);
-
-  const startScrolling = (direction: 'up' | 'down') => {
-    scrollDirection.current = direction;
-    if (scrollInterval.current) return;
-
-    scrollInterval.current = setInterval(() => {
-      if (!scrollDirection.current) return;
-      
-      const threshold = 200;
-      const minSpeed = 5;
-      const maxSpeed = 35; // Faster max speed for better UX
-      
-      let intensity = 0;
-      if (scrollDirection.current === 'up') {
-        intensity = (threshold - lastClientY.current) / threshold;
-      } else {
-        intensity = (lastClientY.current - (window.innerHeight - threshold)) / threshold;
-      }
-      
-      // Calculate smooth variable speed: the closer to the edge, the faster it scrolls
-      const speed = minSpeed + (maxSpeed - minSpeed) * Math.pow(Math.max(0, Math.min(1, intensity)), 1.5);
-      const amount = scrollDirection.current === 'up' ? -speed : speed;
-
-      window.scrollBy(0, amount);
-      if (document.scrollingElement) {
-        document.scrollingElement.scrollTop += amount;
-      } else {
-        document.body.scrollTop += amount;
-        document.documentElement.scrollTop += amount;
-      }
-    }, 16);
-  };
-
-  const stopScrolling = () => {
-    if (scrollInterval.current) {
-      clearInterval(scrollInterval.current);
-      scrollInterval.current = null;
-    }
-    scrollDirection.current = null;
-  };
+  }, [is_dragging_block, startScrolling, stopScrolling]);
 
   return { is_dragging_block, set_is_dragging_block };
 }
