@@ -6,7 +6,7 @@ import { BoardElement, TextElement, ImageElement, VideoElement, AudioElement, Yo
 import { SelectionHandles } from './selection-handles';
 import { get_element_bbox } from './utils';
 import { AudioPlayer } from '@/components/ui/audio-player';
-import { Box, Stack, Group, Text, ActionIcon, Tooltip, useMantineColorScheme, Loader, Badge } from '@mantine/core';
+import { Box, Group, ActionIcon, Tooltip, useMantineColorScheme, Loader, Badge, Stack, Text } from '@mantine/core';
 import { IoDocumentOutline, IoDownloadOutline } from 'react-icons/io5';
 import { MdLink, MdPlayArrow } from 'react-icons/md';
 import { cn } from '@/lib/utils';
@@ -27,9 +27,10 @@ interface CanvasRendererProps {
   interactive_media_id: string | null;
   tool: ToolType;
   on_element_pointer_down: (e: React.MouseEvent, id: string) => void;
+  on_element_touch_start: (e: React.TouchEvent, id: string) => void;
   on_element_double_click: (e: React.MouseEvent, id: string) => void;
-  on_resize_start: (e: React.MouseEvent, id: string, anchor: string) => void;
-  on_rotate_start: (e: React.MouseEvent, id: string) => void;
+  on_resize_start: (e: React.MouseEvent | React.TouchEvent, id: string, anchor: string) => void;
+  on_rotate_start: (e: React.MouseEvent | React.TouchEvent, id: string) => void;
   is_dark: boolean;
   eraser_trail?: { x: number, y: number }[];
 }
@@ -43,8 +44,13 @@ function get_dash(style?: StrokeStyle, width: number = 4) {
 
 export function CanvasRenderer({
   elements, pan_x, pan_y, zoom, selected_ids, editing_text_id, interactive_media_id, tool,
-  on_element_pointer_down, on_element_double_click, on_resize_start, on_rotate_start,
-  is_dark, eraser_trail
+  on_element_pointer_down, 
+  on_element_touch_start,
+  on_element_double_click, 
+  on_resize_start, 
+  on_rotate_start, 
+  is_dark, 
+  eraser_trail 
 }: CanvasRendererProps) {
   const t = useTranslations('Common');
   const sel_style = (id: string): React.CSSProperties =>
@@ -52,10 +58,13 @@ export function CanvasRenderer({
 
   const make_handlers = (id: string) => ({
     onMouseDown: (e: React.MouseEvent) => {
-      // Only allow selection with 'select' tool. Middle mouse or Alt+Left is always pan.
       const is_pan = e.button === 1 || (e.button === 0 && (e.altKey || tool === 'hand'));
       if (is_pan || tool === 'eraser' || tool !== 'select') return;
       on_element_pointer_down(e, id);
+    },
+    onTouchStart: (e: React.TouchEvent) => {
+      if (tool === 'hand' || tool === 'eraser' || tool !== 'select') return;
+      on_element_touch_start(e, id);
     },
     onDoubleClick: (e: React.MouseEvent) => {
       if (tool !== 'select') return;
@@ -184,6 +193,9 @@ export function CanvasRenderer({
                     const is_pan = e.button === 1 || (e.button === 0 && (e.altKey || tool === 'hand'));
                     if (is_pan || tool === 'eraser' || tool !== 'select') return;
                     on_element_pointer_down(e, el.id);
+                  }} onTouchStart={(e) => {
+                    if (tool === 'hand' || tool === 'eraser' || tool !== 'select') return;
+                    on_element_touch_start(e, el.id);
                   }} onDoubleClick={(e) => {
                     if (tool !== 'select') return;
                     e.stopPropagation();
@@ -210,9 +222,25 @@ export function CanvasRenderer({
                         src={get_media_url(img.src)} 
                         alt={img.name} 
                         crossOrigin="anonymous"
-                        style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: tool === 'select' ? 'all' : 'none', cursor: tool === 'select' ? 'grab' : 'default' }} 
-                        onMouseDown={(e) => handlers.onMouseDown(e)} 
-                        onDoubleClick={(e) => handlers.onDoubleClick(e)} 
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', pointerEvents: tool === 'select' ? 'all' : 'none', cursor: tool === 'select' ? (img.is_locked ? 'default' : 'grab') : 'default' }} 
+                        onMouseDown={(e) => {
+                            if (img.is_locked) {
+                                // Still allow selection
+                                const is_pan = e.button === 1 || (e.button === 0 && (e.altKey || tool === 'hand'));
+                                if (is_pan || tool === 'eraser' || tool !== 'select') return;
+                                on_element_pointer_down(e, img.id);
+                                return;
+                            }
+                            handlers.onMouseDown(e);
+                        }} 
+                        onTouchStart={(e) => {
+                            if (img.is_locked) return;
+                            handlers.onTouchStart(e);
+                        }}
+                        onDoubleClick={(e) => {
+                            if (img.is_locked) return;
+                            handlers.onDoubleClick(e);
+                        }} 
                       />
                     )}
                   </div>
@@ -231,8 +259,11 @@ export function CanvasRenderer({
                     if (is_pan || tool === 'eraser' || tool !== 'select') return;
                     e.stopPropagation(); 
                     on_element_pointer_down(e, el.id); 
+                  }} onTouchStart={(e) => {
+                    if (is_int || tool === 'hand' || tool === 'eraser' || tool !== 'select' || el.is_locked) return;
+                    on_element_touch_start(e, el.id);
                   }} onDoubleClick={(e) => { 
-                    if (tool !== 'select') return;
+                    if (tool !== 'select' || el.is_locked) return;
                     e.stopPropagation(); 
                     on_element_double_click(e, el.id); 
                   }}
@@ -240,7 +271,7 @@ export function CanvasRenderer({
                       width: '100%', 
                       height: '100%', 
                       pointerEvents: is_int ? 'auto' : (tool === 'select' ? 'all' : 'none'), 
-                      cursor: is_int ? 'default' : (tool === 'select' ? 'grab' : 'default'), 
+                      cursor: is_int ? 'default' : (tool === 'select' ? (el.is_locked ? 'default' : 'grab') : 'default'), 
                       borderRadius: 8, 
                       overflow: 'hidden', 
                       background: '#000', 
@@ -277,6 +308,9 @@ export function CanvasRenderer({
                     const is_pan = e.button === 1 || (e.button === 0 && (e.altKey || tool === 'hand'));
                     if (is_pan || tool === 'eraser' || tool !== 'select') return;
                     if (!is_int) on_element_pointer_down(e, el.id); 
+                  }} onTouchStart={(e) => {
+                    if (is_int || tool === 'hand' || tool === 'eraser' || tool !== 'select') return;
+                    on_element_touch_start(e, el.id);
                   }} onDoubleClick={(e) => { 
                     if (tool !== 'select') return;
                     e.stopPropagation(); 
@@ -286,7 +320,7 @@ export function CanvasRenderer({
                       width: '100%', 
                       height: '100%', 
                       pointerEvents: tool === 'select' ? 'all' : 'none', 
-                      cursor: is_int ? 'default' : (tool === 'select' ? 'grab' : 'default'), 
+                      cursor: is_int ? 'default' : (tool === 'select' ? (el.is_locked ? 'default' : 'grab') : 'default'), 
                       display: 'flex', 
                       flexDirection: 'column', 
                       alignItems: 'center', 
@@ -325,8 +359,11 @@ export function CanvasRenderer({
                     if (is_pan || tool === 'eraser' || tool !== 'select') return;
                     e.stopPropagation(); 
                     on_element_pointer_down(e, el.id); 
+                  }} onTouchStart={(e) => {
+                    if (is_int || tool === 'hand' || tool === 'eraser' || tool !== 'select' || el.is_locked) return;
+                    on_element_touch_start(e, el.id);
                   }} onDoubleClick={(e) => { 
-                    if (tool !== 'select') return;
+                    if (tool !== 'select' || el.is_locked) return;
                     e.stopPropagation(); 
                     on_element_double_click(e, el.id); 
                   }}
@@ -334,7 +371,7 @@ export function CanvasRenderer({
                       width: '100%', 
                       height: '100%', 
                       pointerEvents: is_int ? 'auto' : (tool === 'select' ? 'all' : 'none'), 
-                      cursor: is_int ? 'default' : (tool === 'select' ? 'grab' : 'default'), 
+                      cursor: is_int ? 'default' : (tool === 'select' ? (el.is_locked ? 'default' : 'grab') : 'default'), 
                       borderRadius: 8, 
                       overflow: 'hidden', 
                       background: '#000', 
@@ -369,9 +406,12 @@ export function CanvasRenderer({
                     if (is_pan || tool === 'eraser' || tool !== 'select') return;
                     e.stopPropagation(); 
                     on_element_pointer_down(e, el.id); 
+                   }} onTouchStart={(e) => {
+                    if (is_int || tool === 'hand' || tool === 'eraser' || tool !== 'select') return;
+                    on_element_touch_start(e, el.id);
                    }}
-                    onDoubleClick={(e) => { if (tool !== 'select') return; e.stopPropagation(); on_element_double_click(e, el.id); }}
-                    style={{ width: '100%', height: '100%', pointerEvents: is_int ? 'auto' : (tool === 'select' ? 'all' : 'none'), cursor: tool === 'select' ? (is_int ? 'default' : 'grab') : 'default', borderRadius: 12, overflow: 'hidden', border: is_sel ? '2px solid var(--space-primary)' : `1px solid ${is_dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`, background: '#000', position: 'relative', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }} >
+                    onDoubleClick={(e) => { if (tool !== 'select' || el.is_locked) return; e.stopPropagation(); on_element_double_click(e, el.id); }}
+                    style={{ width: '100%', height: '100%', pointerEvents: is_int ? 'auto' : (tool === 'select' ? 'all' : 'none'), cursor: tool === 'select' ? (is_int ? 'default' : (el.is_locked ? 'default' : 'grab')) : 'default', borderRadius: 12, overflow: 'hidden', border: is_sel ? '2px solid var(--space-primary)' : `1px solid ${is_dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`, background: '#000', position: 'relative', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }} >
                     <iframe src={eb.src} style={{ width: '100%', height: '100%', border: 'none', pointerEvents: is_int ? 'all' : 'none' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen; vr" allowFullScreen />
                     {!is_int && (
                       <div style={{ position: 'absolute', inset: 0, zIndex: 10, cursor: tool === 'select' ? 'grab' : 'default', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -390,17 +430,31 @@ export function CanvasRenderer({
             case 'link': {
               const l = el as LinkElement;
               const is_sel = selected_ids.includes(l.id);
+              const is_int = interactive_media_id === el.id;
               return (
-                <foreignObject key={el.id} x={l.x} y={l.y} width={l.width} height={l.height} opacity={l.opacity} style={{ overflow: 'visible', pointerEvents: 'none', transform: el.angle ? `rotate(${el.angle}deg)` : undefined, transformOrigin: 'center' }} >
+                <foreignObject key={el.id} x={l.x} y={l.y} width={l.width} height={l.height} opacity={l.opacity} style={{ overflow: 'visible', pointerEvents: 'auto', transform: el.angle ? `rotate(${el.angle}deg)` : undefined, transformOrigin: 'center' }} >
                   <div {...(tool === 'select' ? handlers : {})} 
-                    onDoubleClick={(e) => { if (tool !== 'select') return; e.stopPropagation(); on_element_double_click(e, el.id); }}
-                    style={{ width: '100%', height: '100%', pointerEvents: tool === 'select' ? 'all' : 'none', cursor: tool === 'select' ? 'grab' : 'default', display: 'flex', flexDirection: 'column', background: is_dark ? '#1e1e2d' : '#ffffff', borderRadius: 12, overflow: 'hidden', border: is_sel ? '2px solid var(--space-primary)' : `1px solid ${is_dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} >
-                    {l.image ? <div style={{ width: '100%', height: '55%', background: `url(${l.image}) center/cover no-repeat`, borderBottom: `1px solid ${is_dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'}` }} /> : <div style={{ width: '100%', height: '55%', background: is_dark ? '#2a2a3c' : '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}> 🔗 </div>}
-                    <div style={{ padding: '10px 14px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: is_dark ? '#fff' : '#000', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}> {l.title} </div>
-                      <div style={{ fontSize: 11, color: is_dark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}> {new URL(l.url).hostname} </div>
-                      <div onClick={(e) => { if (tool !== 'select') return; e.stopPropagation(); window.open(l.url, '_blank'); }} style={{ marginTop: 4, fontSize: 10, color: 'var(--space-primary)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, width: 'fit-content' }} > {is_dark ? 'OPEN LINK' : 'ВІДКРИТИ'} ↗ </div>
-                    </div>
+                    onTouchStart={(e) => {
+                        if (is_int || tool === 'hand' || tool === 'eraser' || tool !== 'select' || el.is_locked) return;
+                        on_element_touch_start(e, el.id);
+                    }}
+                    onDoubleClick={(e) => { if (tool !== 'select' || el.is_locked) return; e.stopPropagation(); on_element_double_click(e, el.id); }}
+                    style={{ width: '100%', height: '100%', pointerEvents: is_int ? 'auto' : (tool === 'select' ? 'all' : 'none'), cursor: tool === 'select' ? (is_int ? 'default' : (el.is_locked ? 'default' : 'grab')) : 'default', display: 'flex', flexDirection: 'column', background: is_dark ? '#1e1e2d' : '#ffffff', borderRadius: 12, overflow: 'hidden', border: is_sel ? '2px solid var(--space-primary)' : `1px solid ${is_dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} >
+                    {l.loading ? (
+                      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Loader size="sm" color="primary" />
+                      </div>
+                    ) : (
+                      <>
+                        {l.image ? <div style={{ width: '100%', height: '55%', background: `url(${l.image}) center/cover no-repeat`, borderBottom: `1px solid ${is_dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'}` }} /> : <div style={{ width: '100%', height: '55%', background: is_dark ? '#2a2a3c' : '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}> 🔗 </div>}
+                        <div style={{ padding: '10px 14px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 2 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: is_dark ? '#fff' : '#000', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}> {l.title} </div>
+                          {l.description && <div style={{ fontSize: 11, color: is_dark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}> {l.description} </div>}
+                          <div style={{ fontSize: 11, color: is_dark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}> {new URL(l.url).hostname} </div>
+                          <div onClick={(e) => { if (tool !== 'select') return; e.stopPropagation(); window.open(l.url, '_blank'); }} style={{ marginTop: 4, fontSize: 10, color: 'var(--space-primary)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, width: 'fit-content' }} > {is_dark ? 'OPEN LINK' : 'ВІДКРИТИ'} ↗ </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </foreignObject>
               );
@@ -409,14 +463,21 @@ export function CanvasRenderer({
             case 'file': {
               const f = el as FileElement;
               const is_sel = selected_ids.includes(f.id);
+              const is_int = interactive_media_id === el.id;
               return (
-                <foreignObject key={f.id} x={f.x} y={f.y} width={f.width} height={f.height} style={{ opacity: f.opacity, overflow: 'visible', transform: el.angle ? `rotate(${el.angle}deg)` : undefined, transformOrigin: 'center', pointerEvents: 'none' }} >
+                <foreignObject key={f.id} x={f.x} y={f.y} width={f.width} height={f.height} style={{ opacity: f.opacity, overflow: 'visible', transform: el.angle ? `rotate(${el.angle}deg)` : undefined, transformOrigin: 'center', pointerEvents: 'auto' }} >
                   <div onMouseDown={(e) => {
+                    if (is_int) return;
                     const is_pan = e.button === 1 || (e.button === 0 && (e.altKey || tool === 'hand'));
                     if (is_pan || tool === 'eraser' || tool !== 'select') return;
                     on_element_pointer_down(e, f.id);
-                  }} onDoubleClick={(e) => {
-                    if (tool !== 'select') return;
+                  }} 
+                  onTouchStart={(e) => {
+                    if (is_int || tool === 'hand' || tool === 'eraser' || tool !== 'select' || f.is_locked) return;
+                    on_element_touch_start(e, f.id);
+                  }}
+                  onDoubleClick={(e) => {
+                    if (tool !== 'select' || f.is_locked) return;
                     e.stopPropagation();
                     on_element_double_click(e, f.id);
                   }} className={cn(
@@ -425,8 +486,8 @@ export function CanvasRenderer({
                     is_sel ? "shadow-lg ring-2 ring-[var(--space-primary)]/30" : "shadow-sm"
                   )} 
                   style={{ 
-                    pointerEvents: tool === 'select' ? 'all' : 'none', 
-                    cursor: tool === 'select' ? 'grab' : 'default',
+                    pointerEvents: is_int ? 'auto' : (tool === 'select' ? 'all' : 'none'), 
+                    cursor: tool === 'select' ? (is_int ? 'default' : (f.is_locked ? 'default' : 'grab')) : 'default',
                     borderColor: is_sel ? 'var(--space-primary)' : undefined,
                     zIndex: 10
                   }}>
@@ -511,6 +572,7 @@ export function CanvasRenderer({
               on_resize_start={(e, anchor) => on_resize_start(e, el.id, anchor)} 
               on_rotate_start={(e) => on_rotate_start(e, el.id)}
               on_pointer_down={(e) => on_element_pointer_down(e, el.id)}
+              on_touch_start={(e) => on_element_touch_start(e, el.id)}
               on_double_click={(e) => on_element_double_click(e, el.id)}
               is_locked={el.is_locked}
             />

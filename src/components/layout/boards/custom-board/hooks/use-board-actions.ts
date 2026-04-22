@@ -62,27 +62,46 @@ export function useBoardActions({
     last_emit: 0
   });
 
-  const get_board_coords = (e: React.MouseEvent) => {
-    // Use the main board's bounding rect instead of whatever child element triggered this
+  const get_board_coords = (e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent) => {
     const svg = (e.currentTarget as Element)?.closest('svg') || document.querySelector('svg.touch-none');
     const rect = svg ? svg.getBoundingClientRect() : { left: 0, top: 0 };
+    
+    let clientX = 0;
+    let clientY = 0;
+    
+    if ('clientX' in e) {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    } else {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    }
+
     return {
-      x: (e.clientX - rect.left - pan_x) / zoom,
-      y: (e.clientY - rect.top - pan_y) / zoom
+      x: (clientX - rect.left - pan_x) / zoom,
+      y: (clientY - rect.top - pan_y) / zoom
     };
   };
 
   const handle_mouse_down = (e: React.MouseEvent) => {
-    if (editing_text_id) {
-       // Ignore drawing/selection interactions while actively editing text
-       return;
-    }
+    if (editing_text_id) return;
     if (e.button !== 0 || e.altKey || tool === 'hand') return;
-
-    // Any mousedown on the canvas or board elements (that aren't swallows by iframes) deactivate media edit mode
+    
     if (interactive_media_id) set_interactive_media_id(null);
 
     const coords = get_board_coords(e);
+    start_interaction(coords, e.shiftKey);
+  };
+
+  const handle_touch_start = (e: React.TouchEvent) => {
+    if (editing_text_id || tool === 'hand' || e.touches.length !== 1) return;
+    
+    if (interactive_media_id) set_interactive_media_id(null);
+    const coords = get_board_coords(e);
+    start_interaction(coords, false);
+  };
+
+  const start_interaction = (coords: {x: number, y: number}, is_shift: boolean) => {
     interaction.current.start_mouse = coords;
 
     if (tool === 'select') {
@@ -92,9 +111,9 @@ export function useBoardActions({
       });
 
       if (clicked) {
-        if (!e.shiftKey && !selected_ids.includes(clicked.id)) {
+        if (!is_shift && !selected_ids.includes(clicked.id)) {
             set_selected_ids([clicked.id]);
-        } else if (e.shiftKey) {
+        } else if (is_shift) {
             set_selected_ids(prev => prev.includes(clicked.id) ? prev.filter(id => id !== clicked.id) : [...prev, clicked.id]);
         }
         interaction.current.is_dragging = true;
@@ -113,10 +132,9 @@ export function useBoardActions({
         if (to_delete.length > 0) {
             handle_delete(to_delete);
         }
-        interaction.current.is_dragging = true; // Start continuous erasing
+        interaction.current.is_dragging = true;
         set_eraser_trail([{ x: coords.x, y: coords.y }]);
     } else {
-        // Shapes
         let new_el: BoardElement;
         const id = gen_id();
         switch (tool) {
@@ -137,6 +155,16 @@ export function useBoardActions({
 
   const handle_mouse_move = (e: React.MouseEvent) => {
     const coords = get_board_coords(e);
+    process_move(coords, e.ctrlKey, e.shiftKey);
+  };
+
+  const handle_touch_move = (e: React.TouchEvent) => {
+    if (e.touches.length !== 1 || tool === 'hand') return;
+    const coords = get_board_coords(e);
+    process_move(coords, false, false);
+  };
+
+  const process_move = (coords: {x: number, y: number}, is_ctrl: boolean, is_shift: boolean) => {
     const start = interaction.current.start_mouse;
     let dx = coords.x - start.x;
     let dy = coords.y - start.y;
@@ -145,7 +173,7 @@ export function useBoardActions({
     let target_y = coords.y;
 
     // Orthogonal snapping for drawing tools
-    if (e.ctrlKey && (tool === 'line' || tool === 'arrow' || tool === 'pen' || tool === 'highlighter')) {
+    if (is_ctrl && (tool === 'line' || tool === 'arrow' || tool === 'pen' || tool === 'highlighter')) {
         if (Math.abs(dx) > Math.abs(dy)) {
             target_y = start.y;
             dy = 0; // Update dy to match new target_y
@@ -251,24 +279,19 @@ export function useBoardActions({
                         nh = Math.max(max_y - min_y, 1);
                     }
                 }
-                
+
                 let start_nx = nx, start_ny = ny, start_nw = nw, start_nh = nh;
 
-                if (anchor?.includes('n')) { ny += dy; nh -= dy; }
-                if (anchor?.includes('s')) { nh += dy; }
-                if (anchor?.includes('w')) { nx += dx; nw -= dx; }
-                if (anchor?.includes('e')) { nw += dx; }
-                
-                if (nw < 10) { nx -= (10 - nw); nw = 10; }
-                if (nh < 10) { ny -= (10 - nh); nh = 10; }
-                if (nw < 10) nw = 10;
-                if (nh < 10) nh = 10;
-                
+                if (anchor?.includes('e')) nw = Math.max(5, nw + dx);
+                if (anchor?.includes('w')) { nx = nx + dx; nw = Math.max(5, nw - dx); }
+                if (anchor?.includes('s')) nh = Math.max(5, nh + dy);
+                if (anchor?.includes('n')) { ny = ny + dy; nh = Math.max(5, nh - dy); }
+
                 switch (base.type) {
-                    case 'rect': case 'diamond': case 'triangle': case 'image': case 'video': case 'audio': case 'youtube': case 'embed': case 'link': case 'file': case 'text':
-                        return { ...base, x: nx, y: ny, width: nw, height: nh };
+                    case 'rect': case 'diamond': case 'triangle': case 'image': case 'video': case 'youtube': case 'embed': case 'link': case 'file': case 'text':
+                        return { ...el, x: nx, y: ny, width: nw, height: nh };
                     case 'ellipse':
-                        return { ...base, cx: nx + nw / 2, cy: ny + nh / 2, rx: nw / 2, ry: nh / 2 };
+                        return { ...el, cx: nx + nw / 2, cy: ny + nh / 2, rx: nw / 2, ry: nh / 2 };
                     case 'line': case 'arrow':
                         let nx1 = (base as any).x1, ny1 = (base as any).y1;
                         let nx2 = (base as any).x2, ny2 = (base as any).y2;
@@ -303,7 +326,7 @@ export function useBoardActions({
                const cx = bbox.x + bbox.w / 2;
                const cy = bbox.y + bbox.h / 2;
                let angle = Math.atan2(coords.y - cy, coords.x - cx) * (180 / Math.PI) + 90;
-               if (e.shiftKey) angle = Math.round(angle / 45) * 45;
+               if (is_shift) angle = Math.round(angle / 45) * 45;
                set_elements(prev => prev.map(e => (e.id === el.id && !e.is_locked) ? { ...e, angle } : e));
            }
        }
@@ -311,6 +334,14 @@ export function useBoardActions({
   };
 
   const handle_mouse_up = () => {
+    process_up();
+  };
+
+  const handle_touch_end = () => {
+    process_up();
+  };
+
+  const process_up = () => {
     if (marquee) {
         const found = el_ref.current.filter(el => {
             const bbox = get_element_bbox(el);
@@ -357,13 +388,23 @@ export function useBoardActions({
   const handle_element_pointer_down = (e: React.MouseEvent, id: string) => {
       e.stopPropagation();
       if (tool !== 'select') return;
-
       const coords = get_board_coords(e);
+      start_element_drag(id, coords, e.shiftKey);
+  };
+
+  const handle_element_touch_start = (e: React.TouchEvent, id: string) => {
+      e.stopPropagation();
+      if (tool !== 'select' || e.touches.length !== 1) return;
+      const coords = get_board_coords(e);
+      start_element_drag(id, coords, false);
+  };
+
+  const start_element_drag = (id: string, coords: {x: number, y: number}, is_shift: boolean) => {
       interaction.current.start_mouse = coords;
       
       set_selected_ids(prev => {
-          if (!e.shiftKey && !prev.includes(id)) return [id];
-          if (e.shiftKey) return prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id];
+          if (!is_shift && !prev.includes(id)) return [id];
+          if (is_shift) return prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id];
           return prev;
       });
       
@@ -376,15 +417,16 @@ export function useBoardActions({
       if (!el || el.is_locked) return;
       if (el?.type === 'text') {
           set_editing_text_id(id);
-      } else if (['video', 'audio', 'youtube', 'embed'].includes(el?.type || '')) {
+      } else if (['video', 'audio', 'youtube', 'embed', 'link', 'file'].includes(el?.type || '')) {
           set_interactive_media_id(prev => prev === id ? null : id);
       }
   };
 
-  const handle_resize_start = (e: React.MouseEvent, id: string, anchor: string) => {
+  const handle_resize_start = (e: React.MouseEvent | React.TouchEvent, id: string, anchor: string) => {
       e.stopPropagation();
       const el = el_ref.current.find(e => e.id === id);
       if (!el || el.is_locked) return;
+      if ('touches' in e && e.touches.length !== 1) return;
 
       interaction.current.is_resizing = true;
       interaction.current.resize_id = id;
@@ -393,10 +435,11 @@ export function useBoardActions({
       interaction.current.start_elements = [...el_ref.current];
   };
 
-  const handle_rotate_start = (e: React.MouseEvent, id: string) => {
+  const handle_rotate_start = (e: React.MouseEvent | React.TouchEvent, id: string) => {
       e.stopPropagation();
       const el = el_ref.current.find(e => e.id === id);
       if (!el || el.is_locked) return;
+      if ('touches' in e && e.touches.length !== 1) return;
 
       interaction.current.is_rotating = true;
       interaction.current.rotate_id = id;
@@ -472,7 +515,9 @@ export function useBoardActions({
 
   return {
     selected_ids, editing_text_id, interactive_media_id, draft, active_path, marquee, eraser_trail, text_toolbar_pos, text_edit_ref,
-    handle_mouse_down, handle_mouse_move, handle_mouse_up, handle_element_pointer_down, handle_element_double_click,
-    handle_resize_start, handle_rotate_start, handle_delete, update_selected, update_element_by_id, set_selected_ids, set_editing_text_id
+      handle_mouse_down, handle_mouse_move, handle_mouse_up, 
+      handle_touch_start, handle_touch_move, handle_touch_end,
+      handle_element_pointer_down, handle_element_touch_start, handle_element_double_click,
+      handle_resize_start, handle_rotate_start, handle_delete, update_selected, update_element_by_id, set_selected_ids, set_editing_text_id
   };
 }

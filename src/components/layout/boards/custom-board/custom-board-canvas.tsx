@@ -12,6 +12,7 @@ import { CanvasRenderer } from './canvas-renderer';
 import { CanvasToolbar } from './canvas-toolbar';
 import { ShapeFormatToolbar } from './shape-format-toolbar';
 import { TextFormatToolbar } from './text-format-toolbar';
+import { MediaFormatToolbar } from './media-format-toolbar';
 import { get_element_bbox } from './utils';
 import { InlineTextToolbar } from './inline-text-toolbar';
 import { BoardBackground } from './components/board-background';
@@ -22,7 +23,7 @@ import { MaterialsPickerModal } from '../components/materials-picker-modal';
 import { LinkCreateModal as BoardLinkModal } from './components/link-create-modal';
 import { EditableText } from '@/components/layout/boards/custom-board/components/editable-text';
 import { UserProfile } from '@/schemas/user-profile';
-import { upload_board_file, update_board } from './actions/board-api';
+import { upload_board_file, update_board, get_link_metadata } from './actions/board-api';
 import { Box, useMantineColorScheme } from '@mantine/core';
 
 const backend_url = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api').replace('/api', '');
@@ -159,7 +160,12 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
   const { push_state, undo, redo, can_undo, can_redo } = useBoardHistory(elements, set_elements);
 
   // Zoom / Pan Hook
-  const { pan_x, pan_y, zoom, is_panning, handle_wheel, handle_mouse_down: pan_mouse_down, set_pan, set_zoom } = useBoardZoomPan(tool);
+  const { 
+    pan_x, pan_y, zoom, is_panning, 
+    handle_wheel, handle_mouse_down: pan_mouse_down, 
+    handle_touch_start: pan_touch_start, handle_touch_move: pan_touch_move, handle_touch_end: pan_touch_end,
+    set_pan, set_zoom 
+  } = useBoardZoomPan(tool);
 
   // "Follow Participant" mechanism
   useEffect(() => {
@@ -207,7 +213,9 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
   // Actions Hook (Interaction Logic)
   const {
       selected_ids, editing_text_id, interactive_media_id, draft, active_path, marquee, eraser_trail, text_toolbar_pos, text_edit_ref,
-      handle_mouse_down, handle_mouse_move, handle_mouse_up, handle_element_pointer_down, handle_element_double_click,
+      handle_mouse_down: actions_mouse_down, handle_mouse_move: actions_mouse_move, handle_mouse_up: actions_mouse_up,
+      handle_touch_start: actions_touch_start, handle_touch_move: actions_touch_move, handle_touch_end: actions_touch_end,
+      handle_element_pointer_down, handle_element_touch_start, handle_element_double_click,
       handle_resize_start, handle_rotate_start, handle_delete, update_selected, update_element_by_id, set_selected_ids, set_editing_text_id
   } = useBoardActions({
       el_ref, set_elements, tool, color, stroke_width, stroke_style, pan_x, pan_y, zoom, push_state, emit_element_update, emit_element_delete, emit_cursor, is_dark,
@@ -325,8 +333,31 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
              }
           }
 
-          // Default to plain text if not matched
+          // Default to link or text
           if (!new_el) {
+            // Check if it's a link
+            const is_url = trimmed.match(/^https?:\/\/[^\s$.?#].[^\s]*$/i);
+            if (is_url) {
+                const link_id = gen_id();
+                const link_el: BoardElement = {
+                    type: 'link', id: link_id, x: cx - 150, y: cy - 100, width: 300, height: 200,
+                    url: trimmed, title: trimmed, opacity: 1, loading: true
+                };
+                set_elements(prev => [...prev, link_el]);
+                
+                get_link_metadata(trimmed).then(meta => {
+                    update_element_by_id(link_id, {
+                        title: meta.title,
+                        image: meta.image,
+                        description: meta.description,
+                        loading: false
+                    });
+                }).catch(() => {
+                    update_element_by_id(link_id, { loading: false });
+                });
+                return;
+            }
+
             new_el = {
               type: 'text', id: gen_id(),
               x: cx - 100, y: cy - 20,
@@ -337,10 +368,12 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
             };
           }
 
-          set_elements(prev => [...prev, new_el!]);
-          push_state([...el_ref.current, new_el!]);
-          emit_element_update([new_el!]);
-          set_selected_ids([new_el!.id]);
+          if (new_el) {
+            set_elements(prev => [...prev, new_el!]);
+            push_state([...el_ref.current, new_el!]);
+            emit_element_update([new_el!]);
+            set_selected_ids([new_el!.id]);
+          }
         });
       }
     };
@@ -464,8 +497,19 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
     if (!new_el) {
         new_el = {
             type: 'link', id, x: cx - 150, y: cy - 100, width: 300, height: 200,
-            url: trimmed, title: trimmed, opacity: 1
+            url: trimmed, title: trimmed, opacity: 1, loading: true
         };
+        
+        get_link_metadata(trimmed).then(meta => {
+            update_element_by_id(id, {
+                title: meta.title,
+                image: meta.image,
+                description: meta.description,
+                loading: false
+            });
+        }).catch(() => {
+            update_element_by_id(id, { loading: false });
+        });
     }
 
     set_elements(prev => [...prev, new_el!]);
@@ -493,10 +537,14 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
               pointerEvents: (editing_text_id || (is_panning_state && !is_panning)) ? 'none' : 'auto', 
               cursor: is_panning ? 'grabbing' : tool === 'hand' ? 'grab' : tool === 'eraser' ? (is_dark ? ERASER_CURSOR_WHITE : ERASER_CURSOR_BLACK) : 'crosshair' 
             }}
-            onMouseDown={(e) => { handle_mouse_down(e); pan_mouse_down(e); }}
-            onMouseMove={handle_mouse_move}
-            onMouseUp={handle_mouse_up}
-            onMouseLeave={handle_mouse_up}>
+            onMouseDown={(e) => { actions_mouse_down(e); pan_mouse_down(e); }}
+            onMouseMove={(e) => { actions_mouse_move(e); }}
+            onMouseUp={actions_mouse_up}
+            onMouseLeave={actions_mouse_up}
+            onTouchStart={(e) => { actions_touch_start(e); pan_touch_start(e); }}
+            onTouchMove={(e) => { actions_touch_move(e); pan_touch_move(e); }}
+            onTouchEnd={() => { actions_touch_end(); pan_touch_end(); }}
+            onTouchCancel={() => { actions_touch_end(); pan_touch_end(); }}>
           
           {/* 1. Static infinite background (not affected by main group's translate) */}
           <BoardBackground zoom={zoom} pan_x={pan_x} pan_y={pan_y} grid_type={grid_type} grid_color={grid_color} />
@@ -504,11 +552,13 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
           <g transform={`translate(${pan_x}, ${pan_y}) scale(${zoom})`}>
            <CanvasRenderer elements={elements} pan_x={0} pan_y={0} zoom={1} tool={tool}
                           selected_ids={selected_ids} editing_text_id={editing_text_id} interactive_media_id={interactive_media_id}
-                          on_element_pointer_down={handle_element_pointer_down} on_element_double_click={handle_element_double_click}
+                          on_element_pointer_down={handle_element_pointer_down} 
+                          on_element_touch_start={handle_element_touch_start}
+                          on_element_double_click={handle_element_double_click}
                           on_resize_start={handle_resize_start} on_rotate_start={handle_rotate_start} 
                           is_dark={is_dark} eraser_trail={eraser_trail} />
           
-          {draft && <CanvasRenderer elements={[draft]} pan_x={0} pan_y={0} zoom={1} tool={tool} selected_ids={[]} editing_text_id={null} interactive_media_id={null} on_element_pointer_down={()=>{}} on_element_double_click={()=>{}} on_resize_start={()=>{}} on_rotate_start={()=>{}} is_dark={is_dark} />}
+          {draft && <CanvasRenderer elements={[draft]} pan_x={0} pan_y={0} zoom={1} tool={tool} selected_ids={[]} editing_text_id={null} interactive_media_id={null} on_element_pointer_down={()=>{}} on_element_touch_start={()=>{}} on_element_double_click={()=>{}} on_resize_start={()=>{}} on_rotate_start={()=>{}} is_dark={is_dark} />}
           
           {active_path && <path d={active_path} fill="none" stroke={color} strokeWidth={tool === 'highlighter' ? 12 : stroke_width} strokeLinecap="round" strokeLinejoin="round" opacity={tool === 'highlighter' ? 0.35 : 1} />}
           
@@ -530,9 +580,13 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
          </g>
         </svg>
 
-        {is_panning_state && !is_panning && (
-            <div className="absolute inset-0 z-10 touch-none" style={{ cursor: 'grab' }}
-                 onMouseDown={pan_mouse_down} />
+        {is_panning_state && (
+            <div className="absolute inset-0 z-10 touch-none" 
+                 style={{ cursor: is_panning ? 'grabbing' : 'grab' }}
+                 onMouseDown={pan_mouse_down}
+                 onTouchStart={pan_touch_start}
+                 onTouchMove={pan_touch_move}
+                 onTouchEnd={pan_touch_end} />
         )}
 
         <Box className="absolute top-6 left-1/2 -translate-x-1/2 z-[100] transition-all">
@@ -577,6 +631,17 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
                         screen_y={active_bbox.y * zoom + pan_y}
                         element_h={active_bbox.h * zoom}
                         on_update={update_selected} 
+                        on_delete={handle_delete}
+                        is_dark={is_dark}
+                    />
+                )}
+                {['image', 'video', 'audio', 'youtube', 'embed', 'link', 'file'].includes(selected_element.type) && (
+                    <MediaFormatToolbar 
+                        element={selected_element} 
+                        screen_x={active_bbox.x * zoom + pan_x}
+                        screen_y={active_bbox.y * zoom + pan_y}
+                        element_h={active_bbox.h * zoom}
+                        on_update={update_selected}
                         on_delete={handle_delete}
                         is_dark={is_dark}
                     />

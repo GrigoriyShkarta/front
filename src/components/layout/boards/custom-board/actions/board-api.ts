@@ -73,3 +73,17 @@ export const update_board_preview = async (board_id: string, file: Blob): Promis
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 };
+
+export interface LinkMetadataResponse {
+  title: string;
+  description: string;
+  image: string;
+  url: string;
+}
+
+export const get_link_metadata = async (url: string): Promise<LinkMetadataResponse> => {
+  const { data } = await api.get<LinkMetadataResponse>(`/boards/link-metadata`, {
+    params: { url },
+  });
+  return data;
+};

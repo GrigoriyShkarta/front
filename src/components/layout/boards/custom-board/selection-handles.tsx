@@ -7,9 +7,10 @@ interface Props {
   zoom: number;
   angle?: number;
   is_interactive?: boolean;
-  on_resize_start: (e: React.MouseEvent, anchor: string) => void;
-  on_rotate_start: (e: React.MouseEvent) => void;
+  on_resize_start: (e: React.MouseEvent | React.TouchEvent, anchor: string) => void;
+  on_rotate_start: (e: React.MouseEvent | React.TouchEvent) => void;
   on_pointer_down: (e: React.MouseEvent) => void;
+  on_touch_start: (e: React.TouchEvent) => void;
   on_double_click: (e: React.MouseEvent) => void;
   is_locked?: boolean;
 }
@@ -34,7 +35,7 @@ const CURSOR_MAP: Record<string, string> = {
  * SVG selection border with 8 resize handles (corners + edges) plus rotation handle.
  * Renders inside the world-coordinate transform group.
  */
-export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_resize_start, on_rotate_start, on_pointer_down, on_double_click, is_locked }: Props) {
+export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_resize_start, on_rotate_start, on_pointer_down, on_touch_start, on_double_click, is_locked }: Props) {
   const { x, y, w, h } = bbox;
   const hs  = 8 / zoom;  // handle size in world units (constant 8px on screen)
   const cx = x + w / 2;
@@ -52,6 +53,7 @@ export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_res
           fill="transparent"
           style={{ cursor: is_locked ? 'default' : 'grab', pointerEvents: 'all' }}
           onMouseDown={(e) => { e.stopPropagation(); on_pointer_down(e); }}
+          onTouchStart={(e) => { e.stopPropagation(); on_touch_start(e); }}
           onDoubleClick={(e) => { e.stopPropagation(); on_double_click(e); }}
         />
       )}
@@ -82,6 +84,7 @@ export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_res
             strokeWidth={1.5 / zoom}
             style={{ cursor: CURSOR_MAP[id] }}
             onMouseDown={(e) => { e.stopPropagation(); on_resize_start(e, id); }}
+            onTouchStart={(e) => { e.stopPropagation(); on_resize_start(e, id); }}
           />
         );
       })}
@@ -103,6 +106,7 @@ export function SelectionHandles({ bbox, zoom, angle = 0, is_interactive, on_res
             strokeWidth={1.5 / zoom}
             style={{ cursor: 'alias' }}
             onMouseDown={(e) => { e.stopPropagation(); on_rotate_start(e); }}
+            onTouchStart={(e) => { e.stopPropagation(); on_rotate_start(e); }}
           />
         </>
       )}
