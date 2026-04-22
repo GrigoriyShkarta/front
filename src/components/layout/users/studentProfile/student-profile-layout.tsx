@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, Stack, Title, Paper, Text, Box, LoadingOverlay, Group, Avatar, Badge, Button, ActionIcon, Tooltip } from '@mantine/core';
-import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoListOutline, IoVideocamOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
+import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoListOutline, IoVideocamOutline, IoShieldCheckmarkOutline, IoArrowBackOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { useUserQuery } from '../hooks/use-user-query';
@@ -105,6 +105,23 @@ export function StudentProfileShell({
 
   return (
     <Stack gap="lg">
+      {!is_own_profile && current_user?.role !== 'student' && (
+        <Group>
+          <Button
+            component={Link}
+            href="/main/users"
+            variant="subtle"
+            color="secondary"
+            leftSection={<IoArrowBackOutline size={16} />}
+            size="xs"
+            p={0}
+            className="hover:translate-x-[-4px] transition-transform text-secondary hover:bg-transparent"
+          >
+            {t('back_to_list')}
+          </Button>
+        </Group>
+      )}
+
       {!hide_user_info && (
         <Stack gap="xs">
           <Group justify="space-between" align="flex-start" className="flex-col sm:flex-row sm:items-center gap-y-4">

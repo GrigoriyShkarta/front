@@ -606,8 +606,9 @@
     }
   },
   "Users": {
-    "title": "Student Base",
-    "subtitle": "Manage the database of students and their access to the platform.",
+    "title": "Users Base",
+    "subtitle": "Manage the database of users and their access to the platform.",
+    "back_to_list": "Back to list",
     "add_button": "Add Student",
     "empty_title": "No students found",
     "empty_description": "There are no students in your database yet. Add the first student to get started.",

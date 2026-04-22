@@ -87,7 +87,7 @@ export function StoragePage() {
   return (
     <PageContainer>
       <Stack gap="xl">
-        <Group justify="space-between" align="flex-end">
+        <Group justify="space-between" w="100%">
           <Group align="center" gap="md">
             <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
               <IoCloudOutline size={28} />
@@ -98,12 +98,12 @@ export function StoragePage() {
               </Title>
               <Text c="dimmed" size="sm">
                 {t('page_description') || 'Manage your space storage and see detailed statistics.'}
-            </Text>
-          </Stack>
-          <Badge variant="light" color="primary" size="lg" radius="sm">
-            {t('plan_limit') || 'Plan Limit'}: {format_bytes(limit)}
-          </Badge>
+              </Text>
+            </Stack>
           </Group>
+          <Badge variant="light" color="primary" size="lg" radius="sm">
+              {t('plan_limit') || 'Plan Limit'}: {format_bytes(limit)}
+          </Badge>
         </Group>
 
         <SimpleGrid cols={{ base: 1, lg: 3 }} spacing="xl">
@@ -222,7 +222,7 @@ export function StoragePage() {
                       >
                         <Group justify="space-between">
                           <Group gap="md">
-                            <ThemeIcon color="primary" variant="light" size="lg" radius="xl">
+                            <ThemeIcon color="secondary" size="lg" radius="xl">
                               <item.icon size={20} />
                             </ThemeIcon>
                             <Stack gap={0}>
@@ -283,7 +283,7 @@ export function StoragePage() {
                         >
                           <Group justify="space-between">
                             <Group gap="md">
-                              <ThemeIcon color="primary" variant="light" size="md" radius="xl">
+                              <ThemeIcon color="secondary" size="md" radius="xl">
                                 {category?.icon && <category.icon size={16} />}
                               </ThemeIcon>
                               <Stack gap={0}>

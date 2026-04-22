@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { useAuth } from '@/hooks/use-auth';
 import { PhotoMaterial } from '../schemas/photo-schema';
-import { cn } from '@/lib/utils';
+import { cn, formatBytes } from '@/lib/utils';
 
 interface Props {
   data: PhotoMaterial[];
@@ -124,9 +124,16 @@ export function PhotoGrid({ data, selected_ids, on_selection_change, on_edit, on
               <Text fw={600} size="sm" className="truncate" title={item.name}>
                 {item.name}
               </Text>
-              <Text size="xs" c="dimmed" mt={2}>
-                {dayjs(item.created_at).format('DD.MM.YYYY')}
-              </Text>
+              <Group justify="space-between" mt={2}>
+                <Text size="xs" c="dimmed">
+                  {dayjs(item.created_at).format('DD.MM.YYYY')}
+                </Text>
+                {item.size ? (
+                  <Text size="xs" c="dimmed">
+                    {formatBytes(item.size)}
+                  </Text>
+                ) : null}
+              </Group>
                {item.categories && item.categories.length > 0 && (
                    <Group gap={4} mt={6} className="flex-wrap">
                      {item.categories.slice(0, 3).map((cat) => (
