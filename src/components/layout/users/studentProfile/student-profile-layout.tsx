@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, Stack, Title, Paper, Text, Box, LoadingOverlay, Group, Avatar, Badge, Button, ActionIcon, Tooltip } from '@mantine/core';
-import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoListOutline, IoVideocamOutline, IoShieldCheckmarkOutline, IoArrowBackOutline } from 'react-icons/io5';
+import { IoPersonOutline, IoCardOutline, IoPencilOutline, IoBookOutline, IoListOutline, IoVideocamOutline, IoShieldCheckmarkOutline, IoArrowBackOutline, IoLibraryOutline, IoDocumentTextOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { useUserQuery } from '../hooks/use-user-query';
@@ -12,6 +12,7 @@ import { UserDrawer } from '../components/user-drawer';
 import { StudentRecordingsList } from './recordings/recordings-list';
 import { useUpcomingLesson } from '@/hooks/use-upcoming-lesson';
 import { FaChalkboard } from 'react-icons/fa';
+import { StudentPinnedNote } from './components/student-pinned-note';
 
 interface Props {
   id?: string;
@@ -63,7 +64,9 @@ export function StudentProfileShell({
             ? 'security'
             : pathname.endsWith('/boards')
               ? 'boards'
-              : 'general';
+              : pathname.endsWith('/pinned_note')
+                ? 'pinned_note'
+                : 'general';
 
   if (is_loading) {
     return (
@@ -179,17 +182,22 @@ export function StudentProfileShell({
           className="bg-transparent"
         >
           {!hide_tabs && (
-            <Tabs.List className="!flex !flex-nowrap px-4 py-3 border-b border-secondary/10 sticky top-0 z-10 overflow-x-auto hide-scrollbar bg-secondary/2 gap-1 sm:gap-2">
+            <Tabs.List className="!flex !flex-nowrap px-4 py-3 border-b border-secondary/10 sticky top-0 z-10 overflow-x-auto bg-secondary/2 gap-1 sm:gap-2">
               <Tabs.Tab value="general" leftSection={<IoPersonOutline size={16} />} className="whitespace-nowrap shrink-0">
                 {t('tabs.general') || 'General'}
               </Tabs.Tab>
               {profile_user.role === 'student' && (
                 <>
+                  {current_user?.role !== 'student' && (
+                      <Tabs.Tab value="pinned_note" leftSection={<IoDocumentTextOutline size={16} />} className="whitespace-nowrap shrink-0">
+                        {t('tabs.pinned_note') || 'Notes for Student'}
+                      </Tabs.Tab>
+                  )}
                   <Tabs.Tab value="subscriptions" leftSection={<IoCardOutline size={16} />} className="whitespace-nowrap shrink-0">
                     {t('tabs.lesson_history')}
                   </Tabs.Tab>
                   {current_user?.role !== 'student' && (
-                    <Tabs.Tab value="materials" leftSection={<IoBookOutline size={16} />} className="whitespace-nowrap shrink-0">
+                    <Tabs.Tab value="materials" leftSection={<IoLibraryOutline size={16} />} className="whitespace-nowrap shrink-0">
                       {tNav('materials') || 'Materials'}
                     </Tabs.Tab>
                   )}
@@ -234,6 +242,13 @@ export function StudentProfileShell({
               </Group>
             )}
             {active_tab === 'recordings' && <StudentRecordingsList />}
+            {active_tab === 'pinned_note' && current_user?.role !== 'student' && (
+              <StudentPinnedNote 
+                student_id={id} 
+                student_name={profile_user.name}
+                pinned_note_id={profile_user.pinned_note_id} 
+              />
+            )}
             {children}
           </Box>
         </Tabs>

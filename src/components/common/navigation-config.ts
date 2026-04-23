@@ -116,6 +116,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
         icon: IoSchoolOutline,
         roles: ['super_admin', 'admin', 'teacher',],
       },
+      {
+        label: 'notes',
+        href: '/main/materials/notes',
+        icon: IoDocumentTextOutline,
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
+      },
       // {
       //   label: 'homework',
       //   href: '/main/materials/homework',

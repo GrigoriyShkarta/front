@@ -54,6 +54,7 @@ export const user_response_schema = z.object({
   is_avatar_locked: z.boolean().optional(),
   is_name_locked: z.boolean().optional(),
   deactivation_date: z.string().nullable().optional(),
+  pinned_note_id: z.string().nullable().optional(),
   categories: z.array(z.object({
     id: z.string(),
     name: z.string(),

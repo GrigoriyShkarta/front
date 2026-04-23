@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { materialsActions } from '../actions/materials-actions';
 import { GrantAccessForm, RevokeAccessForm } from '../schemas/materials-schema';
 
-type MaterialType = 'audio' | 'photo' | 'video' | 'file';
+type MaterialType = 'audio' | 'photo' | 'video' | 'file' | 'note';
 
 export function useStudentMaterialsData(student_id: string, type: MaterialType) {
   const queryClient = useQueryClient();
@@ -23,6 +23,7 @@ export function useStudentMaterialsData(student_id: string, type: MaterialType) 
       case 'photo': return materialsActions.get_student_photos;
       case 'video': return materialsActions.get_student_videos;
       case 'file': return materialsActions.get_student_files;
+      case 'note': return materialsActions.get_student_notes;
     }
   };
 

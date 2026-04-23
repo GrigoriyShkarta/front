@@ -1,0 +1,252 @@
+'use client';
+
+import { Link } from '@/i18n/routing';
+import { 
+  Stack, 
+  Title, 
+  Paper, 
+  Box, 
+  Text, 
+  Button, 
+  Group, 
+  TextInput, 
+  Pagination, 
+  Select, 
+  LoadingOverlay,
+} from "@mantine/core";
+import { IoDocumentTextOutline, IoAddOutline, IoTrashOutline, IoSearchOutline, IoFilterOutline } from "react-icons/io5";
+import { useTranslations } from "next-intl";
+import { useState, useEffect } from "react";
+import { useNotes } from "./hooks/use-notes";
+import { NoteTable } from "./components/note-table";
+import { LessonDeleteModal as NoteDeleteModal } from "../lessons/components/lesson-delete-modal";
+import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
+
+import { useAuth } from "@/hooks/use-auth";
+
+export default function NotesLayout() {
+    const t = useTranslations('Materials.note');
+    const common_t = useTranslations('Common');
+    const { user } = useAuth();
+    const is_student = user?.role === 'student';
+
+    // State for filtering and pagination
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState('15');
+    const [search, setSearch] = useState('');
+    const [category_filters, setCategoryFilters] = useState<string[]>([]);
+    const [selected_ids, setSelectedIds] = useState<string[]>([]);
+    const [filter_drawer_opened, setFilterDrawerOpened] = useState(false);
+    const [delete_modal_opened, setDeleteModalOpened] = useState(false);
+    const [id_to_delete, setIdToDelete] = useState<string | null>(null);
+    
+    // Data fetching
+    const { 
+        notes, 
+        is_loading, 
+        is_deleting,
+        is_bulk_deleting,
+        total_pages,
+        delete_note,
+        bulk_delete,
+    } = useNotes({
+        page,
+        limit: parseInt(limit),
+        search,
+        category_id: category_filters.length > 0 ? category_filters[0] : undefined // notes API uses category_id, we just take the first one
+    });
+
+    // Reset page on filter change
+    useEffect(() => {
+        setPage(1);
+    }, [search, category_filters, limit]);
+
+    const handle_delete_click = (id: string) => {
+        setIdToDelete(id);
+        setDeleteModalOpened(true);
+    };
+
+    const handle_bulk_delete_click = () => {
+        setIdToDelete(null);
+        setDeleteModalOpened(true);
+    };
+
+    const confirm_delete = async () => {
+        if (id_to_delete) {
+            await delete_note(id_to_delete);
+        } else {
+            await bulk_delete(selected_ids);
+            setSelectedIds([]);
+        }
+        setDeleteModalOpened(false);
+    };
+
+    const has_data = notes.length > 0;
+
+    return (
+        <Stack gap="lg">
+                <Group justify="space-between" align="center" wrap="nowrap">
+                    <Group align="center" gap="md">
+                        <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+                            <IoDocumentTextOutline size={28} />
+                        </Box>
+                        <Stack gap={0}>
+                            <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+                                {t('title')}
+                            </Title>
+                            <Text c="dimmed" size="sm" className="hidden sm:block">
+                                {t('subtitle')}
+                            </Text>
+                        </Stack>
+                    </Group>
+                    
+                    <Group>
+                         {!is_student && selected_ids.length > 0 && (
+                             <Group gap="xs">
+                                <Button 
+                                   color="red" 
+                                   variant="light" 
+                                   leftSection={<IoTrashOutline size={16} />}
+                                   onClick={handle_bulk_delete_click}
+                                >
+                                   {t('bulk_delete', { count: selected_ids.length })}
+                                </Button>
+                             </Group>
+                         )}
+
+                        <Button 
+                            variant={category_filters.length > 0 ? "light" : "default"}
+                            color={category_filters.length > 0 ? "primary" : "gray"}
+                            leftSection={<IoFilterOutline size={18} />} 
+                            onClick={() => setFilterDrawerOpened(true)}
+                        >
+                            <Box className="hidden sm:inline">{common_t('filters')}</Box>
+                            {category_filters.length > 0 && (
+                                <Box 
+                                    ml={8} 
+                                    className="w-5 h-5 rounded-full text-white flex items-center justify-center text-[10px] font-bold shadow-sm"
+                                    style={{ backgroundColor: 'var(--mantine-primary-color-filled)' }}
+                                >
+                                    {category_filters.length}
+                                </Box>
+                            )}
+                        </Button>
+
+                        {!is_student && (
+                            <Button 
+                                leftSection={<IoAddOutline size={18} />} 
+                                component={Link}
+                                href="/main/materials/notes/create"
+                                className="bg-primary hover:opacity-90 transition-all shadow-md shadow-primary/20"
+                            >
+                                {t('add_note')}
+                            </Button>
+                        )}
+                    </Group>
+                </Group>
+
+                <Paper withBorder radius="md" className="bg-white/5 border-white/10 overflow-hidden relative">
+                    <LoadingOverlay visible={is_loading} overlayProps={{ blur: 2 }} zIndex={40} />
+
+                    {is_loading && <Box mih="calc(100vh - 400px)" />}
+                    
+                    {/* Filters Toolbar */}
+                    <Box className="p-4 border-b border-white/10 bg-white/2">
+                        <Group justify="space-between">
+                            <TextInput
+                                placeholder={common_t('search')}
+                                leftSection={<IoSearchOutline size={16} />}
+                                value={search}
+                                onChange={(e) => setSearch(e.currentTarget.value)}
+                                size="sm"
+                                maw={300}
+                                className="flex-1"
+                                variant="filled"
+                            />
+                        </Group>
+                    </Box>
+
+                    {!is_loading && (
+                        has_data ? (
+                            <Box>
+                                <NoteTable 
+                                    data={notes}
+                                    selected_ids={selected_ids}
+                                    on_selection_change={setSelectedIds}
+                                    on_delete={handle_delete_click}
+                                    is_loading={is_loading}
+                                />
+                                
+                                {/* Pagination */}
+                                <Box className="p-4 border-t border-white/10 bg-white/2">
+                                    <Group justify="center">
+                                        <Group gap="xs">
+                                            <Text size="sm" c="dimmed">{common_t('show')}</Text>
+                                            <Select
+                                                data={['15', '30', '50']}
+                                                value={limit}
+                                                onChange={(val) => setLimit(val || '15')}
+                                                size="xs"
+                                                w={70}
+                                            />
+                                            <Text size="sm" c="dimmed">{common_t('per_page')}</Text>
+                                        </Group>
+    
+                                        <Pagination 
+                                            total={total_pages} 
+                                            value={page} 
+                                            onChange={setPage} 
+                                            size="sm"
+                                            withEdges
+                                            boundaries={1}
+                                            siblings={1}
+                                        />
+                                    </Group>
+                                </Box>
+                            </ Box>
+                        ) : (
+                            <Stack align="center" gap="md" py={60}>
+                                <Box 
+                                    className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
+                                    style={{ 
+                                        backgroundColor: 'var(--mantine-primary-color-light)',
+                                        color: 'var(--mantine-primary-color-filled)',
+                                        border: '1px solid var(--mantine-primary-color-light-hover)',
+                                        boxShadow: '0 0 20px rgba(var(--mantine-primary-color-filled-rgb), 0.15)'
+                                    }}
+                                >
+                                    <IoDocumentTextOutline size={40} />
+                                </Box>
+                                <Text fw={500} size="lg">{t('empty_title')}</Text>
+                                <Text c="dimmed" size="sm" ta="center" maw={400}>
+                                    {t('empty_description')}
+                                </Text>
+                                {!is_student && (
+                                    <Group mt="sm">
+                                        <Button variant="light" component={Link} href="/main/materials/notes/create" className="!bg-primary/10 !text-primary hover:!bg-primary/20 transition-colors">
+                                            {t('add_note')}
+                                        </Button>
+                                    </Group>
+                                )}
+                            </Stack>
+                        )
+                    )}
+                </Paper>
+
+                <CategoryFilterDrawer
+                    opened={filter_drawer_opened}
+                    onClose={() => setFilterDrawerOpened(false)}
+                    categoryIds={category_filters}
+                    onCategoryIdsChange={setCategoryFilters}
+                />
+
+                <NoteDeleteModal 
+                    opened={delete_modal_opened}
+                    onClose={() => setDeleteModalOpened(false)}
+                    onConfirm={confirm_delete}
+                    is_loading={is_deleting || is_bulk_deleting}
+                    count={id_to_delete ? 1 : selected_ids.length}
+                />
+        </Stack>
+    );
+}

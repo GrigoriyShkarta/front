@@ -161,6 +161,37 @@ export async function get_student_files(student_id: string, params: any = {}): P
   return response.data;
 }
 
+/**
+ * Get note materials for a specific student
+ */
+export async function get_student_notes(student_id: string, params: any = {}): Promise<any> {
+  const response = await api.get('/materials/notes', {
+    params: {
+      ...params,
+      // student_id,
+    },
+    paramsSerializer: (params) => {
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => searchParams.append(key, v));
+        } else if (value !== undefined && value !== null) {
+          searchParams.append(key, String(value));
+        }
+      });
+      return searchParams.toString();
+    }
+  });
+  const data = response.data;
+  if (data.data) {
+    data.data = data.data.map((item: any) => ({
+      ...item,
+      has_access: item.access?.some((a: any) => a.student_id === student_id)
+    }));
+  }
+  return data;
+}
+
 export const materialsActions = {
   get_student_courses,
   grant_access,
@@ -170,4 +201,5 @@ export const materialsActions = {
   get_student_photos,
   get_student_videos,
   get_student_files,
+  get_student_notes,
 };

@@ -24,6 +24,7 @@ export function MaterialsLayout({ student_id, initial_tab = 'courses' }: Props) 
       <Stack gap="md">
         {active_tab === 'courses' && <StudentCourses student_id={student_id} />}
         {active_tab === 'additional' && <AdditionalMaterials student_id={student_id} />}
+        {active_tab === 'notes' && <StudentMaterialTypeLayout student_id={student_id} type="note" />}
       </Stack>
     );
   }
@@ -51,6 +52,7 @@ export function MaterialsLayout({ student_id, initial_tab = 'courses' }: Props) 
               <Tabs.Tab value="photo">{t('photo_tab') || 'Photo'}</Tabs.Tab>
               <Tabs.Tab value="video">{t('video_tab') || 'Video'}</Tabs.Tab>
               <Tabs.Tab value="files">{t('files_tab') || 'Files'}</Tabs.Tab>
+              <Tabs.Tab value="notes">{t('notes_tab') || 'Notes'}</Tabs.Tab>
             </>
           )}
         </Tabs.List>
@@ -77,6 +79,10 @@ export function MaterialsLayout({ student_id, initial_tab = 'courses' }: Props) 
 
         <Tabs.Panel value="files" pt="md">
           <StudentMaterialTypeLayout student_id={student_id} type="file" />
+        </Tabs.Panel>
+        
+        <Tabs.Panel value="notes" pt="md">
+          <StudentMaterialTypeLayout student_id={student_id} type="note" />
         </Tabs.Panel>
       </Tabs>
     </Stack>

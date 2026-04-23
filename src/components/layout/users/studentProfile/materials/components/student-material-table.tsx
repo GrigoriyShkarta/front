@@ -1,11 +1,11 @@
 import { Table, Checkbox, Text, Group, Badge, Avatar, UnstyledButton, Box } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { AudioPlayer } from '@/components/ui/audio-player';
-import { IoPlayCircleOutline } from 'react-icons/io5';
+import { IoPlayCircleOutline, IoDocumentTextOutline, IoMusicalNotesOutline } from 'react-icons/io5';
 
 interface Props {
   items: any[];
-  type: 'audio' | 'photo' | 'video' | 'file';
+  type: 'audio' | 'photo' | 'video' | 'file' | 'note';
   on_toggle_access: (id: string, has_access: boolean) => void;
   on_item_click?: (item: any) => void;
   is_mutating: boolean;
@@ -61,20 +61,38 @@ export function StudentMaterialTable({ items, type, on_toggle_access, on_item_cl
                 </Table.Td>
                 <Table.Td>
                   <Group gap="sm" wrap="nowrap">
-                    {(type === 'photo' || type === 'video') && (
+                    {(type === 'photo' || type === 'video' || type === 'audio' || type === 'note') && (
                       <UnstyledButton onClick={() => on_item_click?.(item)}>
                         <Box pos="relative" w={40} h={40}>
-                           <Avatar 
-                            src={thumbnail} 
-                            radius="md" 
-                            size={40}
-                            styles={{
-                              root: { border: '1px solid rgba(255,255,255,0.1)' }
-                            }}
-                          >
-                             {type === 'video' && <IoPlayCircleOutline size={20} />}
-                          </Avatar>
-                          {type === 'video' && thumbnail && (
+                           {type !== 'note' && (
+                             <Avatar 
+                              src={thumbnail} 
+                              radius="md" 
+                              size={40}
+                              styles={{
+                                root: { border: '1px solid rgba(255,255,255,0.1)' }
+                              }}
+                            />
+                           )}
+                           {type === 'audio' && (
+                             <Box 
+                               pos="absolute" 
+                               inset={0} 
+                               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 'var(--mantine-radius-md)' }}
+                             >
+                               <IoMusicalNotesOutline size={20} />
+                             </Box>
+                           )}
+                           {type === 'note' && (
+                             <Box 
+                               pos="absolute" 
+                               inset={0} 
+                               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 'var(--mantine-radius-md)' }}
+                             >
+                               <IoDocumentTextOutline size={20} />
+                             </Box>
+                           )}
+                           {type === 'video' && thumbnail && (
                             <Box 
                               pos="absolute" 
                               inset={0} 
@@ -87,7 +105,7 @@ export function StudentMaterialTable({ items, type, on_toggle_access, on_item_cl
                       </UnstyledButton>
                     )}
                     <UnstyledButton onClick={() => on_item_click?.(item)}>
-                      <Text size="sm" fw={500} className="hover:underline">{item.name}</Text>
+                      <Text size="sm" fw={500} className="hover:underline">{item.title || item.name}</Text>
                     </UnstyledButton>
                   </Group>
                 </Table.Td>

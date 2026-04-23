@@ -17,6 +17,10 @@ interface LessonHeaderProps {
     onEdit: () => void;
     onToggleAdditional: () => void;
     onSave: () => void;
+    hide_edit?: boolean;
+    hide_additional?: boolean;
+    hide_back?: boolean;
+    pinned_student_id?: string;
     t: (key: string) => string;
     common_t: (key: string) => string;
 }
@@ -24,18 +28,21 @@ interface LessonHeaderProps {
 export function LessonHeader({
     is_access_mode, readOnly, is_student, title, full_access, is_saving_access,
     is_saving, onBack, onToggleFullAccess, onSaveAccess, onEdit, onToggleAdditional, onSave,
+    hide_edit, hide_additional, hide_back, pinned_student_id,
     t, common_t
 }: LessonHeaderProps) {
     return (
-        <Group justify="space-between" align="center" px="md" mb="md">
-            <Button 
-                variant="subtle" 
-                color="gray" 
-                leftSection={<IoChevronBackOutline size={18} />}
-                onClick={onBack}
-            >
-                {t('editor.back')}
-            </Button>
+        <Group justify={hide_back ? "flex-end" : "space-between"} align="center" px="md" mb={hide_back ? 'sm' : 'md'}>
+            {!hide_back && (
+                <Button 
+                    variant="subtle" 
+                    color="gray" 
+                    leftSection={<IoChevronBackOutline size={18} />}
+                    onClick={onBack}
+                >
+                    {t('editor.back')}
+                </Button>
+            )}
             
             {is_access_mode ? (
                 <Group gap="sm">
@@ -49,7 +56,7 @@ export function LessonHeader({
                     </Button>
                 </Group>
             ) : readOnly ? (
-                !is_student && (
+                !is_student && !hide_edit && (
                     <Button 
                         variant="filled" color="primary" 
                         leftSection={<IoPencilOutline size={18} />}
@@ -61,20 +68,22 @@ export function LessonHeader({
                 )
             ) : (
                 <Group gap="sm">
+                    {!hide_additional && (
+                        <Button 
+                            color="gray" 
+                            leftSection={<IoOptionsOutline size={18} />}
+                            onClick={onToggleAdditional}
+                            radius="md"
+                        >
+                            {common_t('additional')}
+                        </Button>
+                    )}
                     <Button 
-                        color="gray" 
-                        leftSection={<IoOptionsOutline size={18} />}
-                        onClick={onToggleAdditional}
-                        radius="md"
-                    >
-                        {common_t('additional')}
-                    </Button>
-                    <Button 
-                        variant={!title.trim() ? "light" : "filled"}
-                        color={!title.trim() ? "gray" : "primary"}
+                        variant={(!title.trim() && !pinned_student_id) ? "light" : "filled"}
+                        color={(!title.trim() && !pinned_student_id) ? "gray" : "primary"}
                         onClick={onSave}
                         loading={is_saving}
-                        disabled={!title.trim()}
+                        disabled={!title.trim() && !pinned_student_id}
                         radius="md"
                     >
                         {t('editor.save')}

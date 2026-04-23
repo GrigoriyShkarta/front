@@ -4,6 +4,7 @@ import { Stack, Group, Box, LoadingOverlay, TextInput, Button, Drawer, Paginatio
 import { IoSearchOutline, IoOptionsOutline, IoFilterOutline, IoGridOutline, IoListOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
+import { useLocale } from 'next-intl';
 import { useCategories } from '@/components/layout/categories/hooks/use-categories';
 import { useStudentMaterialsData } from '../hooks/use-student-materials-data';
 import { StudentMaterialTable } from './student-material-table';
@@ -13,12 +14,13 @@ import { VideoPlayerModal } from '@/components/layout/materials/videos/component
 
 interface Props {
   student_id: string;
-  type: 'audio' | 'photo' | 'video' | 'file';
+  type: 'audio' | 'photo' | 'video' | 'file' | 'note';
 }
 
 export function StudentMaterialTypeLayout({ student_id, type }: Props) {
   const t = useTranslations('Materials');
   const common_t = useTranslations('Common');
+  const locale = useLocale();
   
   const { 
     items, 
@@ -49,10 +51,11 @@ export function StudentMaterialTypeLayout({ student_id, type }: Props) {
   const [preview_item, set_preview_item] = useState<any | null>(null);
 
   useEffect(() => {
-    if (type === 'photo' || type === 'video') {
+    if (type === 'photo' || type === 'video' || type === 'audio') {
        const saved_view = localStorage.getItem(`${type}_view_mode`) as 'grid' | 'table';
        if (saved_view) set_view_mode(saved_view);
-       else set_view_mode('grid');
+       else if (type === 'photo' || type === 'video') set_view_mode('grid');
+       else set_view_mode('table');
     } else {
        set_view_mode('table');
     }
@@ -85,6 +88,8 @@ export function StudentMaterialTypeLayout({ student_id, type }: Props) {
     if (type === 'photo' || type === 'video') {
         set_preview_item(item);
         set_preview_opened(true);
+    } else if (type === 'note') {
+        window.open(`/${locale}/main/materials/notes/${item.id}?partial_access=true`, '_blank');
     } else {
         const urlValue = item.file_url || item.url;
         if (urlValue) window.open(urlValue, '_blank');
@@ -106,7 +111,7 @@ export function StudentMaterialTypeLayout({ student_id, type }: Props) {
             className="flex-1"
           />
           
-          {(type === 'photo' || type === 'video') && (
+          {(type === 'photo' || type === 'video' || type === 'audio') && (
             <SegmentedControl
               size="sm"
               value={view_mode}

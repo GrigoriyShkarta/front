@@ -105,7 +105,7 @@ export type StudentCoursesResponse = z.infer<typeof student_courses_response_sch
 export const grant_access_schema = z.object({
   student_ids: z.array(z.string()),
   material_ids: z.array(z.string()),
-  material_type: z.enum(['lesson', 'course', 'audio', 'photo', 'video', 'file', 'test']),
+  material_type: z.enum(['lesson', 'course', 'audio', 'photo', 'video', 'file', 'test', 'note']),
   full_access: z.boolean(),
   accessible_blocks: z.array(z.string()).optional(), // if we need block-level access later
 });
@@ -118,7 +118,7 @@ export type GrantAccessForm = z.infer<typeof grant_access_schema>;
 export const revoke_access_schema = z.object({
   student_ids: z.array(z.string()),
   material_ids: z.array(z.string()),
-  material_type: z.enum(['lesson', 'course', 'audio', 'photo', 'video', 'file', 'test']),
+  material_type: z.enum(['lesson', 'course', 'audio', 'photo', 'video', 'file', 'test', 'note']),
 });
 
 export type RevokeAccessForm = z.infer<typeof revoke_access_schema>;

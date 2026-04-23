@@ -174,7 +174,11 @@
     "success_title": "Success",
     "item_created_transition_prompt": "Successfully created. Would you like to transition to the editor or stay here?",
     "stay": "Stay",
-    "go_to_editor": "Go to Editor"
+    "go_to_editor": "Go to Editor",
+    "delete_confirm": {
+      "title": "Confirm Deletion",
+      "description": "Are you sure you want to delete this item? This action cannot be undone."
+    }
   },
   "Auth": {
     "login": {
@@ -213,6 +217,7 @@
     "video": "Video",
     "file": "Files",
     "lessons": "Lessons",
+    "notes": "Notes",
     "courses": "Courses",
     "additional_materials": "Lessons",
     "audio_materials": "Audio",
@@ -693,6 +698,7 @@
       "subscriptions": "Servants",
       "lesson_history": "Lesson History",
       "recordings": "Lesson Recordings",
+      "pinned_note": "Notes for Student",
       "activity": "Activity"
     },
     "tabs_drawer": {
@@ -972,6 +978,100 @@
         "warning": "Important: these files will also be automatically removed from all lessons where they are used."
       },
       "search_placeholder": "Search by file name..."
+    },
+    "note": {
+      "title": "Notes",
+      "subtitle": "Personal notes and materials",
+      "add_note": "Create note",
+      "edit_note": "Edit note",
+      "edit_lesson": "Edit note",
+      "delete_note": "Delete note",
+      "bulk_delete": "Delete selected ({count})",
+      "gallery": "Gallery",
+      "table_view": "Table",
+      "search_placeholder": "Search by note title...",
+      "empty_title": "No notes found",
+      "empty_description": "There are currently no notes available for your account. Please contact your coordinator for access.",
+      "empty_description_admin": "You haven't created any notes yet. Create your first note to get started.",
+      "table": {
+        "name": "Title",
+        "date": "Creation Date",
+        "actions": "Actions",
+        "categories": "Categories"
+      },
+      "editor": {
+        "title_placeholder": "Untitled",
+        "back": "Back",
+        "save": "Save",
+        "access_students": "Student Access",
+        "select_students": "Select students",
+        "add_to_categories": "Add to categories",
+        "add_to_categories_placeholder": "Select categories",
+        "discard_modal": {
+          "title": "Unsaved changes",
+          "message": "You have unsaved changes. Are you sure you want to leave? Entered data will be lost.",
+          "cancel": "Stay",
+          "confirm": "Leave without saving"
+        }
+      },
+      "access": {
+        "full_access": "Full access"
+      },
+      "notifications": {
+        "delete_success": "Note deleted successfully",
+        "delete_error": "Failed to delete note",
+        "create_success": "Note created successfully",
+        "create_error": "Failed to create note",
+        "update_success": "Note updated successfully",
+        "update_error": "Failed to update note"
+      }
+    },
+    "notes": {
+      "title": "Notes",
+      "subtitle": "Personal notes and materials",
+      "add_note": "Create note",
+      "edit_note": "Edit note",
+      "edit_lesson": "Edit note",
+      "delete_note": "Delete note",
+      "bulk_delete": "Delete selected ({count})",
+      "gallery": "Gallery",
+      "table_view": "Table",
+      "search_placeholder": "Search by note title...",
+      "empty_title": "No notes found",
+      "empty_description": "There are currently no notes available for your account. Please contact your coordinator for access.",
+      "empty_description_admin": "You haven't created any notes yet. Create your first note to get started.",
+      "table": {
+        "name": "Title",
+        "date": "Creation Date",
+        "actions": "Actions",
+        "categories": "Categories"
+      },
+      "editor": {
+        "title_placeholder": "Untitled",
+        "back": "Back",
+        "save": "Save",
+        "access_students": "Student Access",
+        "select_students": "Select students",
+        "add_to_categories": "Add to categories",
+        "add_to_categories_placeholder": "Select categories",
+        "discard_modal": {
+          "title": "Unsaved changes",
+          "message": "You have unsaved changes. Are you sure you want to leave? Entered data will be lost.",
+          "cancel": "Stay",
+          "confirm": "Leave without saving"
+        }
+      },
+      "access": {
+        "full_access": "Full access"
+      },
+      "notifications": {
+        "delete_success": "Note deleted successfully",
+        "delete_error": "Failed to delete note",
+        "create_success": "Note created successfully",
+        "create_error": "Failed to create note",
+        "update_success": "Note updated successfully",
+        "update_error": "Failed to update note"
+      }
     },
     "lessons": {
       "title": "Lessons",
@@ -1364,11 +1464,13 @@
     "photo_tab": "Photo",
     "video_tab": "Video",
     "files_tab": "Files",
+    "notes_tab": "Notes",
     "additional_materials_empty": "No lessons found",
     "audio_materials_empty": "No audio materials found",
     "photo_materials_empty": "No photo materials found",
     "video_materials_empty": "No video materials found",
     "file_materials_empty": "No file materials found",
+    "notes_materials_empty": "No notes found",
     "homework": {
       "title": "Homework",
       "subtitle": "Manage homework assignments for your lessons.",

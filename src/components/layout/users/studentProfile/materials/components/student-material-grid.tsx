@@ -1,14 +1,14 @@
 'use client';
 
 import { SimpleGrid, Card, Image, Text, Group, Checkbox, Box, Badge, ActionIcon, useMantineTheme } from '@mantine/core';
-import { IoPlayOutline, IoLogoYoutube, IoVideocamOutline, IoImageOutline } from 'react-icons/io5';
+import { IoPlayOutline, IoLogoYoutube, IoVideocamOutline, IoImageOutline, IoDocumentTextOutline, IoMusicalNotesOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { cn } from '@/lib/utils';
 
 interface Props {
   items: any[];
-  type: 'audio' | 'photo' | 'video' | 'file';
+  type: 'audio' | 'photo' | 'video' | 'file' | 'note';
   on_toggle_access: (id: string, has_access: boolean) => void;
   on_item_click: (item: any) => void;
   is_mutating: boolean;
@@ -75,7 +75,7 @@ export function StudentMaterialGrid({ items, type, on_toggle_access, on_item_cli
               {type === 'video' ? (
                 is_youtube ? (
                   thumbnail ? (
-                    <Image src={thumbnail} alt={item.name} fit="cover" h="100%" className="transition-transform duration-500 group-hover:scale-105" />
+                    <Image src={thumbnail} alt={item.title || item.name} fit="cover" h="100%" className="transition-transform duration-500 group-hover:scale-105" />
                   ) : (
                     <Box className="w-full h-full flex items-center justify-center bg-white/5">
                       <IoLogoYoutube size={40} className="text-white/20" />
@@ -83,7 +83,7 @@ export function StudentMaterialGrid({ items, type, on_toggle_access, on_item_cli
                   )
                 ) : (
                   item.thumbnail_url ? (
-                    <Image src={item.thumbnail_url} alt={item.name} fit="cover" h="100%" className="transition-transform duration-500 group-hover:scale-105" />
+                    <Image src={item.thumbnail_url} alt={item.title || item.name} fit="cover" h="100%" className="transition-transform duration-500 group-hover:scale-105" />
                   ) : item.file_url ? (
                     <video src={`${item.file_url}#t=0.5`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" preload="metadata" muted playsInline />
                   ) : (
@@ -93,11 +93,17 @@ export function StudentMaterialGrid({ items, type, on_toggle_access, on_item_cli
                   )
                 )
               ) : type === 'photo' ? (
-                <Image src={item.file_url} alt={item.name} fit="cover" h="100%" className="transition-transform duration-500 group-hover:scale-105" fallbackSrc="https://placehold.co/400x400?text=No+Image" />
+                <Image src={item.file_url} alt={item.title || item.name} fit="cover" h="100%" className="transition-transform duration-500 group-hover:scale-105" fallbackSrc="https://placehold.co/400x400?text=No+Image" />
               ) : (
-                 <Box className="w-full h-full flex items-center justify-center bg-white/5">
-                    {type === 'audio' ? <IoImageOutline size={40} className="text-white/20" /> : <IoVideocamOutline size={40} className="text-white/20" />}
-                 </Box>
+                  <Box className="w-full h-full flex items-center justify-center bg-white/5">
+                    {type === 'audio' ? (
+                      <IoMusicalNotesOutline size={40} className="text-white/20" />
+                    ) : type === 'note' ? (
+                      <IoDocumentTextOutline size={40} className="text-white/20" />
+                    ) : (
+                      <IoVideocamOutline size={40} className="text-white/20" />
+                    )}
+                  </Box>
               )}
 
               <Box className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
@@ -120,7 +126,7 @@ export function StudentMaterialGrid({ items, type, on_toggle_access, on_item_cli
             </Card.Section>
 
             <Box pt="xs" px="xs">
-              <Text fw={600} size="sm" className="truncate" title={item.name}>{item.name}</Text>
+              <Text fw={600} size="sm" className="truncate" title={item.title || item.name}>{item.title || item.name}</Text>
               <Text size="xs" c="dimmed" mt={2}>{dayjs(item.created_at).format('DD.MM.YYYY')}</Text>
               {item.categories && item.categories.length > 0 && (
                   <Group gap={4} mt={6} className="flex-wrap">
