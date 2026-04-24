@@ -20,6 +20,7 @@
     "@mantine/hooks": "^8.3.14",
     "@mantine/notifications": "^8.3.14",
     "@stream-io/audio-filters-web": "^0.7.3",
+    "@stream-io/video-filters-web": "^0.7.4",
     "@stream-io/video-react-sdk": "^1.33.4",
     "@tanstack/react-query": "^5.90.20",
     "@tanstack/react-query-devtools": "^5.91.3",
