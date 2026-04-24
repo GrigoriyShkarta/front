@@ -15,6 +15,7 @@ import { SpaceMetadataInitializer } from '@/components/common/space-metadata-ini
 import { PaymentReminder } from '@/components/common/payment-reminder';
 
 import { StreamVideoProvider } from '@/providers/stream-video-provider';
+import { FloatingNotesProvider } from '@/context/floating-notes-context';
 
 export default async function LocaleLayout({
   children,
@@ -32,11 +33,13 @@ export default async function LocaleLayout({
         <MantineProvider theme={theme} defaultColorScheme="auto">
           <Notifications position="top-center" />
           <AuthProvider>
-            <StreamVideoProvider>
-              <SpaceMetadataInitializer />
-              {children}
-              <PaymentReminder />
-            </StreamVideoProvider>
+            <FloatingNotesProvider>
+              <StreamVideoProvider>
+                <SpaceMetadataInitializer />
+                {children}
+                <PaymentReminder />
+              </StreamVideoProvider>
+            </FloatingNotesProvider>
           </AuthProvider>
         </MantineProvider>
       </ReactQueryProvider>

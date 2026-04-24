@@ -6,7 +6,7 @@ import { useUsersQuery } from '@/components/layout/users/hooks/use-users-query';
 import { useTranslations } from 'next-intl';
 import { useDebouncedValue } from '@mantine/hooks';
 import { Link } from '@/i18n/routing';
-import { IoSearchOutline, IoArrowForwardOutline } from 'react-icons/io5';
+import { IoSearchOutline, IoArrowForwardOutline, IoListOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
 
 /**
@@ -35,36 +35,39 @@ export function TrackerUsersLayout() {
 
   return (
     <Stack gap="xl" className="py-4">
-      <Stack gap="xs">
-        <Group justify="space-between" align="flex-end" className="flex-col sm:flex-row items-start sm:items-end gap-4">
-          <Stack gap={4}>
-            <Title order={1} className="text-2xl sm:text-3xl font-bold tracking-tight">
-              {t('users_title')}
+      <Group justify="space-between" align="center" wrap="nowrap">
+        <Group align="center" gap="md">
+          <Box className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shadow-sm border border-secondary/20 shrink-0">
+            <IoListOutline size={28} />
+          </Box>
+          <Stack gap={0}>
+            <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
+              {t('title')}
             </Title>
-            <Text c="dimmed" size="sm">
-              {t('users_subtitle')}
+            <Text c="dimmed" size="sm" className="hidden sm:block">
+              {t('subtitle')}
             </Text>
           </Stack>
-
-          <TextInput
-            placeholder={common_t('search')}
-            leftSection={<IoSearchOutline size={18} />}
-            value={search_query}
-            onChange={(e) => set_search_query(e.currentTarget.value)}
-            className="w-full sm:w-72"
-            size="md"
-            radius="md"
-            styles={{
-               input: {
-                 backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                 border: '1px solid rgba(255, 255, 255, 0.1)',
-                 backdropFilter: 'blur(10px)',
-                 color: 'white'
-               }
-            }}
-          />
         </Group>
-      </Stack>
+
+        <TextInput
+          placeholder={common_t('search')}
+          leftSection={<IoSearchOutline size={18} />}
+          value={search_query}
+          onChange={(e) => set_search_query(e.currentTarget.value)}
+          className="w-full sm:w-72"
+          size="md"
+          radius="md"
+          styles={{
+            input: {
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              color: 'white'
+            }
+          }}
+        />
+      </Group>
 
       <Box className="relative">
         <LoadingOverlay 

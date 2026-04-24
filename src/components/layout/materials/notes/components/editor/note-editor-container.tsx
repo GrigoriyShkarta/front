@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, LoadingOverlay, Grid, Stack, Button, Group } from '@mantine/core';
+import { Box, LoadingOverlay, Grid, Stack, Button, Group, Switch } from '@mantine/core';
 import { useNoteEditorState } from '../../hooks/use-note-editor-state';
 import { LessonHeader as NoteHeader } from '@/components/layout/materials/lessons/components/editor/segments/lesson-header';
 import BlockNoteEditor from '@/components/layout/materials/lessons/components/editor/block-note';
@@ -19,14 +19,23 @@ interface Props {
     hide_title?: boolean;
     compact?: boolean;
     prevent_redirect?: boolean;
+    force_new?: boolean;
+    hide_access_toggle?: boolean;
+    disable_auto_save?: boolean;
+    hide_loader?: boolean;
+    onIdChange?: (id: string) => void;
 }
 
 export default function NoteEditorContainer({ 
     id, is_read_only = false, is_access_mode = false, pinned_student_id, student_name,
     hide_additional = false, hide_edit = false, hide_back = false, hide_title = false,
-    compact = false, prevent_redirect = false
+    compact = false, prevent_redirect = false, force_new = false, hide_access_toggle = false,
+    disable_auto_save = false, hide_loader = false, onIdChange
 }: Props) {
-  const state = useNoteEditorState({ id, is_read_only, is_access_mode, pinned_student_id, student_name, prevent_redirect });
+  const state = useNoteEditorState({ 
+    id, is_read_only, is_access_mode, pinned_student_id, student_name, 
+    prevent_redirect, force_new, disable_auto_save, onIdChange 
+  });
 
   return (
     <Box 
@@ -35,7 +44,7 @@ export default function NoteEditorContainer({
         onDragOver={(e) => e.preventDefault()}
         pos="relative" className="transition-all duration-500 ease-in-out"
     >
-      <LoadingOverlay visible={state.is_loading_note || state.is_saving} overlayProps={{ blur: 2 }} zIndex={100} />
+      <LoadingOverlay visible={!hide_loader && (state.is_loading_note || state.is_saving)} overlayProps={{ blur: 2 }} zIndex={100} />
 
       <Grid gutter={compact ? 20 : 40} align="flex-start">
         <Grid.Col span={12} pos="relative">
@@ -46,9 +55,34 @@ export default function NoteEditorContainer({
                     onBack={state.handleBack} onToggleFullAccess={() => {}} onSaveAccess={() => {}}
                     onEdit={() => state.setReadOnly(false)} onToggleAdditional={() => state.setAdditionalOpened(true)} onSave={state.handleSave}
                     hide_additional={hide_additional} hide_edit={hide_edit} hide_back={hide_back}
+                    hide_save={!!pinned_student_id && !disable_auto_save}
                     pinned_student_id={pinned_student_id}
                     t={state.t} common_t={state.common_t}
                 />
+
+                {pinned_student_id && !state.readOnly && !hide_access_toggle && (
+                    <Group justify="space-between" px="sm" py="6px" className="bg-secondary/5 rounded-lg border border-secondary/10">
+                        <Stack gap={0}>
+                            <Group gap={6} align="center">
+                                <Box fw={600} className="text-[13px] text-[var(--mantine-color-text)]">
+                                    {state.t('editor.grant_access')}
+                                </Box>
+                                <Box fw={500} className="text-[11px] text-primary opacity-80">
+                                    • {state.t('editor.auto_save_hint')}
+                                </Box>
+                            </Group>
+                            <Box className="text-[11px] opacity-60 text-[var(--mantine-color-dimmed)]">
+                                {state.t('editor.grant_access_desc')}
+                            </Box>
+                        </Stack>
+                        <Switch 
+                            checked={state.hasStudentAccess}
+                            onChange={(e) => state.setHasStudentAccess(e.currentTarget.checked)}
+                            size="sm"
+                            color="primary"
+                        />
+                    </Group>
+                )}
 
                 {/* For note title changes since cover was removed in notes */}
                 {!state.readOnly && !hide_title && (
@@ -74,9 +108,7 @@ export default function NoteEditorContainer({
                             read_only={state.readOnly}
                         />
                     ) : (
-                        <Box h={400} pos="relative">
-                            <LoadingOverlay visible={true} overlayProps={{ blur: 1 }} />
-                        </Box>
+                        <Box h={400} />
                     )}
                 </Box>
             </Stack>

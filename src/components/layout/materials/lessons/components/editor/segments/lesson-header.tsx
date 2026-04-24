@@ -20,6 +20,7 @@ interface LessonHeaderProps {
     hide_edit?: boolean;
     hide_additional?: boolean;
     hide_back?: boolean;
+    hide_save?: boolean;
     pinned_student_id?: string;
     t: (key: string) => string;
     common_t: (key: string) => string;
@@ -28,7 +29,7 @@ interface LessonHeaderProps {
 export function LessonHeader({
     is_access_mode, readOnly, is_student, title, full_access, is_saving_access,
     is_saving, onBack, onToggleFullAccess, onSaveAccess, onEdit, onToggleAdditional, onSave,
-    hide_edit, hide_additional, hide_back, pinned_student_id,
+    hide_edit, hide_additional, hide_back, hide_save, pinned_student_id,
     t, common_t
 }: LessonHeaderProps) {
     return (
@@ -78,16 +79,18 @@ export function LessonHeader({
                             {common_t('additional')}
                         </Button>
                     )}
-                    <Button 
-                        variant={(!title.trim() && !pinned_student_id) ? "light" : "filled"}
-                        color={(!title.trim() && !pinned_student_id) ? "gray" : "primary"}
-                        onClick={onSave}
-                        loading={is_saving}
-                        disabled={!title.trim() && !pinned_student_id}
-                        radius="md"
-                    >
-                        {t('editor.save')}
-                    </Button>
+                    {!hide_save && (
+                        <Button 
+                            variant={(!title.trim() && !pinned_student_id) ? "light" : "filled"}
+                            color={(!title.trim() && !pinned_student_id) ? "gray" : "primary"}
+                            onClick={onSave}
+                            loading={is_saving}
+                            disabled={!title.trim() && !pinned_student_id}
+                            radius="md"
+                        >
+                            {t('editor.save')}
+                        </Button>
+                    )}
                 </Group>
             )}
         </Group>

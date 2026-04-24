@@ -353,6 +353,7 @@
       "student_profile": "Student Profile",
       "student_boards": "Student Boards",
       "student_tracker": "Student Tracker",
+      "quick_note": "Quick Note",
       "my_links": "My Workspace",
       "my_profile": "My Profile",
       "my_boards": "My Boards",
@@ -981,7 +982,7 @@
     },
     "note": {
       "title": "Notes",
-      "subtitle": "Personal notes and materials",
+      "subtitle": "Your personal notes for optimizing work.",
       "add_note": "Create note",
       "edit_note": "Edit note",
       "edit_lesson": "Edit note",
@@ -1001,6 +1002,9 @@
       },
       "editor": {
         "title_placeholder": "Untitled",
+        "grant_access": "Grant access to student",
+        "grant_access_desc": "Student will be able to see this note in their profile",
+        "auto_save_hint": "Notes are saved automatically",
         "back": "Back",
         "save": "Save",
         "access_students": "Student Access",
@@ -1361,7 +1365,7 @@
     },
     "courses": {
       "title": "Courses",
-      "search_lessons": "Search by lesson name...",
+      "search_lessons": "Search by course name...",
       "no_extra_filters": "Additional filters can be added here.",
       "gallery": "Gallery",
       "table_view": "Table",
@@ -1728,7 +1732,7 @@
   "Storage": {
     "title": "Storage Settings",
     "description": "View and manage your cloud storage usage. If you run out of space, you won't be able to upload new files.",
-    "storageUsage": "Storage Usage",
+    "storageUsage": "Storage",
     "usageText": "Used {usage} of {limit} ({percent}%)",
     "errorTitle": "Error",
     "errorMessage": "Failed to load storage usage.",

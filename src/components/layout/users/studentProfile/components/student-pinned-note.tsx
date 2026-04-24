@@ -27,6 +27,8 @@ export function StudentPinnedNote({ student_id, student_name, pinned_note_id }: 
                 hide_title={true}
                 compact={true}
                 prevent_redirect={true}
+                hide_access_toggle={true}
+                disable_auto_save={true}
             />
         </Box>
     </Stack>

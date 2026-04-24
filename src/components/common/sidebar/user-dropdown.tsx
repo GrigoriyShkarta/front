@@ -3,7 +3,7 @@
 import { Menu, UnstyledButton, Group, Avatar, Text, Box, rem, Modal, Button, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IoPersonOutline, IoChevronUpOutline, IoChevronDownOutline, IoLogOutOutline, IoCloudOutline } from 'react-icons/io5';
-import { FaPaintbrush } from 'react-icons/fa6';
+import { HiOutlinePaintBrush } from "react-icons/hi2";
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslations } from 'next-intl';
@@ -102,7 +102,7 @@ export function UserDropdown({ collapsed, hide_email, className, style }: Props)
         <Menu.Item 
           component={Link}
           href="/main/personalization"
-          leftSection={<FaPaintbrush style={{ width: rem(14), height: rem(14) }} />}
+          leftSection={<HiOutlinePaintBrush style={{ width: rem(14), height: rem(14) }} />}
         >
           {t('personalization')}
         </Menu.Item>

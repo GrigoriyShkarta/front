@@ -18,6 +18,7 @@ import { useTranslations } from 'next-intl';
 import { useActiveCall } from '@/context/active-call-context';
 import { useRouter } from '@/i18n/routing';
 import { useAuth } from '@/hooks/use-auth';
+import { useFloatingNotes } from '@/context/floating-notes-context';
 
 import { useLessonSettings } from './hooks/use-lesson-settings';
 import { useCallRecording } from './hooks/use-call-recording';
@@ -32,6 +33,7 @@ import { OtherParticipantsPreview } from './components/other-participants-previe
 
 import { LessonTimer } from './components/lesson-timer';
 import { CurrentTime } from './components/current-time';
+import { FloatingNotesManager } from './components/floating-notes-manager';
 
 import '@stream-io/video-react-sdk/dist/css/styles.css';
 
@@ -43,6 +45,18 @@ import '@stream-io/video-react-sdk/dist/css/styles.css';
  */
 export function LessonRoom({ call }: { call: Call }) {
   const { user } = useAuth();
+  const { clearNotes, closeAllNotes } = useFloatingNotes();
+
+  useEffect(() => {
+    if (call.id) {
+      clearNotes(call.id);
+    }
+
+    // Cleanup: hide notes when leaving the lesson room UI, but don't wipe session IDs
+    return () => {
+      closeAllNotes();
+    };
+  }, [call.id, clearNotes, closeAllNotes]);
   
   return (
     <StreamCall call={call}>
@@ -236,6 +250,8 @@ function MyCallUI() {
         isLoading={isUpdating}
         userRole={user?.role}
       />
+
+      <FloatingNotesManager />
     </section>
   );
 }

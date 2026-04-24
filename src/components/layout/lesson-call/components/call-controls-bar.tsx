@@ -16,7 +16,8 @@ import {
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { FaChalkboard } from 'react-icons/fa';
-import { IoListOutline } from 'react-icons/io5';
+import { IoListOutline, IoCreateOutline } from 'react-icons/io5';
+import { useFloatingNotes } from '@/context/floating-notes-context';
 
 interface CallControlsBarProps {
   userRole: string | undefined;
@@ -51,13 +52,15 @@ export function CallControlsBar({
   studentSessionId,
 }: CallControlsBarProps) {
   const t = useTranslations('Calendar.lesson_room');
+  const { openNote } = useFloatingNotes();
   const colorScheme = useComputedColorScheme('light');
   const isDark = colorScheme === 'dark';
   const call = useCall();
   const { useParticipants } = useCallStateHooks();
   const participants = useParticipants();
   
-  const studentParticipant = participants.find(p => p.sessionId === studentSessionId);
+  const studentParticipant = participants.find(p => p.sessionId === studentSessionId) || participants.find(p => p.userId === studentId);
+  const studentName = studentParticipant?.name || 'Student';
   // const isPinned = studentParticipant?.isPinned;
 
   const [visible, set_visible] = useState(true);
@@ -283,6 +286,19 @@ export function CallControlsBar({
             >
               {userRole === 'student' ? t('my_tracker') : t('student_tracker')}
             </Menu.Item>
+
+            {userRole !== 'student' && studentId && (
+              <Menu.Item
+                leftSection={<IoCreateOutline size={16} />}
+                onClick={() => openNote({ 
+                    student_id: studentId, 
+                    student_name: studentName 
+                })}
+                style={{ color: 'var(--call-text)' }}
+              >
+                {t('quick_note')}
+              </Menu.Item>
+            )}
 
             {userRole !== 'student' && studentSessionId && (
               <>

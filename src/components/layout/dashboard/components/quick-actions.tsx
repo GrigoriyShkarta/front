@@ -4,7 +4,7 @@ import { Group, UnstyledButton, Text, Stack, ThemeIcon } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { 
   IoPersonAddOutline, 
-  IoLibraryOutline, 
+  IoSchoolOutline, 
   IoCalendarOutline, 
   IoPieChartOutline 
 } from 'react-icons/io5';
@@ -42,7 +42,7 @@ export function QuickActions({ primary_color, secondary_color }: Props) {
       id: 'create_course',
       title: t('create_course.title'),
       desc: t('create_course.desc'),
-      icon: IoLibraryOutline,
+      icon: IoSchoolOutline,
       route: '/main/materials/courses',
     },
     {

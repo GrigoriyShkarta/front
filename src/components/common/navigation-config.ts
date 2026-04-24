@@ -1,5 +1,5 @@
 import { IconType } from 'react-icons';
-import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPricetagOutline, IoLibraryOutline, IoListOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoShieldCheckmarkOutline, IoDocumentTextOutline, IoCloudOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPieChartOutline, IoPricetagOutline, IoLibraryOutline, IoListOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoDocumentTextOutline, IoCloudOutline } from 'react-icons/io5';
 import { FaChalkboard } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
 import { IoMdCheckboxOutline } from "react-icons/io";
@@ -165,7 +165,7 @@ export const MAIN_NAVIGATION: NavItem[] = [
       {
         label: 'reports',
         href: '/main/finance/reports',
-        icon: IoDocumentOutline,
+        icon: IoPieChartOutline,
         roles: ['super_admin', 'admin'],
       }
     ]

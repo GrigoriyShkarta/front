@@ -64,7 +64,7 @@ export function StudentMaterialTable({ items, type, on_toggle_access, on_item_cl
                     {(type === 'photo' || type === 'video' || type === 'audio' || type === 'note') && (
                       <UnstyledButton onClick={() => on_item_click?.(item)}>
                         <Box pos="relative" w={40} h={40}>
-                           {type !== 'note' && (
+                           {(type === 'photo' || type === 'video') && (
                              <Avatar 
                               src={thumbnail} 
                               radius="md" 
@@ -78,7 +78,7 @@ export function StudentMaterialTable({ items, type, on_toggle_access, on_item_cl
                              <Box 
                                pos="absolute" 
                                inset={0} 
-                               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 'var(--mantine-radius-md)' }}
+                               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--mantine-color-gray-light)', borderRadius: 'var(--mantine-radius-md)' }}
                              >
                                <IoMusicalNotesOutline size={20} />
                              </Box>
@@ -87,7 +87,7 @@ export function StudentMaterialTable({ items, type, on_toggle_access, on_item_cl
                              <Box 
                                pos="absolute" 
                                inset={0} 
-                               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 'var(--mantine-radius-md)' }}
+                               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--mantine-color-gray-light)', borderRadius: 'var(--mantine-radius-md)' }}
                              >
                                <IoDocumentTextOutline size={20} />
                              </Box>

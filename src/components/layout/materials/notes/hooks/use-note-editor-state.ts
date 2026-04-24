@@ -18,16 +18,24 @@ interface UseNoteEditorStateProps {
     pinned_student_id?: string;
     student_name?: string;
     prevent_redirect?: boolean;
+    force_new?: boolean;
+    disable_auto_save?: boolean;
+    onIdChange?: (id: string) => void;
 }
 
-export function useNoteEditorState({ id, is_read_only, is_access_mode, pinned_student_id, student_name, prevent_redirect }: UseNoteEditorStateProps) {
+export function useNoteEditorState({ 
+    id, is_read_only, is_access_mode, pinned_student_id, student_name, 
+    prevent_redirect, force_new, disable_auto_save, onIdChange 
+}: UseNoteEditorStateProps) {
   const t = useTranslations('Materials.note');
   const common_t = useTranslations('Common');
   const router = useRouter();
   const { user } = useAuth();
   const is_student = user?.role === 'student';
 
-  const { note, is_loading_note, is_saving, create_note, update_note } = useNoteEditor({ id, pinned_student_id, prevent_redirect });
+  const [currentId, setCurrentId] = useState<string | undefined>(id);
+
+  const { note, is_loading_note, is_saving, create_note, update_note } = useNoteEditor({ id: currentId, pinned_student_id, prevent_redirect, force_new });
   
   const { is_dragging_block, set_is_dragging_block } = useBlockDragging();
   
@@ -39,6 +47,7 @@ export function useNoteEditorState({ id, is_read_only, is_access_mode, pinned_st
   
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [studentIds, setStudentIds] = useState<string[]>([]);
+  const [hasStudentAccess, setHasStudentAccess] = useState(false);
   
   const { categories: all_categories, create_category, create_categories } = useCategories();
   const { users: all_students } = useUsersQuery({ role: 'student' });
@@ -46,10 +55,21 @@ export function useNoteEditorState({ id, is_read_only, is_access_mode, pinned_st
   const [category_drawer_opened, setCategoryDrawerOpened] = useState(false);
 
   const [content, setContent] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const editorRef = useRef<BlockNoteEditorRef | null>(null);
 
   useEffect(() => {
-    if (note) {
+    if (force_new && content === null) {
+        setContent('');
+        if (student_name && !title) {
+            const date = new Date().toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            setTitle(`${student_name} - ${date}`);
+        }
+        setIsInitialized(true);
+        return;
+    }
+
+    if (note && !isInitialized) {
         setTitle(note.title);
         setCategoryIds(note.categories?.map(c => c.id) || []);
         
@@ -57,50 +77,88 @@ export function useNoteEditorState({ id, is_read_only, is_access_mode, pinned_st
         const existingStudentIds = accessList.map((a: any) => a.student?.id || a.student_id).filter(Boolean) as string[];
         setStudentIds(existingStudentIds);
 
+        if (pinned_student_id && existingStudentIds.includes(pinned_student_id)) {
+            setHasStudentAccess(true);
+        }
+
         if (content === null) {
             setContent(typeof note.content === 'string' 
                 ? note.content 
                 : JSON.stringify(note.content || []));
         }
-    } else if (!id && content === null) {
+        setIsInitialized(true);
+    } else if (!id && !pinned_student_id && content === null) {
+        // Only auto-initialize empty if we aren't waiting for a pinned note
         setContent('');
-        if (student_name && pinned_student_id) {
-            setTitle(`${student_name} (${pinned_student_id})`);
+        setIsInitialized(true);
+    } else if (!id && pinned_student_id && !is_loading_note && (note === undefined || note === null) && content === null) {
+        // If we were looking for a pinned note, but it doesn't exist (note is null/undefined after loading)
+        setContent('');
+        if (student_name) {
+            const date = new Date().toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            setTitle(`${student_name} - ${date}`);
         }
+        setIsInitialized(true);
     }
-  }, [note, id, content, student_name, pinned_student_id]);
+  }, [note, id, content, student_name, pinned_student_id, is_loading_note, force_new, isInitialized]);
+
+  // Auto-save logic for pinned notes
+  useEffect(() => {
+    if (!pinned_student_id || !content || is_loading_note || readOnly || disable_auto_save) return;
+    
+    const timer = setTimeout(() => {
+        handleSave(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [content, hasStudentAccess]);
 
   const isDirty = title.trim() !== '' || (content !== null && content !== '' && content !== '[]');
 
   const handleBack = () => {
-    if (isDirty && !id && !readOnly) {
+    if (isDirty && !currentId && !readOnly) {
         setDiscardModalOpened(true);
     } else {
         router.back();
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (is_auto_save = false) => {
     const finalTitle = (student_name && pinned_student_id) 
-        ? `${student_name} (${pinned_student_id})` 
+        ? `${student_name} - ${new Date().toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' })}` 
         : (title || t('editor.untitled'));
 
-    const payload = {
+    // Ensure current student is added/removed based on hasStudentAccess
+    const finalStudentIds = studentIds.filter(id => id !== pinned_student_id);
+    if (hasStudentAccess && pinned_student_id) {
+        finalStudentIds.push(pinned_student_id);
+    }
+
+    const payload: any = {
         title: finalTitle,
         category_ids: categoryIds,
-        student_ids: studentIds,
+        student_ids: finalStudentIds,
+        access: finalStudentIds,
         content: content || '[]',
-        pinned_student_id: pinned_student_id || null
+        pinned_student_id: null
     };
 
     try {
-        if (id) {
-            await update_note(payload);
-            setReadOnly(true);
-            setAdditionalOpened(false);
+        if (currentId) {
+            await update_note(payload, { hide_notification: is_auto_save });
+            if (!is_auto_save) {
+                setReadOnly(true);
+                setAdditionalOpened(false);
+            }
         } else {
-            await create_note(payload);
-            setReadOnly(true);
+            const new_note = await create_note(payload, { hide_notification: is_auto_save });
+            if (new_note?.id) {
+                setCurrentId(new_note.id);
+                onIdChange?.(new_note.id);
+            }
+            if (!is_auto_save) {
+                setReadOnly(true);
+            }
         }
     } catch (error) {
         console.error('Failed to save note:', error);
@@ -139,6 +197,7 @@ export function useNoteEditorState({ id, is_read_only, is_access_mode, pinned_st
     categoryIds, setCategoryIds, studentIds, setStudentIds,
     all_categories, all_students,
     category_drawer_opened, setCategoryDrawerOpened,
+    hasStudentAccess, setHasStudentAccess,
     content, setContent: (val: string) => setContent(val),
     editorRef, handleBack,
     handleSave, openBank, handleMediaSelect,
