@@ -11,7 +11,8 @@ import {
   IoMicOffOutline,
   IoVideocamOffOutline,
   IoDesktopOutline,
-  IoGridOutline
+  IoGridOutline,
+  IoAnalyticsOutline
 } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';

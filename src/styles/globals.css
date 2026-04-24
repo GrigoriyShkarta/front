@@ -424,6 +424,7 @@ a[href]:not([class*="bg-"]):not([class*="text-primary"]):hover {
   --str-video__border-radius-md: 12px;
   --str-video__border-radius-sm: 8px;
   --str-video__border-radius-circle: 50%;
+  height: 100%;
 }
 
 .str-video.dark {

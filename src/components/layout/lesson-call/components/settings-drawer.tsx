@@ -19,7 +19,8 @@ import {
   useCallStateHooks
 } from '@stream-io/video-react-sdk';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
+import { notifications } from '@mantine/notifications';
 import { 
   IoSettingsOutline, 
   IoVideocamOutline, 
@@ -61,11 +62,50 @@ export function SettingsDrawer({
   const camState = useCameraState();
   const speakerState = useSpeakerState();
   
-  // Noise cancellation requires @stream-io/audio-filters-web (Krisp)
-  // For now we set it to unsupported to avoid crashes
-  const isNCSupported = false;
-  const isNCEnabled = false;
-  const setNCEnabled = (val: boolean) => {};
+  const [is_nc_enabled, set_is_nc_enabled] = useState(false);
+  const [is_nc_loading, set_is_nc_loading] = useState(false);
+  const nc_ref = useRef<any>(null);
+
+  const toggleNoiseCancellation = async (checked: boolean) => {
+    if (!call) return;
+    
+    set_is_nc_loading(true);
+    try {
+      if (!checked) {
+        await call.microphone.disableNoiseCancellation();
+        set_is_nc_enabled(false);
+      } else {
+        if (!nc_ref.current) {
+           const { NoiseCancellation } = await import('@stream-io/audio-filters-web');
+           const nc = new NoiseCancellation();
+           await nc.init();
+           nc_ref.current = nc;
+        }
+        await call.microphone.enableNoiseCancellation(nc_ref.current);
+        set_is_nc_enabled(true);
+      }
+    } catch (e: any) {
+      console.error('Failed to toggle noise cancellation', e);
+      set_is_nc_enabled(false);
+      
+      // If it's a permission issue from Stream side
+      if (e?.message?.includes('not available')) {
+         notifications.show({
+            title: t('error'),
+            message: t('noise_suppression_not_available'),
+            color: 'red',
+         });
+      } else {
+         notifications.show({
+            title: t('error'),
+            message: t('noise_suppression_failed'),
+            color: 'red',
+         });
+      }
+    } finally {
+      set_is_nc_loading(false);
+    }
+  };
 
   const [speakerDevices, setSpeakerDevices] = useState<MediaDeviceInfo[]>([]);
   const [localVolume, setLocalVolume] = useState(Math.round((speakerState?.volume ?? 1) * 100));
@@ -184,8 +224,8 @@ export function SettingsDrawer({
 
         <Tabs.Panel value="tech">
           <Stack gap="xl">
-            {/* Noise Suppression - Commented out for now */}
-            {/* <Box>
+            {/* Noise Suppression */}
+            <Box>
               <Group justify="space-between" mb="xs">
                 <Group gap="xs">
                   <IoShieldCheckmarkOutline size={18} />
@@ -195,14 +235,14 @@ export function SettingsDrawer({
                   </Box>
                 </Group>
                 <Switch 
-                  disabled={!isNCSupported}
-                  checked={isNCEnabled}
-                  onChange={(e) => setNCEnabled(e.currentTarget.checked)}
+                  disabled={is_nc_loading}
+                  checked={is_nc_enabled}
+                  onChange={(e) => toggleNoiseCancellation(e.currentTarget.checked)}
                   color="var(--space-primary)"
                 />
               </Group>
             </Box>
-            <Divider color="var(--call-border)" /> */}
+            <Divider color="var(--call-border)" />
 
             {/* Speaker & Mic Volume */}
             <Box>

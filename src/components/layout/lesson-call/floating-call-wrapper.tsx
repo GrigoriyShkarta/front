@@ -78,7 +78,11 @@ export function FloatingCallWrapper() {
           }
         });
 
-        // Add background color to match app
+        // Copy the color scheme attribute to ensure dark mode variables work correctly
+        const colorScheme = document.documentElement.getAttribute('data-mantine-color-scheme') || 'dark';
+        pip.document.documentElement.setAttribute('data-mantine-color-scheme', colorScheme);
+        pip.document.documentElement.className = document.documentElement.className;
+
         pip.document.body.style.backgroundColor = 'var(--mantine-color-body)';
         pip.document.body.style.margin = '0';
         pip.document.body.style.overflow = 'hidden';
