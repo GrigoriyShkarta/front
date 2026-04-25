@@ -58,6 +58,42 @@
       }
     }
   },
+  "Pricing": {
+    "title": "Pricing Plans",
+    "subtitle": "Choose the plan that's right for your business. All plans include full access to features.",
+    "price_month": "/ mo",
+    "popular": "Most Popular",
+    "current_plan": "Your Current Plan",
+    "get_started": "Choose Plan",
+    "plans": {
+      "basic": {
+        "title": "Basic",
+        "desc": "Essential toolset for small groups."
+      },
+      "premium": {
+        "title": "Premium",
+        "desc": "Advanced capabilities and scale for professionals."
+      }
+    },
+    "features": {
+      "what_included": "What's included",
+      "storage": "{count} GB Storage",
+      "students": "Up to {count} Students",
+      "students_unlimited": "Unlimited Students",
+      "customization_basic": "Standard Customization",
+      "customization_premium": "Advanced Customization",
+      "support_basic": "Email Support",
+      "support_premium": "Priority 24/7 Support",
+      "materials": "Unlimited Materials",
+      "analytics": "Basic Analytics",
+      "analytics_pro": "Professional Analytics"
+    },
+    "student_limit_modal": {
+      "title": "Student Limit Exceeded",
+      "description": "Your current Basic plan allows up to 10 students. To add more, please upgrade to the Premium plan.",
+      "button": "Upgrade Plan"
+    }
+  },
   "Common": {
     "name": "Name",
     "no_data": "No data found",
@@ -1783,5 +1819,14 @@
     "top_files_title": "Largest Files",
     "view_in_library": "View in library",
     "no_files_found": "No large files found."
+  },
+  "StorageLimit": {
+    "title": "Storage Limit Reached",
+    "super_admin_free_desc": "You have reached the limit of your storage. Upgrade to a better plan to get more space.",
+    "super_admin_premium_desc": "You have reached the limit of your storage. You can buy more space in the storage settings.",
+    "student_desc": "Storage limit reached. Please contact your teacher to resolve this.",
+    "upgrade_button": "Upgrade Plan",
+    "storage_button": "Manage Storage",
+    "close_button": "Close"
   }
 }

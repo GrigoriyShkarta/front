@@ -25,7 +25,8 @@ export function useFiles({ page, limit, search, category_ids }: Props) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['files'] });
     },
-    onError: () => {
+    onError: (error: any) => {
+      if (error._is_storage_limit) return;
       notifications.show({
         title: 'Error',
         message: t('upload_error'),
@@ -40,7 +41,8 @@ export function useFiles({ page, limit, search, category_ids }: Props) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['files'] });
     },
-    onError: () => {
+    onError: (error: any) => {
+      if (error._is_storage_limit) return;
       notifications.show({
         title: 'Error',
         message: t('update_error'),

@@ -17,8 +17,18 @@ export const useUsersQuery = (params?: Record<string, any>) => {
     enabled: !!current_user && current_user?.role !== 'student',
   });
 
+  // Dedicated query to fetch the TOTAL number of students (without search/category filters)
+  // to enforce the limit for non-premium users.
+  const students_count_query = useQuery({
+    queryKey: queryKeys.users.list({ role: 'student', limit: 1 }),
+    queryFn: () => userActions.get_users({ role: 'student', limit: 1 }),
+    enabled: !!current_user && current_user?.role !== 'student',
+    staleTime: 60000, // Cache for 1 minute
+  });
+
   const users_list = users_query.data?.data || [];
   const meta = users_query.data?.meta;
+  const total_students = students_count_query.data?.meta.total_items || 0;
 
   const teachers = useMemo(() => {
     // 1. Get all teachers and super_admins from the list
@@ -140,7 +150,8 @@ export const useUsersQuery = (params?: Record<string, any>) => {
   return {
     users: users_list,
     meta,
-    is_loading: users_query.isLoading,
+    total_students,
+    is_loading: users_query.isLoading || students_count_query.isLoading,
     is_error: users_query.isError,
     teachers,
     current_user,

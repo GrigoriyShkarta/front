@@ -51,10 +51,20 @@ const fetch_as_base64 = async (url: string): Promise<string | null> => {
 export function useBoardPreview(board_id: string, elements: BoardElement[], is_dark: boolean) {
     const board_container_ref = useRef<HTMLDivElement | null>(null);
     const last_capture_ref = useRef<number>(0);
+    const is_disabled_ref = useRef<boolean>(false);
+
+    useEffect(() => {
+        const handleLimit = () => {
+            console.log('[Preview] Global storage limit event detected, disabling previews');
+            is_disabled_ref.current = true;
+        };
+        window.addEventListener('storage-limit-exceeded', handleLimit);
+        return () => window.removeEventListener('storage-limit-exceeded', handleLimit);
+    }, []);
 
     const capture_preview = useCallback(async () => {
-        if (!board_id || elements.length === 0) {
-            console.log('[Preview] Skipped: no board_id or no elements');
+        if (!board_id || elements.length === 0 || is_disabled_ref.current) {
+            console.log('[Preview] Skipped: no board_id, no elements or disabled due to storage limit');
             return;
         }
 
@@ -366,8 +376,12 @@ export function useBoardPreview(board_id: string, elements: BoardElement[], is_d
                             await update_board_preview(board_id, blob);
                             last_capture_ref.current = Date.now();
                             console.log('[Preview] Preview uploaded successfully ✓');
-                        } catch (err) {
+                        } catch (err: any) {
                             console.error('[Preview] Upload failed:', err);
+                            if (err._is_storage_limit || err.response?.status === 413) {
+                                console.log('[Preview] Disabling previews due to storage limit');
+                                is_disabled_ref.current = true;
+                            }
                         }
                     } else {
                         console.warn('[Preview] canvas.toBlob returned null');

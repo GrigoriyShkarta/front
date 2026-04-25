@@ -13,6 +13,7 @@ import '@mantine/dates/styles.css';
 import { ReactQueryProvider } from '@/context/query-provider';
 import { SpaceMetadataInitializer } from '@/components/common/space-metadata-initializer';
 import { PaymentReminder } from '@/components/common/payment-reminder';
+import { StorageLimitHandler } from '@/components/common/storage-limit-handler';
 
 import { StreamVideoProvider } from '@/providers/stream-video-provider';
 import { FloatingNotesProvider } from '@/context/floating-notes-context';
@@ -38,6 +39,7 @@ export default async function LocaleLayout({
                 <SpaceMetadataInitializer />
                 {children}
                 <PaymentReminder />
+                <StorageLimitHandler />
               </StreamVideoProvider>
             </FloatingNotesProvider>
           </AuthProvider>

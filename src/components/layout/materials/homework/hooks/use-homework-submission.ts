@@ -30,7 +30,8 @@ export function useHomeworkSubmission(homework_id?: string, initial_data?: any) 
                 color: 'green',
             });
         },
-        onError: () => {
+        onError: (error: any) => {
+            if (error._is_storage_limit) return;
             notifications.show({
                 title: common_t('error'),
                 message: t('submit_error'),

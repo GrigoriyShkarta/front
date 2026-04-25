@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Title, Group, Button, Paper, Stack, Box, LoadingOverlay } from '@mantine/core';
+import { Title, Group, Button, Paper, Stack, Box, LoadingOverlay, Modal } from '@mantine/core';
 import { IoAddOutline, IoTrashOutline, IoFilterOutline, IoPeopleOutline } from 'react-icons/io5';
 import { UserTable } from './components/user-table';
 import { UserDrawer } from './components/user-drawer';
@@ -13,10 +13,13 @@ import { UserListItem, UserFormData } from '@/schemas/users';
 import { useTranslations } from 'next-intl';
 import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
 import { Text } from '@mantine/core';
+import { useRouter } from '@/i18n/routing';
 
 export function UsersLayout() {
   const t = useTranslations('Users');
   const common_t = useTranslations('Common');
+  const pricing_t = useTranslations('Pricing');
+  const router = useRouter();
   const [search_query, set_search_query] = useState('');
   const [debounced_search] = useDebouncedValue(search_query, 300);
   const [category_filters, set_category_filters] = useState<string[]>([]);
@@ -25,10 +28,12 @@ export function UsersLayout() {
   const [sort_by, set_sort_by] = useState<string | undefined>();
   const [sort_order, set_sort_order] = useState<'asc' | 'desc'>('desc');
   const [payment_statuses_filter, set_payment_statuses_filter] = useState<string[]>([]);
+  const [limit_modal_opened, { open: open_limit_modal, close: close_limit_modal }] = useDisclosure(false);
 
   const { 
     users, 
     meta,
+    total_students,
     is_loading, 
     teachers, 
     is_mutating,
@@ -78,6 +83,13 @@ export function UsersLayout() {
   };
 
   const handle_add_user = () => {
+    // Check for student limit (10 for non-premium users)
+    const is_premium = current_user?.is_premium;
+    if (!is_premium && total_students >= 10) {
+      open_limit_modal();
+      return;
+    }
+
     set_editing_user(null);
     open_drawer();
   };
@@ -280,6 +292,36 @@ export function UsersLayout() {
         on_confirm={on_confirm_bulk_delete}
         is_bulk
       />
+
+      <Modal
+        opened={limit_modal_opened}
+        onClose={close_limit_modal}
+        title={<Text fw={700}>{pricing_t('student_limit_modal.title')}</Text>}
+        centered
+        radius="md"
+        zIndex={12000}
+      >
+        <Stack gap="md">
+          <Text size="sm">
+            {pricing_t('student_limit_modal.description')}
+          </Text>
+          <Group justify="flex-end" mt="md">
+            <Button variant="subtle" onClick={close_limit_modal} radius="md">
+              {common_t('cancel')}
+            </Button>
+            <Button 
+              color="blue" 
+              radius="md"
+              onClick={() => {
+                close_limit_modal();
+                router.push('/main/billing');
+              }}
+            >
+              {pricing_t('student_limit_modal.button')}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Stack>
   );
 }

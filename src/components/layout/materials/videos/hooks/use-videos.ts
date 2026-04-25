@@ -27,6 +27,7 @@ export const useVideos = (filters: any = {}) => {
       query_client.invalidateQueries({ queryKey: queryKeys.materials.videos.all() });
     },
     onError: (error: any) => {
+      if (error._is_storage_limit) return;
       notifications.show({
         title: common_t('error'),
         message: error.response?.data?.message || t('notifications.upload_error'),

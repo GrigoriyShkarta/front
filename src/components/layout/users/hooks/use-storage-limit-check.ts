@@ -2,7 +2,6 @@
 
 import { useStorageUsage } from './use-storage-usage';
 import { useTranslations } from 'next-intl';
-import { notifications } from '@mantine/notifications';
 
 export const useStorageLimitCheck = () => {
   const { storage_usage } = useStorageUsage();
@@ -13,12 +12,7 @@ export const useStorageLimitCheck = () => {
     const { usageInBytes, limitInBytes } = storage_usage;
     
     if (usageInBytes + file.size > limitInBytes) {
-      notifications.show({
-        title: t('limitExceededTitle'),
-        message: t('limitExceededMessage'),
-        color: 'red',
-        autoClose: 10000,
-      });
+      window.dispatchEvent(new CustomEvent('storage-limit-exceeded'));
       return false;
     }
     return true;
@@ -31,12 +25,7 @@ export const useStorageLimitCheck = () => {
     const total_new_size = files.reduce((acc, f) => acc + f.size, 0);
     
     if (usageInBytes + total_new_size > limitInBytes) {
-      notifications.show({
-        title: t('limitExceededTitle'),
-        message: t('limitExceededMessage'),
-        color: 'red',
-        autoClose: 10000,
-      });
+      window.dispatchEvent(new CustomEvent('storage-limit-exceeded'));
       return false;
     }
     return true;
