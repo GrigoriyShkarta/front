@@ -504,6 +504,8 @@
     "subtitle": "Track tasks, manage columns and monitor the progress of learning.",
     "users_title": "Choose Student for Tracker",
     "board_title": "Tracker: {name}",
+    "board_subtitle_admin": "Manage student's progress and tasks.",
+    "board_subtitle_student": "Track your progress and tasks.",
     "column_delete_confirm_title": "Are you sure you want to delete this column?",
     "column_delete_confirm_description": "All cards in this column will also be deleted. This action cannot be undone.",
     "columns": {

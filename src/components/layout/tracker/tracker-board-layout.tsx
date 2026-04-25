@@ -93,10 +93,10 @@ export function TrackerBoardLayout({ student_id, hide_header }: Props) {
               </Box>
               <Stack gap={0}>
                 <Title order={2} className="text-[24px] sm:text-[28px] font-bold tracking-tight">
-                  {t('title')}
+                  {is_admin && student_name ? t('board_title', { name: student_name }) : t('title')}
                 </Title>
                 <Text c="dimmed" size="sm" className="hidden sm:block">
-                  {t('subtitle')}
+                  {is_admin ? t('board_subtitle_admin') : t('board_subtitle_student')}
                 </Text>
               </Stack>
             </Group>
