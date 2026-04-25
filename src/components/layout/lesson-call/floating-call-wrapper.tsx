@@ -194,12 +194,17 @@ function MiniCallUI({ t, onTogglePip, isPip }: MiniCallUIProps) {
   };
   
   const participants = useParticipants();
-  const sharingParticipant = participants.find(
+  
+  const remoteParticipants = participants.filter(p => !p.isLocalParticipant);
+  
+  // If a remote participant is sharing, we want to see it. 
+  // If WE are sharing, we don't want to see our own screen share in the PiP, we want to see the student's camera.
+  const remoteSharingParticipant = remoteParticipants.find(
     (p) => p.publishedTracks.includes(SfuModels.TrackType.SCREEN_SHARE)
   ) ?? null;
   
-  const remoteParticipants = participants.filter(p => !p.isLocalParticipant);
-  const mainParticipant = sharingParticipant || (remoteParticipants.length > 0 ? remoteParticipants[0] : participants[0]);
+  const mainParticipant = remoteSharingParticipant || (remoteParticipants.length > 0 ? remoteParticipants[0] : participants[0]);
+  const isSharing = mainParticipant?.sessionId === remoteSharingParticipant?.sessionId;
 
   // Try to set autoPictureInPicture attribute to the underlying video element
   useEffect(() => {
@@ -220,7 +225,7 @@ function MiniCallUI({ t, onTogglePip, isPip }: MiniCallUIProps) {
           <div key={mainParticipant.sessionId} className="relative w-full h-full">
             <ParticipantView
               participant={mainParticipant}
-              trackType={mainParticipant?.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
+              trackType={isSharing ? 'screenShareTrack' : 'videoTrack'}
               className="w-full h-full"
             />
           </div>

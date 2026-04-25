@@ -143,8 +143,8 @@ export function CallControlsBar({
   const layoutIcons: Record<string, React.ReactNode> = {
     grid: <IoGridOutline size={20} />,
     pip: <BsPip size={20} />,
-    'speaker-left': <BsLayoutSidebar size={20} />,
-    'speaker-right': <BsLayoutSidebarReverse size={20} />,
+    'speaker-left': <BsLayoutSidebarReverse size={20} />,
+    'speaker-right': <BsLayoutSidebar size={20} />,
   };
 
   return (
@@ -194,8 +194,8 @@ export function CallControlsBar({
           {[
             { key: 'grid', label: t('layout_grid'), icon: <IoGridOutline size={16} /> },
             { key: 'pip', label: t('layout_pip'), icon: <BsPip size={16} /> },
-            { key: 'speaker-left', label: t('layout_speaker_left'), icon: <BsLayoutSidebar size={16} /> },
-            { key: 'speaker-right', label: t('layout_speaker_right'), icon: <BsLayoutSidebarReverse size={16} /> }
+            { key: 'speaker-left', label: t('layout_speaker_left'), icon: <BsLayoutSidebarReverse size={16} /> },
+            { key: 'speaker-right', label: t('layout_speaker_right'), icon: <BsLayoutSidebar size={16} /> }
           ].map((item) => (
             <Menu.Item
               key={item.key}

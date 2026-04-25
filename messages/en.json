@@ -440,6 +440,7 @@
       "lesson_ends_timer": "Remaining: {time}",
       "recording_started": "Lesson recording started",
       "recording_stopped": "Lesson recording stopped",
+      "recording": "Recording",
       "recording_failed": "Failed to start recording",
       "recordings_ui": {
         "title": "Lesson Recordings",

@@ -88,8 +88,8 @@ export function FloatingNoteWindow({ student_id, student_name, pinned_note_id, s
         cursor: isDragging ? 'grabbing' : 'auto',
         overflow: 'hidden',
         backdropFilter: 'blur(16px)',
-        backgroundColor: 'rgba(var(--space-secondary-rgb), 0.1)',
-        border: '1px solid rgba(var(--space-secondary-rgb), 0.2)',
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
         display: 'flex',
         flexDirection: 'column',
         transition: isDragging ? 'none' : 'transform 0.1s ease, width 0.3s ease'

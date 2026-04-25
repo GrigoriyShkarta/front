@@ -64,6 +64,8 @@ export function LessonLayoutView({
             <ParticipantView 
               participant={p} 
               trackType={p.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
+              // Mute screen share audio to prevent echoing the meeting audio
+              muteAudio={p.sessionId === sharingParticipant?.sessionId}
               className="w-full h-full"
               ParticipantViewUI={NoMenuParticipantViewUI}
             />
@@ -88,11 +90,13 @@ export function LessonLayoutView({
       return <PaginatedGridLayout ParticipantViewUI={NoMenuParticipantViewUI} />;
     case 'pip':
       const remote = participants.find(p => p.sessionId !== localParticipant?.sessionId) || participants[0];
+      const isSharing = remote?.sessionId === sharingParticipant?.sessionId;
       return (
         <div className={`relative w-full h-full overflow-hidden ${fullscreenEl ? 'rounded-none' : 'rounded-xl'}`}>
           <ParticipantView 
             participant={remote} 
-            trackType={remote?.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
+            trackType={isSharing ? 'screenShareTrack' : 'videoTrack'}
+            muteAudio={isSharing}
             className="w-full h-full"
             ParticipantViewUI={NoMenuParticipantViewUI}
           />

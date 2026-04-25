@@ -70,6 +70,7 @@ export function ResizableSpeakerLayout({
           <ParticipantView
             participant={spotlight}
             trackType={spotlight.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
+            muteAudio={spotlight.sessionId === sharing_participant?.sessionId}
             className="w-full h-full"
             ParticipantViewUI={NoMenuParticipantViewUI}
           />

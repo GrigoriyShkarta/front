@@ -201,7 +201,12 @@ function MyCallUI() {
         {call_layout === 'pip' && participants.length > 1 && (fullscreenEl || rootRef.current) && createPortal(
           <DraggablePip containerRef={rootRef}>
             {participants.length === 2 && localParticipant ? (
-              <ParticipantView participant={localParticipant} className="w-full h-full" />
+              <ParticipantView 
+                participant={localParticipant} 
+                trackType="videoTrack"
+                className="w-full h-full" 
+                muteAudio={true} 
+              />
             ) : (
               <OtherParticipantsPreview />
             )}
@@ -209,11 +214,22 @@ function MyCallUI() {
           fullscreenEl || rootRef.current!,
         )}
 
-        {/* Lesson End Timer (5m warning) - Portaled here for fullscreen visibility */}
+        {/* Portaled UI Overlays: Lesson Timer, Clock, Recording Indicator */}
         {(fullscreenEl || rootRef.current) && createPortal(
           <>
+            {isRecordingInProgress && (
+              <Box 
+                className={`absolute z-50 flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 ${
+                  fullscreenEl ? 'top-4 left-4' : 'top-8 left-8'
+                }`} 
+                style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+              >
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+                <Text size="sm" fw={600} style={{ color: 'white' }}>{t('recording')}</Text>
+              </Box>
+            )}
             <LessonTimer lesson_id={call.id} />
-            <CurrentTime visible={!!fullscreenEl} />
+            <CurrentTime visible={!!fullscreenEl && !showParticipants && !showSettings} />
           </>,
           fullscreenEl || rootRef.current!,
         )}

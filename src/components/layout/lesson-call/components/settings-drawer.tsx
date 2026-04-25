@@ -28,6 +28,7 @@ import {
   IoLayersOutline,
   IoSwapHorizontalOutline,
 } from 'react-icons/io5';
+import { GiSoundWaves } from "react-icons/gi";
 import { useCallSettings } from '@/components/layout/lesson-call/hooks/use-call-settings';
 
 interface SettingsDrawerProps {
@@ -73,7 +74,7 @@ export function SettingsDrawer({
     is_mirrored, toggleMirror,
     video_quality, applyVideoQuality,
     echo_cancel, auto_gain, toggleEchoCancel, toggleAutoGain,
-    mic_volume, applyMicVolume,
+    mic_volume, set_mic_volume, applyMicVolume,
   } = useCallSettings();
 
   const [speakerDevices, setSpeakerDevices] = useState<MediaDeviceInfo[]>([]);
@@ -195,7 +196,7 @@ export function SettingsDrawer({
             <Box>
               <Group justify="space-between" wrap="nowrap">
                 <Group gap="xs" wrap="nowrap" style={{ flex: 1 }}>
-                  <IoShieldCheckmarkOutline size={18} style={{ flexShrink: 0 }} />
+                  <GiSoundWaves size={18} style={{ flexShrink: 0 }} />
                   <Box>
                     <Text fw={600} size="sm">{t('noise_suppression')}</Text>
                     <Text size="xs" opacity={0.6}>{t('noise_suppression_desc')}</Text>
@@ -316,7 +317,8 @@ export function SettingsDrawer({
                     <Text size="xs" fw={500} mb={6}>{t('mic_volume')}</Text>
                     <Slider
                       value={mic_volume}
-                      onChange={applyMicVolume}
+                      onChange={set_mic_volume}
+                      onChangeEnd={applyMicVolume}
                       color="var(--space-primary)"
                       label={(v) => `${v}%`}
                       size="sm"
@@ -347,30 +349,36 @@ export function SettingsDrawer({
 
             {/* Devices Selection */}
             <Stack gap="md">
-              <Select
-                label={<Group gap="xs" mb={4}><IoVideocamOutline size={16} />{t('camera')}</Group>}
-                data={deviceToSelectData(camState.devices)}
-                value={camState.selectedDevice}
-                onChange={(v) => call?.camera.select(v!)}
-                variant="filled"
-                styles={SELECT_STYLES}
-              />
-              <Select
-                label={<Group gap="xs" mb={4}><IoMicOutline size={16} />{t('microphone')}</Group>}
-                data={deviceToSelectData(micState.devices)}
-                value={micState.selectedDevice}
-                onChange={(v) => call?.microphone.select(v!)}
-                variant="filled"
-                styles={SELECT_STYLES}
-              />
-              <Select
-                label={<Group gap="xs" mb={4}><IoVolumeHighOutline size={16} />{t('speaker')}</Group>}
-                data={deviceToSelectData(speakerDevices)}
-                value={speakerState.selectedDevice}
-                onChange={(v) => call?.speaker.select(v!)}
-                variant="filled"
-                styles={SELECT_STYLES}
-              />
+              {camState.devices && camState.devices.length > 0 && (
+                <Select
+                  label={<Group gap="xs" mb={4}><IoVideocamOutline size={16} />{t('camera')}</Group>}
+                  data={deviceToSelectData(camState.devices)}
+                  value={camState.selectedDevice || camState.devices[0]?.deviceId || null}
+                  onChange={(v) => { if (v) call?.camera.select(v); }}
+                  variant="filled"
+                  styles={SELECT_STYLES}
+                />
+              )}
+              {micState.devices && micState.devices.length > 0 && (
+                <Select
+                  label={<Group gap="xs" mb={4}><IoMicOutline size={16} />{t('microphone')}</Group>}
+                  data={deviceToSelectData(micState.devices)}
+                  value={micState.selectedDevice || micState.devices[0]?.deviceId || null}
+                  onChange={(v) => { if (v) call?.microphone.select(v); }}
+                  variant="filled"
+                  styles={SELECT_STYLES}
+                />
+              )}
+              {speakerState.isDeviceSelectionSupported && speakerDevices && speakerDevices.length > 0 && (
+                <Select
+                  label={<Group gap="xs" mb={4}><IoVolumeHighOutline size={16} />{t('speaker')}</Group>}
+                  data={deviceToSelectData(speakerDevices)}
+                  value={speakerState.selectedDevice || speakerDevices[0]?.deviceId || null}
+                  onChange={(v) => { if (v) call?.speaker.select(v); }}
+                  variant="filled"
+                  styles={SELECT_STYLES}
+                />
+              )}
             </Stack>
           </Stack>
         </Tabs.Panel>

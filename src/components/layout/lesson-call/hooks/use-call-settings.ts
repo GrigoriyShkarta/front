@@ -31,6 +31,43 @@ export function useCallSettings() {
   const [is_nc_loading, set_is_nc_loading] = useState(false);
   const nc_ref = useRef<any>(null);
 
+  const [echo_cancel, set_echo_cancel] = useState(false);
+  const [auto_gain, set_auto_gain] = useState(false);
+  const [mic_volume, set_mic_volume] = useState(100);
+  const mic_filter_ref = useRef<(() => void) | null>(null);
+
+  const applyMicConstraints = useCallback(async (echo: boolean, gain: boolean, software_nc_active: boolean) => {
+    if (!call) return;
+    
+    const constraints = {
+      echoCancellation: echo,
+      autoGainControl: gain,
+      // If software NC is active, we MUST disable browser-level suppression 
+      // to prevent artifacts and ensure Krisp gets the raw audio stream.
+      noiseSuppression: !software_nc_active,
+    };
+
+    // Update default constraints for future enable() calls
+    call.microphone.setDefaultConstraints(constraints);
+
+    // Apply to active track immediately if it exists (no flicker/drop)
+    const active_stream = call.microphone.state.mediaStream;
+    const audio_track = active_stream?.getAudioTracks()[0];
+    
+    if (audio_track) {
+      try {
+        await audio_track.applyConstraints(constraints);
+      } catch (e) {
+        console.error('Failed to apply mic constraints live, falling back to restart', e);
+        // Fallback: only restart if live update fails
+        if (call.microphone.state.status === 'enabled') {
+          await call.microphone.disable();
+          await call.microphone.enable();
+        }
+      }
+    }
+  }, [call]);
+
   const toggleNoiseCancellation = useCallback(async (
     checked: boolean,
     t: (key: string) => string
@@ -41,13 +78,19 @@ export function useCallSettings() {
       if (!checked) {
         await call.microphone.disableNoiseCancellation();
         set_is_nc_enabled(false);
+        // Re-enable browser-level suppression when software NC is off
+        await applyMicConstraints(echo_cancel, auto_gain, false);
       } else {
+        const { NoiseCancellation } = await import('@stream-io/audio-filters-web');
+
         if (!nc_ref.current) {
-          const { NoiseCancellation } = await import('@stream-io/audio-filters-web');
           const nc = new NoiseCancellation();
           await nc.init();
           nc_ref.current = nc;
         }
+
+        // Disable browser-level suppression to let software NC work with raw audio
+        await applyMicConstraints(echo_cancel, auto_gain, true);
         await call.microphone.enableNoiseCancellation(nc_ref.current);
         set_is_nc_enabled(true);
       }
@@ -63,7 +106,7 @@ export function useCallSettings() {
     } finally {
       set_is_nc_loading(false);
     }
-  }, [call]);
+  }, [call, echo_cancel, auto_gain, applyMicConstraints]);
 
   // ──────────────────────────────────────────
   // 2. Background Blur
@@ -71,7 +114,8 @@ export function useCallSettings() {
   const [bg_filter, set_bg_filter] = useState<VideoBackground>('none');
   const [bg_loading, set_bg_loading] = useState(false);
   const bg_unregister_ref = useRef<(() => void) | null>(null);
-
+  const bg_options_ref = useRef<any>(null);
+  
   const applyBackgroundFilter = useCallback(async (
     value: VideoBackground,
     t: (key: string) => string
@@ -79,14 +123,12 @@ export function useCallSettings() {
     if (!call) return;
     set_bg_loading(true);
 
-    // Unregister previous filter first
-    if (bg_unregister_ref.current) {
-      bg_unregister_ref.current();
-      bg_unregister_ref.current = null;
-    }
-
     try {
       if (value === 'none') {
+        if (bg_unregister_ref.current) {
+          bg_unregister_ref.current();
+          bg_unregister_ref.current = null;
+        }
         set_bg_filter('none');
         return;
       }
@@ -104,9 +146,33 @@ export function useCallSettings() {
 
       const blurLevel = value === 'blur-strong' ? 'high' : 'medium';
 
-      // MediaStreamFilter must be synchronous and return MediaStreamFilterResult:
-      // { output: MediaStream | Promise<MediaStream>, stop?: () => void }
-      // The SDK calls stop() automatically when unregistering.
+      // If we already have an active filter, try to update it dynamically
+      if (bg_unregister_ref.current && bg_options_ref.current) {
+        try {
+          if (typeof bg_options_ref.current.updateOptions === 'function') {
+            await bg_options_ref.current.updateOptions({ backgroundFilter: 'blur', backgroundBlurLevel: blurLevel });
+            set_bg_filter(value);
+            return;
+          }
+          if (typeof bg_options_ref.current.update === 'function') {
+            await bg_options_ref.current.update({ backgroundFilter: 'blur', backgroundBlurLevel: blurLevel });
+            set_bg_filter(value);
+            return;
+          }
+        } catch (err) {
+          console.warn('Could not update background filter dynamically', err);
+        }
+      }
+
+      // We must unregister the old filter BEFORE registering the new one.
+      // If we don't, the new filter will receive the old filter's output track as input.
+      // Then, when we eventually unregister the old filter, it stops its output track,
+      // which kills the input to the new filter, resulting in the camera turning off permanently.
+      if (bg_unregister_ref.current) {
+        bg_unregister_ref.current();
+        bg_unregister_ref.current = null;
+      }
+      
       const { unregister } = call.camera.registerFilter((ms: MediaStream) => {
         const video_track = ms.getVideoTracks()[0];
         if (!video_track) return { output: ms };
@@ -115,17 +181,22 @@ export function useCallSettings() {
           video_track as any,
           { backgroundFilter: 'blur', backgroundBlurLevel: blurLevel }
         );
+        
+        bg_options_ref.current = processor;
 
         return {
-          // output can be a Promise<MediaStream> — SDK awaits it internally
           output: processor.start().then((processed_track) =>
             new MediaStream([processed_track, ...ms.getAudioTracks()])
           ),
-          // SDK calls stop() when the filter is unregistered or stream changes
-          stop: () => processor.stop(),
+          stop: () => {
+            processor.stop();
+            if (bg_options_ref.current === processor) {
+              bg_options_ref.current = null;
+            }
+          },
         };
       });
-
+      
       bg_unregister_ref.current = () => {
         unregister();
       };
@@ -205,41 +276,42 @@ export function useCallSettings() {
   const applyVideoQuality = useCallback(async (value: VideoQuality) => {
     if (!call) return;
 
+    let constraintsToApply: MediaTrackConstraints = {};
+
     if (value === 'auto') {
       call.camera.setDefaultConstraints({});
       // For auto we clear target resolution and let SDK decide
       await call.camera.selectTargetResolution(undefined as any).catch(() => {});
     } else {
-      const constraints = QUALITY_CONSTRAINTS[value];
-      call.camera.setDefaultConstraints(constraints);
+      constraintsToApply = QUALITY_CONSTRAINTS[value];
+      call.camera.setDefaultConstraints(constraintsToApply);
 
-      const w = typeof constraints.width === 'object' ? constraints.width.ideal : constraints.width;
-      const h = typeof constraints.height === 'object' ? constraints.height.ideal : constraints.height;
+      const w = typeof constraintsToApply.width === 'object' ? constraintsToApply.width.ideal : constraintsToApply.width;
+      const h = typeof constraintsToApply.height === 'object' ? constraintsToApply.height.ideal : constraintsToApply.height;
 
-      // This explicitly tells the Stream SFU server what resolution to target
       if (w && h) {
         await call.camera.selectTargetResolution({
           width: w as number,
           height: h as number,
         }).catch(console.error);
       }
+    }
 
-      // Try to apply constraints to the already-running track (live change, no flicker)
-      const active_stream = call.camera.state.mediaStream;
-      const video_track = active_stream?.getVideoTracks()[0];
+    // Apply to live track to prevent flashing/restarting
+    const active_stream = call.camera.state.mediaStream;
+    const video_track = active_stream?.getVideoTracks()[0];
 
-      if (video_track) {
-        try {
-          await video_track.applyConstraints(constraints);
-          set_video_quality(value);
-          return;
-        } catch (e) {
-          console.error('applyConstraints failed', e);
-        }
+    if (video_track) {
+      try {
+        await video_track.applyConstraints(constraintsToApply);
+        set_video_quality(value);
+        return; // Success, no need to restart
+      } catch (e) {
+        console.error('applyConstraints failed, falling back to restart', e);
       }
     }
 
-    // Fallback: restart the camera with new constraints
+    // Only restart if the live apply failed
     if (call.camera.state.status === 'enabled') {
       await call.camera.disable();
       await call.camera.enable();
@@ -250,43 +322,48 @@ export function useCallSettings() {
   // ──────────────────────────────────────────
   // 5. Browser-level mic constraints & Volume
   // ──────────────────────────────────────────
-  const [echo_cancel, set_echo_cancel] = useState(false);
-  const [auto_gain, set_auto_gain] = useState(false);
-  const [mic_volume, set_mic_volume] = useState(100);
-  const mic_filter_ref = useRef<(() => void) | null>(null);
 
-  const applyMicConstraints = useCallback(async (echo: boolean, gain: boolean) => {
-    if (!call) return;
-    call.microphone.setDefaultConstraints({
-      echoCancellation: echo,
-      autoGainControl: gain,
-      noiseSuppression: true,
-    });
-    if (call.microphone.state.status === 'enabled') {
-      await call.microphone.disable();
-      await call.microphone.enable();
-    }
-  }, [call]);
+  const mic_volume_ref = useRef(100);
+  const gain_node_ref = useRef<GainNode | null>(null);
 
   // Use Web Audio API to manually set gain when auto_gain is off
   const applyMicVolume = useCallback((volume: number) => {
     if (!call) return;
     set_mic_volume(volume);
+    mic_volume_ref.current = volume;
 
-    if (mic_filter_ref.current) {
-      mic_filter_ref.current();
-      mic_filter_ref.current = null;
+    // If auto_gain is ON, we must remove the manual filter
+    if (auto_gain) {
+      if (mic_filter_ref.current) {
+        mic_filter_ref.current();
+        mic_filter_ref.current = null;
+        gain_node_ref.current = null;
+      }
+      return;
     }
 
-    // Only apply filter if auto_gain is off and we need to change volume
-    if (auto_gain || volume === 100) return;
+    // If filter is already active, just update the gain value.
+    // We keep it active even at 100% to avoid flickering during adjustment.
+    if (mic_filter_ref.current && gain_node_ref.current) {
+      const targetGain = volume / 100;
+      // Use a slightly longer ramp to make it even smoother
+      gain_node_ref.current.gain.setTargetAtTime(targetGain, 0, 0.05);
+      return;
+    }
 
+    // Don't register filter if it's 100% and not yet active
+    if (volume === 100) return;
+
+    // Register filter
     try {
       const { unregister } = call.microphone.registerFilter((ms: MediaStream) => {
+        // Double check auto_gain here as it might have changed during async import/setup
         const audioCtx = new window.AudioContext();
         const source = audioCtx.createMediaStreamSource(ms);
         const gainNode = audioCtx.createGain();
-        gainNode.gain.value = volume / 100;
+        
+        gainNode.gain.value = mic_volume_ref.current / 100;
+        gain_node_ref.current = gainNode;
         
         source.connect(gainNode);
         const dest = audioCtx.createMediaStreamDestination();
@@ -294,7 +371,10 @@ export function useCallSettings() {
 
         return {
           output: dest.stream,
-          stop: () => audioCtx.close(),
+          stop: () => {
+            audioCtx.close();
+            gain_node_ref.current = null;
+          },
         };
       });
 
@@ -306,8 +386,8 @@ export function useCallSettings() {
 
   const toggleEchoCancel = useCallback(async (checked: boolean) => {
     set_echo_cancel(checked);
-    await applyMicConstraints(checked, auto_gain);
-  }, [applyMicConstraints, auto_gain]);
+    await applyMicConstraints(checked, auto_gain, is_nc_enabled);
+  }, [applyMicConstraints, auto_gain, is_nc_enabled]);
 
   const toggleAutoGain = useCallback(async (checked: boolean) => {
     set_auto_gain(checked);
@@ -319,8 +399,8 @@ export function useCallSettings() {
       set_mic_volume(100);
     }
     
-    await applyMicConstraints(echo_cancel, checked);
-  }, [applyMicConstraints, echo_cancel]);
+    await applyMicConstraints(echo_cancel, checked, is_nc_enabled);
+  }, [applyMicConstraints, echo_cancel, is_nc_enabled]);
 
   return {
     // NC
@@ -333,6 +413,6 @@ export function useCallSettings() {
     video_quality, applyVideoQuality,
     // Mic constraints
     echo_cancel, auto_gain, toggleEchoCancel, toggleAutoGain,
-    mic_volume, applyMicVolume,
+    mic_volume, set_mic_volume, applyMicVolume,
   };
 }

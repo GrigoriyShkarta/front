@@ -446,6 +446,7 @@
       "lesson_ends_timer": "Залишилось: {time}",
       "recording_started": "Запис уроку розпочато",
       "recording_stopped": "Запис уроку завершено",
+      "recording": "Запис",
       "recording_failed": "Не вдалося розпочати запис",
       "recordings_ui": {
         "title": "Записи уроків",
