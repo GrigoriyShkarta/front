@@ -123,7 +123,9 @@ export function useNoteEditorState({
     }
   };
 
-  const handleSave = async (is_auto_save = false) => {
+  const handleSave = async (is_auto_save: boolean | any = false) => {
+    const is_auto = typeof is_auto_save === 'boolean' ? is_auto_save : false;
+
     const finalTitle = (student_name && pinned_student_id) 
         ? `${student_name} - ${new Date().toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' })}` 
         : (title || t('editor.untitled'));
@@ -145,18 +147,18 @@ export function useNoteEditorState({
 
     try {
         if (currentId) {
-            await update_note(payload, { hide_notification: is_auto_save });
-            if (!is_auto_save) {
+            await update_note(payload, { hide_notification: is_auto });
+            if (!is_auto) {
                 setReadOnly(true);
                 setAdditionalOpened(false);
             }
         } else {
-            const new_note = await create_note(payload, { hide_notification: is_auto_save });
+            const new_note = await create_note(payload, { hide_notification: is_auto });
             if (new_note?.id) {
                 setCurrentId(new_note.id);
                 onIdChange?.(new_note.id);
             }
-            if (!is_auto_save) {
+            if (!is_auto) {
                 setReadOnly(true);
             }
         }

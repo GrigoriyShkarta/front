@@ -85,15 +85,21 @@ export default function NoteEditorContainer({
                 )}
 
                 {/* For note title changes since cover was removed in notes */}
-                {!state.readOnly && !hide_title && (
-                    <Box>
-                        <input
-                            type="text"
-                            value={state.title}
-                            onChange={(e) => state.setTitle(e.target.value)}
-                            placeholder={state.t('editor.title_placeholder')}
-                            className="w-full text-3xl font-bold bg-transparent border-none outline-none text-[var(--mantine-color-text)] placeholder:text-[var(--mantine-color-dimmed)]"
-                        />
+                {!hide_title && (
+                    <Box ta="center">
+                        {state.readOnly ? (
+                            <h1 className="text-4xl md:text-5xl font-extrabold text-[var(--mantine-color-text)] mb-2 tracking-tight">
+                                {state.title || state.t('editor.untitled_note')}
+                            </h1>
+                        ) : (
+                            <input
+                                type="text"
+                                value={state.title}
+                                onChange={(e) => state.setTitle(e.target.value)}
+                                placeholder={state.t('editor.title_placeholder')}
+                                className="w-full text-center text-4xl! md:text-4xl font-bold bg-transparent border-none outline-none text-[var(--mantine-color-text)] placeholder:text-[var(--mantine-color-dimmed)] mb-2"
+                            />
+                        )}
                     </Box>
                 )}
 

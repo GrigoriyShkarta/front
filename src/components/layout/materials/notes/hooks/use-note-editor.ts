@@ -15,7 +15,7 @@ interface EditorProps {
 export function useNoteEditor({ id, pinned_student_id, prevent_redirect = false, force_new = false }: EditorProps = {}) {
     const queryClient = useQueryClient();
     const router = useRouter();
-    const t = useTranslations('Materials.notes');
+    const t = useTranslations('Materials.note');
     const common_t = useTranslations('Common');
 
     const { data: note, isLoading: is_loading_note } = useQuery({
@@ -29,14 +29,23 @@ export function useNoteEditor({ id, pinned_student_id, prevent_redirect = false,
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: CreateNoteForm) => noteActions.create_note(data),
-        onSuccess: (data) => {
+        mutationFn: ({ data }: { data: CreateNoteForm, hide_notification?: boolean }) => 
+            noteActions.create_note(data),
+        onSuccess: (data, variables) => {
             queryClient.invalidateQueries({ queryKey: ['notes'] });
             queryClient.invalidateQueries({ queryKey: ['student-notes'] });
             if (pinned_student_id) {
                 queryClient.invalidateQueries({ queryKey: ['note', 'pinned', pinned_student_id] });
             }
             
+            if (!variables.hide_notification) {
+                notifications.show({
+                    title: common_t('success'),
+                    message: t('notifications.create_success'),
+                    color: 'green',
+                });
+            }
+
             if (!prevent_redirect) {
                 router.push('/main/materials/notes');
             }
@@ -51,12 +60,21 @@ export function useNoteEditor({ id, pinned_student_id, prevent_redirect = false,
     });
 
     const updateMutation = useMutation({
-        mutationFn: (data: Partial<CreateNoteForm>) => noteActions.update_note(id!, data),
-        onSuccess: () => {
+        mutationFn: ({ data }: { data: Partial<CreateNoteForm>, hide_notification?: boolean }) => 
+            noteActions.update_note(id!, data),
+        onSuccess: (data, variables) => {
             queryClient.invalidateQueries({ queryKey: ['notes'] });
             queryClient.invalidateQueries({ queryKey: ['note', id] });
             if (pinned_student_id) {
                 queryClient.invalidateQueries({ queryKey: ['note', 'pinned', pinned_student_id] });
+            }
+
+            if (!variables.hide_notification) {
+                notifications.show({
+                    title: common_t('success'),
+                    message: t('notifications.update_success'),
+                    color: 'green',
+                });
             }
         },
         onError: () => {
@@ -73,26 +91,10 @@ export function useNoteEditor({ id, pinned_student_id, prevent_redirect = false,
         is_loading_note,
         is_saving: createMutation.isPending || updateMutation.isPending,
         create_note: async (data: CreateNoteForm, options?: { hide_notification?: boolean }) => {
-            const res = await createMutation.mutateAsync(data);
-            if (!options?.hide_notification) {
-                notifications.show({
-                    title: common_t('success'),
-                    message: t('notifications.create_success'),
-                    color: 'green',
-                });
-            }
-            return res;
+            return await createMutation.mutateAsync({ data, hide_notification: options?.hide_notification });
         },
         update_note: async (data: Partial<CreateNoteForm>, options?: { hide_notification?: boolean }) => {
-            const res = await updateMutation.mutateAsync(data);
-            if (!options?.hide_notification) {
-                notifications.show({
-                    title: common_t('success'),
-                    message: t('notifications.update_success'),
-                    color: 'green',
-                });
-            }
-            return res;
+            return await updateMutation.mutateAsync({ data, hide_notification: options?.hide_notification });
         },
     };
 }

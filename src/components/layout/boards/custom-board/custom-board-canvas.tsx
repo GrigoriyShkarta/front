@@ -64,6 +64,17 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
   );
   const [board_theme, set_board_theme] = useState<'light' | 'dark' | 'auto'>(initial_data?.board_theme || 'auto');
 
+  // Load local preferences
+  useEffect(() => {
+    const local_bg = localStorage.getItem(`board_${board_id}_bg_color`);
+    const local_grid = localStorage.getItem(`board_${board_id}_grid_type`);
+    const local_theme = localStorage.getItem(`board_${board_id}_board_theme`);
+    
+    if (local_bg) set_bg_color(local_bg);
+    if (local_grid) set_grid_type(local_grid as GridType);
+    if (local_theme) set_board_theme(local_theme as any);
+  }, [board_id]);
+
   const is_dark = board_theme === 'auto' ? (colorScheme === 'dark') : (board_theme === 'dark');
 
   const [tool, set_tool] = useState<ToolType>('select');
@@ -113,11 +124,7 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
     };
     const handleSync = (data: { elements: BoardElement[], settings?: any }) => {
       if (data.elements) set_elements(data.elements);
-      if (data.settings) {
-        if (data.settings.bg_color) set_bg_color(data.settings.bg_color);
-        if (data.settings.grid_type) set_grid_type(data.settings.grid_type);
-        if (data.settings.board_theme) set_board_theme(data.settings.board_theme);
-      }
+      // Ignore remote settings to keep them local
     };
     
     const handleSettingsUpdated = (data: { settings: any }) => {
@@ -130,7 +137,7 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
     socket.on('element:update', handleRemoteUpdate);
     socket.on('element:updated', handleRemoteUpdate);
     socket.on('elements:updated', handleRemoteUpdate);
-    socket.on('element:create', handleRemoteUpdate); // Backend sends { element: [] }
+    socket.on('element:create', handleRemoteUpdate);
     socket.on('element:created', handleRemoteUpdate);
 
     socket.on('element:delete', handleRemoteDelete);
@@ -138,8 +145,6 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
     socket.on('elements:deleted', handleRemoteDelete);
 
     socket.on('elements:sync', handleSync);
-    socket.on('board:settings_updated', handleSettingsUpdated);
-    socket.on('settings:updated', handleSettingsUpdated);
 
     return () => {
       socket.off('element:update', handleRemoteUpdate);
@@ -151,8 +156,6 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
       socket.off('element:deleted', handleRemoteDelete);
       socket.off('elements:deleted', handleRemoteDelete);
       socket.off('elements:sync', handleSync);
-      socket.off('board:settings_updated', handleSettingsUpdated);
-      socket.off('settings:updated', handleSettingsUpdated);
     };
   }, [socket, set_elements]);
 
@@ -178,25 +181,18 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
   }, [following_user_id, cursors, zoom, set_pan, is_panning]);
 
   const handle_settings_update = (key: 'bg_color' | 'grid_type' | 'board_theme', value: any) => {
-    if (key === 'bg_color') set_bg_color(value);
-    if (key === 'grid_type') set_grid_type(value);
-    if (key === 'board_theme') set_board_theme(value);
-
-    // Persist to server
-    update_board(board_id, { 
-      settings: { 
-        bg_color: key === 'bg_color' ? value : bg_color,
-        grid_type: key === 'grid_type' ? value : grid_type,
-        board_theme: key === 'board_theme' ? value : board_theme
-      } 
-    });
-
-    // Broadcast to other participants
-    emit_board_settings({
-      bg_color: key === 'bg_color' ? value : bg_color,
-      grid_type: key === 'grid_type' ? value : grid_type,
-      board_theme: key === 'board_theme' ? value : board_theme
-    });
+    if (key === 'bg_color') {
+        set_bg_color(value);
+        localStorage.setItem(`board_${board_id}_bg_color`, value);
+    }
+    if (key === 'grid_type') {
+        set_grid_type(value);
+        localStorage.setItem(`board_${board_id}_grid_type`, value);
+    }
+    if (key === 'board_theme') {
+        set_board_theme(value);
+        localStorage.setItem(`board_${board_id}_board_theme`, value);
+    }
   };
 
   const router = useRouter();
