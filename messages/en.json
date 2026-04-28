@@ -283,7 +283,20 @@
     "boards": "Boards",
     "add": "Add",
     "save": "Save",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "widgets": "Widgets",
+    "piano": "Piano"
+  },
+  "Widgets": {
+    "piano": {
+      "subtitle": "Digital piano with sampled sounds and keyboard support",
+      "octaves": "Octaves",
+      "change_octaves_hint": "Use Arrow Keys to change octaves",
+      "mobile_hint": "Tip: You can use your computer keyboard or touch/mouse to play. Swipe to shift octaves on mobile.",
+      "loading": "Loading high-quality piano samples...",
+      "shift_down": "Shift Down (Left Arrow)",
+      "shift_up": "Shift Up (Right Arrow)"
+    }
   },
   "Calendar": {
     "reminder": {

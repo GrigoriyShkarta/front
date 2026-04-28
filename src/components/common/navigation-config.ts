@@ -1,8 +1,9 @@
 import { IconType } from 'react-icons';
-import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPieChartOutline, IoPricetagOutline, IoLibraryOutline, IoListOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoDocumentTextOutline, IoCloudOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPieChartOutline, IoPricetagOutline, IoLibraryOutline, IoListOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoDocumentTextOutline, IoAppsOutline } from 'react-icons/io5';
 import { FaChalkboard } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
 import { IoMdCheckboxOutline } from "react-icons/io";
+import { MdOutlinePiano } from "react-icons/md";
 
 
 export interface NavItem {
@@ -167,6 +168,20 @@ export const MAIN_NAVIGATION: NavItem[] = [
         href: '/main/finance/reports',
         icon: IoPieChartOutline,
         roles: ['super_admin', 'admin'],
+      }
+    ]
+  },
+  {
+    label: 'widgets',
+    href: '/main/widgets',
+    icon: IoAppsOutline,
+    roles: ['super_admin', 'admin', 'teacher', 'student'],
+    items: [
+      {
+        label: 'piano',
+        href: '/main/widgets/piano',
+        icon: MdOutlinePiano,
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
       }
     ]
   },
