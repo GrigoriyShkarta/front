@@ -41,7 +41,14 @@ export function LessonReminder() {
     } else {
       set_visible(false);
     }
-  }, [lesson, closed_id, pathname, activeCall?.id]);
+  }, [lesson?.id, closed_id, pathname, activeCall?.id]);
+
+  useEffect(() => {
+    // Reset closed state when the lesson changes to a new one
+    if (lesson?.id && lesson.id !== closed_id) {
+      set_closed_id(null);
+    }
+  }, [lesson?.id, closed_id]);
 
   if (!lesson || !is_lesson_event(lesson)) return null;
 
@@ -110,24 +117,21 @@ export function LessonReminder() {
               </Group>
 
               <Group gap="xs">
-                {clicked_id !== lesson.id && (
-                  <Button 
-                    component={Link}
-                    href={`/main/lesson/${lesson.id}`}
-                    onClick={() => set_clicked_id(lesson.id)}
-                    size="md"
-                    radius="md"
-                    variant="white"
-                    style={{ 
-                      backgroundColor: 'var(--space-accent-text)', 
-                      color: 'var(--space-accent)' 
-                    }}
-                    className="shadow-lg px-6 font-bold transition-all hover:scale-105 active:scale-95"
-                    rightSection={<IoArrowForwardOutline size={18} />}
-                  >
-                    {t('join_button')}
-                  </Button>
-                )}
+                <Button 
+                  component={Link}
+                  href={`/main/lesson/${lesson.id}`}
+                  size="md"
+                  radius="md"
+                  variant="white"
+                  style={{ 
+                    backgroundColor: 'var(--space-accent-text)', 
+                    color: 'var(--space-accent)' 
+                  }}
+                  className="shadow-lg px-6 font-bold transition-all hover:scale-105 active:scale-95"
+                  rightSection={<IoArrowForwardOutline size={18} />}
+                >
+                  {t('join_button')}
+                </Button>
                 
                 <ActionIcon 
                   variant="subtle" 
@@ -148,5 +152,6 @@ export function LessonReminder() {
         </Box>
       )}
     </Transition>
+
   );
 }
