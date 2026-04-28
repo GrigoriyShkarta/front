@@ -13,7 +13,7 @@ export function useSidebarResize() {
   const container_ref = useRef<HTMLDivElement | null>(null);
 
   const on_drag_start = useCallback(
-    (e: React.MouseEvent, bar_position: 'left' | 'right') => {
+    (e: React.MouseEvent, bar_position: 'left' | 'right' | 'top') => {
       const container = container_ref.current;
       if (!container) return;
 
@@ -21,13 +21,18 @@ export function useSidebarResize() {
       e.preventDefault();
 
       const on_move = (move_e: MouseEvent) => {
-        const relative_x = move_e.clientX - container_rect.left;
-        const pct = (relative_x / container_rect.width) * 100;
+        let pct: number;
+        
+        if (bar_position === 'top') {
+          const relative_y = move_e.clientY - container_rect.top;
+          pct = (relative_y / container_rect.height) * 100;
+        } else {
+          const relative_x = move_e.clientX - container_rect.left;
+          pct = (relative_x / container_rect.width) * 100;
+        }
 
-        // bar on the left → sidebar is left portion
-        // bar on the right → sidebar is right portion (100 - pct)
         const new_ratio =
-          bar_position === 'left'
+          bar_position === 'left' || bar_position === 'top'
             ? Math.min(MAX_RATIO, Math.max(MIN_RATIO, pct))
             : Math.min(MAX_RATIO, Math.max(MIN_RATIO, 100 - pct));
 

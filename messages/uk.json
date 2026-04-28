@@ -386,6 +386,7 @@
       "layout_grid": "Сітка",
       "layout_speaker_left": "Доповідач зліва",
       "layout_speaker_right": "Доповідач справа",
+      "layout_speaker_top": "Доповідач зверху",
       "layout_pip": "Доповідач (PIP)",
       "participants": "Учасники",
       "stats": "Статистика дзвінка",

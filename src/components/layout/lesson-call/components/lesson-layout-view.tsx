@@ -15,7 +15,7 @@ const NoMenuParticipantViewUI = () => (
 );
 
 interface LessonLayoutViewProps {
-  layout: 'grid' | 'speaker-left' | 'speaker-right' | 'pip';
+  layout: 'grid' | 'speaker-left' | 'speaker-right' | 'speaker-top' | 'pip';
   fullscreenEl: Element | null;
   localParticipant: any;
   participants: any[];
@@ -33,7 +33,7 @@ export function LessonLayoutView({
   sharingParticipant
 }: LessonLayoutViewProps) {
   
-  if (fullscreenEl && layout === 'grid' && localParticipant) {
+  if (fullscreenEl && layout === 'grid' && localParticipant && !sharingParticipant) {
     // Sort participants to ensure consistent order (local participant at the end)
     const sortedParticipants = [...participants].sort((a, b) => {
       if (a.sessionId === localParticipant.sessionId) return 1;
@@ -66,7 +66,7 @@ export function LessonLayoutView({
               trackType={p.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
               // Mute screen share audio to prevent echoing the meeting audio
               muteAudio={p.sessionId === sharingParticipant?.sessionId}
-              className="w-full h-full"
+              className={`w-full h-full ${p.sessionId === sharingParticipant?.sessionId ? '[&_video]:object-contain' : ''}`}
               ParticipantViewUI={NoMenuParticipantViewUI}
             />
           </div>
@@ -77,6 +77,17 @@ export function LessonLayoutView({
 
   switch (layout) {
     case 'grid':
+      if (sharingParticipant) {
+        return (
+          <ResizableSpeakerLayout
+            bar_position="top"
+            local_participant={localParticipant}
+            participants={participants}
+            sharing_participant={sharingParticipant}
+            is_fullscreen={!!fullscreenEl}
+          />
+        );
+      }
       if (participants.length === 2 && localParticipant) {
         return (
           <ResizableGridLayout 
@@ -89,20 +100,45 @@ export function LessonLayoutView({
       }
       return <PaginatedGridLayout ParticipantViewUI={NoMenuParticipantViewUI} />;
     case 'pip':
-      const remote = participants.find(p => p.sessionId !== localParticipant?.sessionId) || participants[0];
-      const isSharing = remote?.sessionId === sharingParticipant?.sessionId;
+      // Prioritize the screen share if any, otherwise find first remote, otherwise local
+      const main_participant = sharingParticipant || 
+                              participants.find(p => p.sessionId !== localParticipant?.sessionId) || 
+                              localParticipant || 
+                              participants[0];
+      
+      const is_sharing = main_participant?.sessionId === sharingParticipant?.sessionId;
       return (
         <div className={`relative w-full h-full overflow-hidden ${fullscreenEl ? 'rounded-none' : 'rounded-xl'}`}>
           <ParticipantView 
-            participant={remote} 
-            trackType={isSharing ? 'screenShareTrack' : 'videoTrack'}
-            muteAudio={isSharing}
-            className="w-full h-full"
+            participant={main_participant} 
+            trackType={is_sharing ? 'screenShareTrack' : 'videoTrack'}
+            muteAudio={is_sharing}
+            className={`w-full h-full ${is_sharing ? '[&_video]:object-contain' : ''}`}
             ParticipantViewUI={NoMenuParticipantViewUI}
           />
         </div>
       );
+    case 'speaker-top':
+      return (
+        <ResizableSpeakerLayout
+          bar_position="top"
+          local_participant={localParticipant}
+          participants={participants}
+          sharing_participant={sharingParticipant}
+          is_fullscreen={!!fullscreenEl}
+        />
+      );
     case 'speaker-right':
+      return (
+        <ResizableSpeakerLayout
+          bar_position="right"
+          local_participant={localParticipant}
+          participants={participants}
+          sharing_participant={sharingParticipant}
+          is_fullscreen={!!fullscreenEl}
+        />
+      );
+    case 'speaker-left':
       return (
         <ResizableSpeakerLayout
           bar_position="left"
@@ -115,7 +151,7 @@ export function LessonLayoutView({
     default:
       return (
         <ResizableSpeakerLayout
-          bar_position="right"
+          bar_position="left"
           local_participant={localParticipant}
           participants={participants}
           sharing_participant={sharingParticipant}

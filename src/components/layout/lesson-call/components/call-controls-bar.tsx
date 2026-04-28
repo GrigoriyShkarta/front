@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ActionIcon, Menu, useComputedColorScheme, Divider } from '@mantine/core';
 import { CallControls, useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
-import { BsGrid3X3Gap, BsLayoutSidebar, BsLayoutSidebarReverse, BsPip, BsFullscreen } from "react-icons/bs";
+import { BsGrid3X3Gap, BsLayoutSidebar, BsLayoutSidebarReverse, BsPip, BsFullscreen, BsLayoutThreeColumns } from "react-icons/bs";
 import {  
   IoSettingsOutline, 
   IoPersonOutline, 
@@ -57,8 +57,9 @@ export function CallControlsBar({
   const colorScheme = useComputedColorScheme('light');
   const isDark = colorScheme === 'dark';
   const call = useCall();
-  const { useParticipants } = useCallStateHooks();
+  const { useParticipants, useHasOngoingScreenShare } = useCallStateHooks();
   const participants = useParticipants();
+  const hasOngoingScreenShare = useHasOngoingScreenShare();
   
   const studentParticipant = participants.find(p => p.sessionId === studentSessionId) || participants.find(p => p.userId === studentId);
   const studentName = studentParticipant?.name || 'Student';
@@ -143,8 +144,8 @@ export function CallControlsBar({
   const layoutIcons: Record<string, React.ReactNode> = {
     grid: <IoGridOutline size={20} />,
     pip: <BsPip size={20} />,
-    'speaker-left': <BsLayoutSidebarReverse size={20} />,
-    'speaker-right': <BsLayoutSidebar size={20} />,
+    'speaker-left': <BsLayoutSidebar size={20} />,
+    'speaker-right': <BsLayoutSidebarReverse size={20} />,
   };
 
   return (
@@ -192,18 +193,29 @@ export function CallControlsBar({
         <Menu.Dropdown style={{ backgroundColor: 'var(--call-surface)', borderColor: 'var(--call-border)' }}>
           <Menu.Label>{t('layout')}</Menu.Label>
           {[
-            { key: 'grid', label: t('layout_grid'), icon: <IoGridOutline size={16} /> },
-            { key: 'pip', label: t('layout_pip'), icon: <BsPip size={16} /> },
-            { key: 'speaker-left', label: t('layout_speaker_left'), icon: <BsLayoutSidebarReverse size={16} /> },
-            { key: 'speaker-right', label: t('layout_speaker_right'), icon: <BsLayoutSidebar size={16} /> }
+            { 
+              key: 'grid', 
+              label: t('layout_grid'), 
+              icon: <IoGridOutline size={16} />
+            },
+            { 
+              key: 'pip', 
+              label: t('layout_pip'), 
+              icon: <BsPip size={16} />,
+              disabled: hasOngoingScreenShare
+            },
+            { key: 'speaker-left', label: t('layout_speaker_left'), icon: <BsLayoutSidebar size={16} /> },
+            { key: 'speaker-right', label: t('layout_speaker_right'), icon: <BsLayoutSidebarReverse size={16} /> }
           ].map((item) => (
             <Menu.Item
               key={item.key}
               onClick={() => onLayoutChange(item.key)}
+              disabled={item.disabled}
               leftSection={item.icon}
               style={{ 
                 backgroundColor: layout === item.key ? 'var(--space-primary)' : 'transparent',
                 color: layout === item.key ? 'var(--space-primary-text)' : 'var(--call-text)',
+                opacity: item.disabled ? 0.5 : 1,
                 transition: 'all 0.2s ease'
               }}
             >

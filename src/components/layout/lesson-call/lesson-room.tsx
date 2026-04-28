@@ -72,7 +72,7 @@ export function LessonRoom({ call }: { call: Call }) {
   );
 }
 
-type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right' | 'pip';
+type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right' | 'speaker-top' | 'pip';
 
 function MyCallUI() {
   const t = useTranslations('Calendar.lesson_room');
@@ -111,22 +111,54 @@ function MyCallUI() {
   const [showParticipants, setShowParticipants] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Auto-switch layout on screen share
+  // Screen share layout management: auto-switch and restore
+  const prevSharing = useRef(hasOngoingScreenShare);
   useEffect(() => {
-    if (hasOngoingScreenShare) {
-      // Only switch if we are in grid (default) to not disrupt manual choices
-      if (call_layout === 'grid') {
-        set_call_layout('speaker-right');
+    // Case 1: Screen share STARTED
+    if (!prevSharing.current && hasOngoingScreenShare) {
+      // If we were in PIP, move to grid (which now looks like speaker-top)
+      if (call_layout === 'pip') {
+        set_call_layout('grid');
       }
     }
-  }, [hasOngoingScreenShare, call_layout, set_call_layout]);
 
-  // Default to PIP in fullscreen mode
+    // Case 2: Screen share ENDED
+    if (prevSharing.current && !hasOngoingScreenShare) {
+      // Restore layout based on fullscreen state
+      if (fullscreenEl) {
+        set_call_layout('pip');
+      } else {
+        set_call_layout('grid');
+      }
+    }
+
+    prevSharing.current = hasOngoingScreenShare;
+  }, [hasOngoingScreenShare, fullscreenEl, call_layout, set_call_layout]);
+
+  // Set default constraints for screen share to avoid audio echo when sharing tab
   useEffect(() => {
-    if (fullscreenEl) {
+    if (call && typeof (call.screenShare as any).setDefaultConstraints === 'function') {
+      try {
+        (call.screenShare as any).setDefaultConstraints({
+          audio: {
+            suppressLocalAudioPlayback: true,
+            echoCancellation: true,
+            noiseSuppression: true,
+          },
+          video: true,
+        });
+      } catch (e) {
+        console.warn('Could not set screen share default constraints', e);
+      }
+    }
+  }, [call]);
+
+  // Default to PIP in fullscreen mode, unless there is a screen share
+  useEffect(() => {
+    if (fullscreenEl && !hasOngoingScreenShare) {
       set_call_layout('pip');
     }
-  }, [fullscreenEl, set_call_layout]);
+  }, [fullscreenEl, hasOngoingScreenShare, set_call_layout]);
 
   // Handle call end/cleanup
   useEffect(() => {

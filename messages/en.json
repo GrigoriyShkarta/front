@@ -379,6 +379,7 @@
       "layout_grid": "Grid",
       "layout_speaker_left": "Speaker Left",
       "layout_speaker_right": "Speaker Right",
+      "layout_speaker_top": "Speaker Top",
       "layout_pip": "Speaker (PIP)",
       "participants": "Participants",
       "stats": "Call Stats",

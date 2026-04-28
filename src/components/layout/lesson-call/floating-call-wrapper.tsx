@@ -28,6 +28,19 @@ export function FloatingCallWrapper() {
   const router = useRouter();
   
   const [pipWindow, setPipWindow] = useState<Window | null>(null);
+  const [participantCount, setParticipantCount] = useState(1);
+
+  // Handle PiP window resize when participant count changes
+  useEffect(() => {
+    if (pipWindow) {
+      try {
+        const targetHeight = participantCount > 1 ? 480 : 240;
+        pipWindow.resizeTo(320, targetHeight);
+      } catch (e) {
+        // resizeTo might be blocked or fail
+      }
+    }
+  }, [pipWindow, participantCount]);
 
   // Close PiP when call ends or component unmounts
   useEffect(() => {
@@ -52,9 +65,10 @@ export function FloatingCallWrapper() {
 
     if (typeof window !== 'undefined' && 'documentPictureInPicture' in window) {
       try {
+        const targetHeight = participantCount > 1 ? 480 : 240;
         const pip = await (window as any).documentPictureInPicture.requestWindow({
           width: 320,
-          height: 240,
+          height: targetHeight,
         });
 
         // Copy styles to PiP window
@@ -100,7 +114,7 @@ export function FloatingCallWrapper() {
         }
       }
     }
-  }, [pipWindow, activeCall]);
+  }, [pipWindow, activeCall, participantCount]);
 
   // Attempt to auto-PIP when tab becomes hidden and auto-close when visible
   useEffect(() => {
@@ -132,7 +146,12 @@ export function FloatingCallWrapper() {
   const content = (
     <StreamCall call={activeCall}>
       <StreamTheme>
-        <MiniCallUI t={t} onTogglePip={togglePip} isPip={!!pipWindow} />
+        <MiniCallUI 
+          t={t} 
+          onTogglePip={togglePip} 
+          isPip={!!pipWindow} 
+          onParticipantCountChange={setParticipantCount} 
+        />
       </StreamTheme>
     </StreamCall>
   );
@@ -152,7 +171,7 @@ export function FloatingCallWrapper() {
     <DraggablePip 
       fixed 
       width={280} 
-      height={210} 
+      height={participantCount > 1 ? 420 : 210} 
     >
       <div 
         className="w-full h-full cursor-pointer"
@@ -168,15 +187,24 @@ interface MiniCallUIProps {
   t: any;
   onTogglePip: () => void;
   isPip: boolean;
+  onParticipantCountChange?: (count: number) => void;
 }
 
-function MiniCallUI({ t, onTogglePip, isPip }: MiniCallUIProps) {
-  const { useCameraState, useMicrophoneState, useParticipants } = useCallStateHooks();
+function MiniCallUI({ t, onTogglePip, isPip, onParticipantCountChange }: MiniCallUIProps) {
+  const { useCameraState, useMicrophoneState, useParticipants, useCallCallingState } = useCallStateHooks();
   const { setActiveCall } = useActiveCall();
   const call = useCall();
   const { user } = useAuth();
   const { isMute: isMicMuted } = useMicrophoneState();
   const { isMute: isCamMuted } = useCameraState();
+  const callingState = useCallCallingState();
+
+  // Close the PiP window automatically if the call ends remotely
+  useEffect(() => {
+    if (callingState === 'left') {
+      setActiveCall(null);
+    }
+  }, [callingState, setActiveCall]);
 
   const handleLeave = async () => {
     if (call) {
@@ -194,17 +222,24 @@ function MiniCallUI({ t, onTogglePip, isPip }: MiniCallUIProps) {
   };
   
   const participants = useParticipants();
-  
+  const localParticipant = participants.find(p => p.isLocalParticipant);
   const remoteParticipants = participants.filter(p => !p.isLocalParticipant);
   
-  // If a remote participant is sharing, we want to see it. 
-  // If WE are sharing, we don't want to see our own screen share in the PiP, we want to see the student's camera.
-  const remoteSharingParticipant = remoteParticipants.find(
-    (p) => p.publishedTracks.includes(SfuModels.TrackType.SCREEN_SHARE)
-  ) ?? null;
-  
-  const mainParticipant = remoteSharingParticipant || (remoteParticipants.length > 0 ? remoteParticipants[0] : participants[0]);
-  const isSharing = mainParticipant?.sessionId === remoteSharingParticipant?.sessionId;
+  useEffect(() => {
+    onParticipantCountChange?.(participants.length);
+  }, [participants.length, onParticipantCountChange]);
+
+  const isStudent = user?.role === 'student';
+  const topParticipant = isStudent ? remoteParticipants[0] : localParticipant;
+  const bottomParticipant = isStudent ? localParticipant : remoteParticipants[0];
+
+  const getTrackType = (p: any) => {
+    if (!p) return 'videoTrack';
+    if (!p.isLocalParticipant && p.publishedTracks.includes(SfuModels.TrackType.SCREEN_SHARE)) {
+      return 'screenShareTrack';
+    }
+    return 'videoTrack';
+  };
 
   // Try to set autoPictureInPicture attribute to the underlying video element
   useEffect(() => {
@@ -216,22 +251,35 @@ function MiniCallUI({ t, onTogglePip, isPip }: MiniCallUIProps) {
       }
     }, 1000);
     return () => clearTimeout(timer);
-  }, [mainParticipant]);
+  }, [topParticipant, bottomParticipant]);
 
   return (
     <Box className="w-full h-full relative group bg-[var(--call-surface)]">
-      <div className="w-full h-full flex items-center justify-center overflow-hidden">
-        {mainParticipant ? (
-          <div key={mainParticipant.sessionId} className="relative w-full h-full">
+      <div className="w-full h-full flex flex-col overflow-hidden">
+        {topParticipant && (
+          <div 
+            key={`top-${topParticipant.sessionId}`} 
+            className={`flex-1 relative w-full h-full min-h-0 bg-black ${participants.length > 1 ? 'border-b border-[var(--call-border)]' : ''}`}
+          >
             <ParticipantView
-              participant={mainParticipant}
-              trackType={isSharing ? 'screenShareTrack' : 'videoTrack'}
+              participant={topParticipant}
+              trackType={getTrackType(topParticipant)}
               className="w-full h-full"
             />
           </div>
-        ) : (
+        )}
+        {bottomParticipant && (
+          <div key={`bottom-${bottomParticipant.sessionId}`} className="flex-1 relative w-full h-full min-h-0 bg-black">
+            <ParticipantView
+              participant={bottomParticipant}
+              trackType={getTrackType(bottomParticipant)}
+              className="w-full h-full"
+            />
+          </div>
+        )}
+        {!topParticipant && !bottomParticipant && (
           <div
-            className="flex items-center justify-center text-xs"
+            className="flex-1 flex items-center justify-center text-xs"
             style={{ color: 'var(--call-text)' }}
           >
             {t('loading')}

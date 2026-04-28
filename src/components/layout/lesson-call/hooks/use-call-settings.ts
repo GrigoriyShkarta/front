@@ -76,6 +76,10 @@ export function useCallSettings() {
     set_is_nc_loading(true);
     try {
       if (!checked) {
+        // Explicitly disable the plugin before unregistering it
+        if (nc_ref.current && typeof nc_ref.current.disable === 'function') {
+          await nc_ref.current.disable();
+        }
         await call.microphone.disableNoiseCancellation();
         set_is_nc_enabled(false);
         // Re-enable browser-level suppression when software NC is off
@@ -85,13 +89,39 @@ export function useCallSettings() {
 
         if (!nc_ref.current) {
           const nc = new NoiseCancellation();
+
+          // Check platform support before initializing
+          const supported = await nc.isSupported();
+          if (!supported) {
+            notifications.show({
+              title: t('error'),
+              message: t('noise_suppression_not_available'),
+              color: 'orange',
+            });
+            return;
+          }
+
           await nc.init();
           nc_ref.current = nc;
         }
 
+        // Max suppression level (0–100)
+        if (typeof nc_ref.current.setSuppressionLevel === 'function') {
+          nc_ref.current.setSuppressionLevel(100);
+        }
+
         // Disable browser-level suppression to let software NC work with raw audio
         await applyMicConstraints(echo_cancel, auto_gain, true);
+
+        // Register the plugin with the call
         await call.microphone.enableNoiseCancellation(nc_ref.current);
+
+        // IMPORTANT: enableNoiseCancellation only registers the plugin;
+        // nc.enable() must be called explicitly to start audio processing.
+        if (typeof nc_ref.current.enable === 'function') {
+          await nc_ref.current.enable();
+        }
+
         set_is_nc_enabled(true);
       }
     } catch (e: any) {
@@ -115,7 +145,7 @@ export function useCallSettings() {
   const [bg_loading, set_bg_loading] = useState(false);
   const bg_unregister_ref = useRef<(() => void) | null>(null);
   const bg_options_ref = useRef<any>(null);
-  
+
   const applyBackgroundFilter = useCallback(async (
     value: VideoBackground,
     t: (key: string) => string
@@ -129,6 +159,7 @@ export function useCallSettings() {
           bg_unregister_ref.current();
           bg_unregister_ref.current = null;
         }
+        bg_options_ref.current = null;
         set_bg_filter('none');
         return;
       }
@@ -146,16 +177,17 @@ export function useCallSettings() {
 
       const blurLevel = value === 'blur-strong' ? 'high' : 'medium';
 
-      // If we already have an active filter, try to update it dynamically
+      // Fast path: if an existing processor supports live option updates, use it.
       if (bg_unregister_ref.current && bg_options_ref.current) {
+        const proc = bg_options_ref.current;
         try {
-          if (typeof bg_options_ref.current.updateOptions === 'function') {
-            await bg_options_ref.current.updateOptions({ backgroundFilter: 'blur', backgroundBlurLevel: blurLevel });
+          if (typeof proc.updateOptions === 'function') {
+            await proc.updateOptions({ backgroundFilter: 'blur', backgroundBlurLevel: blurLevel });
             set_bg_filter(value);
             return;
           }
-          if (typeof bg_options_ref.current.update === 'function') {
-            await bg_options_ref.current.update({ backgroundFilter: 'blur', backgroundBlurLevel: blurLevel });
+          if (typeof proc.update === 'function') {
+            await proc.update({ backgroundFilter: 'blur', backgroundBlurLevel: blurLevel });
             set_bg_filter(value);
             return;
           }
@@ -164,15 +196,13 @@ export function useCallSettings() {
         }
       }
 
-      // We must unregister the old filter BEFORE registering the new one.
-      // If we don't, the new filter will receive the old filter's output track as input.
-      // Then, when we eventually unregister the old filter, it stops its output track,
-      // which kills the input to the new filter, resulting in the camera turning off permanently.
+      // Slow path: unregister old filter, register new one.
       if (bg_unregister_ref.current) {
         bg_unregister_ref.current();
         bg_unregister_ref.current = null;
+        bg_options_ref.current = null;
       }
-      
+
       const { unregister } = call.camera.registerFilter((ms: MediaStream) => {
         const video_track = ms.getVideoTracks()[0];
         if (!video_track) return { output: ms };
@@ -181,7 +211,6 @@ export function useCallSettings() {
           video_track as any,
           { backgroundFilter: 'blur', backgroundBlurLevel: blurLevel }
         );
-        
         bg_options_ref.current = processor;
 
         return {
@@ -190,17 +219,12 @@ export function useCallSettings() {
           ),
           stop: () => {
             processor.stop();
-            if (bg_options_ref.current === processor) {
-              bg_options_ref.current = null;
-            }
+            if (bg_options_ref.current === processor) bg_options_ref.current = null;
           },
         };
       });
-      
-      bg_unregister_ref.current = () => {
-        unregister();
-      };
 
+      bg_unregister_ref.current = unregister;
       set_bg_filter(value);
     } catch (e) {
       console.error('Background filter error:', e);
@@ -276,46 +300,40 @@ export function useCallSettings() {
   const applyVideoQuality = useCallback(async (value: VideoQuality) => {
     if (!call) return;
 
-    let constraintsToApply: MediaTrackConstraints = {};
+    const constraintsToApply: MediaTrackConstraints = value === 'auto' ? {} : QUALITY_CONSTRAINTS[value];
 
-    if (value === 'auto') {
-      call.camera.setDefaultConstraints({});
-      // For auto we clear target resolution and let SDK decide
-      await call.camera.selectTargetResolution(undefined as any).catch(() => {});
-    } else {
-      constraintsToApply = QUALITY_CONSTRAINTS[value];
-      call.camera.setDefaultConstraints(constraintsToApply);
+    // Update default constraints so the SDK uses them on the next camera restart (if any)
+    call.camera.setDefaultConstraints(constraintsToApply);
 
+    // Tell the SFU which resolution to expect (best-effort, ignored on 'auto')
+    if (value !== 'auto') {
       const w = typeof constraintsToApply.width === 'object' ? constraintsToApply.width.ideal : constraintsToApply.width;
       const h = typeof constraintsToApply.height === 'object' ? constraintsToApply.height.ideal : constraintsToApply.height;
-
       if (w && h) {
-        await call.camera.selectTargetResolution({
-          width: w as number,
-          height: h as number,
-        }).catch(console.error);
+        await call.camera.selectTargetResolution({ width: w as number, height: h as number }).catch(() => {});
       }
+    } else {
+      await call.camera.selectTargetResolution(undefined as any).catch(() => {});
     }
 
-    // Apply to live track to prevent flashing/restarting
+    // Apply to the live track — camera stays on, resolution changes seamlessly.
+    // applyConstraints() is non-destructive: the browser negotiates the new
+    // resolution without stopping the track. We never call disable/enable here.
     const active_stream = call.camera.state.mediaStream;
     const video_track = active_stream?.getVideoTracks()[0];
 
     if (video_track) {
       try {
         await video_track.applyConstraints(constraintsToApply);
-        set_video_quality(value);
-        return; // Success, no need to restart
       } catch (e) {
-        console.error('applyConstraints failed, falling back to restart', e);
+        // applyConstraints can reject if the device doesn't support the requested
+        // resolution. The track keeps producing frames at its current resolution —
+        // we still update the UI state so the user sees their selection.
+        console.warn('applyConstraints rejected (unsupported resolution), keeping current track:', e);
       }
     }
 
-    // Only restart if the live apply failed
-    if (call.camera.state.status === 'enabled') {
-      await call.camera.disable();
-      await call.camera.enable();
-    }
+    // Always update UI state — camera is guaranteed to remain on
     set_video_quality(value);
   }, [call]);
 

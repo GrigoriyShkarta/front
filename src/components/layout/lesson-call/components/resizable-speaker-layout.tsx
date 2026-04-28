@@ -13,7 +13,7 @@ const NoMenuParticipantViewUI = () => (
 );
 
 interface ResizableSpeakerLayoutProps {
-  bar_position: 'left' | 'right';
+  bar_position: 'left' | 'right' | 'top';
   local_participant: any;
   participants: any[];
   sharing_participant?: any;
@@ -34,28 +34,23 @@ export function ResizableSpeakerLayout({
   const { sidebar_ratio, container_ref, on_drag_start } = useSidebarResize();
 
   // Determine who goes to spotlight
-  // 1. If someone is sharing screen, they take the spotlight (with screen track)
-  // 2. Otherwise, the first remote participant takes it
-  // 3. Last fallback: local participant
-  
   const is_sharing = !!sharing_participant;
   
   const spotlight = sharing_participant 
     ? sharing_participant 
     : (participants.find(p => p.sessionId !== local_participant?.sessionId) || local_participant);
 
-  // Sidebar participants are everyone except what's in the spotlight
-  // Note: if someone is sharing screen, we still want to see their camera in the sidebar
   const final_sidebar = is_sharing 
     ? participants 
     : participants.filter(p => p.sessionId !== spotlight?.sessionId);
 
   const spotlight_pct = 100 - sidebar_ratio;
+  const is_horizontal = bar_position === 'top';
 
   return (
     <div
       ref={container_ref}
-      className="flex w-full h-full gap-0 items-center"
+      className={`flex w-full h-full gap-0 items-center ${is_horizontal ? 'flex-col' : 'flex-row'}`}
     >
       {/* Spotlight Panel (Big Video or Screen Share) */}
       <div
@@ -63,7 +58,7 @@ export function ResizableSpeakerLayout({
         style={{ 
           flex: `0 0 ${spotlight_pct}%`, 
           minWidth: 0,
-          order: bar_position === 'left' ? 2 : 1 
+          order: bar_position === 'left' ? 3 : 1 
         }}
       >
         {spotlight && (
@@ -71,18 +66,18 @@ export function ResizableSpeakerLayout({
             participant={spotlight}
             trackType={spotlight.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
             muteAudio={spotlight.sessionId === sharing_participant?.sessionId}
-            className="w-full h-full"
+            className="w-full h-full [&_video]:object-contain"
             ParticipantViewUI={NoMenuParticipantViewUI}
           />
         )}
       </div>
 
-      {/* Drag handle */}
-      {final_sidebar.length > 0 && (
+      {/* Drag handle - only for left/right positions */}
+      {final_sidebar.length > 0 && !is_horizontal && (
         <div
           onMouseDown={(e) => on_drag_start(e, bar_position)}
-          className="flex-shrink-0 w-2 cursor-col-resize group flex items-center justify-center z-10"
-          style={{ order: 1.5 }}
+          className={`flex-shrink-0 group flex items-center justify-center z-10 w-2 h-full cursor-col-resize`}
+          style={{ order: 2 }}
         >
           <div className="w-[3px] h-12 rounded-full bg-white/20 group-hover:bg-white/50 transition-colors duration-150" />
         </div>
@@ -91,15 +86,18 @@ export function ResizableSpeakerLayout({
       {/* Sidebar Panel (Small Participant Videos) */}
       {final_sidebar.length > 0 && (
         <div
-          className="max-h-full overflow-y-auto overflow-x-hidden hide-scrollbar flex flex-col gap-2 p-1"
+          className={`max-h-full hide-scrollbar flex gap-2 p-1 justify-center ${is_horizontal ? 'w-full flex-row overflow-x-auto overflow-y-hidden items-center' : 'h-full flex-col overflow-y-auto overflow-x-hidden'}`}
           style={{ 
             flex: `0 0 ${sidebar_ratio}%`, 
             minWidth: 0,
-            order: bar_position === 'left' ? 1 : 2
+            order: bar_position === 'left' ? 1 : 3
           }}
         >
           {final_sidebar.map(p => (
-            <div key={p.sessionId} className={`relative overflow-hidden aspect-video w-full border border-white/5 shrink-0 ${is_fullscreen ? 'rounded-none' : 'rounded-lg'}`}>
+            <div 
+              key={p.sessionId} 
+              className={`relative overflow-hidden aspect-video border border-white/5 shrink-0 ${is_fullscreen ? 'rounded-none' : 'rounded-lg'} ${is_horizontal ? 'h-full' : 'w-full'}`}
+            >
               <ParticipantView
                 participant={p}
                 trackType="videoTrack"
