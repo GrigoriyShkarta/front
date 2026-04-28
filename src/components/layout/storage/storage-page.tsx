@@ -17,7 +17,8 @@ import {
   Divider,
   Badge,
   List,
-  ThemeIcon as MantineThemeIcon
+  ThemeIcon as MantineThemeIcon,
+  Button,
 } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 import { useStorageStats } from './hooks/use-storage-stats';
@@ -32,7 +33,9 @@ import {
   IoCloudDoneOutline,
   IoFileTrayOutline,
   IoLibraryOutline,
-  IoCloudOutline
+  IoCloudOutline,
+  IoRocketOutline,
+  IoCardOutline
 } from 'react-icons/io5';
 import { Link } from '@/i18n/routing';
 import { PageContainer } from '@/components/common/page-container';
@@ -182,22 +185,38 @@ export function StoragePage() {
               <Divider w="100%" label={t('breakdown') || 'Breakdown'} labelPosition="center" />
 
               <Stack w="100%" gap="xs">
-                {data.map(item => (
-                   <Stack key={item.key} gap={2}>
-                     <Group justify="space-between" wrap="nowrap">
+                {data.map(item => {
+                   const content = (
+                     <Group 
+                       justify="space-between" 
+                       wrap="nowrap"
+                       className={item.href ? "hover:opacity-70 transition-opacity cursor-pointer" : ""}
+                     >
                        <Group gap="sm" wrap="nowrap">
                          <Box w={10} h={10} style={{ borderRadius: 2, backgroundColor: item.color }} />
                          <Text size="xs" fw={600}>{item.label}</Text>
                        </Group>
                        <Text size="xs" c="dimmed" fw={500}>{format_bytes(item.value)}</Text>
                      </Group>
-                     {item.key === 'other' && (
-                       <Text size="10px" c="dimmed" ml={18} style={{ lineHeight: 1.2 }}>
-                         {t('category_other_description')}
-                       </Text>
-                     )}
-                   </Stack>
-                ))}
+                   );
+
+                   return (
+                     <Stack key={item.key} gap={2}>
+                       {item.href ? (
+                         <Link href={item.href} style={{ textDecoration: 'none', color: 'inherit' }}>
+                           {content}
+                         </Link>
+                       ) : (
+                         content
+                       )}
+                       {item.key === 'other' && (
+                         <Text size="10px" c="dimmed" ml={18} style={{ lineHeight: 1.2 }}>
+                           {t('category_other_description')}
+                         </Text>
+                       )}
+                     </Stack>
+                   );
+                })}
               </Stack>
             </Stack>
           </Paper>
@@ -205,64 +224,93 @@ export function StoragePage() {
           {/* Details and Top Files */}
           <Stack gap="xl" style={{ gridColumn: 'span 2' }}>
              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
-                <Paper withBorder p="xl" radius="lg" className="shadow-sm">
-                  <Title order={4} mb="lg" fw={700} display="flex" style={{ alignItems: 'center', gap: 8 }}>
-                    <IoLibraryOutline size={20} /> {t('quick_access') || 'Quick Access'}
-                  </Title>
-                  <Stack gap="sm">
-                    {data.filter(i => i.href).map(item => (
-                      <Paper 
-                        key={item.key} 
-                        component={Link} 
-                        href={item.href!}
-                        withBorder 
-                        p="md" 
-                        radius="md" 
-                        className="transition-all hover:bg-gray-50 dark:hover:bg-white/5 group"
+                {/* 10 GB Plan */}
+                <Paper 
+                  withBorder 
+                  p="xl" 
+                  radius="lg" 
+                  className="shadow-sm relative overflow-hidden group hover:border-primary/50 transition-all duration-300"
+                >
+                  <Box 
+                    className="absolute top-0 right-0 w-32 h-32 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity"
+                    style={{ transform: 'translate(20%, -20%)' }}
+                  >
+                    <IoCloudOutline size={120} />
+                  </Box>
+                  
+                  <Stack gap="md">
+                    <ThemeIcon color="primary" size={48} radius="md" variant="light">
+                      <IoCloudOutline size={26} />
+                    </ThemeIcon>
+                    
+                    <Box>
+                      <Text fw={800} size="xl" className="tracking-tight">10 GB</Text>
+                      {/* <Text c="dimmed" size="sm">{t('extra_storage_desc') || 'Additional space for your materials'}</Text> */}
+                    </Box>
+
+                    <Divider variant="dashed" />
+                    
+                    <Group justify="space-between" align="center">
+                      <Text fw={700} size="lg">$1.99</Text>
+                      <Button 
+                        variant="light" 
+                        color="blue" 
+                        radius="md"
+                        leftSection={<IoCardOutline size={16} />}
                       >
-                        <Group justify="space-between">
-                          <Group gap="md">
-                            <ThemeIcon color="secondary" size="lg" radius="xl">
-                              <item.icon size={20} />
-                            </ThemeIcon>
-                            <Stack gap={0}>
-                              <Text fw={600} size="sm">{item.label}</Text>
-                              <Text size="xs" c="dimmed">{format_bytes(item.value)}</Text>
-                            </Stack>
-                          </Group>
-                          <IoArrowForwardOutline className="opacity-0 group-hover:opacity-100 transition-all" />
-                        </Group>
-                      </Paper>
-                    ))}
+                        {t('buy_button') || 'Buy'}
+                      </Button>
+                    </Group>
                   </Stack>
                 </Paper>
 
-                <Stack gap="xl">
-                  <Paper withBorder p="xl" radius="lg" className="shadow-sm" style={{ background: 'var(--space-accent-bg)', color: 'var(--space-accent-text, #ffffff)', border: 'none' }}>
-                    <Group justify="space-between" align="flex-start">
-                      <Stack gap="xs" style={{ flex: 1 }}>
-                        <Title order={4} fw={700}>{t('storage_health') || 'Storage Health'}</Title>
-                        <Text size="sm" opacity={0.9}>
-                          {used_percent < 80 
-                            ? (t('health_good') || 'Your storage usage is within safe limits. Keep it up!') 
-                            : (t('health_warning') || 'You are running out of space. Consider deleting some old files.')}
-                        </Text>
-                      </Stack>
-                      <IoCloudDoneOutline size={40} opacity={0.3} />
-                    </Group>
-                  </Paper>
+                {/* 50 GB Plan */}
+                <Paper 
+                  withBorder 
+                  p="xl" 
+                  radius="lg" 
+                  className="shadow-sm relative overflow-hidden group hover:border-primary/50 transition-all duration-300"
+                  style={{ 
+                    background: is_dark 
+                      ? 'linear-gradient(135deg, rgba(var(--mantine-color-primary-0-rgb), 0.05) 0%, rgba(255, 255, 255, 0) 100%)'
+                      : 'linear-gradient(135deg, var(--mantine-primary-color-light) 0%, white 100%)'
+                  }}
+                >
+                  <Box 
+                    className="absolute top-0 right-0 w-32 h-32 opacity-[0.05] group-hover:opacity-[0.08] transition-opacity"
+                    style={{ transform: 'translate(20%, -20%)' }}
+                  >
+                    <IoRocketOutline size={120} />
+                  </Box>
+                  
+                  <Stack gap="md">
+                    <ThemeIcon color="primary" size={48} radius="md">
+                      <IoRocketOutline size={26} />
+                    </ThemeIcon>
+                    
+                    <Box>
+                      <Group gap="xs" align="center">
+                        <Text fw={800} size="xl" className="tracking-tight">50 GB</Text>
+                        <Badge variant="filled" color="primary" size="xs">{t('popular_tag') || 'Popular'}</Badge>
+                      </Group>
+                      {/* <Text c="dimmed" size="sm">{t('extra_storage_pro_desc') || 'Pro choice for large video collections'}</Text> */}
+                    </Box>
 
-                  <Paper withBorder p="xl" radius="lg" className="shadow-sm">
-                    <Title order={4} mb="md" fw={700} display="flex" style={{ alignItems: 'center', gap: 8 }}>
-                      <IoInformationCircleOutline size={20} /> {t('tips_title') || 'Optimization Tips'}
-                    </Title>
-                    <List spacing="xs" size="xs" icon={<MantineThemeIcon color="primary" size={14} radius="xl"><IoInformationCircleOutline size={8} /></MantineThemeIcon>}>
-                       <List.Item>{t('tip_video') || 'Videos consume the most space. Audit your video materials regularly.'}</List.Item>
-                       <List.Item>{t('tip_temp') || 'Temporary files in "Other" can be cleared by contacting support.'}</List.Item>
-                       <List.Item>{t('tip_upgrade') || 'Need more space? You can always upgrade your plan in Billing.'}</List.Item>
-                    </List>
-                  </Paper>
-                </Stack>
+                    <Divider variant="dashed" />
+                    
+                    <Group justify="space-between" align="center">
+                      <Text fw={800} size="xl">$9.99</Text>
+                      <Button 
+                        color="primary" 
+                        radius="md"
+                        className="shadow-md shadow-primary/20"
+                        leftSection={<IoCardOutline size={16} />}
+                      >
+                        {t('buy_button') || 'Buy'}
+                      </Button>
+                    </Group>
+                  </Stack>
+                </Paper>
              </SimpleGrid>
 
              <Paper withBorder p="xl" radius="lg" className="shadow-sm">
