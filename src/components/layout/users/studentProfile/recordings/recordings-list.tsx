@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { 
   Stack, Group, Paper, Text, ActionIcon, 
-  Button, Modal, TextInput, SimpleGrid, AspectRatio, Box,
+  Button, Modal, TextInput, SimpleGrid, AspectRatio, Box, Tooltip,
 } from '@mantine/core';
 import { useTranslations, useLocale } from 'next-intl';
 import { 
@@ -306,15 +306,22 @@ function RecordingCard({ lesson, is_teacher, locale, onEdit, onDelete, part_idx 
 
       <Stack p="sm" gap={4} className="flex-grow">
         <Group justify="space-between" wrap="nowrap" align="center">
-          <Stack gap={0}>
-            <Text fw={700} size="sm" className="line-clamp-1">
-              {dayjs(lesson.date || new Date()).locale(locale).format('DD MMM YYYY')}
-              {part_idx !== undefined && (
-                <Text component="span" ml={6} c="primary" fw={800} size="xs">
-                  ({t('part')} {part_idx + 1})
-                </Text>
-              )}
-            </Text>
+          <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
+            <Tooltip 
+              label={`${dayjs(lesson.date || new Date()).locale(locale).format('DD MMM YYYY')}${part_idx !== undefined ? ` (${t('part')} ${part_idx + 1})` : ''}`} 
+              position="top-start" 
+              withArrow
+              openDelay={300}
+            >
+              <Text fw={700} size="sm" className="line-clamp-1">
+                {dayjs(lesson.date || new Date()).locale(locale).format('DD MMM YYYY')}
+                {part_idx !== undefined && (
+                  <Text component="span" ml={6} c="primary" fw={800} size="xs">
+                    ({t('part')} {part_idx + 1})
+                  </Text>
+                )}
+              </Text>
+            </Tooltip>
             <Text size="xs" c="dimmed" fw={500}>
                 {dayjs(lesson.date || new Date()).locale(locale).format('HH:mm')}
             </Text>
