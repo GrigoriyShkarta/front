@@ -1,9 +1,10 @@
 import { IconType } from 'react-icons';
-import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPieChartOutline, IoPricetagOutline, IoLibraryOutline, IoListOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoDocumentTextOutline, IoAppsOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPieChartOutline, IoPricetagOutline, IoLibraryOutline, IoListOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoDocumentTextOutline, IoAppsOutline, IoTimerOutline } from 'react-icons/io5';
 import { FaChalkboard } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
 import { IoMdCheckboxOutline } from "react-icons/io";
 import { MdOutlinePiano } from "react-icons/md";
+import { PiMetronome } from "react-icons/pi";
 
 
 export interface NavItem {
@@ -181,6 +182,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
         label: 'piano',
         href: '/main/widgets/piano',
         icon: MdOutlinePiano,
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
+      },
+      {
+        label: 'metronome',
+        href: '/main/widgets/metronome',
+        icon: PiMetronome,
         roles: ['super_admin', 'admin', 'teacher', 'student'],
       }
     ]

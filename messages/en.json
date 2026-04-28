@@ -285,7 +285,8 @@
     "save": "Save",
     "feedback": "Feedback",
     "widgets": "Widgets",
-    "piano": "Piano"
+    "piano": "Piano",
+    "metronome": "Metronome"
   },
   "Widgets": {
     "piano": {
@@ -296,6 +297,16 @@
       "loading": "Loading high-quality piano samples...",
       "shift_down": "Shift Down (Left Arrow)",
       "shift_up": "Shift Up (Right Arrow)"
+    },
+    "metronome": {
+      "subtitle": "Metronome for rhythm and tempo practice",
+      "bpm": "BPM",
+      "start": "Start",
+      "stop": "Stop",
+      "tempo": "Tempo",
+      "time_signature": "Time Signature",
+      "sound": "Sound",
+      "volume": "Volume"
     }
   },
   "Calendar": {
