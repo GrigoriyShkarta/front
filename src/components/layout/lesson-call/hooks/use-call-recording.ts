@@ -6,27 +6,38 @@ import { notifications } from '@mantine/notifications';
 import { useTranslations } from 'next-intl';
 
 /**
- * Hook to handle call recording events and debug logging.
- * 
- * @param call Stream call instance
+ * Hook to handle call recording events and show user-facing notifications.
+ *
+ * @param call - Stream call instance
+ * @param existing_parts_count - Number of recording segments already saved for this lesson.
+ *   When > 0, the "recording started" notification informs the teacher that the new
+ *   segment will be appended as Part (existing_parts_count + 1).
  */
-export function useCallRecording(call: Call | undefined) {
+export function useCallRecording(call: Call | undefined, existing_parts_count: number = 0) {
   const t = useTranslations('Calendar.lesson_room');
 
   useEffect(() => {
     if (!call) return;
 
-    const handleRecordingStarted = (event: any) => {
-      console.log('[Recording] Started:', event);
-      notifications.show({
-        title: t('success_title'),
-        message: t('recording_started'),
-        color: 'green',
-      });
+    const handleRecordingStarted = () => {
+      if (existing_parts_count > 0) {
+        // Inform the teacher that the new recording will be a new segment
+        notifications.show({
+          title: t('recording_new_part_title'),
+          message: t('recording_new_part_desc', { count: existing_parts_count + 1 }),
+          color: 'yellow',
+          autoClose: 6000,
+        });
+      } else {
+        notifications.show({
+          title: t('success_title'),
+          message: t('recording_started'),
+          color: 'green',
+        });
+      }
     };
 
-    const handleRecordingStopped = (event: any) => {
-      console.log('[Recording] Stopped:', event);
+    const handleRecordingStopped = () => {
       notifications.show({
         title: t('success_title'),
         message: t('recording_stopped'),
@@ -34,8 +45,7 @@ export function useCallRecording(call: Call | undefined) {
       });
     };
 
-    const handleRecordingFailed = (event: any) => {
-      console.error('[Recording] Failed:', event);
+    const handleRecordingFailed = () => {
       notifications.show({
         title: t('error_title'),
         message: t('recording_failed'),
@@ -43,20 +53,14 @@ export function useCallRecording(call: Call | undefined) {
       });
     };
 
-    const handleRecordingReady = (event: any) => {
-      console.log('[Recording] Ready:', event);
-    };
-
     const unsubStarted = call.on('call.recording_started', handleRecordingStarted);
     const unsubStopped = call.on('call.recording_stopped', handleRecordingStopped);
     const unsubFailed = call.on('call.recording_failed', handleRecordingFailed);
-    const unsubReady = call.on('call.recording_ready', handleRecordingReady);
 
     return () => {
       unsubStarted?.();
       unsubStopped?.();
       unsubFailed?.();
-      unsubReady?.();
     };
-  }, [call, t]);
+  }, [call, t, existing_parts_count]);
 }

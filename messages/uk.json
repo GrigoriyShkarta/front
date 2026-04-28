@@ -449,10 +449,13 @@
       "recording_stopped": "Запис уроку завершено",
       "recording": "Запис",
       "recording_failed": "Не вдалося розпочати запис",
+      "recording_new_part_title": "Багатофрагментний запис",
+      "recording_new_part_desc": "Попередня частина вже збережена. Новий запис буде додано як Частина {count}.",
       "recordings_ui": {
         "title": "Записи уроків",
         "no_recordings": "Записів уроків ще немає",
         "period": "Період: {start} — {end}",
+        "part": "Частина",
         "download": "Завантажити",
         "delete": "Видалити",
         "edit": "Редагувати",

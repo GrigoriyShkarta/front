@@ -11,6 +11,11 @@ interface LessonSettings {
   can_student_download_recording: boolean;
 }
 
+interface LessonSettingsState extends LessonSettings {
+  /** Comma-separated recording URLs saved on the lesson at the time the call was joined. */
+  lesson_recording_url: string | null;
+}
+
 /**
  * Hook to manage lesson recording settings for a specific student profile.
  * 
@@ -21,9 +26,10 @@ export function useLessonSettings(call: Call | undefined, userRole: string | und
   const t = useTranslations('Calendar.lesson_room');
   const [studentId, setStudentId] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [lessonSettings, setLessonSettings] = useState<LessonSettings>({
+  const [lessonSettings, setLessonSettings] = useState<LessonSettingsState>({
     is_recording_enabled: false,
     can_student_download_recording: false,
+    lesson_recording_url: null,
   });
 
   useEffect(() => {
@@ -40,6 +46,7 @@ export function useLessonSettings(call: Call | undefined, userRole: string | und
           setLessonSettings({
             is_recording_enabled: !!userRes.data.is_recording_enabled,
             can_student_download_recording: !!userRes.data.can_student_download_recording,
+            lesson_recording_url: lessonRes.data.recording_url ?? null,
           });
         }
       } catch (error) {

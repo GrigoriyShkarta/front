@@ -443,10 +443,13 @@
       "recording_stopped": "Lesson recording stopped",
       "recording": "Recording",
       "recording_failed": "Failed to start recording",
+      "recording_new_part_title": "Multi-part Recording",
+      "recording_new_part_desc": "The previous segment is already saved. The new recording will be saved as Part {count}.",
       "recordings_ui": {
         "title": "Lesson Recordings",
         "no_recordings": "No lesson recordings yet",
         "period": "Period: {start} — {end}",
+        "part": "Part",
         "download": "Download",
         "delete": "Delete",
         "edit": "Edit",
@@ -456,7 +459,8 @@
         "insert_link": "Insert link",
         "no_recording_yet": "No recording yet",
         "invalid_youtube_url": "Invalid YouTube URL",
-        "recording_processing": "Video is being processed..."
+        "recording_processing": "Video is being processed...",
+        "processing_next_part": "Processing next part..."
       }
     }
   },

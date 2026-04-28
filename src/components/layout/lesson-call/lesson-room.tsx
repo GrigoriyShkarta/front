@@ -105,7 +105,13 @@ function MyCallUI() {
   const rootRef = useRef<HTMLElement | null>(null);
   const { fullscreenEl, toggleFullscreen } = useFullscreen(rootRef);
   const { lessonSettings, isUpdating, updateSetting } = useLessonSettings(call, user?.role);
-  useCallRecording(call);
+
+  // Count existing recording segments so useCallRecording can show the correct notification
+  const existing_parts_count = lessonSettings.lesson_recording_url
+    ? lessonSettings.lesson_recording_url.split(',').filter(Boolean).length
+    : 0;
+
+  useCallRecording(call, existing_parts_count);
 
   // Local State
   const [showParticipants, setShowParticipants] = useState(false);

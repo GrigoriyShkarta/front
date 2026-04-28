@@ -16,6 +16,19 @@ import 'dayjs/locale/uk';
 import 'dayjs/locale/en';
 
 /**
+ * Splits a potentially comma-separated recording_url string into individual URLs.
+ * Multiple segments are stored as comma-separated values when a lesson has
+ * multiple recording parts (e.g., after a reconnection mid-lesson).
+ *
+ * @param url - Raw recording_url value from the database
+ * @returns Array of individual recording URLs
+ */
+function parse_recording_urls(url: string | null | undefined): string[] {
+  if (!url) return [];
+  return url.split(',').map((u) => u.trim()).filter(Boolean);
+}
+
+/**
  * Component to display all lesson recordings for a student, grouped by subscription.
  */
 export function StudentRecordingsList() {
@@ -138,49 +151,55 @@ export function StudentRecordingsList() {
 
             <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 4, lg: 5 }} spacing="md">
               {slots.map((lesson: any) => {
-                if (lesson.recording_status === 'processing') {
-                  return (
-                    <ProcessingRecordingSlot 
-                      key={lesson.id}
-                      lesson={lesson}
-                      locale={locale}
-                    />
-                  );
-                }
-
-                if (lesson.recording_status === 'failed') {
-                  return (
-                    <FailedRecordingSlot 
-                      key={lesson.id}
-                      lesson={lesson}
-                      locale={locale}
-                      is_teacher={is_teacher}
-                      onEdit={() => set_editing_lesson({ id: lesson.id, url: '', date: lesson.date })}
-                    />
-                  );
-                }
-
-                if (lesson.recording_url) {
-                  return (
-                    <RecordingCard 
-                      key={lesson.id} 
-                      lesson={lesson} 
-                      is_teacher={is_teacher}
-                      locale={locale}
-                      onEdit={() => set_editing_lesson({ id: lesson.id, url: lesson.recording_url, date: lesson.date })}
-                      onDelete={() => set_deleting_id(lesson.id)}
-                    />
-                  );
-                }
+                const urls = parse_recording_urls(lesson.recording_url);
+                const has_recordings = urls.length > 0;
+                const is_processing = lesson.recording_status === 'processing';
+                const is_failed = lesson.recording_status === 'failed';
 
                 return (
-                  <EmptyRecordingSlot 
-                    key={lesson.id}
-                    lesson={lesson}
-                    locale={locale}
-                    is_teacher={is_teacher}
-                    onEdit={is_teacher && !lesson.is_placeholder ? () => set_editing_lesson({ id: lesson.id, url: '', date: lesson.date }) : undefined}
-                  />
+                  <div key={lesson.id} className="contents">
+                    {/* 1. Show existing recording parts */}
+                    {has_recordings && urls.map((url, idx) => (
+                      <RecordingCard 
+                        key={`${lesson.id}-${idx}`} 
+                        lesson={{ ...lesson, recording_url: url }} 
+                        is_teacher={is_teacher}
+                        locale={locale}
+                        onEdit={() => set_editing_lesson({ id: lesson.id, url: urls.length > 1 ? '' : lesson.recording_url, date: lesson.date })}
+                        onDelete={() => set_deleting_id(lesson.id)}
+                        part_idx={urls.length > 1 ? idx : undefined}
+                      />
+                    ))}
+
+                    {/* 2. Show processing slot if a new segment is arriving */}
+                    {is_processing && (
+                      <ProcessingRecordingSlot 
+                        lesson={lesson}
+                        locale={locale}
+                        is_additional={has_recordings}
+                      />
+                    )}
+
+                    {/* 3. Show failed slot if recording failed and no parts exist */}
+                    {is_failed && !has_recordings && (
+                      <FailedRecordingSlot 
+                        lesson={lesson}
+                        locale={locale}
+                        is_teacher={is_teacher}
+                        onEdit={() => set_editing_lesson({ id: lesson.id, url: '', date: lesson.date })}
+                      />
+                    )}
+
+                    {/* 4. Show empty slot only if no recordings AND not processing/failed */}
+                    {!has_recordings && !is_processing && !is_failed && (
+                      <EmptyRecordingSlot 
+                        lesson={lesson}
+                        locale={locale}
+                        is_teacher={is_teacher}
+                        onEdit={is_teacher && !lesson.is_placeholder ? () => set_editing_lesson({ id: lesson.id, url: '', date: lesson.date }) : undefined}
+                      />
+                    )}
+                  </div>
                 );
               })}
             </SimpleGrid>
@@ -228,15 +247,15 @@ export function StudentRecordingsList() {
   );
 }
 
-function RecordingCard({ lesson, is_teacher, locale, onEdit, onDelete }: { 
+function RecordingCard({ lesson, is_teacher, locale, onEdit, onDelete, part_idx }: { 
   lesson: any, 
   is_teacher: boolean, 
   locale: string,
   onEdit: () => void, 
-  onDelete: () => void 
+  onDelete: () => void,
+  part_idx?: number
 }) {
   const t = useTranslations('Calendar.lesson_room.recordings_ui');
-  const common_t = useTranslations('Common');
   
   const get_youtube_embed_url = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -245,13 +264,14 @@ function RecordingCard({ lesson, is_teacher, locale, onEdit, onDelete }: {
     return id ? `https://www.youtube.com/embed/${id}` : null;
   };
 
-  const is_youtube = lesson.recording_url?.includes('youtube.com') || lesson.recording_url?.includes('youtu.be');
-  const youtube_embed = is_youtube ? get_youtube_embed_url(lesson.recording_url) : null;
+  const active_url = lesson.recording_url || '';
+  const is_youtube = active_url.includes('youtube.com') || active_url.includes('youtu.be');
+  const youtube_embed = is_youtube ? get_youtube_embed_url(active_url) : null;
 
   const handle_download = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!lesson.recording_url) return;
-    window.open(lesson.recording_url, '_blank');
+    if (!active_url) return;
+    window.open(active_url, '_blank');
   };
 
   const can_download = is_teacher || lesson.can_student_download_recording;
@@ -275,7 +295,7 @@ function RecordingCard({ lesson, is_teacher, locale, onEdit, onDelete }: {
           />
         ) : (
           <video 
-            src={lesson.recording_url} 
+            src={active_url} 
             className="w-full h-full object-contain"
             controls
             controlsList="nodownload"
@@ -289,6 +309,11 @@ function RecordingCard({ lesson, is_teacher, locale, onEdit, onDelete }: {
           <Stack gap={0}>
             <Text fw={700} size="sm" className="line-clamp-1">
               {dayjs(lesson.date || new Date()).locale(locale).format('DD MMM YYYY')}
+              {part_idx !== undefined && (
+                <Text component="span" ml={6} c="primary" fw={800} size="xs">
+                  ({t('part')} {part_idx + 1})
+                </Text>
+              )}
             </Text>
             <Text size="xs" c="dimmed" fw={500}>
                 {dayjs(lesson.date || new Date()).locale(locale).format('HH:mm')}
@@ -348,7 +373,7 @@ function EmptyRecordingSlot({ lesson, is_teacher, locale, onEdit }: { lesson: an
   );
 }
 
-function ProcessingRecordingSlot({ lesson, locale }: { lesson: any, locale: string }) {
+function ProcessingRecordingSlot({ lesson, locale, is_additional }: { lesson: any, locale: string, is_additional?: boolean }) {
   const t = useTranslations('Calendar.lesson_room.recordings_ui');
   
   return (
@@ -363,7 +388,7 @@ function ProcessingRecordingSlot({ lesson, locale }: { lesson: any, locale: stri
         </Box>
         <Stack gap={2} align="center">
           <Text size="sm" fw={600} c="dimmed" ta="center">
-            {t('recording_processing')}
+            {is_additional ? t('processing_next_part') : t('recording_processing')}
           </Text>
           {lesson?.date && (
             <Text size="xs" c="dimmed" ta="center">
