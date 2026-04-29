@@ -27,7 +27,11 @@ export function TimerWidget() {
     if (!is_sound_on) return;
     
     try {
-      const audio_ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      if (typeof window === 'undefined') return;
+      const AudioContextClass = (window as any).AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      
+      const audio_ctx = new AudioContextClass();
       const oscillator = audio_ctx.createOscillator();
       const gain_node = audio_ctx.createGain();
 
@@ -266,13 +270,13 @@ export function TimerWidget() {
         </Group>
       </Stack>
 
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes pulse {
             0% { opacity: 0.1; }
             50% { opacity: 0.3; }
             100% { opacity: 0.1; }
         }
-      `}</style>
+      `}} />
     </Box>
   );
 }
