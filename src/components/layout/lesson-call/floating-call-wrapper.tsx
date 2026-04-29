@@ -143,6 +143,14 @@ export function FloatingCallWrapper() {
     return null;
   }
 
+  // Hide the floating widget if the local user is sharing their screen 
+  // (to prevent it from being captured in the demonstration)
+  // We only hide the internal DraggablePip, the real pipWindow (separate window) can stay.
+  const isLocalSharing = activeCall.state.localParticipant?.publishedTracks.includes(SfuModels.TrackType.SCREEN_SHARE);
+  if (isLocalSharing && !pipWindow) {
+    return null;
+  }
+
   const content = (
     <StreamCall call={activeCall}>
       <StreamTheme>

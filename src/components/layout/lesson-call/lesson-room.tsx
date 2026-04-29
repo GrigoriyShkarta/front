@@ -134,10 +134,8 @@ function MyCallUI() {
   useEffect(() => {
     // Case 1: Screen share STARTED
     if (!prevSharing.current && hasOngoingScreenShare) {
-      // If we were in PIP, move to grid (which now looks like speaker-top)
-      if (call_layout === 'pip') {
-        set_call_layout('grid');
-      }
+      // Auto-switch to PiP mode when sharing starts
+      set_call_layout('pip');
     }
 
     // Case 2: Screen share ENDED
@@ -160,8 +158,9 @@ function MyCallUI() {
         (call.screenShare as any).setDefaultConstraints({
           audio: {
             suppressLocalAudioPlayback: false,
-            echoCancellation: false,
+            echoCancellation: true,
             noiseSuppression: false,
+            autoGainControl: false,
           },
           video: true,
         });
@@ -253,7 +252,13 @@ function MyCallUI() {
           <DraggablePip containerRef={rootRef}>
             {participants.length === 2 && localParticipant ? (
               <ParticipantView 
-                participant={localParticipant} 
+                participant={
+                  // If someone is sharing, always show the remote participant in the corner
+                  // so the user can see their reaction/camera.
+                  hasOngoingScreenShare 
+                    ? (participants.find(p => p.sessionId !== localParticipant.sessionId) || localParticipant)
+                    : localParticipant
+                } 
                 trackType="videoTrack"
                 className="w-full h-full" 
                 muteAudio={true} 
