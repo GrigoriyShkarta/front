@@ -53,8 +53,17 @@ export function EditableText({ element, zoom, pan_x, pan_y, on_save, on_cancel, 
 
   const performSave = () => {
       if (has_saved.current || !ref.current) return;
+      
+      const content = ref.current.innerHTML || '';
+      // If content is empty or just whitespace/br, cancel instead of saving
+      if (!content.trim() || content === '<br>') {
+          has_saved.current = true;
+          on_cancel();
+          return;
+      }
+
       has_saved.current = true;
-      on_save(ref.current.innerHTML || '', (ref.current.offsetWidth || 100) / zoom + 2, (ref.current.offsetHeight || 40) / zoom);
+      on_save(content, (ref.current.offsetWidth || 100) / zoom + 2, (ref.current.offsetHeight || 40) / zoom);
   };
 
   const handleBlur = (e: React.FocusEvent) => {

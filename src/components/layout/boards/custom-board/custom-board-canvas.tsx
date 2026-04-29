@@ -113,7 +113,11 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
         const next = [...prev];
         (data.elements || []).forEach(u => {
           const idx = next.findIndex(e => e.id === u.id);
-          if (idx !== -1) next[idx] = u;
+          if (idx !== -1) {
+            // Don't let remote updates overwrite the element we are currently editing
+            if (u.id === editing_text_id) return;
+            next[idx] = u;
+          }
           else next.push(u);
         });
         return next;

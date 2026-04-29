@@ -74,6 +74,8 @@ export function useBoardSocket(board_id: string, user: any) {
       const remote_id = data.user_id || data.id || data.socket_id;
       if (!remote_id || remote_id === user?.id) return;
       
+      // console.debug('[Socket] Cursor move received', remote_id, data.x, data.y);
+
       set_cursors(prev => ({
         ...prev,
         [remote_id]: { 
@@ -83,7 +85,7 @@ export function useBoardSocket(board_id: string, user: any) {
           avatar: data.avatar,
           path: data.path,
           draft: data.draft,
-          color: data.color || '#000000',
+          color: data.color || '#ff8c00', // Use our new default orange if missing
           stroke_width: data.stroke_width || 4
         }
       }));
@@ -109,7 +111,9 @@ export function useBoardSocket(board_id: string, user: any) {
   }, [board_id]);
 
   const emit_cursor = useCallback((data: any) => {
-    socket_ref.current?.emit('cursor:move', { 
+    if (!socket_ref.current?.connected) return;
+
+    socket_ref.current.emit('cursor:move', { 
         board_id, 
         user_id: user?.id,
         x: data.x, 
