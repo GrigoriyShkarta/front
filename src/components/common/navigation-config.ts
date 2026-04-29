@@ -1,5 +1,5 @@
 import { IconType } from 'react-icons';
-import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPieChartOutline, IoPricetagOutline, IoLibraryOutline, IoListOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoDocumentTextOutline, IoAppsOutline, IoTimerOutline } from 'react-icons/io5';
+import { IoHomeOutline, IoPeopleOutline, IoBookOutline, IoMusicalNotesOutline, IoImageOutline, IoVideocamOutline, IoDocumentOutline, IoPieChartOutline, IoPricetagOutline, IoLibraryOutline, IoListOutline, IoSchoolOutline, IoWalletOutline, IoCardOutline, IoPersonOutline, IoCalendarOutline, IoClipboardOutline, IoDocumentTextOutline, IoAppsOutline, IoTimerOutline, IoHourglassOutline } from 'react-icons/io5';
 import { FaChalkboard } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
 import { IoMdCheckboxOutline } from "react-icons/io";
@@ -188,6 +188,12 @@ export const MAIN_NAVIGATION: NavItem[] = [
         label: 'metronome',
         href: '/main/widgets/metronome',
         icon: PiMetronome,
+        roles: ['super_admin', 'admin', 'teacher', 'student'],
+      },
+      {
+        label: 'timer',
+        href: '/main/widgets/timer',
+        icon: IoHourglassOutline,
         roles: ['super_admin', 'admin', 'teacher', 'student'],
       }
     ]

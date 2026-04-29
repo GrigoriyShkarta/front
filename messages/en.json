@@ -286,7 +286,8 @@
     "feedback": "Feedback",
     "widgets": "Widgets",
     "piano": "Piano",
-    "metronome": "Metronome"
+    "metronome": "Metronome",
+    "timer": "Timer"
   },
   "Widgets": {
     "piano": {
@@ -307,6 +308,13 @@
       "time_signature": "Time Signature",
       "sound": "Sound",
       "volume": "Volume"
+    },
+    "timer": {
+      "title": "Timer",
+      "subtitle": "Timer for lessons and practice",
+      "ready": "Ready",
+      "running": "Running",
+      "finished": "Time's Up!"
     }
   },
   "Calendar": {

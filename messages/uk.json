@@ -291,7 +291,8 @@
     "edit_title": "Редагувати назву",
     "delete_confirm_desc": "Ви впевнені, що хочете видалити цю дошку?",
     "unlink": "Видалити посилання",
-    "storage": "Сховище"
+    "storage": "Сховище",
+    "timer": "Таймер"
   },
   "Widgets": {
     "piano": {
@@ -312,6 +313,13 @@
       "time_signature": "Розмір",
       "sound": "Звук",
       "volume": "Гучність"
+    },
+    "timer": {
+      "title": "Таймер",
+      "subtitle": "Таймер для уроків та практики",
+      "ready": "Готово",
+      "running": "Працює",
+      "finished": "Час вийшов!"
     }
   },
   "Calendar": {

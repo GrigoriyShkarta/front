@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { Title, Text, Stack, Container, SimpleGrid, Card, Box, Group } from '@mantine/core';
 import { PageContainer } from '@/components/common/page-container';
-import { IoAppsOutline, IoTimerOutline } from "react-icons/io5";
+import { IoAppsOutline, IoTimerOutline, IoHourglassOutline } from "react-icons/io5";
 import { MdOutlinePiano } from "react-icons/md";
 
 /**
@@ -31,6 +31,14 @@ export const WidgetsLayout: React.FC = () => {
       icon: IoTimerOutline,
       href: '/main/widgets/metronome',
       color: 'teal'
+    },
+    {
+      id: 'timer',
+      label: nt('timer'),
+      description: wt('timer.subtitle'),
+      icon: IoHourglassOutline,
+      href: '/main/widgets/timer',
+      color: 'orange'
     }
   ];
 
