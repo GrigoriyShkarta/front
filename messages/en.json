@@ -489,6 +489,7 @@
     }
   },
   "Boards": {
+    "back_to_content": "Back to Content",
     "lock": "Lock",
     "unlock": "Unlock",
     "enter_link_url": "Enter URL",

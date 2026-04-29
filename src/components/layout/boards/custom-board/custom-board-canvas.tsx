@@ -13,11 +13,12 @@ import { CanvasToolbar } from './canvas-toolbar';
 import { ShapeFormatToolbar } from './shape-format-toolbar';
 import { TextFormatToolbar } from './text-format-toolbar';
 import { MediaFormatToolbar } from './media-format-toolbar';
-import { get_element_bbox } from './utils';
+import { get_element_bbox, get_collective_bbox } from './utils';
 import { InlineTextToolbar } from './inline-text-toolbar';
 import { BoardBackground } from './components/board-background';
 import { BoardParticipants } from './components/board-participants';
 import { BoardCursors } from './components/board-cursors';
+import { BackToContentButton } from './components/back-to-content-button';
 import { BoardSettingsModal } from './components/board-settings-modal';
 import { MaterialsPickerModal } from '../components/materials-picker-modal';
 import { LinkCreateModal as BoardLinkModal } from './components/link-create-modal';
@@ -183,6 +184,28 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
         set_pan({ x: vw / 2 - c.x * zoom, y: vh / 2 - c.y * zoom });
     }
   }, [following_user_id, cursors, zoom, set_pan, is_panning]);
+  
+  const handle_back_to_content = useCallback((bbox: any) => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    
+    // Calculate zoom to fit (with 15% padding)
+    const padding = 0.15;
+    const available_w = vw * (1 - padding * 2);
+    const available_h = vh * (1 - padding * 2);
+    
+    const zoom_w = available_w / bbox.w;
+    const zoom_h = available_h / bbox.h;
+    // Don't zoom in more than 100%, but don't zoom out less than 10%
+    const new_zoom = Math.min(1, Math.max(0.1, Math.min(zoom_w, zoom_h)));
+    
+    // Calculate pan to center the collective bbox
+    const new_pan_x = vw / 2 - (bbox.x + bbox.w / 2) * new_zoom;
+    const new_pan_y = vh / 2 - (bbox.y + bbox.h / 2) * new_zoom;
+    
+    set_zoom(new_zoom);
+    set_pan({ x: new_pan_x, y: new_pan_y });
+  }, [set_zoom, set_pan]);
 
   const handle_settings_update = (key: 'bg_color' | 'grid_type' | 'board_theme', value: any) => {
     if (key === 'bg_color') {
@@ -602,6 +625,8 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
             on_add_link={() => set_is_link_modal_opened(true)}
             on_open_settings={() => set_is_settings_opened(true)}
             on_exit={handle_exit}
+            zoom={zoom}
+            on_zoom_change={set_zoom}
             is_student={user?.role === 'student'}
           />
           <input 
@@ -685,6 +710,14 @@ export function CustomBoardCanvas({ board_id, initial_data, user }: Props) {
             bgColor={bg_color} onBgColorChange={(v) => handle_settings_update('bg_color', v)}
             gridType={grid_type} onGridTypeChange={(v) => handle_settings_update('grid_type', v)}
             boardTheme={board_theme} onBoardThemeChange={(v) => handle_settings_update('board_theme', v)}
+        />
+
+        <BackToContentButton 
+          elements={elements} 
+          pan_x={pan_x} 
+          pan_y={pan_y} 
+          zoom={zoom} 
+          on_back={handle_back_to_content} 
         />
     </Box>
   );

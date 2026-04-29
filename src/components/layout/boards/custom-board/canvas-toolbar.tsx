@@ -21,6 +21,8 @@ import {
   IoSettingsOutline,
   IoArrowBack,
   IoArrowForwardOutline,
+  IoAddOutline,
+  IoSearchOutline,
 } from 'react-icons/io5';
 import { TfiText } from "react-icons/tfi";
 import { LuEraser, LuHighlighter } from "react-icons/lu";
@@ -52,6 +54,8 @@ interface CanvasToolbarProps {
   on_add_link: () => void;
   on_open_settings: () => void;
   on_exit: () => void;
+  zoom: number;
+  on_zoom_change: (new_zoom: number) => void;
   is_student?: boolean;
 }
 
@@ -63,6 +67,7 @@ export function CanvasToolbar({
   tool, color, stroke_width, stroke_style, can_undo, can_redo,
   on_tool_change, on_color_change, on_width_change, on_style_change, on_undo, on_redo, on_delete,
   on_open_library, on_upload_device, on_add_link, on_open_settings, on_exit, is_student,
+  zoom, on_zoom_change,
 }: CanvasToolbarProps) {
   const t = useTranslations('Boards');
   const common_t = useTranslations('Common');
@@ -483,6 +488,54 @@ export function CanvasToolbar({
             </Group>
           </Popover.Dropdown>
         </Popover>
+
+        {/* Zoom Controls */}
+        <Group gap={2} wrap="nowrap">
+          <Tooltip label={t('zoom_out')} position="bottom">
+            <ActionIcon 
+              variant="subtle" 
+              size="md" 
+              radius="md" 
+              onClick={() => on_zoom_change(zoom / 1.2)}
+              color={icon_color}
+              disabled={zoom <= 0.1}
+            >
+              <IoRemoveOutline size={18} />
+            </ActionIcon>
+          </Tooltip>
+          
+          <Tooltip label={t('reset_zoom')} position="bottom">
+            <Box 
+              onClick={() => on_zoom_change(1)}
+              px={4}
+              style={{ 
+                fontSize: 11, 
+                fontWeight: 700, 
+                color: icon_color,
+                cursor: 'pointer',
+                minWidth: 40,
+                textAlign: 'center',
+                userSelect: 'none'
+              }}
+              className="hover:opacity-70"
+            >
+              {Math.round(zoom * 100)}%
+            </Box>
+          </Tooltip>
+
+          <Tooltip label={t('zoom_in')} position="bottom">
+            <ActionIcon 
+              variant="subtle" 
+              size="md" 
+              radius="md" 
+              onClick={() => on_zoom_change(zoom * 1.2)}
+              color={icon_color}
+              disabled={zoom >= 10}
+            >
+              <IoAddOutline size={18} />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
 
         <Divider orientation="vertical" h={24} />
 

@@ -248,3 +248,33 @@ export function move_element(el: BoardElement, dx: number, dy: number): BoardEle
     default: return el;
   }
 }
+/**
+ * Calculate the collective bounding box of all board elements.
+ */
+export function get_collective_bbox(elements: BoardElement[]): BBox | null {
+    if (elements.length === 0) return null;
+    
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    
+    elements.forEach(el => {
+        const bbox = get_element_bbox(el);
+        if (bbox) {
+            minX = Math.min(minX, bbox.x);
+            minY = Math.min(minY, bbox.y);
+            maxX = Math.max(maxX, bbox.x + bbox.w);
+            maxY = Math.max(maxY, bbox.y + bbox.h);
+        }
+    });
+    
+    if (minX === Infinity) return null;
+    
+    return {
+        x: minX,
+        y: minY,
+        w: maxX - minX,
+        h: maxY - minY
+    };
+}

@@ -494,6 +494,7 @@
     }
   },
   "Boards": {
+    "back_to_content": "Назад до контенту",
     "lock": "Заблокувати",
     "unlock": "Розблокувати",
     "enter_link_url": "Введіть URL",
