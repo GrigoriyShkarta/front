@@ -23,7 +23,7 @@ export function BoardCursors({ cursors }: Props) {
           {/* Cursor Arrow */}
           <path
             d="M0,0 L0,22 L6,16 L13,16 Z"
-            fill={c.color || '#ff8c00'} // Default to a vibrant orange if no color
+            fill={c.color}
             stroke="white"
             strokeWidth="2"
             style={{ 
@@ -34,7 +34,7 @@ export function BoardCursors({ cursors }: Props) {
           {/* Accent Pulse Dot */}
           <circle 
             r="3" 
-            fill={c.color || '#ff8c00'} 
+            fill={c.color} 
             stroke="white" 
             strokeWidth="1"
           >
@@ -47,7 +47,7 @@ export function BoardCursors({ cursors }: Props) {
               px={10} 
               py={4} 
               style={{ 
-                backgroundColor: c.color || '#ff8c00',
+                backgroundColor: c.color,
                 color: 'white',
                 borderRadius: 6,
                 fontSize: 11,

@@ -7,9 +7,9 @@ import Cookies from 'js-cookie';
 const backend_data_url = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
 // For sockets on Vercel, we MUST use direct connection to the backend, not the /api-proxy
 const backend_url = process.env.NEXT_PUBLIC_SOCKET_URL || 
-                    (backend_data_url.includes('localhost') 
+                    (backend_data_url.startsWith('http') 
                       ? backend_data_url.replace('/api', '') 
-                      : 'https://test-lirnexa-435a6bda28a0.herokuapp.com');
+                      : (typeof window !== 'undefined' ? window.location.origin : ''));
 const socket_path = '/socket.io';
 
 export interface ActiveParticipant {
@@ -70,12 +70,22 @@ export function useBoardSocket(board_id: string, user: any) {
       if (following_user_id === data.user_id) set_following_user_id(null);
     });
 
+    const get_user_color = (id: string) => {
+      const colors = [
+        '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', 
+        '#3b82f6', '#06b6d4', '#10b981', '#84cc16'
+      ];
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = id.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return colors[Math.abs(hash) % colors.length];
+    };
+
     const handleCursor = (data: any) => {
       const remote_id = data.user_id || data.id || data.socket_id;
       if (!remote_id || remote_id === user?.id) return;
       
-      // console.debug('[Socket] Cursor move received', remote_id, data.x, data.y);
-
       set_cursors(prev => ({
         ...prev,
         [remote_id]: { 
@@ -85,7 +95,7 @@ export function useBoardSocket(board_id: string, user: any) {
           avatar: data.avatar,
           path: data.path,
           draft: data.draft,
-          color: data.color || '#ff8c00', // Use our new default orange if missing
+          color: get_user_color(remote_id),
           stroke_width: data.stroke_width || 4
         }
       }));
