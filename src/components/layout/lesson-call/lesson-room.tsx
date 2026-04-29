@@ -116,6 +116,18 @@ function MyCallUI() {
   // Local State
   const [showParticipants, setShowParticipants] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [visibilityKey, setVisibilityKey] = useState(0);
+
+  // Force re-render of layout when tab becomes visible to fix frozen videos (e.g. after PiP or tab switch)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        setVisibilityKey(prev => prev + 1);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   // Screen share layout management: auto-switch and restore
   const prevSharing = useRef(hasOngoingScreenShare);
@@ -147,9 +159,9 @@ function MyCallUI() {
       try {
         (call.screenShare as any).setDefaultConstraints({
           audio: {
-            suppressLocalAudioPlayback: true,
-            echoCancellation: true,
-            noiseSuppression: true,
+            suppressLocalAudioPlayback: false,
+            echoCancellation: false,
+            noiseSuppression: false,
           },
           video: true,
         });
@@ -227,6 +239,7 @@ function MyCallUI() {
       <div className={`relative flex-1 flex w-full items-center justify-center min-h-0 ${fullscreenEl ? 'p-0' : 'p-4'}`}>
         <div className="flex size-full items-center">
           <LessonLayoutView 
+            key={`layout-${visibilityKey}-${call_layout}`}
             layout={call_layout}
             fullscreenEl={fullscreenEl}
             localParticipant={localParticipant}

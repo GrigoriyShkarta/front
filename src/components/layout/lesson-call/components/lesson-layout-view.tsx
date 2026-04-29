@@ -64,8 +64,8 @@ export function LessonLayoutView({
             <ParticipantView 
               participant={p} 
               trackType={p.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
-              // Mute screen share audio to prevent echoing the meeting audio
-              muteAudio={p.sessionId === sharingParticipant?.sessionId}
+              // Mute only local participant to avoid loopback; remote audio should be heard
+              muteAudio={p.sessionId === localParticipant?.sessionId}
               className={`w-full h-full ${p.sessionId === sharingParticipant?.sessionId ? '[&_video]:object-contain' : ''}`}
               ParticipantViewUI={NoMenuParticipantViewUI}
             />
@@ -112,7 +112,7 @@ export function LessonLayoutView({
           <ParticipantView 
             participant={main_participant} 
             trackType={is_sharing ? 'screenShareTrack' : 'videoTrack'}
-            muteAudio={is_sharing}
+            muteAudio={main_participant?.sessionId === localParticipant?.sessionId}
             className={`w-full h-full ${is_sharing ? '[&_video]:object-contain' : ''}`}
             ParticipantViewUI={NoMenuParticipantViewUI}
           />

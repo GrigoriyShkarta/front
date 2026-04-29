@@ -150,6 +150,7 @@ export function FloatingCallWrapper() {
           t={t} 
           onTogglePip={togglePip} 
           isPip={!!pipWindow} 
+          pipWindow={pipWindow}
           onParticipantCountChange={setParticipantCount} 
         />
       </StreamTheme>
@@ -187,10 +188,11 @@ interface MiniCallUIProps {
   t: any;
   onTogglePip: () => void;
   isPip: boolean;
+  pipWindow: Window | null;
   onParticipantCountChange?: (count: number) => void;
 }
 
-function MiniCallUI({ t, onTogglePip, isPip, onParticipantCountChange }: MiniCallUIProps) {
+function MiniCallUI({ t, onTogglePip, isPip, pipWindow, onParticipantCountChange }: MiniCallUIProps) {
   const { useCameraState, useMicrophoneState, useParticipants, useCallCallingState } = useCallStateHooks();
   const { setActiveCall } = useActiveCall();
   const call = useCall();
@@ -244,14 +246,15 @@ function MiniCallUI({ t, onTogglePip, isPip, onParticipantCountChange }: MiniCal
   // Try to set autoPictureInPicture attribute to the underlying video element
   useEffect(() => {
     const timer = setTimeout(() => {
-      const video = document.querySelector('.str-video__participant-view video');
+      const doc = pipWindow ? pipWindow.document : document;
+      const video = doc.querySelector('.str-video__participant-view video');
       if (video) {
         (video as any).autoPictureInPicture = true;
         (video as any).disablePictureInPicture = false;
       }
     }, 1000);
     return () => clearTimeout(timer);
-  }, [topParticipant, bottomParticipant]);
+  }, [topParticipant, bottomParticipant, pipWindow]);
 
   return (
     <Box className="w-full h-full relative group bg-[var(--call-surface)]">

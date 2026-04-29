@@ -65,7 +65,7 @@ export function ResizableSpeakerLayout({
           <ParticipantView
             participant={spotlight}
             trackType={spotlight.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
-            muteAudio={spotlight.sessionId === sharing_participant?.sessionId}
+            muteAudio={spotlight.sessionId === local_participant?.sessionId}
             className="w-full h-full [&_video]:object-contain"
             ParticipantViewUI={NoMenuParticipantViewUI}
           />
@@ -101,6 +101,7 @@ export function ResizableSpeakerLayout({
               <ParticipantView
                 participant={p}
                 trackType="videoTrack"
+                muteAudio={p.sessionId === local_participant?.sessionId}
                 className="w-full h-full"
                 ParticipantViewUI={NoMenuParticipantViewUI}
               />

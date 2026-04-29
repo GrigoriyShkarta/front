@@ -75,7 +75,7 @@ export function ResizableGridLayout({
         <ParticipantView
           participant={left_participant}
           trackType={left_participant?.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
-          muteAudio={left_participant?.sessionId === sharing_participant?.sessionId}
+          muteAudio={left_participant?.sessionId === local_participant?.sessionId}
           className="w-full h-full"
           ParticipantViewUI={NoMenuParticipantViewUI}
         />
@@ -97,7 +97,7 @@ export function ResizableGridLayout({
         <ParticipantView
           participant={right_participant}
           trackType={right_participant?.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
-          muteAudio={right_participant?.sessionId === sharing_participant?.sessionId}
+          muteAudio={right_participant?.sessionId === local_participant?.sessionId}
           className="w-full h-full"
           ParticipantViewUI={NoMenuParticipantViewUI}
         />
