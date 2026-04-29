@@ -310,44 +310,7 @@ export function CallControlsBar({
               </Menu.Item>
             )}
 
-            {userRole !== 'student' && studentSessionId && (
-              <>
-                <Divider my="xs" color="var(--call-border)" />
-                <Menu.Label>{t('moderation')}</Menu.Label>
-                
-                {/* <Menu.Item
-                  leftSection={<IoPinOutline size={16} />}
-                  onClick={handlePin}
-                  style={{ color: isPinned ? 'var(--space-primary)' : 'var(--call-text)' }}
-                >
-                  {isPinned ? t('unpin_student') : t('pin_student')}
-                </Menu.Item> */}
 
-                <Menu.Item
-                  leftSection={<IoMicOffOutline size={16} />}
-                  onClick={() => handleMute('audio')}
-                  style={{ color: 'var(--call-text)' }}
-                >
-                  {t('mute_student')}
-                </Menu.Item>
-
-                <Menu.Item
-                  leftSection={<IoVideocamOffOutline size={16} />}
-                  onClick={() => handleMute('video')}
-                  style={{ color: 'var(--call-text)' }}
-                >
-                  {t('stop_student_video')}
-                </Menu.Item>
-
-                <Menu.Item
-                  leftSection={<IoDesktopOutline size={16} />}
-                  onClick={() => handleMute('screenshare')}
-                  style={{ color: 'var(--call-text)' }}
-                >
-                  {t('stop_student_screen_share')}
-                </Menu.Item>
-              </>
-            )}
           </Menu.Dropdown>
         </Menu>
       )}

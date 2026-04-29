@@ -6,6 +6,7 @@ import {
 } from '@stream-io/video-react-sdk';
 
 import { useSidebarResize } from '../hooks/use-sidebar-resize';
+import { ParticipantModerationWrapper } from './participant-moderation-wrapper';
 
 /** ParticipantViewUI without the three-dot menu button */
 const NoMenuParticipantViewUI = () => (
@@ -62,13 +63,15 @@ export function ResizableSpeakerLayout({
         }}
       >
         {spotlight && (
-          <ParticipantView
-            participant={spotlight}
-            trackType={spotlight.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
-            muteAudio={spotlight.sessionId === local_participant?.sessionId}
-            className="w-full h-full [&_video]:object-contain"
-            ParticipantViewUI={NoMenuParticipantViewUI}
-          />
+          <ParticipantModerationWrapper participant={spotlight}>
+            <ParticipantView
+              participant={spotlight}
+              trackType={spotlight.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
+              muteAudio={spotlight.sessionId === local_participant?.sessionId}
+              className="w-full h-full [&_video]:object-contain"
+              ParticipantViewUI={NoMenuParticipantViewUI}
+            />
+          </ParticipantModerationWrapper>
         )}
       </div>
 
@@ -98,13 +101,15 @@ export function ResizableSpeakerLayout({
               key={p.sessionId} 
               className={`relative overflow-hidden aspect-video border border-white/5 shrink-0 ${is_fullscreen ? 'rounded-none' : 'rounded-lg'} ${is_horizontal ? 'h-full' : 'w-full'}`}
             >
-              <ParticipantView
-                participant={p}
-                trackType="videoTrack"
-                muteAudio={p.sessionId === local_participant?.sessionId}
-                className="w-full h-full"
-                ParticipantViewUI={NoMenuParticipantViewUI}
-              />
+              <ParticipantModerationWrapper participant={p}>
+                <ParticipantView
+                  participant={p}
+                  trackType="videoTrack"
+                  muteAudio={p.sessionId === local_participant?.sessionId}
+                  className="w-full h-full"
+                  ParticipantViewUI={NoMenuParticipantViewUI}
+                />
+              </ParticipantModerationWrapper>
             </div>
           ))}
         </div>

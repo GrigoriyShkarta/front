@@ -8,6 +8,7 @@ import {
 
 import { ResizableSpeakerLayout } from './resizable-speaker-layout';
 import { ResizableGridLayout } from './resizable-grid-layout';
+import { ParticipantModerationWrapper } from './participant-moderation-wrapper';
 
 /** ParticipantViewUI without the three-dot menu button */
 const NoMenuParticipantViewUI = () => (
@@ -61,14 +62,16 @@ export function LessonLayoutView({
             key={p.sessionId}
             className={`relative w-full h-full overflow-hidden ${fullscreenEl ? 'rounded-none' : 'rounded-xl'} border border-white/5`}
           >
-            <ParticipantView 
-              participant={p} 
-              trackType={p.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
-              // Mute only local participant to avoid loopback; remote audio should be heard
-              muteAudio={p.sessionId === localParticipant?.sessionId}
-              className={`w-full h-full ${p.sessionId === sharingParticipant?.sessionId ? '[&_video]:object-contain' : ''}`}
-              ParticipantViewUI={NoMenuParticipantViewUI}
-            />
+            <ParticipantModerationWrapper participant={p}>
+              <ParticipantView 
+                participant={p} 
+                trackType={p.sessionId === sharingParticipant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
+                // Mute only local participant to avoid loopback; remote audio should be heard
+                muteAudio={p.sessionId === localParticipant?.sessionId}
+                className={`w-full h-full ${p.sessionId === sharingParticipant?.sessionId ? '[&_video]:object-contain' : ''}`}
+                ParticipantViewUI={NoMenuParticipantViewUI}
+              />
+            </ParticipantModerationWrapper>
           </div>
         ))}
       </div>
@@ -109,13 +112,15 @@ export function LessonLayoutView({
       const is_sharing = main_participant?.sessionId === sharingParticipant?.sessionId;
       return (
         <div className={`relative w-full h-full overflow-hidden ${fullscreenEl ? 'rounded-none' : 'rounded-xl'}`}>
-          <ParticipantView 
-            participant={main_participant} 
-            trackType={is_sharing ? 'screenShareTrack' : 'videoTrack'}
-            muteAudio={main_participant?.sessionId === localParticipant?.sessionId}
-            className={`w-full h-full ${is_sharing ? '[&_video]:object-contain' : ''}`}
-            ParticipantViewUI={NoMenuParticipantViewUI}
-          />
+          <ParticipantModerationWrapper participant={main_participant}>
+            <ParticipantView 
+              participant={main_participant} 
+              trackType={is_sharing ? 'screenShareTrack' : 'videoTrack'}
+              muteAudio={main_participant?.sessionId === localParticipant?.sessionId}
+              className={`w-full h-full ${is_sharing ? '[&_video]:object-contain' : ''}`}
+              ParticipantViewUI={NoMenuParticipantViewUI}
+            />
+          </ParticipantModerationWrapper>
         </div>
       );
     case 'speaker-top':

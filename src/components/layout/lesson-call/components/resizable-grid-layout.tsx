@@ -3,6 +3,8 @@
 import { ParticipantView, DefaultParticipantViewUI } from '@stream-io/video-react-sdk';
 import { useCallback, useRef, useState } from 'react';
 
+import { ParticipantModerationWrapper } from './participant-moderation-wrapper';
+
 /** ParticipantViewUI without the three-dot menu button */
 const NoMenuParticipantViewUI = () => (
   <DefaultParticipantViewUI showMenuButton={false} />
@@ -72,13 +74,15 @@ export function ResizableGridLayout({
         className={`relative overflow-hidden w-full h-full ${is_fullscreen ? 'rounded-none' : 'rounded-xl'}`}
         style={{ flex: `0 0 ${left_pct}%`, minWidth: 0 }}
       >
-        <ParticipantView
-          participant={left_participant}
-          trackType={left_participant?.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
-          muteAudio={left_participant?.sessionId === local_participant?.sessionId}
-          className="w-full h-full"
-          ParticipantViewUI={NoMenuParticipantViewUI}
-        />
+        <ParticipantModerationWrapper participant={left_participant}>
+          <ParticipantView
+            participant={left_participant}
+            trackType={left_participant?.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
+            muteAudio={left_participant?.sessionId === local_participant?.sessionId}
+            className="w-full h-full"
+            ParticipantViewUI={NoMenuParticipantViewUI}
+          />
+        </ParticipantModerationWrapper>
       </div>
 
       {/* Splitter */}
@@ -94,13 +98,15 @@ export function ResizableGridLayout({
         className={`relative overflow-hidden w-full h-full ${is_fullscreen ? 'rounded-none' : 'rounded-xl'}`}
         style={{ flex: `0 0 ${100 - left_pct}%`, minWidth: 0 }}
       >
-        <ParticipantView
-          participant={right_participant}
-          trackType={right_participant?.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
-          muteAudio={right_participant?.sessionId === local_participant?.sessionId}
-          className="w-full h-full"
-          ParticipantViewUI={NoMenuParticipantViewUI}
-        />
+        <ParticipantModerationWrapper participant={right_participant}>
+          <ParticipantView
+            participant={right_participant}
+            trackType={right_participant?.sessionId === sharing_participant?.sessionId ? 'screenShareTrack' : 'videoTrack'}
+            muteAudio={right_participant?.sessionId === local_participant?.sessionId}
+            className="w-full h-full"
+            ParticipantViewUI={NoMenuParticipantViewUI}
+          />
+        </ParticipantModerationWrapper>
       </div>
     </div>
   );
