@@ -9,9 +9,15 @@ const backend_data_url = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8
 // Helper to get socket URL
 const get_socket_url = () => {
     if (process.env.NEXT_PUBLIC_SOCKET_URL) return process.env.NEXT_PUBLIC_SOCKET_URL;
-    if (backend_data_url.startsWith('http')) return backend_data_url.replace('/api', '');
-    if (typeof window !== 'undefined') return window.location.origin;
-    return '';
+    
+    // If we have an absolute API URL, use it as the base for sockets
+    if (backend_data_url.startsWith('http')) {
+        return backend_data_url.replace('/api', '');
+    }
+    
+    // Fallback for production if NEXT_PUBLIC_API_URL is relative or missing
+    // Vercel doesn't support WebSockets, so we MUST point to the real backend on Heroku
+    return 'https://test-lirnexa-435a6bda28a0.herokuapp.com';
 };
 
 const backend_url = get_socket_url();
