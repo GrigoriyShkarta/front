@@ -31,7 +31,7 @@ interface Props {
   opened: boolean;
   onClose: () => void;
   materialIds: string[];
-  materialType: 'lesson' | 'audio' | 'photo' | 'video' | 'file';
+  materialType: 'lesson' | 'audio' | 'photo' | 'video' | 'file' | 'test' | 'note';
   initialSelectedIds?: string[];
   onSuccess?: () => void;
 }

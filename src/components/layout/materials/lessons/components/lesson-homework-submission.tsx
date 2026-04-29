@@ -13,6 +13,7 @@ interface Props {
     id: string;
     name: string;
     content?: any[];
+    can_retake?: boolean;
   };
   homework_status?: 'not_submitted' | 'pending' | 'reviewed';
   my_submission?: any;
@@ -23,6 +24,7 @@ export function LessonHomeworkSubmission({ homework, homework_status, my_submiss
   const common_t = useTranslations('Common');
   
   const [is_expanded, set_is_expanded] = useState(false);
+  const [is_retaking, set_is_retaking] = useState(false);
   const [text, set_text] = useState('');
   const [local_files, set_local_files] = useState<File[]>([]);
   const [uploading_files, set_uploading_files] = useState(false);
@@ -47,6 +49,7 @@ export function LessonHomeworkSubmission({ homework, homework_status, my_submiss
 
       await submit({ text, file_urls, files: local_files });
       set_is_expanded(false);
+      set_is_retaking(false);
       set_local_files([]);
       set_text('');
     } finally {
@@ -112,7 +115,12 @@ export function LessonHomeworkSubmission({ homework, homework_status, my_submiss
     );
   };
 
-  if (my_submission) {
+  const handle_resubmit_click = () => {
+    set_is_retaking(true);
+    set_is_expanded(true);
+  };
+
+  if (my_submission && !is_retaking) {
     return (
       <Paper withBorder p="xl" radius="md" className="dark:bg-zinc-900/50">
         <Stack gap="md">
@@ -182,6 +190,18 @@ export function LessonHomeworkSubmission({ homework, homework_status, my_submiss
               </Paper>
             </>
           )}
+
+          {homework.can_retake && (
+            <Group justify="center" mt="md">
+              <Button 
+                variant="light" 
+                color="primary"
+                onClick={handle_resubmit_click}
+              >
+                {t('resubmit_button') || 'Перездати'}
+              </Button>
+            </Group>
+          )}
         </Stack>
       </Paper>
     );
@@ -247,7 +267,10 @@ export function LessonHomeworkSubmission({ homework, homework_status, my_submiss
         </Stack>
 
         <Group justify="flex-end">
-          <Button variant="subtle" color="gray" onClick={() => set_is_expanded(false)} disabled={uploading_files || is_submitting}>{common_t('cancel')}</Button>
+          <Button variant="subtle" color="gray" onClick={() => {
+              set_is_expanded(false);
+              set_is_retaking(false);
+          }} disabled={uploading_files || is_submitting}>{common_t('cancel')}</Button>
           <Button 
             loading={is_submitting || uploading_files} 
             onClick={handle_submit}

@@ -1,6 +1,6 @@
 'use client';
 
-import { Drawer, Stack, Box, Text, NumberInput, Divider, MultiSelect, Select, Switch, Group } from '@mantine/core';
+import { Drawer, Stack, Box, Text, NumberInput, Divider, MultiSelect, Select, Switch, Group, Button } from '@mantine/core';
 
 interface LessonSettingsDrawerProps {
     opened: boolean;
@@ -21,15 +21,20 @@ interface LessonSettingsDrawerProps {
     addFilesToMaterials: boolean;
     onToggleAddFiles: (val: boolean) => void;
     onOpenCategoryDrawer: () => void;
+    studentIds: string[];
+    onStudentsChange: (val: string[]) => void;
+    all_users: any[];
     t: (key: string) => string;
     common_t: (key: string) => string;
+    onSave: () => void;
+    is_saving: boolean;
 }
 
 export function LessonSettingsDrawer({
     opened, onClose, duration, onDurationChange, categoryIds, onCategoriesChange,
     all_categories, homeworkId, onHomeworkChange, all_homeworks, courseIds, onCoursesChange,
     all_courses, isCopyingDisabled, onToggleCopying, addFilesToMaterials, onToggleAddFiles,
-    onOpenCategoryDrawer, t, common_t
+    onOpenCategoryDrawer, studentIds, onStudentsChange, all_users, t, common_t, onSave, is_saving
 }: LessonSettingsDrawerProps) {
     return (
         <Drawer 
@@ -78,6 +83,17 @@ export function LessonSettingsDrawer({
 
                 <Divider />
 
+                <Box>
+                    <Text size="sm" fw={600} mb={8}>{t('editor.access_students')}</Text>
+                    <MultiSelect 
+                        data={all_users?.map(u => ({ value: u.id, label: u.name })) || []}
+                        value={studentIds} onChange={onStudentsChange} placeholder={t('editor.select_students')}
+                        searchable clearable
+                    />
+                </Box>
+
+                <Divider />
+
                 <Stack gap="lg">
                     <Box>
                         <Group justify="space-between" wrap="nowrap">
@@ -92,6 +108,18 @@ export function LessonSettingsDrawer({
                         </Group>
                     </Box>
                 </Stack>
+
+                <Button 
+                    fullWidth 
+                    color="primary" 
+                    onClick={onSave} 
+                    loading={is_saving}
+                    size="md"
+                    radius="md"
+                    mt="md"
+                >
+                    {common_t('save')}
+                </Button>
             </Stack>
         </Drawer>
     );

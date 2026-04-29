@@ -11,6 +11,7 @@ export const homework_schema = z.object({
   }).optional(),
   categories: z.array(z.any()).optional(),
   category_ids: z.array(z.string()).optional(),
+  can_retake: z.boolean().optional(),
   author_id: z.string(),
   super_admin_id: z.string(),
   submissions: z.array(z.any()).optional(),
@@ -25,6 +26,7 @@ export const create_homework_schema = z.object({
   lesson_id: z.string().nullable().optional(),
   content: z.array(z.any()).optional().default([]),
   category_ids: z.array(z.string()).optional().default([]),
+  can_retake: z.boolean().optional().default(false),
 });
 
 export type CreateHomeworkForm = z.infer<typeof create_homework_schema>;

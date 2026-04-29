@@ -73,6 +73,8 @@ export const test_schema = z.object({
   is_passed: z.boolean().optional(),
   last_attempt: z.any().nullable().optional(), 
   course_ids: z.array(z.string()).optional(),
+  can_retake: z.boolean().default(false),
+  accessible_student_ids: z.array(z.string()).optional().default([]),
 });
 
 export type TestMaterial = z.infer<typeof test_schema>;
@@ -87,6 +89,8 @@ export const create_test_schema = z.object({
   content: z.string(), // JSON stringified TestQuestion[]
   category_ids: z.array(z.string()).optional(),
   course_ids: z.array(z.string()).optional(),
+  can_retake: z.boolean().optional().default(false),
+  student_ids: z.array(z.string()).optional().default([]),
 });
 
 export type CreateTestForm = z.infer<typeof create_test_schema>;

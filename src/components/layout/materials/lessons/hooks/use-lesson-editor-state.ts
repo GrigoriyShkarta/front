@@ -18,6 +18,8 @@ import { useLessons } from '@/components/layout/materials/lessons/hooks/use-less
 import { BlockNoteEditorRef } from '../components/editor/block-note';
 import { CreateCategoryForm } from '@/components/layout/categories/schemas/category-schema';
 import { useBlockDragging } from './use-block-dragging';
+import { useUsersQuery } from '@/components/layout/users/hooks/use-users-query';
+
 
 export interface LessonBlock {
   id: string;
@@ -76,6 +78,9 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
   const [category_drawer_opened, setCategoryDrawerOpened] = useState(false);
   const [deleteHwModalOpened, setDeleteHwModalOpened] = useState(false);
 
+  const [studentIds, setStudentIds] = useState<string[]>([]);
+  const { users: all_users } = useUsersQuery({ role: 'student', limit: 1000 });
+
   const { course: context_course, is_loading: is_loading_context_course } = useCourse(course_id || '');
   const { lessons: all_lessons_context } = useLessons({ page: 1, limit: 1000, search: '' });
 
@@ -100,7 +105,7 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
         setCover(lesson.cover_url || null);
         setCoverPosition(lesson.cover_position || 50);
         setCategoryIds(lesson.categories?.map(c => c.id) || []);
-        setCourseIds(lesson.course_ids || []);
+        setCourseIds(lesson.course_ids || lesson.courses?.map((c: any) => c.id) || []);
         setDuration(lesson.duration || null);
         setIsCopyingDisabled(lesson.is_copying_disabled || false);
         setAddFilesToMaterials(lesson.add_files_to_materials ?? true);
@@ -130,6 +135,9 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
         }
         if (lesson.full_access !== undefined) {
             set_full_access(lesson.full_access);
+        }
+        if (lesson.accessible_student_ids) {
+            setStudentIds(lesson.accessible_student_ids);
         }
     }
   }, [lesson]);
@@ -192,7 +200,8 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
                     name: title,
                     content: Array.isArray(JSON.parse(hw_content)) ? JSON.parse(hw_content) : [],
                     lesson_id: id || null,
-                    category_ids: []
+                    category_ids: [],
+                    can_retake: false
                 });
                 currentHomeworkId = result.id;
                 setHomeworkId(currentHomeworkId);
@@ -220,6 +229,7 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
         is_copying_disabled: isCopyingDisabled,
         add_files_to_materials: addFilesToMaterials,
         homework_id: currentHomeworkId,
+        student_ids: studentIds,
         content: JSON.stringify(blocks.map((b, i) => ({
             id: b.id,
             content: b.content,
@@ -378,6 +388,6 @@ export function useLessonEditorState({ id, student_id, course_id, is_read_only, 
     handleMouseDown, handleMouseMove, handleMouseUp, addBlock, removeBlock, updateBlockContent,
     handleToggleBlockAccess, handleToggleFullAccess, openBank, handleMediaSelect, moveBlock,
     handle_category_create_submit, router, deleteHwModalOpened, setDeleteHwModalOpened,
-    is_dragging_block, set_is_dragging_block
+    is_dragging_block, set_is_dragging_block, studentIds, setStudentIds, all_users
   };
 }

@@ -19,7 +19,8 @@ import {
     IoAddOutline, 
     IoFilterOutline, 
     IoTrashOutline,
-    IoClipboardOutline
+    IoClipboardOutline,
+    IoPeopleOutline
 } from 'react-icons/io5';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -28,11 +29,13 @@ import { useAuth } from '@/hooks/use-auth';
 import { useTests } from '@/components/layout/materials/tests/hooks/use-tests';
 import { TestTable } from '@/components/layout/materials/tests/components/test-table';
 import { CategoryFilterDrawer } from '@/components/common/category-filter-drawer';
+import { GrantAccessModal } from '@/components/common/materials/grant-access-modal';
 import { cn } from '@/lib/utils';
 
 export default function TestsLayout() {
     const t = useTranslations('Materials.tests');
     const tNav = useTranslations('Navigation');
+    const tAccess = useTranslations('Materials.access');
     const common_t = useTranslations('Common');
     const { user } = useAuth();
     const is_student = user?.role === 'student';
@@ -43,6 +46,8 @@ export default function TestsLayout() {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
     const [categoryDrawerOpened, setCategoryDrawerOpened] = useState(false);
+    const [accessModalOpened, setAccessModalOpened] = useState(false);
+    const [idsToGrant, setIdsToGrant] = useState<string[]>([]);
 
     const { tests, meta, total_pages, is_loading, delete_test, bulk_delete_tests } = useTests({
         page,
@@ -97,6 +102,21 @@ export default function TestsLayout() {
                             </Box>
                         )}
                     </Button>
+
+                    {!is_student && selectedIds.length > 0 && (
+                        <Button 
+                            variant="light" 
+                            leftSection={<IoPeopleOutline size={18} />}
+                            onClick={() => {
+                                setIdsToGrant(selectedIds);
+                                setAccessModalOpened(true);
+                            }}
+                            size="md"
+                            radius="md"
+                        >
+                            {tAccess('grant_access')}
+                        </Button>
+                    )}
 
                     {!is_student && (
                         <Button 
@@ -170,6 +190,10 @@ export default function TestsLayout() {
                             delete_test(id);
                         }
                     }}
+                    on_grant_access={(id) => {
+                        setIdsToGrant([id]);
+                        setAccessModalOpened(true);
+                    }}
                     is_loading={is_loading}
                 />
 
@@ -221,6 +245,17 @@ export default function TestsLayout() {
                 onClose={() => setCategoryDrawerOpened(false)}
                 categoryIds={categoryFilters}
                 onCategoryIdsChange={setCategoryFilters}
+            />
+
+            <GrantAccessModal 
+                opened={accessModalOpened}
+                onClose={() => setAccessModalOpened(false)}
+                materialIds={idsToGrant}
+                materialType="test"
+                initialSelectedIds={tests
+                    .filter(t => idsToGrant.includes(t.id))
+                    .flatMap(t => (t as any).accessible_student_ids || [])
+                }
             />
         </Stack>
     );

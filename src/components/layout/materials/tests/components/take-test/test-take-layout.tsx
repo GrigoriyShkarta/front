@@ -74,6 +74,7 @@ export function TestTakeLayout({ test_id, course_id }: Props) {
     total_questions,
     result,
     start_test,
+    reset,
     set_answer,
     go_to_question,
     go_next,
@@ -117,8 +118,8 @@ export function TestTakeLayout({ test_id, course_id }: Props) {
     );
   }
 
-  // Show result screen if finished now OR if already has a completed attempt
-  if ((is_finished && result) || (test?.last_attempt && test.last_attempt.status !== 'in_progress')) {
+  // Show result screen if finished now OR if already has a completed attempt and retake is NOT allowed
+  if ((is_finished && result) || (!is_started && test?.last_attempt && test.last_attempt.status !== 'in_progress' && !test.can_retake)) {
     const display_attempt = (is_finished && result) ? result : test.last_attempt;
     
     return (
@@ -129,6 +130,10 @@ export function TestTakeLayout({ test_id, course_id }: Props) {
                         attempt={display_attempt}
                         questions={questions}
                         on_back={() => router.push(course_id ? `/main/materials/courses/${course_id}` : '/main/materials/tests')}
+                        test_id={test_id}
+                        can_retake={test.can_retake}
+                        course_id={course_id}
+                        on_retake={reset}
                     />
                 </Box>
                 
@@ -194,7 +199,7 @@ export function TestTakeLayout({ test_id, course_id }: Props) {
     <Box>
       {/* Start modal */}
       <TestStartModal
-        opened={show_start_modal && !is_started && !test.is_passed}
+        opened={show_start_modal && !is_started && (!test.is_passed || test.can_retake)}
         on_start={handle_start}
         on_close={() => router.push('/main/materials/tests')}
         test_name={test.name}

@@ -1,7 +1,7 @@
 'use client';
 
-import { Table, Checkbox, ActionIcon, Group, Text, Menu, rem, Badge } from '@mantine/core';
-import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoClipboardOutline } from 'react-icons/io5';
+import { Table, Checkbox, ActionIcon, Group, Text, Menu, rem, Badge, Stack } from '@mantine/core';
+import { IoEllipsisVertical, IoTrashOutline, IoPencilOutline, IoClipboardOutline, IoPeopleOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import dayjs from 'dayjs';
 import { useAuth } from '@/hooks/use-auth';
@@ -15,10 +15,13 @@ interface Props {
   is_loading?: boolean;
   on_selection_change: (ids: string[]) => void;
   on_delete: (id: string) => void;
+  on_grant_access: (id: string) => void;
 }
 
-export function TestTable({ data, selected_ids, on_selection_change, on_delete, is_loading }: Props) {
+export function TestTable({ data, selected_ids, on_selection_change, on_delete, on_grant_access, is_loading }: Props) {
   const t = useTranslations('Materials.tests.table');
+  const tMain = useTranslations('Materials.tests');
+  const tAccess = useTranslations('Materials.access');
   const common_t = useTranslations('Common');
   const tCat = useTranslations('Categories');
   const { user } = useAuth();
@@ -95,6 +98,12 @@ export function TestTable({ data, selected_ids, on_selection_change, on_delete, 
                           {common_t('edit')}
                         </Menu.Item>
                         <Menu.Item 
+                          leftSection={<IoPeopleOutline style={{ width: rem(14), height: rem(14) }} />}
+                          onClick={() => on_grant_access(item.id)}
+                        >
+                          {tAccess('grant_access')}
+                        </Menu.Item>
+                        <Menu.Item 
                           color="red"
                           leftSection={<IoTrashOutline style={{ width: rem(14), height: rem(14) }} />}
                           onClick={() => on_delete(item.id)}
@@ -111,12 +120,19 @@ export function TestTable({ data, selected_ids, on_selection_change, on_delete, 
                       size={20} 
                       className="text-secondary"
                     />
-                    <Link 
-                      href={`/main/materials/tests/${item.id}`}
-                      className="text-sm font-medium truncate max-w-[400px] hover:opacity-80 transition-opacity"
-                    >
-                      {item.name}
-                    </Link>
+                    <Stack gap={0} className="flex-1 min-w-0">
+                      <Link 
+                        href={`/main/materials/tests/${item.id}`}
+                        className="text-sm font-medium truncate max-w-[400px] hover:opacity-80 transition-opacity"
+                      >
+                        {item.name}
+                      </Link>
+                      {is_student && item.is_passed && (
+                        <Text size="10px" fw={700} tt="uppercase" c="emerald.5">
+                          {tMain('passed')}
+                        </Text>
+                      )}
+                    </Stack>
                   </Group>
                 </Table.Td>
                 <Table.Td>

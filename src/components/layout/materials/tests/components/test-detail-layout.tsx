@@ -110,6 +110,9 @@ export function TestDetailLayout({ test_id, course_id }: Props) {
                                 attempt={test.last_attempt} 
                                 questions={typeof test.content === 'string' ? JSON.parse(test.content) : test.content} 
                                 on_back={() => router.push(course_id ? `/main/materials/courses/${course_id}` : '/main/materials/tests')}
+                                test_id={test_id}
+                                can_retake={test.can_retake}
+                                course_id={course_id}
                             />
                         </Box>
                     ) : (

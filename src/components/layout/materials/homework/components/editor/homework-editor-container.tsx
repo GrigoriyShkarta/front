@@ -1,6 +1,6 @@
 'use client';
 
-import { Stack, Button, Group, Box, TextInput, Modal, LoadingOverlay, Title, Drawer, MultiSelect, Select, ActionIcon, Loader, Text } from '@mantine/core';
+import { Stack, Button, Group, Box, TextInput, Modal, LoadingOverlay, Title, Drawer, MultiSelect, Select, ActionIcon, Loader, Text, Switch } from '@mantine/core';
 import { IoAddOutline, IoChevronBackOutline, IoPencilOutline, IoOptionsOutline } from 'react-icons/io5';
 import { useState, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -48,6 +48,7 @@ export default function HomeworkEditorContainer({ id, is_read_only = false }: Pr
 
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [lessonId, setLessonId] = useState<string | null>(null);
+  const [canRetake, setCanRetake] = useState(false);
 
   const { categories: all_categories, create_category, create_categories, is_pending: is_cat_pending } = useCategories();
   const { lessons: all_lessons, is_loading: lessonsLoading } = useLessons({ page: 1, limit: 1000, search: '' });
@@ -59,6 +60,7 @@ export default function HomeworkEditorContainer({ id, is_read_only = false }: Pr
         setTitle(homework.name);
         setCategoryIds(homework.category_ids || []);
         setLessonId(homework.lesson_id || null);
+        setCanRetake(homework.can_retake || false);
 
         if (homework.content && Array.isArray(homework.content) && homework.content.length > 0) {
             const firstBlockContent = homework.content[0]?.content;
@@ -91,6 +93,7 @@ export default function HomeworkEditorContainer({ id, is_read_only = false }: Pr
         name: title,
         lesson_id: lessonId,
         category_ids: categoryIds,
+        can_retake: canRetake,
         content: contentStr ? [{ id: 'main', content: contentStr }] : []
     };
 
@@ -314,6 +317,14 @@ export default function HomeworkEditorContainer({ id, is_read_only = false }: Pr
                     <IoAddOutline size={22} />
                 </ActionIcon>
             </Group>
+
+            <Switch
+                label={t('form.can_retake')}
+                checked={canRetake}
+                onChange={(event) => setCanRetake(event.currentTarget.checked)}
+                size="md"
+                color="primary"
+            />
 
             <Button 
                 fullWidth 

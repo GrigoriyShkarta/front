@@ -1260,7 +1260,9 @@
         "show_sidebar": "Show course navigation",
         "hide_sidebar": "Hide course navigation",
         "course_navigation": "Course Navigation",
-        "your_progress": "Your Progress"
+        "your_progress": "Your Progress",
+        "access_students": "Student Access",
+        "select_students": "Select students"
       }
     },
     "tests": {
@@ -1290,12 +1292,17 @@
         "add_question": "Add Question",
         "points": "points",
         "point": "point",
+        "access_students": "Student Access",
+        "select_students": "Select students",
         "settings": {
           "title": "Test Settings",
           "passing_score": "Passing Score (%)",
           "time_limit": "Time Limit",
           "courses": "Add to Courses",
-          "select_courses": "Select courses to add"
+          "select_courses": "Select courses to add",
+          "can_retake": "Allow test retake",
+          "access_students": "Student Access",
+          "select_students": "Select students"
         },
         "question_placeholder": "Enter question text...",
         "option_placeholder": "Option text...",
@@ -1335,6 +1342,8 @@
       },
       "take": {
         "start_button": "Start Test",
+        "retake_button": "Retake Test",
+        "continue_button": "Continue Test",
         "begin": "Begin Test",
         "cancel": "Cancel",
         "minutes": "min",
@@ -1361,9 +1370,10 @@
           "max_score": "Max Score",
           "minutes": "min",
           "points": "points",
-          "begin": "Start Test",
+          "begin": "Begin Test",
+          "continue": "Continue Test",
           "cancel": "Cancel",
-          "time_warning": "Warning: The timer will start immediately after clicking 'Start Test'."
+          "time_warning": "Warning: The timer will start immediately after clicking 'Begin Test'."
         },
         "confirm_submit": {
           "title": "Finish Test?",

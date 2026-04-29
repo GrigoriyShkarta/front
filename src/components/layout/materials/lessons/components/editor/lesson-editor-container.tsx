@@ -87,6 +87,8 @@ export default function LessonEditorContainer({ id, is_read_only = false, course
             isCopyingDisabled={state.isCopyingDisabled} onToggleCopying={state.setIsCopyingDisabled}
             addFilesToMaterials={state.addFilesToMaterials} onToggleAddFiles={state.setAddFilesToMaterials}
             onOpenCategoryDrawer={() => state.setCategoryDrawerOpened(true)} t={state.t} common_t={state.common_t}
+            onSave={state.handleSave} is_saving={state.is_saving}
+            studentIds={state.studentIds} onStudentsChange={state.setStudentIds} all_users={state.all_users}
       />
 
       <LessonModals 

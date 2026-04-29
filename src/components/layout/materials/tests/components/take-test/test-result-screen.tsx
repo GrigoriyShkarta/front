@@ -21,6 +21,7 @@ import {
   IoChevronDownOutline,
   IoChevronUpOutline,
   IoHourglassOutline,
+  IoPlayOutline,
 } from 'react-icons/io5';
 import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
@@ -30,23 +31,38 @@ import { testAttemptActions } from '../../actions/test-attempt-actions';
 import { cn } from '@/lib/utils';
 import { TestAttempt, ATTEMPT_STATUSES, TestAnswer } from '../../schemas/test-attempt-schema';
 import { TestQuestion, QUESTION_TYPES } from '../../schemas/test-schema';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   attempt: TestAttempt;
   questions: TestQuestion[];
   on_back: () => void;
+  can_retake?: boolean;
+  test_id?: string;
+  course_id?: string;
+  on_retake?: () => void;
 }
 
 /**
  * Result screen shown after completing a test.
  * Shows score, pass/fail status, time, and optionally detailed answer breakdown.
  */
-export function TestResultScreen({ attempt, questions, on_back }: Props) {
+export function TestResultScreen({ attempt, questions, on_back, can_retake, test_id, course_id, on_retake }: Props) {
   const t = useTranslations('Materials.tests.results');
+  const tTake = useTranslations('Materials.tests.take');
+  const router = useRouter();
   const [show_details, set_show_details] = useState(false);
 
   const has_pending = attempt.status === ATTEMPT_STATUSES.PENDING_REVIEW;
   const is_passed = attempt.is_passed;
+
+  const handle_retake = () => {
+    if (on_retake) {
+      on_retake();
+    } else if (test_id) {
+      router.push(`/main/materials/tests/${test_id}/take${course_id ? `?courseId=${course_id}` : ''}`);
+    }
+  };
 
   const format_time = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -85,7 +101,7 @@ export function TestResultScreen({ attempt, questions, on_back }: Props) {
   const display_percentage = Math.round(raw_percentage);
 
   return (
-    <Stack gap="xl" maw={700} mx="auto" py="xl" className="animate-in fade-in zoom-in-95 duration-500">
+    <Stack gap="sm" maw={700} mx="auto" py="xl" className="animate-in fade-in zoom-in-95 duration-500">
       {/* Status badge */}
       <Stack align="center" gap="lg">
         <RingProgress
@@ -165,11 +181,19 @@ export function TestResultScreen({ attempt, questions, on_back }: Props) {
         )}
       </Collapse>
 
-      {/* <Group justify="center">
-        <Button variant="light" color="gray" onClick={on_back} radius="md" size="md">
-          {t('back_to_tests')}
-        </Button>
-      </Group> */}
+      {can_retake && (test_id || on_retake) && (
+        <Group justify="center" mt="xl">
+          <Button
+            onClick={handle_retake}
+            size="lg"
+            radius="xl"
+            leftSection={<IoPlayOutline size={22} />}
+            className="bg-primary hover:opacity-90 shadow-xl shadow-primary/20 transition-all hover:-translate-y-0.5"
+          >
+            {tTake('retake_button')}
+          </Button>
+        </Group>
+      )}
     </Stack>
   );
 }

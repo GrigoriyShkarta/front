@@ -14,6 +14,7 @@ import {
     MultiSelect,
     NumberInput,
     Divider,
+    Switch,
     rem
 } from '@mantine/core';
 import { 
@@ -36,6 +37,7 @@ import { CategoryDrawer as CreateCategoryDrawer } from '@/components/layout/cate
 import { CreateCategoryForm } from '@/components/layout/categories/schemas/category-schema';
 import { MediaPickerModal } from '@/components/layout/materials/lessons/components/media-picker-modal';
 import { useCourses } from '@/components/layout/materials/courses/hooks/use-courses';
+import { useUsersQuery } from '@/components/layout/users/hooks/use-users-query';
 
 interface Props {
     id?: string;
@@ -60,6 +62,8 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
   const [description, setDescription] = useState('');
   const [discardModalOpened, setDiscardModalOpened] = useState(false);
   const [additionalOpened, setAdditionalOpened] = useState(false);
+  const [canRetake, setCanRetake] = useState(false);
+  const [studentIds, setStudentIds] = useState<string[]>([]);
   
   // Settings
   const [passingScore, setPassingScore] = useState(0);
@@ -78,6 +82,9 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
   const [courseIds, setCourseIds] = useState<string[]>([]);
   const { courses: all_courses } = useCourses({ limit: 100 });
   
+  // Students
+  const { users: all_students } = useUsersQuery({ role: 'student', limit: 1000 });
+  
   // Bank modal state
   const [bankOpened, setBankOpened] = useState(false);
   const [bankType, setBankType] = useState<'image' | 'video' | 'audio' | 'file'>('image');
@@ -91,6 +98,8 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
         setPassingScore(test.settings.passing_score);
         setTimeLimit(test.settings.time_limit || null);
         setCourseIds(test.course_ids || []);
+        setCanRetake(test.can_retake || false);
+        setStudentIds(test.accessible_student_ids || []);
         
         if (test.content) {
             try {
@@ -216,7 +225,9 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
             time_limit: timeLimit
         },
         content: JSON.stringify(questions),
-        course_ids: courseIds
+        course_ids: courseIds,
+        can_retake: canRetake,
+        student_ids: studentIds
     };
 
     try {
@@ -476,6 +487,11 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
                     variant="filled"
                     placeholder="∞"
                 />
+                <Switch 
+                    label={t('editor.settings.can_retake')}
+                    checked={canRetake}
+                    onChange={(event) => setCanRetake(event.currentTarget.checked)}
+                />
             </Stack>
 
             <Group align="flex-end" gap={8} className="w-full">
@@ -511,6 +527,21 @@ export default function TestEditorContainer({ id, is_read_only = false }: Props)
                 clearable
                 variant="filled"
             />
+
+            <Divider />
+
+            <Stack gap="xs">
+                <Text size="sm" fw={600}>{t('editor.access_students')}</Text>
+                <MultiSelect 
+                    data={all_students.map(u => ({ value: u.id, label: u.name }))}
+                    value={studentIds}
+                    onChange={setStudentIds}
+                    placeholder={t('editor.select_students')}
+                    searchable
+                    clearable
+                    variant="filled"
+                />
+            </Stack>
 
             <Button 
                 fullWidth 

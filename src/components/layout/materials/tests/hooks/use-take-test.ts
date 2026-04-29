@@ -198,6 +198,16 @@ export function useTakeTest({ test_id, questions, time_limit }: UseTakeTestProps
 
     // Actions
     start_test,
+    reset: () => {
+        set_is_started(false);
+        set_is_finished(false);
+        set_attempt_id(null);
+        set_result(null);
+        set_answers(new Map());
+        set_current_index(0);
+        set_time_spent(0);
+        set_time_left(time_limit ? time_limit * 60 : null);
+    },
     set_answer,
     go_to_question,
     go_next,
