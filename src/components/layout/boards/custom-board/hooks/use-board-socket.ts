@@ -5,11 +5,16 @@ import { io, Socket } from 'socket.io-client';
 import Cookies from 'js-cookie';
 
 const backend_data_url = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
-// For sockets on Vercel, we MUST use direct connection to the backend, not the /api-proxy
-const backend_url = process.env.NEXT_PUBLIC_SOCKET_URL || 
-                    (backend_data_url.startsWith('http') 
-                      ? backend_data_url.replace('/api', '') 
-                      : (typeof window !== 'undefined' ? window.location.origin : ''));
+
+// Helper to get socket URL
+const get_socket_url = () => {
+    if (process.env.NEXT_PUBLIC_SOCKET_URL) return process.env.NEXT_PUBLIC_SOCKET_URL;
+    if (backend_data_url.startsWith('http')) return backend_data_url.replace('/api', '');
+    if (typeof window !== 'undefined') return window.location.origin;
+    return '';
+};
+
+const backend_url = get_socket_url();
 const socket_path = '/socket.io';
 
 export interface ActiveParticipant {
@@ -26,9 +31,23 @@ export function useBoardSocket(board_id: string, user: any) {
   const [cursors, set_cursors] = useState<Record<string, any>>({});
   const [following_user_id, set_following_user_id] = useState<string | null>(null);
 
+  const get_user_color = (id: string) => {
+    const colors = [
+      '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', 
+      '#3b82f6', '#06b6d4', '#10b981', '#84cc16'
+    ];
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   useEffect(() => {
     if (!board_id) return;
 
+    console.log('[Socket] Connecting to:', backend_url, 'path:', socket_path);
+    
     const socket = io(`${backend_url}/board`, {
       path: socket_path,
       withCredentials: true,
@@ -36,16 +55,24 @@ export function useBoardSocket(board_id: string, user: any) {
       query: { board_id },
       transports: ['websocket', 'polling'],
       reconnection: true,
+      reconnectionAttempts: 10,
     });
 
     socket_ref.current = socket;
 
     socket.on('connect', () => {
       set_is_connected(true);
-      console.log('[Socket] Connected');
+      console.log('[Socket] ✅ Connected to board:', board_id);
     });
 
-    socket.on('disconnect', () => set_is_connected(false));
+    socket.on('connect_error', (err) => {
+      console.error('[Socket] ❌ Connection error:', err.message);
+    });
+
+    socket.on('disconnect', (reason) => {
+      set_is_connected(false);
+      console.warn('[Socket] 🔌 Disconnected:', reason);
+    });
 
     socket.on('participants:list', (data) => {
       set_participants(data.participants || []);
@@ -67,22 +94,9 @@ export function useBoardSocket(board_id: string, user: any) {
         delete next[data.user_id];
         return next;
       });
-      if (following_user_id === data.user_id) set_following_user_id(null);
     });
 
-    const get_user_color = (id: string) => {
-      const colors = [
-        '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', 
-        '#3b82f6', '#06b6d4', '#10b981', '#84cc16'
-      ];
-      let hash = 0;
-      for (let i = 0; i < id.length; i++) {
-        hash = id.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      return colors[Math.abs(hash) % colors.length];
-    };
-
-    const handleCursor = (data: any) => {
+    socket.on('cursor:move', (data: any) => {
       const remote_id = data.user_id || data.id || data.socket_id;
       if (!remote_id || remote_id === user?.id) return;
       
@@ -99,30 +113,31 @@ export function useBoardSocket(board_id: string, user: any) {
           stroke_width: data.stroke_width || 4
         }
       }));
-    };
-
-    socket.on('cursor:move', handleCursor);
+    });
 
     return () => {
+      console.log('[Socket] Disconnecting...');
       socket.disconnect();
     };
-  }, [board_id, user?.id, following_user_id]);
+  }, [board_id, user?.id]); // REMOVED following_user_id from here!
 
   const emit_element_update = useCallback((elements: any[]) => {
-    socket_ref.current?.emit('element:update', { board_id, elements });
+    if (!socket_ref.current?.connected) return;
+    socket_ref.current.emit('element:update', { board_id, elements });
   }, [board_id]);
 
   const emit_element_create = useCallback((element: any) => {
-    socket_ref.current?.emit('element:create', { board_id, element });
+    if (!socket_ref.current?.connected) return;
+    socket_ref.current.emit('element:create', { board_id, element });
   }, [board_id]);
 
   const emit_element_delete = useCallback((ids: string[]) => {
-    socket_ref.current?.emit('element:delete', { board_id, ids });
+    if (!socket_ref.current?.connected) return;
+    socket_ref.current.emit('element:delete', { board_id, ids });
   }, [board_id]);
 
   const emit_cursor = useCallback((data: any) => {
     if (!socket_ref.current?.connected) return;
-
     socket_ref.current.emit('cursor:move', { 
         board_id, 
         user_id: user?.id,
@@ -138,7 +153,8 @@ export function useBoardSocket(board_id: string, user: any) {
   }, [board_id, user?.id, user?.name, user?.avatar]);
 
   const emit_board_settings = useCallback((settings: any) => {
-    socket_ref.current?.emit('board:settings_update', { board_id, settings });
+    if (!socket_ref.current?.connected) return;
+    socket_ref.current.emit('board:settings_update', { board_id, settings });
   }, [board_id]);
 
   return { 
