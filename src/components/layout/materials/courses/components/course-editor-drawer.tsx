@@ -106,7 +106,13 @@ export function CourseEditorDrawer({ opened, on_close, course, on_save, is_savin
                 const res = await lessonActions.create_lesson({ name: creation_name, course_ids: course?.id ? [course.id] : [] });
                 created_id = res.id;
             } else {
-                const res = await testActions.create_test({ name: creation_name, content: '[]', course_ids: course?.id ? [course.id] : [] });
+                const res = await testActions.create_test({ 
+                    name: creation_name, 
+                    content: '[]', 
+                    course_ids: course?.id ? [course.id] : [],
+                    can_retake: false,
+                    student_ids: []
+                });
                 created_id = res.id;
             }
 
