@@ -201,8 +201,7 @@ export function CallControlsBar({
             { 
               key: 'pip', 
               label: t('layout_pip'), 
-              icon: <BsPip size={16} />,
-              disabled: hasOngoingScreenShare
+              icon: <BsPip size={16} />
             },
             { key: 'speaker-left', label: t('layout_speaker_left'), icon: <BsLayoutSidebar size={16} /> },
             { key: 'speaker-right', label: t('layout_speaker_right'), icon: <BsLayoutSidebarReverse size={16} /> }
@@ -210,12 +209,10 @@ export function CallControlsBar({
             <Menu.Item
               key={item.key}
               onClick={() => onLayoutChange(item.key)}
-              disabled={item.disabled}
               leftSection={item.icon}
               style={{ 
                 backgroundColor: layout === item.key ? 'var(--space-primary)' : 'transparent',
                 color: layout === item.key ? 'var(--space-primary-text)' : 'var(--call-text)',
-                opacity: item.disabled ? 0.5 : 1,
                 transition: 'all 0.2s ease'
               }}
             >

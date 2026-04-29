@@ -131,21 +131,21 @@ function MyCallUI() {
 
   // Screen share layout management: auto-switch and restore
   const prevSharing = useRef(hasOngoingScreenShare);
+  const preShareLayout = useRef<CallLayoutType>(call_layout);
+
   useEffect(() => {
     // Case 1: Screen share STARTED
     if (!prevSharing.current && hasOngoingScreenShare) {
+      // Remember the current layout before switching
+      preShareLayout.current = call_layout;
       // Auto-switch to PiP mode when sharing starts
       set_call_layout('pip');
     }
 
     // Case 2: Screen share ENDED
     if (prevSharing.current && !hasOngoingScreenShare) {
-      // Restore layout based on fullscreen state
-      if (fullscreenEl) {
-        set_call_layout('pip');
-      } else {
-        set_call_layout('grid');
-      }
+      // Restore the layout that was active before sharing
+      set_call_layout(preShareLayout.current);
     }
 
     prevSharing.current = hasOngoingScreenShare;
