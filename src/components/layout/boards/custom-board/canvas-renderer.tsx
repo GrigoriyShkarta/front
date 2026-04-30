@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import DOMPurify from 'isomorphic-dompurify';
 
 import { BoardElement, TextElement, ImageElement, VideoElement, AudioElement, YoutubeElement, LinkElement, EmbedElement, FileElement, ArrowElement, ToolType, StrokeStyle } from './types';
 import { SelectionHandles } from './selection-handles';
@@ -274,7 +275,7 @@ export function CanvasRenderer({
                     e.stopPropagation();
                     on_element_double_click(e, el.id);
                   }} style={{ width: 'fit-content', minWidth: '100%', pointerEvents: tool === 'select' ? 'all' : 'none', cursor: tool === 'select' ? 'text' : 'default', color: c_color, fontSize: t.font_size, fontWeight: t.font_weight, fontStyle: t.font_style, textDecoration: decor.join(' ') || 'none', fontFamily: t.font_family, whiteSpace: 'pre-wrap', wordBreak: 'break-word', userSelect: 'none', marginTop: 0, lineHeight: 1.35 }} 
-                    dangerouslySetInnerHTML={{ __html: t.content }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t.content) }}
                   />
                 </foreignObject>
               );

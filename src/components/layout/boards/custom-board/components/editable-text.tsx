@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import { TextElement } from '../types';
 
 interface Props {
@@ -115,7 +116,7 @@ export function EditableText({ element, zoom, pan_x, pan_y, on_save, on_cancel, 
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
-        dangerouslySetInnerHTML={{ __html: initialContent }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(initialContent) }}
         style={{
           width: 'fit-content',
           minWidth: '50px',
