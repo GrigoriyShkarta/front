@@ -86,7 +86,7 @@ export const homeworkActions = {
   /**
    * Review and grade a homework submission
    */
-  review_submission: async (submission_id: string, data: { status: 'reviewed'; feedback?: string; score?: number }): Promise<any> => {
+  review_submission: async (submission_id: string, data: { status: 'reviewed'; feedback?: string; score?: number; can_retake?: boolean }): Promise<any> => {
     const response = await api.patch(`/materials/homeworks/submissions/${submission_id}/review`, data);
     return response.data;
   }

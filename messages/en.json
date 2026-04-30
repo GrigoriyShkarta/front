@@ -1688,12 +1688,15 @@
         "score_label": "Grade / Score",
         "teacher_review": "Teacher Review",
         "no_text_answer": "Student did not provide a text response.",
-        "unknown_student": "Unknown Student"
+        "unknown_student": "Unknown Student",
+        "can_retake_label": "Allow Retake",
+        "can_retake_hint": "Student will be able to submit the homework again"
       }
     },
     "picker_title_homework": "Select homework",
     "homeworks": "Homeworks",
     "submission": {
+      "resubmit_button": "Retake Homework",
       "submit_button": "Submit Homework",
       "submit_title": "Submit Your Homework",
       "placeholder": "Enter your answer or notes for the teacher...",

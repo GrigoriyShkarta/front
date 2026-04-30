@@ -1603,6 +1603,7 @@
         "actions": "Дії"
       },
       "submission": {
+        "resubmit_button": "Перездати ДЗ",
         "submit_button": "Здати домашнє завдання",
         "submit_title": "Здати вашу работу",
         "task_description": "Завдання до ДЗ",
@@ -1687,7 +1688,9 @@
         "score_label": "Оцінка / Бал",
         "teacher_review": "Перевірка викладача",
         "no_text_answer": "Учень не надав текстової відповіді.",
-        "unknown_student": "Невідомий учень"
+        "unknown_student": "Невідомий учень",
+        "can_retake_label": "Дозволити перездачу",
+        "can_retake_hint": "Учень зможе здати роботу повторно"
       }
     }
   },

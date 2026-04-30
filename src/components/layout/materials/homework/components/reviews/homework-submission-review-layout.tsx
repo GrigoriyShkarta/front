@@ -18,6 +18,7 @@ import {
   LoadingOverlay,
   Container,
   Anchor,
+  Switch,
 } from '@mantine/core';
 import { 
   IoArrowBack, 
@@ -52,6 +53,7 @@ export function HomeworkSubmissionReviewLayout({ id }: Props) {
   const format = useFormatter();
 
   const [feedback, set_feedback] = useState('');
+  const [can_retake, set_can_retake] = useState(false);
 
   const { data: submission, isLoading } = useQuery({
     queryKey: ['homework_submission', id],
@@ -61,11 +63,12 @@ export function HomeworkSubmissionReviewLayout({ id }: Props) {
   useEffect(() => {
     if (submission) {
       set_feedback(submission.feedback || '');
+      set_can_retake(submission.can_retake || false);
     }
   }, [submission]);
 
   const review_mutation = useMutation({
-    mutationFn: (data: { feedback: string }) => 
+    mutationFn: (data: { feedback: string, can_retake: boolean }) => 
       homeworkActions.review_submission(id, { status: 'reviewed', ...data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['homework_submissions_admin'] });
@@ -124,7 +127,7 @@ export function HomeworkSubmissionReviewLayout({ id }: Props) {
             leftSection={<IoSaveOutline size={18} />} 
             radius="md" 
             size="md"
-            onClick={() => review_mutation.mutate({ feedback })}
+            onClick={() => review_mutation.mutate({ feedback, can_retake })}
             loading={review_mutation.isPending}
             className="shadow-lg shadow-primary/20 transition-transform active:scale-95"
           >
@@ -285,6 +288,21 @@ export function HomeworkSubmissionReviewLayout({ id }: Props) {
                       radius="md"
                       className="w-full"
                     />
+
+                    <Divider className="border-white/10" />
+
+                    <Group justify="space-between" align="center" px="xs">
+                        <Stack gap={0}>
+                            <Text fw={700} size="sm">{t('can_retake_label') || 'Allow Retake'}</Text>
+                            <Text size="xs" c="dimmed">{t('can_retake_hint') || 'Student will be able to submit again'}</Text>
+                        </Stack>
+                        <Switch 
+                            checked={can_retake}
+                            onChange={(event) => set_can_retake(event.currentTarget.checked)}
+                            size="md"
+                            color="primary"
+                        />
+                    </Group>
                   </Stack>
 
                 </Stack>

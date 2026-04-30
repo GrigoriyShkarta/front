@@ -18,6 +18,7 @@ export interface HomeworkSubmission {
     feedback?: string;
     score?: number;
     created_at: string;
+    can_retake: boolean;
 }
 
 export const homeworkSubmissionActions = {

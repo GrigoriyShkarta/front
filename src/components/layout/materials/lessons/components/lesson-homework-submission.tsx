@@ -191,7 +191,7 @@ export function LessonHomeworkSubmission({ homework, homework_status, my_submiss
             </>
           )}
 
-          {homework.can_retake && (
+          {(homework.can_retake || my_submission.can_retake) && (
             <Group justify="center" mt="md">
               <Button 
                 variant="light" 
