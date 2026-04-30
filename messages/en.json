@@ -125,7 +125,7 @@
     "download": "Download",
     "per_page": "per page",
     "delete_selected": "Delete Selected",
-    "user_created_success": "User has been successfully created!",
+    "user_created_success": "User has been successfully created! Login and password have been sent to the specified email.",
     "user_created_error": "Failed to create user.",
     "user_updated_success": "User has been successfully updated!",
     "user_updated_error": "Failed to update user.",
@@ -244,6 +244,7 @@
     }
   },
   "Navigation": {
+    "storage": "Storage",
     "users": "Users Management",
     "profile": "My Profile",
     "personalization": "Personalization",
@@ -492,6 +493,7 @@
         "youtube_video": "YouTube Video",
         "delete_confirm": "Are you sure you want to delete this recording?",
         "recording_deleted": "Recording successfully deleted",
+        "deletion_date": "Deletion date:",
         "insert_link": "Insert link",
         "no_recording_yet": "No recording yet",
         "invalid_youtube_url": "Invalid YouTube URL",

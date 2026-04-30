@@ -125,7 +125,7 @@
     "download": "Завантажити",
     "per_page": "на сторінці",
     "delete_selected": "Видалити виділених",
-    "user_created_success": "Користувача успішно створено!",
+    "user_created_success": "Користувача успішно створено! Логін та пароль надіслано на вказану електронну пошту.",
     "user_created_error": "Не вдалося створити користувача.",
     "user_updated_success": "Дані користувача успішно оновлено!",
     "user_updated_error": "Не вдалося оновити дані користувача.",
@@ -245,6 +245,7 @@
     }
   },
   "Navigation": {
+    "storage": "Сховище",
     "users": "База користувачів",
     "profile": "Мій профіль",
     "personalization": "Персоналізація",
@@ -494,6 +495,7 @@
         "youtube_video": "Відео на YouTube",
         "delete_confirm": "Ви впевнені, що хочете видалити цей запис?",
         "recording_deleted": "Запис успішно видалено",
+        "deletion_date": "Дата видалення:",
         "insert_link": "Вставити посилання",
         "no_recording_yet": "Запису ще немає",
         "invalid_youtube_url": "Невірне посилання на YouTube",
